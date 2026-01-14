@@ -9,6 +9,8 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthModalProvider, useAuthModal } from './contexts/AuthModalContext';
 import CssBaseline from '@mui/material/CssBaseline';
 import ProtectedRoute from './components/ProtectedRoute';
+// Utilities
+import { startKeepAlive, stopKeepAlive } from './utils/keepAlive';
 
 // Page Components
 import HomePage from './pages/HomePage';
@@ -57,6 +59,16 @@ const RegisterRedirect = () => {
 };
 
 function App() {
+    // Initialize keep-alive mechanism to prevent server from spinning down
+    useEffect(() => {
+        startKeepAlive();
+
+        // Cleanup on unmount
+        return () => {
+            stopKeepAlive();
+        };
+    }, []);
+
     return (
         <ThemeProvider>
             <AuthModalProvider>
