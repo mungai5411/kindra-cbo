@@ -7,6 +7,9 @@ set -o errexit
 pip install --upgrade pip
 pip install -r requirements.txt
 
+# Create logs directory
+mkdir -p logs
+
 # Collect static files
 python manage.py collectstatic --no-input
 
