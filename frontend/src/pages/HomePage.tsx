@@ -82,10 +82,10 @@ export default function HomePage() {
     const statsData = dashboardData?.public || {};
 
     const STATS = [
-        { value: statsData.children_supported || '2', label: 'Children Supported', icon: <School />, color: '#6366f1' },
-        { value: statsData.families_helped || '8', label: 'Families Helped', icon: <FamilyRestroom />, color: '#14b8a6' },
-        { value: statsData.active_volunteers || '3', label: 'Active Volunteers', icon: <Groups />, color: '#f59e0b' },
-        { value: statsData.partner_organizations || '12', label: 'Partner Organizations', icon: <TrendingUp />, color: '#ec4899' },
+        { value: statsData.children_supported ?? 0, label: 'Children Supported', icon: <School />, color: '#6366f1' },
+        { value: statsData.families_helped ?? 0, label: 'Families Helped', icon: <FamilyRestroom />, color: '#14b8a6' },
+        { value: statsData.active_volunteers ?? 0, label: 'Active Volunteers', icon: <Groups />, color: '#f59e0b' },
+        { value: statsData.partner_organizations ?? 0, label: 'Partner Organizations', icon: <TrendingUp />, color: '#ec4899' },
     ];
 
     const { scrollY } = useScroll();
