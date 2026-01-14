@@ -313,7 +313,7 @@ SIMPLE_JWT = {
 # CORS CONFIGURATION
 # ==================================
 
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:5173', cast=Csv())
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:5173,https://kindra-cbo.vercel.app', cast=Csv())
 CORS_ALLOW_ALL_ORIGINS = True if DEBUG else False
 
 # Add dynamic network origins for development
@@ -425,7 +425,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # CSRF Protection
 CSRF_COOKIE_HTTPONLY = False  # Frontend needs to read this for API calls
 CSRF_COOKIE_SAMESITE = 'Lax'
-CSRF_TRUSTED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:5173', cast=Csv())
+CSRF_TRUSTED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:5173,https://kindra-cbo.vercel.app', cast=Csv())
 if DEBUG:
     # Allow local network IPs for CSRF as well in debug mode
     CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
