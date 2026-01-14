@@ -81,7 +81,7 @@ function App() {
 
                         {/* Protected routes */}
                         <Route
-                            path="/dashboard"
+                            path="/dashboard/:view?"
                             element={
                                 <ProtectedRoute>
                                     <DashboardPage />

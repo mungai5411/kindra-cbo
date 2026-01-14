@@ -155,24 +155,24 @@ else:
 # ==================================
 # Auto-detect: Use Redis for production, local memory for development
 
-if config('REDIS_URL', default=''):
-    # Production: Use Redis
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': config('REDIS_URL'),
-        }
+# if config('REDIS_URL', default=''):
+#     CACHES = {
+#         "default": {
+#             "BACKEND": "django_redis.cache.RedisCache",
+#             "LOCATION": config('REDIS_URL'),
+#             "OPTIONS": {
+#                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#             }
+#         }
+#     }
+# else:
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
     }
-    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-else:
-    # Development: Use local memory
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'unique-snowflake',
-        }
-    }
-    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+}
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Session configuration
 SESSION_CACHE_ALIAS = 'default'

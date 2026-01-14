@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     Box,
     Drawer,
@@ -68,12 +68,20 @@ export default function DashboardPage() {
     const navigate = useNavigate();
     const theme = useTheme();
     const deviceType = useDeviceType();
-    // const { toggleColorMode } = useColorMode(); // Removed
     const { user, isAuthenticated, isLoading: authLoading } = useSelector((state: RootState) => state.auth);
+
+    // URL Parsing for Active Tab
+    const { view } = useParams<{ view?: string }>();
+    const activeTab = view || 'overview';
 
     // UI State
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('overview');
+
+    // Helper to change tab via URL
+    const handleTabChange = (newTab: string) => {
+        navigate(`/dashboard/${newTab}`);
+    };
+
     const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({
         blog_campaigns: true,
         case_management: false,
@@ -171,7 +179,7 @@ export default function DashboardPage() {
             dispatch(fetchProfile());
         } else if (user && !canViewModule(activeTab)) {
             // Redirect to overview if user tries to access restricted tab
-            setActiveTab('overview');
+            navigate('/dashboard/overview');
         }
     }, [isAuthenticated, user, dispatch, navigate, authLoading, activeTab]);
 
@@ -223,9 +231,9 @@ export default function DashboardPage() {
         const viewMap: { [key: string]: React.ReactNode } = {
             'overview': (
                 <Overview
-                    setActiveTab={setActiveTab}
+                    setActiveTab={handleTabChange}
                     setOpenDonationDialog={(campaign) => {
-                        setActiveTab('donations');
+                        handleTabChange('donations');
                         // We'll use a window event to trigger the donation dialog in DonationsView
                         setTimeout(() => {
                             window.dispatchEvent(new CustomEvent('open-donation-dialog', { detail: campaign }));
@@ -241,13 +249,13 @@ export default function DashboardPage() {
             'trainings': <VolunteersView setOpenDialog={setOpenVolunteerDialog} activeTab={activeTab} />,
             'volunteer_groups': <VolunteerGroupsView />,
 
-            'donations': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={setActiveTab} />,
-            'campaigns': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={setActiveTab} />,
-            'donation_records': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={setActiveTab} />,
-            'donors': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={setActiveTab} />,
-            'receipts': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={setActiveTab} />,
-            'social_media': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={setActiveTab} />,
-            'material_donations': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={setActiveTab} />,
+            'donations': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'campaigns': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'donation_records': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'donors': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'receipts': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'social_media': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'material_donations': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
 
             'case_management': <CasesView activeTab={activeTab} />,
             'cases': <CasesView activeTab={activeTab} />,
@@ -285,7 +293,7 @@ export default function DashboardPage() {
             'settings': <SystemAdminView />,
         };
 
-        return viewMap[activeTab] || <PlaceholderView title={activeTab.replace('_', ' ').toUpperCase()} setActiveTab={setActiveTab} />;
+        return viewMap[activeTab] || <PlaceholderView title={activeTab.replace('_', ' ').toUpperCase()} setActiveTab={handleTabChange} />;
     };
 
     if (authLoading || (isAuthenticated && !user)) {
@@ -330,7 +338,7 @@ export default function DashboardPage() {
                     >
                         <Sidebar
                             activeTab={activeTab}
-                            setActiveTab={setActiveTab}
+                            setActiveTab={handleTabChange}
                             openSections={openSections}
                             handleSectionToggle={handleSectionToggle}
                             canViewModule={canViewModule}
@@ -355,7 +363,7 @@ export default function DashboardPage() {
                         <Toolbar />
                         <Sidebar
                             activeTab={activeTab}
-                            setActiveTab={setActiveTab}
+                            setActiveTab={handleTabChange}
                             openSections={openSections}
                             handleSectionToggle={handleSectionToggle}
                             canViewModule={canViewModule}
@@ -380,7 +388,7 @@ export default function DashboardPage() {
             {isMobile && (
                 <MobileBottomNav
                     activeTab={activeTab}
-                    setActiveTab={setActiveTab}
+                    setActiveTab={handleTabChange}
                     canViewModule={canViewModule}
                 />
             )}
