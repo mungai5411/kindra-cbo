@@ -78,7 +78,6 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_celery_beat',
     'django_celery_results',
-    'storages',
     'django_extensions',  # For HTTPS development server
     
     # Kindra CBO Apps
