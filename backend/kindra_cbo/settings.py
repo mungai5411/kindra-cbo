@@ -77,7 +77,12 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_spectacular',
     'django_celery_beat',
+    'django_celery_beat',
     'django_celery_results',
+    
+    # Cloudinary Storage
+    'cloudinary_storage',
+    'cloudinary',
     
     # Kindra CBO Apps
     'accounts.apps.AccountsConfig',
