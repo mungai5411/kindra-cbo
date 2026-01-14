@@ -322,6 +322,10 @@ if DEBUG and LOCAL_IP != '127.0.0.1':
     CORS_ALLOWED_ORIGINS.append(f'http://{LOCAL_IP}:3000')
     CORS_ALLOWED_ORIGINS.append(f'http://{LOCAL_IP}:5173')
 
+# Force add production frontend domain (ensures it works even if env vars override defaults)
+if 'https://kindra-cbo.vercel.app' not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append('https://kindra-cbo.vercel.app')
+
 CORS_ALLOW_CREDENTIALS = True
 
 # ==================================
@@ -432,6 +436,10 @@ if DEBUG:
     if LOCAL_IP != '127.0.0.1':
         CSRF_TRUSTED_ORIGINS.append(f"http://{LOCAL_IP}:3000")
         CSRF_TRUSTED_ORIGINS.append(f"http://{LOCAL_IP}:8000")
+
+# Force add production frontend domain
+if 'https://kindra-cbo.vercel.app' not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append('https://kindra-cbo.vercel.app')
 
 # ==================================
 # LOGGING CONFIGURATION
