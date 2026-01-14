@@ -1,0 +1,149 @@
+"""
+Shelter Home Views
+"""
+
+from rest_framework import generics, permissions, status, parsers
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
+from django.utils import timezone
+from .models import (
+    ShelterHome, Placement, Resource, StaffCredential, 
+    ResourceRequest, IncidentReport
+)
+from .serializers import (
+    ShelterHomeSerializer, PlacementSerializer, ResourceSerializer, 
+    StaffCredentialSerializer, ResourceRequestSerializer, IncidentReportSerializer
+)
+from accounts.models import User, Notification
+
+
+class ShelterHomeListCreateView(generics.ListCreateAPIView):
+    serializer_class = ShelterHomeSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]  # For file uploads
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['county', 'is_active', 'approval_status']
+    
+    def get_queryset(self):
+        """Filter shelters based on user role"""
+        user = self.request.user
+        if not user or not user.is_authenticated:
+            # Guest users only see approved shelters
+            return ShelterHome.objects.filter(approval_status='APPROVED').prefetch_related('photos')
+            
+        if user.is_superuser or user.role in ['ADMIN', 'MANAGEMENT']:
+            # Admins see all shelters
+            return ShelterHome.objects.all().prefetch_related('photos')
+        elif user.role == 'SHELTER_PARTNER':
+            # Partners only see their own shelter
+            return ShelterHome.objects.filter(partner_user=user).prefetch_related('photos')
+        # Other authenticated users only see approved shelters
+        return ShelterHome.objects.filter(approval_status='APPROVED').prefetch_related('photos')
+    
+    def perform_create(self, serializer):
+        """New shelters start as PENDING"""
+        shelter = serializer.save(partner_user=self.request.user)
+        
+        # Notify admins about new shelter registration
+        admins = User.objects.filter(role__in=['ADMIN', 'MANAGEMENT'])
+        for admin in admins:
+            Notification.objects.create(
+                recipient=admin,
+                title="New Shelter Registration",
+                message=f"A new shelter '{shelter.name}' has been registered and is pending review.",
+                type=Notification.Type.INFO,
+                category=Notification.Category.SHELTER,
+                link=f"/dashboard/shelters/{shelter.id}",
+                metadata={
+                    'shelter_id': str(shelter.id),
+                    'action': 'review_registration'
+                }
+            )
+
+
+class ShelterHomeDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ShelterHome.objects.all()
+    serializer_class = ShelterHomeSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class PlacementListCreateView(generics.ListCreateAPIView):
+    serializer_class = PlacementSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['shelter_home', 'child', 'status']
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser or user.role in ['ADMIN', 'MANAGEMENT', 'CASE_WORKER']:
+            return Placement.objects.all()
+        elif user.role == 'SHELTER_PARTNER':
+            return Placement.objects.filter(shelter_home__partner_user=user)
+        return Placement.objects.none()
+
+
+class PlacementDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Placement.objects.all()
+    serializer_class = PlacementSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class ResourceListCreateView(generics.ListCreateAPIView):
+    queryset = Resource.objects.all()
+    serializer_class = ResourceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['shelter_home', 'resource_type', 'is_available']
+
+
+class ResourceDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Resource.objects.all()
+    serializer_class = ResourceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class StaffCredentialListCreateView(generics.ListCreateAPIView):
+    queryset = StaffCredential.objects.all()
+    serializer_class = StaffCredentialSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['shelter_home', 'is_verified', 'is_active']
+
+
+class StaffCredentialDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = StaffCredential.objects.all()
+    serializer_class = StaffCredentialSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class ResourceRequestListCreateView(generics.ListCreateAPIView):
+    serializer_class = ResourceRequestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['shelter_home', 'item_category', 'priority', 'status']
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser or user.role in ['ADMIN', 'MANAGEMENT']:
+            return ResourceRequest.objects.all()
+        return ResourceRequest.objects.filter(shelter_home__partner_user=user)
+
+    def perform_create(self, serializer):
+        serializer.save(requested_by=self.request.user)
+
+
+class IncidentReportListCreateView(generics.ListCreateAPIView):
+    serializer_class = IncidentReportSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['shelter_home', 'severity', 'status']
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser or user.role in ['ADMIN', 'MANAGEMENT']:
+            return IncidentReport.objects.all()
+        return IncidentReport.objects.filter(shelter_home__partner_user=user)
+
+    def perform_create(self, serializer):
+        serializer.save(reported_by=self.request.user)

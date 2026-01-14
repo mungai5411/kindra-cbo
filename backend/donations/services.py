@@ -1,0 +1,286 @@
+"""
+Donation Services
+Business logic for donation processing, separated from views
+"""
+
+import uuid
+import logging
+from django.utils import timezone
+from django.db import transaction
+from .models import Donor, Campaign, Donation, Receipt, MaterialDonation
+from accounts.models import User, Notification, AuditLog
+
+logger = logging.getLogger('kindra_cbo')
+
+
+class DonationService:
+    """
+    Service class for donation-related business logic
+    """
+    
+    @staticmethod
+    @transaction.atomic
+    def finalize_donation(donation):
+        """
+        Finalize a successful donation
+        Updates campaign, donor, creates receipt, and sends notifications
+        
+        Args:
+            donation: Donation instance
+            
+        Returns:
+            Receipt instance
+        """
+        try:
+            # Update donation status
+            donation.status = Donation.Status.COMPLETED
+            donation.save()
+            
+            # Update campaign raised amount
+            if donation.campaign:
+                donation.campaign.raised_amount += donation.amount
+                donation.campaign.save()
+                logger.info(f"Updated campaign {donation.campaign.id} raised amount by {donation.amount}")
+            
+            # Update donor total
+            if donation.donor:
+                donation.donor.total_donated += donation.amount
+                donation.donor.save()
+                logger.info(f"Updated donor {donation.donor.id} total donated by {donation.amount}")
+            
+            # Create receipt
+            receipt = Receipt.objects.create(
+                donation=donation,
+                receipt_number=f"REC-{uuid.uuid4().hex[:8].upper()}",
+                tax_year=timezone.now().year
+            )
+            logger.info(f"Created receipt {receipt.receipt_number} for donation {donation.id}")
+            
+            # Send notifications
+            NotificationService.notify_donation_completed(donation)
+            
+            return receipt
+            
+        except Exception as e:
+            logger.error(f"Error finalizing donation {donation.id}: {str(e)}")
+            raise
+    
+    @staticmethod
+    def create_donation(data, user=None):
+        """
+        Create a new donation with validation
+        
+        Args:
+            data: Dictionary with donation data
+            user: Optional user making the donation
+            
+        Returns:
+            Donation instance
+        """
+        # Link to donor if user has a donor profile
+        donor = None
+        if user and hasattr(user, 'donor_profile'):
+            donor = user.donor_profile
+        
+        donation = Donation.objects.create(
+            amount=data.get('amount'),
+            payment_method=data.get('payment_method'),
+            transaction_id=data.get('transaction_id'),
+            donor=donor,
+            donor_name=data.get('donor_name', ''),
+            donor_email=data.get('donor_email', ''),
+            is_anonymous=data.get('is_anonymous', False),
+            message=data.get('message', ''),
+            campaign_id=data.get('campaign'),
+            status=data.get('status', Donation.Status.PENDING)
+        )
+        
+        logger.info(f"Created donation {donation.id} for amount {donation.amount}")
+        return donation
+
+
+class PaymentService:
+    """
+    Service class for payment processing
+    """
+    
+    @staticmethod
+    def process_mpesa_payment(data):
+        """
+        Process M-Pesa payment
+        
+        Args:
+            data: Payment data dictionary
+            
+        Returns:
+            Donation instance
+        """
+        # Validate required fields
+        if not data.get('amount') or not data.get('phone_number'):
+            raise ValueError('Amount and phone number are required')
+        
+        # Create donation in PENDING status
+        donation = DonationService.create_donation({
+            'amount': data.get('amount'),
+            'payment_method': Donation.PaymentMethod.MPESA,
+            'transaction_id': f"MPESA-{uuid.uuid4().hex[:10].upper()}",
+            'donor_name': data.get('donor_name', 'M-Pesa Donor'),
+            'donor_email': data.get('donor_email', ''),
+            'is_anonymous': data.get('is_anonymous', False),
+            'message': data.get('message', ''),
+            'campaign': data.get('campaign'),
+            'status': Donation.Status.PENDING
+        })
+        
+        # Notify admins
+        NotificationService.notify_pending_donation(donation, f"M-Pesa from {data.get('phone_number')}")
+        
+        logger.info(f"Processed M-Pesa payment: {donation.transaction_id}")
+        return donation
+    
+    @staticmethod
+    def process_paypal_payment(data):
+        """
+        Process PayPal payment
+        
+        Args:
+            data: Payment data dictionary
+            
+        Returns:
+            Donation instance
+        """
+        if not data.get('amount') or not data.get('order_id'):
+            raise ValueError('Amount and order ID are required')
+        
+        donation = DonationService.create_donation({
+            'amount': data.get('amount'),
+            'payment_method': Donation.PaymentMethod.PAYPAL,
+            'transaction_id': data.get('order_id'),
+            'donor_name': data.get('donor_name', 'PayPal Donor'),
+            'donor_email': data.get('donor_email', ''),
+            'is_anonymous': data.get('is_anonymous', False),
+            'message': data.get('message', ''),
+            'campaign': data.get('campaign'),
+            'status': Donation.Status.COMPLETED
+        })
+        
+        # Auto-finalize PayPal donations
+        DonationService.finalize_donation(donation)
+        
+        logger.info(f"Processed PayPal payment: {donation.transaction_id}")
+        return donation
+    
+    @staticmethod
+    def process_stripe_payment(data):
+        """
+        Process Stripe payment
+        
+        Args:
+            data: Payment data dictionary
+            
+        Returns:
+            Donation instance
+        """
+        if not data.get('amount') or not data.get('token'):
+            raise ValueError('Amount and token are required')
+        
+        donation = DonationService.create_donation({
+            'amount': data.get('amount'),
+            'payment_method': Donation.PaymentMethod.STRIPE,
+            'transaction_id': f"STRIPE-{uuid.uuid4().hex[:10].upper()}",
+            'donor_name': data.get('donor_name', 'Stripe Donor'),
+            'donor_email': data.get('donor_email', ''),
+            'is_anonymous': data.get('is_anonymous', False),
+            'message': data.get('message', ''),
+            'campaign': data.get('campaign'),
+            'status': Donation.Status.COMPLETED
+        })
+        
+        # Auto-finalize Stripe donations
+        DonationService.finalize_donation(donation)
+        
+        logger.info(f"Processed Stripe payment: {donation.transaction_id}")
+        return donation
+
+
+class NotificationService:
+    """
+    Service class for sending notifications
+    """
+    
+    @staticmethod
+    def notify_donation_completed(donation):
+        """
+        Send notifications when a donation is completed
+        
+        Args:
+            donation: Donation instance
+        """
+        # Notify admins
+        admins = User.objects.filter(role__in=['ADMIN', 'MANAGEMENT'])
+        for admin in admins:
+            Notification.objects.create(
+                recipient=admin,
+                title="Donation Received",
+                message=f"A donation of KES {donation.amount} has been completed for '{donation.campaign.title if donation.campaign else 'General Fund'}'.",
+                type=Notification.Type.SUCCESS,
+                category=Notification.Category.DONATION,
+                link=f"/dashboard/donations/{donation.id}"
+            )
+        
+        # Notify donor if they have a user account
+        if donation.donor and donation.donor.user:
+            Notification.objects.create(
+                recipient=donation.donor.user,
+                title="Thank You for Your Donation!",
+                message=f"Your donation of KES {donation.amount} to '{donation.campaign.title if donation.campaign else 'Kindra CBO'}' has been processed. Thank you for your support!",
+                type=Notification.Type.SUCCESS,
+                category=Notification.Category.DONATION,
+                link="/dashboard/donations/history"
+            )
+        
+        logger.info(f"Sent donation completion notifications for donation {donation.id}")
+    
+    @staticmethod
+    def notify_pending_donation(donation, source_info):
+        """
+        Send notifications for pending donations
+        
+        Args:
+            donation: Donation instance
+            source_info: String describing payment source
+        """
+        admins = User.objects.filter(role__in=['ADMIN', 'MANAGEMENT'])
+        for admin in admins:
+            Notification.objects.create(
+                recipient=admin,
+                title="Pending Donation",
+                message=f"A donation of KES {donation.amount} from {source_info} is pending approval.",
+                type=Notification.Type.INFO,
+                category=Notification.Category.DONATION,
+                link=f"/dashboard/donations/{donation.id}"
+            )
+        
+        logger.info(f"Sent pending donation notifications for donation {donation.id}")
+    
+    @staticmethod
+    def notify_material_donation(material_donation, user):
+        """
+        Send notifications for material donation requests
+        
+        Args:
+            material_donation: MaterialDonation instance
+            user: User who created the request
+        """
+        admins = User.objects.filter(role__in=['ADMIN', 'MANAGEMENT'])
+        for admin in admins:
+            Notification.objects.create(
+                recipient=admin,
+                title="New Material Donation Request",
+                message=f"A new request for {material_donation.category} donation has been submitted by {user.get_full_name()}.",
+                type=Notification.Type.INFO,
+                category=Notification.Category.DONATION,
+                link=f"/dashboard/donations/materials/{material_donation.id}"
+            )
+        
+        logger.info(f"Sent material donation notifications for {material_donation.id}")

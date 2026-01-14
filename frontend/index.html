@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Kindra CBO Management System - NGO management platform for child welfare services" />
+  <meta name="theme-color" content="#667eea" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Kindra CBO Management System</title>
+  <style>
+    #initial-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #f8fafc;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(102, 126, 234, 0.1);
+      border-radius: 50%;
+      border-top-color: #667eea;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+
+    #loading-text {
+      color: #64748b;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.025em;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root">
+    <div id="initial-loader">
+      <div class="spinner"></div>
+      <div id="loading-text">Initializing Kindra system...</div>
+    </div>
+  </div>
+
+  <script>
+    const messages = [
+      "Initializing Kindra system...",
+      "Loading community data...",
+      "Optimizing for your device...",
+      "Almost there, preparing your dashboard...",
+      "Securing your connection..."
+    ];
+    let msgIndex = 0;
+    const textElement = document.getElementById('loading-text');
+    const loader = document.getElementById('initial-loader');
+
+    const messageInterval = setInterval(() => {
+      // If loader is gone or transparent, stop interval
+      if (!loader || loader.style.opacity === '0' || getComputedStyle(loader).display === 'none') {
+        clearInterval(messageInterval);
+        return;
+      }
+
+      textElement.style.opacity = 0;
+      setTimeout(() => {
+        msgIndex = (msgIndex + 1) % messages.length;
+        textElement.innerText = messages[msgIndex];
+        textElement.style.opacity = 1;
+      }, 300);
+    }, 2500);
+
+    // Ensure loader is removed when app re-renders or on a timeout as a fail-safe
+    // But React usually handles this by replacing the content of #root.
+    // However, if we put the loader INSIDE #root, it will be replaced.
+  </script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>
