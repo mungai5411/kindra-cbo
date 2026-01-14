@@ -163,7 +163,7 @@ if config('REDIS_URL', default=''):
             'LOCATION': config('REDIS_URL'),
         }
     }
-    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 else:
     # Development: Use local memory
     CACHES = {
