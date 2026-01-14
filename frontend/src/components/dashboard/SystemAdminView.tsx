@@ -419,7 +419,9 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                 </Box>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <Typography variant="caption" fontWeight="bold" sx={{ opacity: 0.6 }}>JOINED</Typography>
-                                    <Typography variant="caption" fontWeight="bold">{new Date(u.date_joined).toLocaleDateString()}</Typography>
+                                    <Typography variant="caption" fontWeight="bold">
+                                        {u.date_joined ? new Date(u.date_joined).toLocaleDateString() : 'N/A'}
+                                    </Typography>
                                 </Box>
                             </Box>
 
