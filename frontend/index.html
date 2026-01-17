@@ -52,32 +52,17 @@
       }
     }
 
-    /* Force Chatbot to Bottom-Right with Robust Selector */
-    [id^="JotformAgent-"] {
-      position: fixed !important;
+    /* Typebot Style Overrides */
+    .typebot-bubble-button {
       bottom: 20px !important;
       right: 20px !important;
-      left: auto !important;
-      top: auto !important;
-      z-index: 9999 !important;
-      max-width: 350px !important;
-      /* Smaller on desktop */
-      max-height: 500px !important;
-      /* Smaller on desktop */
     }
 
     @media (max-width: 600px) {
-      [id^="JotformAgent-"] {
+      .typebot-bubble-button {
         bottom: 100px !important;
-        /* increased to 100px to clear nav bar */
+        /* Clear the navigation bar */
         right: 20px !important;
-        left: auto !important;
-        max-width: 80vw !important;
-        /* even smaller on mobile */
-        max-height: 50vh !important;
-        /* even shorter on mobile */
-        border-radius: 12px !important;
-        overflow: hidden !important;
       }
     }
   </style>
@@ -104,7 +89,6 @@
     const loader = document.getElementById('initial-loader');
 
     const messageInterval = setInterval(() => {
-      // If loader is gone or transparent, stop interval
       if (!loader || loader.style.opacity === '0' || getComputedStyle(loader).display === 'none') {
         clearInterval(messageInterval);
         return;
@@ -120,78 +104,24 @@
   </script>
   <script type="module" src="/src/main.tsx"></script>
 
-  <!-- JotForm AI Agent -->
-  <script src='https://cdn.jotfor.ms/agent/embedjs/019bc811b1a279fbbe89b21e0da33a423c31/embed.js'></script>
+  <!-- Typebot AI Agent (Minimal & Professional) -->
+  <script type="module">
+    import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0.3/dist/web.js'
 
-  <script>
-    // Custom logic to handle "click outside to close" and "mobile draggability"
-    (function () {
-      let agentRoot = null;
-      let isDragging = false;
-      let startX, startY, initialRight, initialBottom;
-
-      function initTouch() {
-        agentRoot = document.querySelector('[id^="JotformAgent-"]');
-        if (!agentRoot) return;
-
-        agentRoot.addEventListener('touchstart', function (e) {
-          // If the chat is open (heuristic height > 150), don't drag the whole container
-          if (agentRoot.getBoundingClientRect().height > 150) return;
-
-          isDragging = true;
-          const touch = e.touches[0];
-          startX = touch.clientX;
-          startY = touch.clientY;
-
-          const rect = agentRoot.getBoundingClientRect();
-          initialRight = window.innerWidth - rect.right;
-          initialBottom = window.innerHeight - rect.bottom;
-
-          // Prevent scroll while dragging
-          // e.preventDefault(); 
-        }, { passive: true });
-
-        document.addEventListener('touchmove', function (e) {
-          if (!isDragging) return;
-
-          const touch = e.touches[0];
-          const deltaX = startX - touch.clientX;
-          const deltaY = startY - touch.clientY;
-
-          agentRoot.style.right = (initialRight + deltaX) + 'px';
-          agentRoot.style.bottom = (initialBottom + deltaY) + 'px';
-          agentRoot.style.left = 'auto'; // Ensure right takes precedence
-          agentRoot.style.top = 'auto';
-        }, { passive: true });
-
-        document.addEventListener('touchend', function () {
-          isDragging = false;
-        }, { passive: true });
-      }
-
-      // Re-check periodically if the agent is injected
-      const checkInterval = setInterval(() => {
-        if (document.querySelector('[id^="JotformAgent-"]')) {
-          initTouch();
-          clearInterval(checkInterval);
+    Typebot.initBubble({
+      typebot: "kindra-cbo-ai-v1", // Note: USER needs to set their actual typebot ID here
+      theme: {
+        button: {
+          backgroundColor: "#0066C3",
+          size: "medium",
+        },
+        chatWindow: {
+          backgroundColor: "#ffffff",
+          maxWidth: "350px",
+          maxHeight: "500px",
         }
-      }, 1000);
-
-      document.addEventListener('click', function (e) {
-        agentRoot = document.querySelector('[id^="JotformAgent-"]');
-        if (!agentRoot) return;
-
-        if (agentRoot.contains(e.target)) return;
-
-        const rect = agentRoot.getBoundingClientRect();
-        if (rect.height > 150) {
-          const toggleBtn = agentRoot.querySelector('button');
-          if (toggleBtn) {
-            toggleBtn.click();
-          }
-        }
-      });
-    })();
+      },
+    });
   </script>
 </body>
 
