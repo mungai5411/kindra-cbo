@@ -118,21 +118,67 @@
   <script src='https://cdn.jotfor.ms/agent/embedjs/019bc811b1a279fbbe89b21e0da33a423c31/embed.js'></script>
 
   <script>
-    // Custom logic to handle "click outside to close"
+    // Custom logic to handle "click outside to close" and "mobile draggability"
     (function () {
-      document.addEventListener('click', function (e) {
-        // Find the agent root container (id starts with JotformAgent-)
-        const agentRoot = document.querySelector('[id^="JotformAgent-"]');
+      let agentRoot = null;
+      let isDragging = false;
+      let startX, startY, initialRight, initialBottom;
+
+      function initTouch() {
+        agentRoot = document.querySelector('[id^="JotformAgent-"]');
         if (!agentRoot) return;
 
-        // If the click is inside the agent container, do nothing
+        agentRoot.addEventListener('touchstart', function (e) {
+          // If the chat is open (heuristic height > 150), don't drag the whole container
+          if (agentRoot.getBoundingClientRect().height > 150) return;
+
+          isDragging = true;
+          const touch = e.touches[0];
+          startX = touch.clientX;
+          startY = touch.clientY;
+
+          const rect = agentRoot.getBoundingClientRect();
+          initialRight = window.innerWidth - rect.right;
+          initialBottom = window.innerHeight - rect.bottom;
+
+          // Prevent scroll while dragging
+          // e.preventDefault(); 
+        }, { passive: true });
+
+        document.addEventListener('touchmove', function (e) {
+          if (!isDragging) return;
+
+          const touch = e.touches[0];
+          const deltaX = startX - touch.clientX;
+          const deltaY = startY - touch.clientY;
+
+          agentRoot.style.right = (initialRight + deltaX) + 'px';
+          agentRoot.style.bottom = (initialBottom + deltaY) + 'px';
+          agentRoot.style.left = 'auto'; // Ensure right takes precedence
+          agentRoot.style.top = 'auto';
+        }, { passive: true });
+
+        document.addEventListener('touchend', function () {
+          isDragging = false;
+        }, { passive: true });
+      }
+
+      // Re-check periodically if the agent is injected
+      const checkInterval = setInterval(() => {
+        if (document.querySelector('[id^="JotformAgent-"]')) {
+          initTouch();
+          clearInterval(checkInterval);
+        }
+      }, 1000);
+
+      document.addEventListener('click', function (e) {
+        agentRoot = document.querySelector('[id^="JotformAgent-"]');
+        if (!agentRoot) return;
+
         if (agentRoot.contains(e.target)) return;
 
-        // Check if the agent is "open" based on its size (heuristic)
-        // An open chat is larger than the launcher icon.
         const rect = agentRoot.getBoundingClientRect();
         if (rect.height > 150) {
-          // Attempt to find the toggle/launcher button to close it
           const toggleBtn = agentRoot.querySelector('button');
           if (toggleBtn) {
             toggleBtn.click();
