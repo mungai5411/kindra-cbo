@@ -149,7 +149,16 @@ export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionTo
                 <Typography variant="h6" fontWeight="bold" sx={{ color: theme.palette.text.primary }}>Kindra CBO</Typography>
             </Box>
 
-            <List sx={{ flexGrow: 1, px: 2, py: 1 }}>
+            <List sx={{
+                flexGrow: 1,
+                px: 2,
+                py: 1,
+                overflowY: 'auto',
+                '&::-webkit-scrollbar': { width: '4px' },
+                '&::-webkit-scrollbar-track': { background: 'transparent' },
+                '&::-webkit-scrollbar-thumb': { background: alpha(theme.palette.divider, 0.1), borderRadius: '4px' },
+                '&:hover::-webkit-scrollbar-thumb': { background: alpha(theme.palette.divider, 0.2) }
+            }}>
                 {(NAVIGATION as NavigationItem[]).filter(item => canViewModule(item.id)).map((item) => {
                     const hasChildren = item.children && item.children.length > 0;
                     const visibleChildren = item.children?.filter(child => {

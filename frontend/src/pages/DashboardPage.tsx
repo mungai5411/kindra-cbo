@@ -336,16 +336,20 @@ export default function DashboardPage() {
                             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: DRAWER_WIDTH },
                         }}
                     >
-                        <Sidebar
-                            activeTab={activeTab}
-                            setActiveTab={handleTabChange}
-                            openSections={openSections}
-                            handleSectionToggle={handleSectionToggle}
-                            canViewModule={canViewModule}
-                        />
-                        <Divider />
-                        <Box sx={{ p: 2 }}>
-                            <Button fullWidth variant="outlined" color="error" onClick={handleLogoutClick}>Logout</Button>
+                        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
+                                <Sidebar
+                                    activeTab={activeTab}
+                                    setActiveTab={handleTabChange}
+                                    openSections={openSections}
+                                    handleSectionToggle={handleSectionToggle}
+                                    canViewModule={canViewModule}
+                                />
+                            </Box>
+                            <Divider />
+                            <Box sx={{ p: 2, flexShrink: 0, bgcolor: 'background.paper' }}>
+                                <Button fullWidth variant="outlined" color="error" onClick={handleLogoutClick}>Logout</Button>
+                            </Box>
                         </Box>
                     </Drawer>
                 )}

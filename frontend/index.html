@@ -5,8 +5,7 @@
   <meta charset="UTF-8" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="Kindra CBO - Empowering Lives, Building Futures." />
+  <meta name="description" content="Kindra CBO - Empowering Lives, Building Futures." />
   <meta name="theme-color" content="#667eea" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,7 +95,44 @@
   </script>
   <script type="module" src="/src/main.tsx"></script>
   <!-- JotForm AI Agent -->
-  <script src='https://cdn.jotfor.ms/agent/embedjs/019bc811b1a279fbbe89b21e0da33a423c31/embed.js'></script>
+  <script>
+    (function () {
+      var script = document.createElement('script');
+      script.src = "https://www.jotform.com/s/umd/00294e3ed83/for-embedded-agent.js";
+      script.async = true;
+      script.onload = function () {
+        window.AgentInitializer.init({
+          agentRenderURL: "https://www.jotform.com/agent/019bc811b1a279fbbe89b21e0da33a423c31",
+          rootId: "JotformAgent-019bc811b1a279fbbe89b21e0da33a423c31",
+          formID: "019bc811b1a279fbbe89b21e0da33a423c31",
+          contextID: "019bca02c20e737cb6a2f9d7d7af8c000154",
+          initialContext: "",
+          queryParams: ["skipWelcome=1", "maximizable=1"],
+          domain: "https://www.jotform.com",
+          isDraggable: true,
+          background: "linear-gradient(180deg, #6C73A8 0%, #6C73A8 100%)",
+          buttonBackgroundColor: "#0066C3",
+          buttonIconColor: "#FFFFFF",
+          inputTextColor: "#01105C",
+          variant: false,
+          customizations: {
+            "greeting": "Yes",
+            "greetingMessage": "Hi! How can I assist you?",
+            "openByDefault": "No",
+            "pulse": "Yes",
+            "position": "right",
+            "autoOpenChatIn": "0", // Disable auto open
+            "layout": "compact",
+            "size": "medium", // Reduced from sg/lg
+            "placeholder": "Ask Kindra AI"
+          },
+          isVoice: false,
+          isVoiceWebCallEnabled: false
+        });
+      };
+      document.head.appendChild(script);
+    })();
+  </script>
 </body>
 
 </html>
