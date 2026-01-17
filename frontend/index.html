@@ -67,6 +67,11 @@
         bottom: 15px !important;
         right: 15px !important;
         max-width: 90vw !important;
+        max-height: 60vh !important;
+        /* Limit height on mobile */
+        border-radius: 12px !important;
+        /* Slightly rounded corners */
+        overflow: hidden !important;
       }
     }
   </style>
@@ -139,9 +144,9 @@
             "openByDefault": "No",
             "pulse": "Yes",
             "position": "right",
-            "autoOpenChatIn": "0", // Disable auto open
-            "layout": "compact",
-            "size": "medium", // Reduced from sg/lg
+            "autoOpenChatIn": "0",
+            "layout": "minimal", // Changed to minimal
+            "size": "small", // Changed to small
             "placeholder": "Ask Kindra AI"
           },
           isVoice: false,
