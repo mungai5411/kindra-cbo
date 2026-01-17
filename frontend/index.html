@@ -51,6 +51,24 @@
         transform: rotate(360deg);
       }
     }
+
+    /* Force Chatbot to Bottom-Right */
+    #JotformAgent-019bc811b1a279fbbe89b21e0da33a423c31 {
+      position: fixed !important;
+      bottom: 20px !important;
+      right: 20px !important;
+      left: auto !important;
+      top: auto !important;
+      z-index: 9999 !important;
+    }
+
+    @media (max-width: 600px) {
+      #JotformAgent-019bc811b1a279fbbe89b21e0da33a423c31 {
+        bottom: 15px !important;
+        right: 15px !important;
+        max-width: 90vw !important;
+      }
+    }
   </style>
 </head>
 
