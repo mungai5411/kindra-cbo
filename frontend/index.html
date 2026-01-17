@@ -65,7 +65,7 @@
     @media (max-width: 600px) {
       [id^="JotformAgent-"] {
         bottom: 100px !important;
-        /* increased to 100px to be safe */
+        /* increased to 100px to clear nav bar */
         right: 20px !important;
         left: auto !important;
         max-width: 90vw !important;
@@ -111,64 +111,28 @@
         textElement.style.opacity = 1;
       }, 300);
     }, 2500);
-
-    // Ensure loader is removed when app re-renders or on a timeout as a fail-safe
-    // But React usually handles this by replacing the content of #root.
-    // However, if we put the loader INSIDE #root, it will be replaced.
   </script>
   <script type="module" src="/src/main.tsx"></script>
-  <!-- JotForm AI Agent -->
-  <script>
-    (function () {
-      var script = document.createElement('script');
-      script.src = "https://www.jotform.com/s/umd/00294e3ed83/for-embedded-agent.js";
-      script.async = true;
-      script.onload = function () {
-        window.AgentInitializer.init({
-          agentRenderURL: "https://www.jotform.com/agent/019bc811b1a279fbbe89b21e0da33a423c31",
-          rootId: "JotformAgent-019bc811b1a279fbbe89b21e0da33a423c31",
-          formID: "019bc811b1a279fbbe89b21e0da33a423c31",
-          contextID: "019bca02c20e737cb6a2f9d7d7af8c000154",
-          initialContext: "",
-          queryParams: ["skipWelcome=1", "maximizable=1"],
-          domain: "https://www.jotform.com",
-          isDraggable: true,
-          background: "linear-gradient(180deg, #6C73A8 0%, #6C73A8 100%)",
-          buttonBackgroundColor: "#0066C3",
-          buttonIconColor: "#FFFFFF",
-          inputTextColor: "#01105C",
-          variant: false,
-          customizations: {
-            "greeting": "Yes",
-            "greetingMessage": "Hi! How can I assist you?",
-            "openByDefault": "No",
-            "pulse": "Yes",
-            "position": "right",
-            "autoOpenChatIn": "0",
-            "layout": "minimal", // Changed to minimal
-            "size": "small", // Changed to small
-            "placeholder": "Ask Kindra AI"
-          },
-          isVoice: false,
-          isVoiceWebCallEnabled: false
-        });
-      };
-      document.head.appendChild(script);
 
-      // Click outside to close implementation
+  <!-- JotForm AI Agent -->
+  <script src='https://cdn.jotfor.ms/agent/embedjs/019bc811b1a279fbbe89b21e0da33a423c31/embed.js'></script>
+
+  <script>
+    // Custom logic to handle "click outside to close"
+    (function () {
       document.addEventListener('click', function (e) {
-        const agentRoot = document.getElementById('JotformAgent-019bc811b1a279fbbe89b21e0da33a423c31');
+        // Find the agent root container (id starts with JotformAgent-)
+        const agentRoot = document.querySelector('[id^="JotformAgent-"]');
         if (!agentRoot) return;
 
         // If the click is inside the agent container, do nothing
         if (agentRoot.contains(e.target)) return;
 
         // Check if the agent is "open" based on its size (heuristic)
-        // A closed launcher is small (e.g., < 100px height), an open chat is larger.
+        // An open chat is larger than the launcher icon.
         const rect = agentRoot.getBoundingClientRect();
         if (rect.height > 150) {
           // Attempt to find the toggle/launcher button to close it
-          // We look for a button element inside the root.
           const toggleBtn = agentRoot.querySelector('button');
           if (toggleBtn) {
             toggleBtn.click();
