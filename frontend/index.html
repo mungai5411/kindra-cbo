@@ -60,6 +60,10 @@
       left: auto !important;
       top: auto !important;
       z-index: 9999 !important;
+      max-width: 350px !important;
+      /* Smaller on desktop */
+      max-height: 500px !important;
+      /* Smaller on desktop */
     }
 
     @media (max-width: 600px) {
@@ -68,8 +72,10 @@
         /* increased to 100px to clear nav bar */
         right: 20px !important;
         left: auto !important;
-        max-width: 90vw !important;
-        max-height: 60vh !important;
+        max-width: 80vw !important;
+        /* even smaller on mobile */
+        max-height: 50vh !important;
+        /* even shorter on mobile */
         border-radius: 12px !important;
         overflow: hidden !important;
       }
