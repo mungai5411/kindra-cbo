@@ -131,6 +131,27 @@
         });
       };
       document.head.appendChild(script);
+
+      // Click outside to close implementation
+      document.addEventListener('click', function (e) {
+        const agentRoot = document.getElementById('JotformAgent-019bc811b1a279fbbe89b21e0da33a423c31');
+        if (!agentRoot) return;
+
+        // If the click is inside the agent container, do nothing
+        if (agentRoot.contains(e.target)) return;
+
+        // Check if the agent is "open" based on its size (heuristic)
+        // A closed launcher is small (e.g., < 100px height), an open chat is larger.
+        const rect = agentRoot.getBoundingClientRect();
+        if (rect.height > 150) {
+          // Attempt to find the toggle/launcher button to close it
+          // We look for a button element inside the root.
+          const toggleBtn = agentRoot.querySelector('button');
+          if (toggleBtn) {
+            toggleBtn.click();
+          }
+        }
+      });
     })();
   </script>
 </body>
