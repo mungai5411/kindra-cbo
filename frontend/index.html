@@ -52,8 +52,8 @@
       }
     }
 
-    /* Force Chatbot to Bottom-Right */
-    #JotformAgent-019bc811b1a279fbbe89b21e0da33a423c31 {
+    /* Force Chatbot to Bottom-Right with Robust Selector */
+    [id^="JotformAgent-"] {
       position: fixed !important;
       bottom: 20px !important;
       right: 20px !important;
@@ -63,9 +63,9 @@
     }
 
     @media (max-width: 600px) {
-      #JotformAgent-019bc811b1a279fbbe89b21e0da33a423c31 {
-        bottom: 90px !important;
-        /* Move up to clear Bottom Navigation */
+      [id^="JotformAgent-"] {
+        bottom: 100px !important;
+        /* increased to 100px to be safe */
         right: 20px !important;
         left: auto !important;
         max-width: 90vw !important;
