@@ -138,9 +138,13 @@ let baseTheme = createTheme({
         MuiCssBaseline: {
             styleOverrides: {
                 body: {
-                    fontSize: '0.875rem',
+                    fontSize: '0.9375rem', // Slightly larger base for easier view
+                    lineHeight: 1.6,
+                    '@media (max-width:1200px)': {
+                        fontSize: '0.875rem',
+                    },
                     '@media (max-width:600px)': {
-                        fontSize: '0.8125rem', // Smaller on mobile
+                        fontSize: '0.8125rem',
                     },
                 },
             },
