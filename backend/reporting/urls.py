@@ -30,9 +30,9 @@ urlpatterns = [
     path('kpis/', KPIListCreateView.as_view(), name='kpi-list'),
     path('kpis/<uuid:pk>/', KPIDetailView.as_view(), name='kpi-detail'),
     
-    # Analytics
-    path('analytics/events/', AnalyticsEventListView.as_view(), name='analytics-events'),
-    path('analytics/aggregation/', AnalyticsAggregationView.as_view(), name='analytics-aggregation'),
+    # Activity/Audit Trail (renamed from analytics to avoid adblockers)
+    path('activity/events/', AnalyticsEventListView.as_view(), name='analytics-events'),
+    path('activity/aggregation/', AnalyticsAggregationView.as_view(), name='analytics-aggregation'),
     
     # Compliance
     path('compliance/', ComplianceReportListCreateView.as_view(), name='compliance-list'),

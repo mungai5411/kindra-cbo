@@ -206,6 +206,6 @@ export const endpoints = {
         dashboard: '/reports/dashboard/',
         reports: '/reports/reports/',
         kpis: '/reports/kpis/',
-        analytics: '/reports/analytics/',
+        analytics: '/reports/activity/',
     },
 };

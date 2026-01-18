@@ -41,7 +41,7 @@ export const fetchAuditLogs = createAsyncThunk(
     'admin/fetchAuditLogs',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await apiClient.get('/reporting/analytics/events/');
+            const response = await apiClient.get('/reporting/activity/events/');
             return response.data.results || response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch audit logs');
