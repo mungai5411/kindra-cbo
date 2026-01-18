@@ -484,97 +484,158 @@ export default function HomePage() {
                 </Container>
             </Box>
 
-            {/* Integrated CTA & FAQ Section */}
-            <Box sx={{ py: 8, bgcolor: alpha(theme.palette.divider, 0.02) }}>
-                <Container maxWidth="lg">
-                    <Grid container spacing={6} alignItems="center">
-                        {/* Left Side: Transform Lives Today CTA */}
-                        <Grid item xs={12} md={5}>
-                            <Card sx={{
-                                borderRadius: 6,
-                                p: { xs: 4, md: 5 },
-                                textAlign: 'left',
-                                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                                color: 'white',
-                                boxShadow: '0 24px 48px rgba(99, 102, 241, 0.3)',
-                                position: 'relative',
-                                overflow: 'hidden',
-                                height: '100%',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center'
-                            }}>
-                                <Box sx={{ position: 'absolute', top: -50, right: -50, width: 150, height: 150, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.1)' }} />
-                                <Box sx={{ position: 'absolute', bottom: -50, left: -50, width: 120, height: 120, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.1)' }} />
+            {/* Premium Integrated CTA & FAQ Section */}
+            <Box
+                sx={{
+                    py: { xs: 8, md: 12 },
+                    position: 'relative',
+                    background: `radial-gradient(circle at 10% 10%, ${alpha(theme.palette.primary.light, 0.08)} 0%, transparent 40%),
+                                radial-gradient(circle at 90% 90%, ${alpha(theme.palette.secondary.light, 0.05)} 0%, transparent 40%),
+                                ${alpha(theme.palette.background.default, 0.5)}`,
+                    overflow: 'hidden'
+                }}
+            >
+                {/* Decorative background element */}
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '120%',
+                    height: '120%',
+                    opacity: 0.03,
+                    zIndex: 0,
+                    pointerEvents: 'none',
+                    backgroundImage: `radial-gradient(${theme.palette.primary.main} 1px, transparent 1px)`,
+                    backgroundSize: '40px 40px'
+                }} />
 
-                                <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, color: 'common.white', fontSize: { xs: '2rem', md: '2.5rem' } }}>
-                                    Transform <br /> Lives Today
-                                </Typography>
-                                <Typography variant="body1" sx={{ mb: 4, opacity: 0.95, color: 'common.white', lineHeight: 1.6 }}>
-                                    Your support directly impacts vulnerable children and families. Every contribution brings hope and opportunity.
-                                </Typography>
-                                <Button
-                                    variant="outlined"
-                                    size="large"
-                                    component={Link}
-                                    to="/register"
-                                    sx={{
-                                        borderColor: 'white',
-                                        color: 'white',
-                                        alignSelf: 'flex-start',
-                                        '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' },
-                                        px: 4,
-                                        py: 1.5,
-                                        borderRadius: '12px',
-                                        fontWeight: 800,
-                                        borderWidth: '2px'
-                                    }}
-                                >
-                                    Start Volunteering
-                                </Button>
-                            </Card>
+                <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+                    <Grid container spacing={{ xs: 4, md: 8 }} alignItems="center">
+                        {/* Left Side: Premium CTA Card */}
+                        <Grid item xs={12} md={5}>
+                            <MotionBox
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8 }}
+                            >
+                                <Card sx={{
+                                    borderRadius: '32px',
+                                    p: { xs: 4, md: 6 },
+                                    textAlign: 'left',
+                                    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 50%, ${alpha(theme.palette.secondary.dark, 0.8)} 100%)`,
+                                    color: 'white',
+                                    boxShadow: `0 32px 64px -12px ${alpha(theme.palette.primary.main, 0.4)}`,
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    border: '1px solid rgba(255,255,255,0.1)'
+                                }}>
+                                    <Box sx={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.08)', filter: 'blur(20px)' }} />
+                                    <Box sx={{ position: 'absolute', bottom: -60, left: -60, width: 180, height: 180, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.05)', filter: 'blur(30px)' }} />
+
+                                    <MotionTypography
+                                        variant="h2"
+                                        sx={{
+                                            fontWeight: 900,
+                                            mb: 2,
+                                            color: 'common.white',
+                                            fontSize: { xs: '2.2rem', md: '2.8rem' },
+                                            lineHeight: 1.1,
+                                            letterSpacing: '-0.04em'
+                                        }}
+                                    >
+                                        Transform <br /> Lives Today
+                                    </MotionTypography>
+                                    <Typography variant="body1" sx={{ mb: 4, opacity: 0.9, color: 'common.white', lineHeight: 1.7, fontSize: '1.05rem', fontWeight: 500 }}>
+                                        Join our mission to empower vulnerable children. Every contribution brings tangible hope and sustainable opportunity.
+                                    </Typography>
+                                    <Button
+                                        variant="contained"
+                                        size="large"
+                                        component={Link}
+                                        to="/register"
+                                        sx={{
+                                            bgcolor: 'white',
+                                            color: 'primary.main',
+                                            alignSelf: 'flex-start',
+                                            '&:hover': { bgcolor: alpha('#fff', 0.9), transform: 'translateY(-3px)' },
+                                            px: 5,
+                                            py: 2,
+                                            borderRadius: '16px',
+                                            fontWeight: 800,
+                                            fontSize: '1rem',
+                                            boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
+                                        }}
+                                    >
+                                        Start Volunteering
+                                    </Button>
+                                </Card>
+                            </MotionBox>
                         </Grid>
 
-                        {/* Right Side: FAQ Accordions */}
+                        {/* Right Side: Glassmorphic FAQs */}
                         <Grid item xs={12} md={7}>
-                            <Box sx={{ mb: 3 }}>
-                                <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: 2 }}>QUESTIONS?</Typography>
-                                <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>Common Inquiries</Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    Quick help for our community members.
-                                </Typography>
-                            </Box>
+                            <MotionBox
+                                initial={{ opacity: 0, x: 30 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8, delay: 0.2 }}
+                            >
+                                <Box sx={{ mb: 4 }}>
+                                    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
+                                        <Box sx={{ width: 40, height: 3, bgcolor: 'secondary.main', borderRadius: 2 }} />
+                                        <Typography variant="overline" sx={{ color: 'secondary.main', fontWeight: 800, letterSpacing: 3 }}>DISCOVER MORE</Typography>
+                                    </Stack>
+                                    <Typography variant="h3" sx={{ fontWeight: 900, mb: 1.5, letterSpacing: '-0.02em' }}>Common Inquiries</Typography>
+                                    <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
+                                        Quick answers to help you navigate our services.
+                                    </Typography>
+                                </Box>
 
-                            <Box>
-                                {FAQS.map((faq, index) => (
-                                    <Accordion
-                                        key={index}
-                                        sx={{
-                                            mb: 1.5,
-                                            borderRadius: '12px !important',
-                                            '&:before': { display: 'none' },
-                                            boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-                                            border: '1px solid',
-                                            borderColor: alpha(theme.palette.divider, 0.08),
-                                        }}
-                                        elevation={0}
-                                    >
-                                        <AccordionSummary
-                                            expandIcon={<ExpandMore color="primary" />}
-                                            sx={{ px: 2.5 }}
+                                <Box>
+                                    {FAQS.map((faq, index) => (
+                                        <Accordion
+                                            key={index}
+                                            sx={{
+                                                mb: 2,
+                                                borderRadius: '20px !important',
+                                                '&:before': { display: 'none' },
+                                                background: 'rgba(255, 255, 255, 0.7)',
+                                                backdropFilter: 'blur(10px)',
+                                                border: '1px solid',
+                                                borderColor: 'rgba(255, 255, 255, 0.3)',
+                                                boxShadow: '0 8px 32px -4px rgba(0,0,0,0.05)',
+                                                transition: 'all 0.3s ease',
+                                                '&:hover': {
+                                                    borderColor: alpha(theme.palette.secondary.main, 0.3),
+                                                    transform: 'translateX(8px)',
+                                                    background: 'rgba(255, 255, 255, 0.9)',
+                                                }
+                                            }}
+                                            elevation={0}
                                         >
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                                                {faq.question}
-                                            </Typography>
-                                        </AccordionSummary>
-                                        <AccordionDetails sx={{ px: 2.5, pb: 2, pt: 0 }}>
-                                            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                                                {faq.answer}
-                                            </Typography>
-                                        </AccordionDetails>
-                                    </Accordion>
-                                ))}
-                            </Box>
+                                            <AccordionSummary
+                                                expandIcon={<ExpandMore color="secondary" sx={{ fontSize: '1.4rem' }} />}
+                                                sx={{
+                                                    px: 3,
+                                                    py: 0.5,
+                                                    '& .MuiAccordionSummary-content': { my: 1.5 }
+                                                }}
+                                            >
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.95rem' }}>
+                                                    {faq.question}
+                                                </Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails sx={{ px: 3, pb: 3, pt: 0 }}>
+                                                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7, fontSize: '0.9rem', fontWeight: 500 }}>
+                                                    {faq.answer}
+                                                </Typography>
+                                            </AccordionDetails>
+                                        </Accordion>
+                                    ))}
+                                </Box>
+                            </MotionBox>
                         </Grid>
                     </Grid>
                 </Container>
