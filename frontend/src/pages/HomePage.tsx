@@ -225,11 +225,11 @@ export default function HomePage() {
                                             border: '2px solid white',
                                             ml: -1.5
                                         }}>
-                                            +50
+                                            +{statsData.active_volunteers ?? 0}
                                         </Box>
                                     </Box>
                                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                        <Box component="span" sx={{ color: 'primary.main' }}>50+ Active Volunteers</Box> joined this month
+                                        <Box component="span" sx={{ color: 'primary.main' }}>{statsData.active_volunteers ?? 0} Active Volunteers</Box> join our cause
                                     </Typography>
                                 </Stack>
                             </MotionBox>

@@ -352,17 +352,25 @@ class PublicStatsView(APIView):
     permission_classes = [permissions.AllowAny]
     
     def get(self, request):
-        # Import models
+        """
+        Public aggregated stats for homepage - ensure sync with real data
+        """
+        # Import models inside method to avoid circular imports
         from case_management.models import Family, Child
         from volunteers.models import Volunteer
-        from donations.models import Campaign
-        from reporting.models import Dashboard 
+        from shelter_homes.models import ShelterHome
+        from donations.models import Donor
         
+        # Calculate partner organizations: Active shelters + Corporate/Org donors
+        shelter_partners = ShelterHome.objects.filter(is_active=True).count()
+        org_donors = Donor.objects.exclude(donor_type='INDIVIDUAL').count()
+        partner_orgs_count = shelter_partners + org_donors
+
         data = {
             'children_supported': Child.objects.filter(is_active=True).count(),
             'families_helped': Family.objects.filter(is_active=True).count(),
             'active_volunteers': Volunteer.objects.filter(status='ACTIVE').count(),
-            'partner_organizations': 12, # Still partially hardcoded or could count Donation organizations if available
+            'partner_organizations': partner_orgs_count,
         }
         
         return Response(data)
