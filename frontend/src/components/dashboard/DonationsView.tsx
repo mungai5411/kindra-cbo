@@ -697,11 +697,14 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                         size="small"
                         variant="outlined"
                         sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
-                        onClick={() => {
-                            const baseUrl = window.location.origin.includes('localhost') ? 'http://localhost:8000' : '';
-                            const exportUrl = `${baseUrl}/api/v1/reporting/reports/?format=CSV&report_type=DONATIONS`;
-                            window.open(exportUrl, '_blank');
-                            setSnackbar({ open: true, message: 'Generating donations report...', severity: 'info' });
+                        onClick={async () => {
+                            try {
+                                const exportUrl = `/reporting/reports/?format=CSV&report_type=DONATIONS`;
+                                await downloadFile(exportUrl, 'donations_report.csv');
+                                setSnackbar({ open: true, message: 'Donations report downloaded successfully.', severity: 'success' });
+                            } catch (err) {
+                                setSnackbar({ open: true, message: 'Failed to download report. Please try again.', severity: 'error' });
+                            }
                         }}
                     >
                         Export CSV
@@ -950,9 +953,13 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                     size="small"
                                     color="primary"
                                     startIcon={<Receipt />}
-                                    onClick={() => {
-                                        const baseUrl = window.location.origin.includes('localhost') ? 'http://localhost:8000' : '';
-                                        window.open(`${baseUrl}/api/v1/donations/material-donations/${md.id}/acknowledgment/`, '_blank');
+                                    onClick={async () => {
+                                        try {
+                                            const url = `/donations/material-donations/${md.id}/acknowledgment/`;
+                                            await downloadFile(url, `Acknowledgment_${md.id.substring(0, 8)}.pdf`);
+                                        } catch (err) {
+                                            setSnackbar({ open: true, message: 'Failed to download acknowledgment.', severity: 'error' });
+                                        }
                                     }}
                                     sx={{ borderRadius: 2, mt: 1, textTransform: 'none', fontWeight: 600 }}
                                 >

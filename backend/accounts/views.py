@@ -146,7 +146,7 @@ class UserRegistrationView(generics.CreateAPIView):
             max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
             httponly=True,  # Prevents JavaScript access (XSS protection)
             secure=not settings.DEBUG,  # HTTPS only in production
-            samesite='Strict',  # CSRF protection
+            samesite='Lax',  # CSRF protection (relaxed slightly for cross-origin consistency)
             path='/'
         )
         
@@ -157,7 +157,7 @@ class UserRegistrationView(generics.CreateAPIView):
             max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
             httponly=True,
             secure=not settings.DEBUG,
-            samesite='Strict',
+            samesite='Lax',
             path='/'
         )
     
@@ -281,7 +281,7 @@ class LoginView(APIView):
             max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
             httponly=True,  # Prevents JavaScript access (XSS protection)
             secure=not settings.DEBUG,  # HTTPS only in production
-            samesite='Strict',  # CSRF protection
+            samesite='Lax',  # CSRF protection
             path='/'
         )
         
@@ -292,7 +292,7 @@ class LoginView(APIView):
             max_age=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds(),
             httponly=True,
             secure=not settings.DEBUG,
-            samesite='Strict',
+            samesite='Lax',
             path='/'
         )
     

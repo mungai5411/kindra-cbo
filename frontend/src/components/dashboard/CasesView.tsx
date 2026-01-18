@@ -51,6 +51,7 @@ import { SubTabView } from './SubTabView';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
 import { KENYA_COUNTIES } from '../../utils/locationData';
+import { downloadFile } from '../../utils/downloadHelper';
 import { Select, FormControl, InputLabel } from '@mui/material';
 
 // Reusable Status Chip for consistency
@@ -259,9 +260,13 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                         size="small"
                                         variant="outlined"
                                         color="primary"
-                                        onClick={() => {
-                                            const baseUrl = window.location.origin.includes('localhost') ? 'http://localhost:8000' : '';
-                                            window.open(`${baseUrl}/api/v1/cases/cases/${c.id}/export-summary/`, '_blank');
+                                        onClick={async () => {
+                                            try {
+                                                const url = `/cases/cases/${c.id}/export-summary/`;
+                                                await downloadFile(url, `CaseSummary_${c.case_number}.pdf`);
+                                            } catch (err) {
+                                                setSnackbar({ open: true, message: 'Failed to download case summary.', severity: 'error' });
+                                            }
                                         }}
                                         sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
                                     >
@@ -417,9 +422,13 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                         size="small"
                                         variant="outlined"
                                         sx={{ borderRadius: 2, textTransform: 'none' }}
-                                        onClick={() => {
-                                            const baseUrl = window.location.origin.includes('localhost') ? 'http://localhost:8000' : '';
-                                            window.open(`${baseUrl}/api/v1/cases/assessments/${item.id}/export-pdf/`, '_blank');
+                                        onClick={async () => {
+                                            try {
+                                                const url = `/cases/assessments/${item.id}/export-pdf/`;
+                                                await downloadFile(url, `Assessment_${item.id.substring(0, 8)}.pdf`);
+                                            } catch (err) {
+                                                setSnackbar({ open: true, message: 'Failed to download assessment.', severity: 'error' });
+                                            }
                                         }}
                                     >
                                         Export PDF

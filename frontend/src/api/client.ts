@@ -26,7 +26,7 @@ const getDynamicApiBaseUrl = () => {
     return API_URL_FROM_ENV;
 };
 
-const API_BASE_URL = getDynamicApiBaseUrl();
+export const API_BASE_URL = getDynamicApiBaseUrl();
 
 // Create axios instance
 const apiClient = axios.create({

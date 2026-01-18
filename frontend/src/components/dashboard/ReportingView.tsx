@@ -55,6 +55,7 @@ import {
 import { RootState, AppDispatch } from '../../store';
 import { fetchDashboardData, fetchReports, generateReport } from '../../features/reporting/reportingSlice';
 import { SubTabView } from './SubTabView';
+import { downloadFile } from '../../utils/downloadHelper';
 import { motion } from 'framer-motion';
 
 export function ReportingView({ activeTab }: { activeTab?: string }) {
@@ -215,9 +216,15 @@ export function ReportingView({ activeTab }: { activeTab?: string }) {
                             secondaryAction={
                                 <IconButton
                                     edge="end"
-                                    onClick={() => {
+                                    onClick={async () => {
                                         if (report.file) {
-                                            window.open(report.file, '_blank');
+                                            try {
+                                                // If report.file is already an absolute URL from media, we can use it,
+                                                // but for backend consistency we use downloadFile
+                                                await downloadFile(report.file, `${report.title}.${report.format.toLowerCase()}`);
+                                            } catch (err) {
+                                                setSnackbar({ open: true, message: `Failed to download ${report.title}.`, severity: 'error' });
+                                            }
                                         } else {
                                             setSnackbar({ open: true, message: `Report file for ${report.title} is still being generated or is unavailable.`, severity: 'warning' });
                                         }
