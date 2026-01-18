@@ -3,7 +3,7 @@
  * Redesigned with Framer Motion, Glassmorphism, and Unified Theming
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store';
 import logo from '../assets/logo.jpg';
@@ -119,6 +119,12 @@ export default function HomePage() {
 
     const { scrollY } = useScroll();
     const y1 = useTransform(scrollY, [0, 500], [0, 200]);
+
+    // Accordion State: Only one open at a time
+    const [expanded, setExpanded] = useState<number | false>(false);
+    const handleAccordionChange = (panel: number) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+        setExpanded(isExpanded ? panel : false);
+    };
 
 
     return (
@@ -597,15 +603,17 @@ export default function HomePage() {
                                     {FAQS.map((faq, index) => (
                                         <Accordion
                                             key={index}
+                                            expanded={expanded === index}
+                                            onChange={handleAccordionChange(index)}
                                             sx={{
                                                 mb: 2,
                                                 borderRadius: '20px !important',
                                                 '&:before': { display: 'none' },
-                                                background: 'rgba(255, 255, 255, 0.7)',
+                                                background: expanded === index ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.7)',
                                                 backdropFilter: 'blur(10px)',
                                                 border: '1px solid',
-                                                borderColor: 'rgba(255, 255, 255, 0.3)',
-                                                boxShadow: '0 8px 32px -4px rgba(0,0,0,0.05)',
+                                                borderColor: expanded === index ? alpha(theme.palette.secondary.main, 0.4) : 'rgba(255, 255, 255, 0.3)',
+                                                boxShadow: expanded === index ? `0 12px 40px -8px ${alpha(theme.palette.secondary.main, 0.15)}` : '0 8px 32px -4px rgba(0,0,0,0.05)',
                                                 transition: 'all 0.3s ease',
                                                 '&:hover': {
                                                     borderColor: alpha(theme.palette.secondary.main, 0.3),
