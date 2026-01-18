@@ -32,7 +32,13 @@ import {
     EmojiEvents,
     Favorite,
     PlayArrow,
+    ExpandMore,
 } from '@mui/icons-material';
+import { 
+    Accordion, 
+    AccordionSummary, 
+    AccordionDetails,
+} from '@mui/material';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Navbar } from '../components/public/Navbar';
@@ -68,6 +74,29 @@ const IMPACT_AREAS = [
         icon: <FamilyRestroom sx={{ fontSize: 40 }} />,
         color: 'warning.main'
     },
+];
+
+const FAQS = [
+    {
+        question: "How can I donate material items like clothes or food?",
+        answer: "To donate materials, simply log in to your donor account and visit the 'Donate Materials' section. Fill out the form describing the items and your location, and our logistics team will coordinate a pickup or provide a drop-off location."
+    },
+    {
+        question: "Is my financial donation secure?",
+        answer: "Yes, we use industry-standard secure payment processors like M-Pesa, Stripe, and PayPal. We never store your full credit card details on our servers to ensure maximum security."
+    },
+    {
+        question: "How do I become a volunteer for Kindra CBO?",
+        answer: "We welcome passionate individuals! Visit our 'Volunteer' page to sign up. Once your application is reviewed and approved, you'll be able to join teams and view upcoming events."
+    },
+    {
+        question: "How can shelter homes partner with Kindra?",
+        answer: "Shelter owners can apply through our portal. Partnering requires valid registration, safety compliance audits, and a commitment to our child protection policies."
+    },
+    {
+        question: "Can I track the impact of my donation?",
+        answer: "Absolutely. We pride ourselves on transparency. You can view impact stories in our Community Hub and see real-time progress on specific fundraising campaigns."
+    }
 ];
 
 export default function HomePage() {
@@ -501,6 +530,55 @@ export default function HomePage() {
                             </Button>
                         </Stack>
                     </Card>
+                </Container>
+            </Box>
+
+            {/* FAQ Section */}
+            <Box sx={{ py: 10, bgcolor: alpha(theme.palette.divider, 0.02) }}>
+                <Container maxWidth="md">
+                    <Box sx={{ textAlign: 'center', mb: 6 }}>
+                        <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: 2 }}>QUESTIONS?</Typography>
+                        <Typography variant="h3" sx={{ fontWeight: 800, mb: 2 }}>Frequently Asked Questions</Typography>
+                        <Typography variant="body1" color="text.secondary">
+                            Everything you need to know about how Kindra CBO operates and how you can get involved.
+                        </Typography>
+                    </Box>
+
+                    <Box>
+                        {FAQS.map((faq, index) => (
+                            <Accordion 
+                                key={index} 
+                                sx={{ 
+                                    mb: 2, 
+                                    borderRadius: '16px !important',
+                                    '&:before': { display: 'none' },
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                                    border: '1px solid',
+                                    borderColor: alpha(theme.palette.divider, 0.1),
+                                    overflow: 'hidden'
+                                }}
+                                elevation={0}
+                            >
+                                <AccordionSummary
+                                    expandIcon={<ExpandMore color="primary" />}
+                                    sx={{ 
+                                        px: 3, 
+                                        py: 1,
+                                        '& .MuiAccordionSummary-content': { my: 1 }
+                                    }}
+                                >
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                        {faq.question}
+                                    </Typography>
+                                </AccordionSummary>
+                                <AccordionDetails sx={{ px: 3, pb: 2 }}>
+                                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                                        {faq.answer}
+                                    </Typography>
+                                </AccordionDetails>
+                            </Accordion>
+                        ))}
+                    </Box>
                 </Container>
             </Box>
 

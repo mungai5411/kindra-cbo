@@ -51,20 +51,6 @@
         transform: rotate(360deg);
       }
     }
-
-    /* Typebot Style Overrides */
-    .typebot-bubble-button {
-      bottom: 20px !important;
-      right: 20px !important;
-    }
-
-    @media (max-width: 600px) {
-      .typebot-bubble-button {
-        bottom: 100px !important;
-        /* Clear the navigation bar */
-        right: 20px !important;
-      }
-    }
   </style>
 </head>
 
@@ -103,26 +89,6 @@
     }, 2500);
   </script>
   <script type="module" src="/src/main.tsx"></script>
-
-  <!-- Typebot AI Agent (Minimal & Professional) -->
-  <script type="module">
-    import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0.3/dist/web.js'
-
-    Typebot.initBubble({
-      typebot: "kindra-cbo-ai-v1", // Note: USER needs to set their actual typebot ID here
-      theme: {
-        button: {
-          backgroundColor: "#0066C3",
-          size: "medium",
-        },
-        chatWindow: {
-          backgroundColor: "#ffffff",
-          maxWidth: "350px",
-          maxHeight: "500px",
-        }
-      },
-    });
-  </script>
 </body>
 
 </html>
