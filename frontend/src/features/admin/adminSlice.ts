@@ -61,6 +61,30 @@ export const fetchPendingUsers = createAsyncThunk(
     }
 );
 
+export const fetchPeriodicTasks = createAsyncThunk(
+    'admin/fetchPeriodicTasks',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get('/reporting/celery/tasks/');
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch periodic tasks');
+        }
+    }
+);
+
+export const fetchTaskResults = createAsyncThunk(
+    'admin/fetchTaskResults',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get('/reporting/celery/results/');
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch task results');
+        }
+    }
+);
+
 export const approveUser = createAsyncThunk(
     'admin/approveUser',
     async (userId: string, { rejectWithValue }) => {
@@ -80,6 +104,8 @@ interface AdminState {
     error: string | null;
     lastCleanupResults: any | null;
     auditLogs: any[];
+    periodicTasks: any[];
+    taskResults: any[];
 }
 
 const initialState: AdminState = {
@@ -89,6 +115,8 @@ const initialState: AdminState = {
     error: null,
     lastCleanupResults: null,
     auditLogs: [],
+    periodicTasks: [],
+    taskResults: [],
 };
 
 const adminSlice = createSlice({
@@ -134,6 +162,12 @@ const adminSlice = createSlice({
             })
             .addCase(approveUser.fulfilled, (state, action) => {
                 state.pendingUsers = state.pendingUsers.filter(u => u.id !== action.payload);
+            })
+            .addCase(fetchPeriodicTasks.fulfilled, (state, action) => {
+                state.periodicTasks = action.payload;
+            })
+            .addCase(fetchTaskResults.fulfilled, (state, action) => {
+                state.taskResults = action.payload;
             });
     },
 });

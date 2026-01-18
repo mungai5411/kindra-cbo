@@ -4,6 +4,8 @@ Reporting & Analytics Serializers
 
 from rest_framework import serializers
 from .models import Report, Dashboard, KPI, AnalyticsEvent, ComplianceReport
+from django_celery_beat.models import PeriodicTask, CrontabSchedule, IntervalSchedule
+from django_celery_results.models import TaskResult
 
 
 class ReportSerializer(serializers.ModelSerializer):
@@ -54,3 +56,35 @@ class ComplianceReportSerializer(serializers.ModelSerializer):
             'id', 'submitted_by', 'submitted_at',
             'approved_by', 'approved_at', 'created_at', 'updated_at'
         )
+
+class CrontabScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CrontabSchedule
+        fields = '__all__'
+
+
+class IntervalScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IntervalSchedule
+        fields = '__all__'
+
+
+class PeriodicTaskSerializer(serializers.ModelSerializer):
+    schedule_description = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PeriodicTask
+        fields = ('id', 'name', 'task', 'enabled', 'last_run_at', 'total_run_count', 'schedule_description')
+
+    def get_schedule_description(self, obj):
+        if obj.crontab:
+            return f"Crontab: {obj.crontab.minute} {obj.crontab.hour} {obj.crontab.day_of_month} {obj.crontab.month_of_year} {obj.crontab.day_of_week}"
+        if obj.interval:
+            return f"Every {obj.interval.every} {obj.interval.period}"
+        return "Manual/Other"
+
+
+class TaskResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskResult
+        fields = ('id', 'task_id', 'task_name', 'status', 'date_done', 'result', 'traceback')

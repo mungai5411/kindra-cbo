@@ -572,6 +572,16 @@ def trigger_cleanup_view(request):
     """
     try:
         call_command('cleanup_inactive_users')
+        
+        # Log manual cleanup trigger
+        from reporting.utils import log_analytics_event
+        log_analytics_event(
+            event_type='SYSTEM_CLEANUP_TRIGGERED',
+            description='Administrator manually triggered user inactivity cleanup engine.',
+            user=request.user,
+            request=request
+        )
+        
         return Response({
             'success': True, 
             'message': 'Inactivity cleanup task executed successfully. Notifications sent and expired profiles removed.'

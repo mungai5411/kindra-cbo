@@ -12,9 +12,12 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models.functions import TruncDate
 from .models import Report, Dashboard, KPI, AnalyticsEvent, ComplianceReport
+from django_celery_beat.models import PeriodicTask
+from django_celery_results.models import TaskResult
 from .serializers import (
     ReportSerializer, DashboardSerializer, KPISerializer,
-    AnalyticsEventSerializer, ComplianceReportSerializer
+    AnalyticsEventSerializer, ComplianceReportSerializer,
+    PeriodicTaskSerializer, TaskResultSerializer
 )
 from accounts.permissions import IsAdminOrManagement
 
@@ -343,6 +346,26 @@ class ComplianceReportApproveView(APIView):
                 {'error': 'Report not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+
+
+class PeriodicTaskListView(generics.ListAPIView):
+    """
+    List all periodic tasks defined in Celery Beat
+    """
+    queryset = PeriodicTask.objects.all().order_by('name')
+    serializer_class = PeriodicTaskSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
+
+
+class TaskResultListView(generics.ListAPIView):
+    """
+    List recent background task execution results
+    """
+    queryset = TaskResult.objects.all().order_by('-date_done')
+    serializer_class = TaskResultSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
+    pagination_class = None
 
 
 class PublicStatsView(APIView):

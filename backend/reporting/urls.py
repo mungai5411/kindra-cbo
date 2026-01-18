@@ -10,6 +10,7 @@ from .views import (
     AnalyticsEventListView, AnalyticsAggregationView,
     ComplianceReportListCreateView, ComplianceReportDetailView,
     ComplianceReportSubmitView, ComplianceReportApproveView,
+    PeriodicTaskListView, TaskResultListView,
 )
 
 app_name = 'reporting'
@@ -38,4 +39,8 @@ urlpatterns = [
     path('compliance/<uuid:pk>/', ComplianceReportDetailView.as_view(), name='compliance-detail'),
     path('compliance/<uuid:pk>/submit/', ComplianceReportSubmitView.as_view(), name='compliance-submit'),
     path('compliance/<uuid:pk>/approve/', ComplianceReportApproveView.as_view(), name='compliance-approve'),
+    
+    # Celery Tasks
+    path('celery/tasks/', PeriodicTaskListView.as_view(), name='celery-task-list'),
+    path('celery/results/', TaskResultListView.as_view(), name='celery-task-results'),
 ]

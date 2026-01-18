@@ -69,7 +69,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         cases,
     } = useSelector((state: RootState) => state.caseManagement);
     const { groups } = useSelector((state: RootState) => state.groups);
-    const { auditLogs, pendingUsers } = useSelector((state: RootState) => state.admin);
+    const { auditLogs, pendingUsers, periodicTasks, taskResults } = useSelector((state: RootState) => state.admin);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [openDialog, setOpenDialog] = useState(false);
@@ -109,6 +109,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         dispatch(fetchGroups());
         dispatch(fetchAuditLogs());
         dispatch(fetchPendingUsers());
+        dispatch(fetchPeriodicTasks());
+        dispatch(fetchTaskResults());
     }, [dispatch]);
 
     // Fetch volunteers realtime when creating/editing groups
@@ -129,7 +131,9 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 dispatch(fetchCases()),
                 dispatch(fetchGroups()),
                 dispatch(fetchAuditLogs()),
-                dispatch(fetchPendingUsers())
+                dispatch(fetchPendingUsers()),
+                dispatch(fetchPeriodicTasks()),
+                dispatch(fetchTaskResults())
             ]);
             setSnackbar({ open: true, message: 'System synchronization successful!', severity: 'success' });
         } catch (err) {
@@ -592,49 +596,87 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     </Box>
 
                     <Box>
-                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Active Background Threads</Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <Typography variant="subtitle2" fontWeight="bold">Active Background Threads</Typography>
+                            <Button size="small" variant="text" onClick={() => dispatch(fetchTaskResults())} startIcon={<Refresh />}>Refresh</Button>
+                        </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {[
-                                { name: 'Audit Trail Compression', progress: 100, status: 'DONE' },
-                                { name: 'Media Storage Cleanup', progress: 45, status: 'RUNNING' },
-                                { name: 'Third-party API Sync', progress: 88, status: 'PENDING' }
-                            ].map((task, i) => (
-                                <Box key={i} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                            {taskResults.length > 0 ? taskResults.slice(0, 5).map((result: any, i) => (
+                                <Box key={result.id} sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.4), borderRadius: 1.5, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1) }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                        <Typography variant="body2" fontWeight="600">{task.name}</Typography>
-                                        <Typography variant="caption" sx={{ fontWeight: 'bold', color: task.status === 'RUNNING' ? 'primary.main' : 'text.secondary' }}>{task.status}</Typography>
+                                        <Typography variant="body2" fontWeight="bold" sx={{ fontFamily: 'monospace' }}>{result.task_name?.split('.').pop()}</Typography>
+                                        <Chip
+                                            label={result.status}
+                                            size="small"
+                                            color={result.status === 'SUCCESS' ? 'success' : result.status === 'FAILURE' ? 'error' : 'warning'}
+                                            sx={{ fontSize: '0.6rem', height: 20, fontWeight: 'bold' }}
+                                        />
                                     </Box>
-                                    <LinearProgress variant="determinate" value={task.progress} sx={{ height: 4, borderRadius: 1 }} />
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={result.status === 'SUCCESS' ? 100 : result.status === 'FAILURE' ? 0 : 50}
+                                        color={result.status === 'SUCCESS' ? 'success' : result.status === 'FAILURE' ? 'error' : 'primary'}
+                                        sx={{ borderRadius: 5, height: 6, bgcolor: alpha(theme.palette.divider, 0.2) }}
+                                    />
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                                        <Typography variant="caption" color="text.secondary">Ref: {result.task_id.substring(0, 8)}...</Typography>
+                                        <Typography variant="caption" fontWeight="bold">{new Date(result.date_done).toLocaleTimeString()}</Typography>
+                                    </Box>
                                 </Box>
-                            ))}
+                            )) : (
+                                <Box sx={{ p: 3, textAlign: 'center', bgcolor: alpha(theme.palette.background.default, 0.3), borderRadius: 1 }}>
+                                    <Typography variant="caption" color="text.secondary">No thread history captured in current cycle.</Typography>
+                                </Box>
+                            )}
                         </Box>
                     </Box>
                 </Paper>
             </Grid>
 
             <Grid item xs={12} md={4}>
-                <Paper sx={{ p: 3, borderRadius: 2, height: '100%', bgcolor: '#1e293b', color: '#fff', boxShadow: '0 10px 40px rgba(15, 23, 42, 0.3)' }}>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#94a3b8' }}>
-                        <AccessTime sx={{ fontSize: 20 }} /> EVENT_LOG_TAIL
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 3, maxHeight: 400, overflow: 'auto' }}>
-                        {auditLogs.slice(0, 10).map((log: any, i: number) => (
-                            <Box key={log.id || i} sx={{ p: 2, borderRadius: 1, bgcolor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                    <Typography variant="subtitle2" sx={{ color: '#38bdf8', fontFamily: 'monospace', fontWeight: 'bold', textTransform: 'uppercase' }}>{log.event_type?.replace(/_/g, ' ')}</Typography>
-                                    <Typography variant="caption" sx={{ color: '#64748b' }}>{new Date(log.timestamp).toLocaleTimeString()}</Typography>
+                <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%', bgcolor: '#1a1f2c', color: '#fff', display: 'flex', flexDirection: 'column' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                        <Box sx={{ p: 1, bgcolor: alpha('#fff', 0.1), borderRadius: 1 }}>
+                            <AccessTime sx={{ color: '#fff' }} fontSize="small" />
+                        </Box>
+                        <Typography variant="subtitle1" fontWeight="bold">Operational Schedule</Typography>
+                    </Box>
+                    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 2, overflow: 'auto' }}>
+                        {periodicTasks.length > 0 ? periodicTasks.map((task: any) => (
+                            <Box key={task.id} sx={{ p: 2, borderRadius: 2, bgcolor: alpha('#fff', 0.05), border: '1px solid', borderColor: alpha('#fff', 0.1) }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                    <Typography variant="body2" fontWeight="bold" color="primary.main">{task.name}</Typography>
+                                    <Chip
+                                        label={task.enabled ? "ACTIVE" : "PAUSED"}
+                                        size="small"
+                                        sx={{
+                                            height: 16, fontSize: '0.55rem',
+                                            bgcolor: task.enabled ? alpha(theme.palette.success.main, 0.2) : alpha(theme.palette.error.main, 0.2),
+                                            color: task.enabled ? 'success.light' : 'error.light', fontWeight: 'bold'
+                                        }}
+                                    />
                                 </Box>
-                                <Typography variant="caption" sx={{ color: '#94a3b8', display: 'block' }}>&gt; {log.description}</Typography>
-                                {log.user_name && <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 'bold', mt: 0.5, display: 'block' }}>User: {log.user_name}</Typography>}
+                                <Typography variant="caption" sx={{ display: 'block', mb: 1, opacity: 0.7 }}>{task.schedule_description}</Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Schedule sx={{ fontSize: 14, opacity: 0.5 }} />
+                                    <Typography variant="caption" sx={{ opacity: 0.5 }}>Last Run: {task.last_run_at ? new Date(task.last_run_at).toLocaleString() : 'Never'}</Typography>
+                                </Box>
                             </Box>
-                        ))}
-                        {auditLogs.length === 0 && (
-                            <Box sx={{ p: 4, textAlign: 'center', opacity: 0.5 }}>
-                                <Typography variant="caption">No real-time events captured in current cycle.</Typography>
+                        )) : (
+                            <Box sx={{ p: 4, textAlign: 'center', opacity: 0.3 }}>
+                                <Autorenew sx={{ fontSize: 40, mb: 1 }} />
+                                <Typography variant="caption" display="block">Scanning System Schedule...</Typography>
                             </Box>
                         )}
                     </Box>
-                    <Button fullWidth sx={{ mt: 4, color: '#64748b', borderColor: 'rgba(255,255,255,0.1)', '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' } }} variant="outlined">View Full Terminal Logs</Button>
+                    <Button
+                        fullWidth
+                        sx={{ mt: 3, color: '#94a3b8', borderColor: 'rgba(255,255,255,0.1)', '&:hover': { bgcolor: 'rgba(255,255,255,0.05)', borderColor: '#fff' } }}
+                        variant="outlined"
+                        onClick={() => dispatch(fetchPeriodicTasks())}
+                    >
+                        Sync Scheduler
+                    </Button>
                 </Paper>
             </Grid>
         </Grid>
