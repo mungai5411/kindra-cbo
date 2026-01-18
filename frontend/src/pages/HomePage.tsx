@@ -534,13 +534,13 @@ export default function HomePage() {
             </Box>
 
             {/* FAQ Section */}
-            <Box sx={{ py: 10, bgcolor: alpha(theme.palette.divider, 0.02) }}>
+            <Box sx={{ py: 6, bgcolor: alpha(theme.palette.divider, 0.02) }}>
                 <Container maxWidth="md">
-                    <Box sx={{ textAlign: 'center', mb: 6 }}>
+                    <Box sx={{ textAlign: 'center', mb: 4 }}>
                         <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: 2 }}>QUESTIONS?</Typography>
-                        <Typography variant="h3" sx={{ fontWeight: 800, mb: 2 }}>Frequently Asked Questions</Typography>
-                        <Typography variant="body1" color="text.secondary">
-                            Everything you need to know about how Kindra CBO operates and how you can get involved.
+                        <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, fontSize: { xs: '1.8rem', md: '2.5rem' } }}>Frequently Asked Questions</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Quick answers to common questions about Kindra CBO.
                         </Typography>
                     </Box>
 
@@ -549,30 +549,31 @@ export default function HomePage() {
                             <Accordion 
                                 key={index} 
                                 sx={{ 
-                                    mb: 2, 
-                                    borderRadius: '16px !important',
+                                    mb: 1, 
+                                    borderRadius: '12px !important',
                                     '&:before': { display: 'none' },
-                                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                                    boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
                                     border: '1px solid',
-                                    borderColor: alpha(theme.palette.divider, 0.1),
+                                    borderColor: alpha(theme.palette.divider, 0.08),
                                     overflow: 'hidden'
                                 }}
                                 elevation={0}
                             >
                                 <AccordionSummary
-                                    expandIcon={<ExpandMore color="primary" />}
+                                    expandIcon={<ExpandMore color="primary" sx={{ fontSize: '1.2rem' }} />}
                                     sx={{ 
-                                        px: 3, 
-                                        py: 1,
-                                        '& .MuiAccordionSummary-content': { my: 1 }
+                                        px: 2.5, 
+                                        py: 0,
+                                        minHeight: '48px !important',
+                                        '& .MuiAccordionSummary-content': { my: 1.2 }
                                     }}
                                 >
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
                                         {faq.question}
                                     </Typography>
                                 </AccordionSummary>
-                                <AccordionDetails sx={{ px: 3, pb: 2 }}>
-                                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                                <AccordionDetails sx={{ px: 2.5, pb: 2, pt: 0 }}>
+                                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, fontSize: '0.875rem' }}>
                                         {faq.answer}
                                     </Typography>
                                 </AccordionDetails>
