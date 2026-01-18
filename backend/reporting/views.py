@@ -9,6 +9,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from django.db.models import Count, Sum, Avg, Q, F
 from django.utils import timezone
+from django.http import HttpResponse
 from datetime import timedelta
 from django.db.models.functions import TruncDate
 from .models import Report, Dashboard, KPI, AnalyticsEvent, ComplianceReport
@@ -122,6 +123,54 @@ class ReportListCreateView(generics.ListCreateAPIView):
     filterset_fields = ['report_type', 'format', 'is_scheduled']
     ordering_fields = ['generated_at', 'start_date', 'end_date']
     ordering = ['-generated_at']
+    
+    def get(self, request, *args, **kwargs):
+        """
+        Support instant export via query parameter
+        """
+        instant_export = request.query_params.get('instant_export') == 'true'
+        if instant_export:
+            # Create a temporary report object (not saved to DB if possible, or deleted after)
+            report_type = request.query_params.get('report_type', 'DONATION')
+            report_format = request.query_params.get('format', 'CSV')
+            
+            # Create the report record
+            report = Report.objects.create(
+                report_type=report_type,
+                format=report_format,
+                generated_by=request.user,
+                title=f"Instant {report_type} Report",
+                status='PENDING'
+            )
+            
+            try:
+                # Generate the file
+                ReportService.generate_report_file(report)
+                
+                # Re-fetch to get the file path
+                report.refresh_from_db()
+                
+                if report.file:
+                    file_content = report.file.read()
+                    content_type = {
+                        'PDF': 'application/pdf',
+                        'EXCEL': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'CSV': 'text/csv'
+                    }.get(report_format, 'text/csv')
+                    
+                    response = HttpResponse(file_content, content_type=content_type)
+                    filename = report.file.name.split('/')[-1]
+                    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+                    
+                    # Clean up the report record after sending if desired, 
+                    # but keeping it provides an audit trail.
+                    return response
+                else:
+                    return Response({'error': 'Failed to generate report file'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+        return super().get(request, *args, **kwargs)
     
     def perform_create(self, serializer):
         report = serializer.save(generated_by=self.request.user)

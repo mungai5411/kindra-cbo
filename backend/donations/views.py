@@ -387,6 +387,35 @@ def reject_material_donation(request, pk):
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
+def download_receipt(request, pk):
+    """Download PDF receipt for a donation"""
+    try:
+        receipt = Receipt.objects.get(pk=pk)
+        
+        # Check permissions - donor can only download their own receipt
+        if request.user.role == 'DONOR':
+            if not receipt.donation.donor or receipt.donation.donor.user != request.user:
+                return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Generate if file is missing
+        if not receipt.receipt_file:
+            ReceiptService.generate_pdf_receipt(receipt)
+            receipt.refresh_from_db()
+
+        if not receipt.receipt_file:
+            return Response({'error': 'Failed to generate receipt'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        file_content = receipt.receipt_file.read()
+        response = HttpResponse(file_content, content_type='application/pdf')
+        filename = f"receipt_{receipt.receipt_number}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    except Receipt.DoesNotExist:
+        return Response({'error': 'Receipt not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
 def download_material_acknowledgment(request, pk):
     """Download PDF acknowledgment for a material donation"""
     try:

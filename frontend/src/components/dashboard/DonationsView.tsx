@@ -66,6 +66,7 @@ import { SubTabView } from './SubTabView';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
 import { ConfirmationDialog } from './ConfirmationDialog';
+import { downloadFile } from '../../utils/downloadHelper';
 
 interface DonationsViewProps {
     setOpenDialog?: (open: boolean) => void;
@@ -678,37 +679,34 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
         <Paper sx={{ p: 0, borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], overflow: 'hidden' }}>
             <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
                 <Typography variant="h6" fontWeight="bold">{isDonor ? 'My Donation History' : 'Recent Donation Registry'}</Typography>
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
-                        size="small"
                         variant="outlined"
                         startIcon={<Refresh />}
-                        onClick={() => {
-                            dispatch(fetchDonations());
-                            dispatch(fetchCampaigns());
-                            dispatch(fetchDonors());
-                            dispatch(fetchReceipts());
-                        }}
-                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
+                        onClick={() => dispatch(fetchDonations())}
+                        sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
                     >
-                        Refresh
+                        Sync Records
                     </Button>
-                    <Button
-                        size="small"
-                        variant="outlined"
-                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
-                        onClick={async () => {
-                            try {
-                                const exportUrl = `/reporting/reports/?format=CSV&report_type=DONATIONS`;
-                                await downloadFile(exportUrl, 'donations_report.csv');
-                                setSnackbar({ open: true, message: 'Donations report downloaded successfully.', severity: 'success' });
-                            } catch (err) {
-                                setSnackbar({ open: true, message: 'Failed to download report. Please try again.', severity: 'error' });
-                            }
-                        }}
-                    >
-                        Export CSV
-                    </Button>
+                    {isManagement && (
+                        <Button
+                            variant="contained"
+                            startIcon={<Receipt />}
+                            onClick={async () => {
+                                try {
+                                    setSnackbar({ open: true, message: 'Preparing your export, please wait...', severity: 'info' });
+                                    const url = `/reporting/reports/?instant_export=true&report_type=DONATION&format=CSV`;
+                                    await downloadFile(url, 'Donations_Export.csv');
+                                    setSnackbar({ open: true, message: 'Export completed successfully.', severity: 'success' });
+                                } catch (err) {
+                                    setSnackbar({ open: true, message: 'Export failed. Please try again.', severity: 'error' });
+                                }
+                            }}
+                            sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600, boxShadow: theme.shadows[2] }}
+                        >
+                            Export CSV
+                        </Button>
+                    )}
                 </Box>
             </Box>
             <TableContainer>
@@ -851,9 +849,17 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                         variant="outlined"
                                         startIcon={<Receipt />}
                                         sx={{ borderRadius: 2, textTransform: 'none' }}
-                                        onClick={() => receipt.receipt_file
-                                            ? window.open(receipt.receipt_file, '_blank')
-                                            : setSnackbar({ open: true, message: 'Receipt file is still being generated. Please check back in a moment.', severity: 'info' })}
+                                        onClick={async () => {
+                                            try {
+                                                setSnackbar({ open: true, message: 'Starting download...', severity: 'info' });
+                                                const url = `/donations/receipts/${receipt.id}/download/`;
+                                                await downloadFile(url, `Receipt_${receipt.receipt_number}.pdf`);
+                                                setSnackbar({ open: true, message: 'Download complete.', severity: 'success' });
+                                            } catch (err: any) {
+                                                const msg = err.response?.data?.error || 'Failed to download receipt.';
+                                                setSnackbar({ open: true, message: msg, severity: 'error' });
+                                            }
+                                        }}
                                     >
                                         Download PDF
                                     </Button>

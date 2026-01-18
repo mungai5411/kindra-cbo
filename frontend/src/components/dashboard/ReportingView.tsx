@@ -219,11 +219,11 @@ export function ReportingView({ activeTab }: { activeTab?: string }) {
                                     onClick={async () => {
                                         if (report.file) {
                                             try {
-                                                // If report.file is already an absolute URL from media, we can use it,
-                                                // but for backend consistency we use downloadFile
-                                                await downloadFile(report.file, `${report.title}.${report.format.toLowerCase()}`);
+                                                const filename = report.file.split('/').pop() || 'report.csv';
+                                                await downloadFile(report.file, filename);
+                                                setSnackbar({ open: true, message: 'Report downloaded.', severity: 'success' });
                                             } catch (err) {
-                                                setSnackbar({ open: true, message: `Failed to download ${report.title}.`, severity: 'error' });
+                                                setSnackbar({ open: true, message: 'Download failed.', severity: 'error' });
                                             }
                                         } else {
                                             setSnackbar({ open: true, message: `Report file for ${report.title} is still being generated or is unavailable.`, severity: 'warning' });

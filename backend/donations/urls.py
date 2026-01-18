@@ -11,7 +11,7 @@ from .views import (
     process_mpesa_payment, process_paypal_payment, process_stripe_payment,
     approve_donation, reject_donation,
     approve_material_donation, reject_material_donation,
-    download_material_acknowledgment,
+    download_material_acknowledgment, download_receipt,
 )
 
 app_name = 'donations'
@@ -25,6 +25,7 @@ urlpatterns = [
     path('<uuid:pk>/', DonationDetailView.as_view(), name='donation-detail'),
     path('receipts/', ReceiptListView.as_view(), name='receipt-list'),
     path('receipts/<uuid:pk>/', ReceiptDetailView.as_view(), name='receipt-detail'),
+    path('receipts/<uuid:pk>/download/', download_receipt, name='receipt-download'),
     
     path('material-donations/', MaterialDonationListCreateView.as_view(), name='material-donation-list'),
     path('material-donations/<uuid:pk>/', MaterialDonationDetailView.as_view(), name='material-donation-detail'),
