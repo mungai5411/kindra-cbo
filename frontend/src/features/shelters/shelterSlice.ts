@@ -45,11 +45,64 @@ export const fetchStaff = createAsyncThunk(
     'shelters/fetchStaff',
     async (_, { rejectWithValue }) => {
         try {
-            // Reusing volunteers endpoint or a specific staff endpoint if available
             const response = await apiClient.get(endpoints.volunteers.volunteers);
             return response.data.results || response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch shelter staff');
+        }
+    }
+);
+
+export const fetchStaffCredentials = createAsyncThunk(
+    'shelters/fetchStaffCredentials',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get(endpoints.shelters.staff);
+            return response.data.results || response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch staff credentials');
+        }
+    }
+);
+
+export const createStaffCredential = createAsyncThunk(
+    'shelters/createStaffCredential',
+    async (credentialData: any, { rejectWithValue, dispatch }) => {
+        try {
+            const response = await apiClient.post(endpoints.shelters.staff, credentialData);
+            dispatch(fetchStaffCredentials());
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || 'Failed to create staff credential');
+        }
+    }
+);
+
+export const verifyStaffCredential = createAsyncThunk(
+    'shelters/verifyStaffCredential',
+    async ({ id, is_verified }: { id: string; is_verified: boolean }, { rejectWithValue, dispatch }) => {
+        try {
+            const response = await apiClient.patch(`${endpoints.shelters.staff}${id}/`, {
+                is_verified,
+                verification_date: is_verified ? new Date().toISOString().split('T')[0] : null
+            });
+            dispatch(fetchStaffCredentials());
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to verify staff credential');
+        }
+    }
+);
+
+export const deleteStaffCredential = createAsyncThunk(
+    'shelters/deleteStaffCredential',
+    async (id: string, { rejectWithValue, dispatch }) => {
+        try {
+            await apiClient.delete(`${endpoints.shelters.staff}${id}/`);
+            dispatch(fetchStaffCredentials());
+            return id;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete staff credential');
         }
     }
 );
@@ -256,6 +309,7 @@ interface ShelterState {
     placements: any[];
     resources: any[];
     staff: any[];
+    staffCredentials: any[];
     incidents: any[];
     isLoading: boolean;
     error: string | null;
@@ -267,6 +321,7 @@ const initialState: ShelterState = {
     placements: [],
     resources: [],
     staff: [],
+    staffCredentials: [],
     incidents: [],
     isLoading: false,
     error: null,
@@ -303,6 +358,11 @@ const shelterSlice = createSlice({
         // Fetch Staff
         builder.addCase(fetchStaff.fulfilled, (state, action: PayloadAction<any[]>) => {
             state.staff = Array.isArray(action.payload) ? action.payload : [];
+        });
+
+        // Staff Credentials
+        builder.addCase(fetchStaffCredentials.fulfilled, (state, action: PayloadAction<any[]>) => {
+            state.staffCredentials = Array.isArray(action.payload) ? action.payload : [];
         });
 
         // Assign Staff

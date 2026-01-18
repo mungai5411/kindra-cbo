@@ -268,6 +268,7 @@ export default function DashboardPage() {
             'shelter': <ShelterView activeTab={activeTab} />,
             'shelters': <ShelterView activeTab={activeTab} />,
             'placements': <ShelterView activeTab={activeTab} />,
+            'staff_creds': <ShelterView activeTab={activeTab} />,
             'resources': <ResourcesView />,
 
             'reporting': <ReportingView activeTab={activeTab} />,

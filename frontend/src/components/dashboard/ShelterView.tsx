@@ -49,23 +49,21 @@ import {
     Schedule,
     AssignmentInd,
     PersonAdd,
-    NoAccounts
+    NoAccounts,
+    VerifiedUser,
+    Delete
 } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
 import {
     fetchShelters,
     fetchPlacements,
     fetchResources,
-    fetchStaff,
-    assignStaff,
-    transferStaff,
-    terminateDuty,
-    createShelter,
-    fetchPendingShelters,
-    approveShelter,
-    rejectShelter,
     requestShelterInfo,
-    addPlacement
+    addPlacement,
+    fetchStaffCredentials,
+    createStaffCredential,
+    verifyStaffCredential,
+    deleteStaffCredential
 } from '../../features/shelters/shelterSlice';
 import { fetchChildren } from '../../features/cases/casesSlice';
 import { fetchEvents } from '../../features/volunteers/volunteersSlice';
@@ -118,7 +116,7 @@ const StatusChip = ({ status }: { status: string }) => {
 export function ShelterView({ activeTab }: { activeTab?: string }) {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
-    const { shelters, pendingShelters, resources, staff, placements } = useSelector((state: RootState) => state.shelters);
+    const { shelters, pendingShelters, resources, staff, placements, staffCredentials } = useSelector((state: RootState) => state.shelters);
     const { children } = useSelector((state: RootState) => state.cases);
     const { volunteers, events: volunteerEvents } = useSelector((state: RootState) => state.volunteers);
     const { user } = useSelector((state: RootState) => state.auth);
@@ -147,6 +145,14 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
         placement_reason: '',
         status: 'PENDING'
     });
+    const [credentialForm, setCredentialForm] = useState({
+        shelter_home: '',
+        staff_name: '',
+        position: '',
+        id_number: '',
+        phone_number: '',
+        certificate_of_good_conduct: false,
+    });
 
     // Confirmation Dialog State
     const [confirmDialog, setConfirmDialog] = useState<{
@@ -170,6 +176,7 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
         dispatch(fetchChildren());
         if (isAdmin) {
             dispatch(fetchPendingShelters());
+            dispatch(fetchStaffCredentials());
         }
         dispatch(fetchEvents());
     }, [dispatch, isAdmin]);
@@ -240,6 +247,28 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
             setSnackbar({ open: true, message: 'Placement registered successfully', severity: 'success' });
         } catch (error: any) {
             setSnackbar({ open: true, message: typeof error === 'string' ? error : 'Failed to register placement', severity: 'error' });
+        }
+    };
+
+    const handleStaffCredentialSubmit = async () => {
+        if (!credentialForm.staff_name || !credentialForm.position || !credentialForm.shelter_home) {
+            setSnackbar({ open: true, message: 'Name, Position and Shelter are required', severity: 'error' });
+            return;
+        }
+        try {
+            await dispatch(createStaffCredential(credentialForm)).unwrap();
+            setOpenDialog(false);
+            setCredentialForm({
+                shelter_home: '',
+                staff_name: '',
+                position: '',
+                id_number: '',
+                phone_number: '',
+                certificate_of_good_conduct: false,
+            });
+            setSnackbar({ open: true, message: 'Staff credential registered successfully', severity: 'success' });
+        } catch (error: any) {
+            setSnackbar({ open: true, message: typeof error === 'string' ? error : 'Failed to register credential', severity: 'error' });
         }
     };
 
@@ -498,6 +527,96 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
         </Paper>
     );
 
+    const renderStaffCredentials = () => (
+        <Paper sx={{ p: 0, borderRadius: 4, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
+            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Box>
+                    <Typography variant="h6" fontWeight="bold">Staff Credentials & Verification</Typography>
+                    <Typography variant="caption" color="text.secondary">Manage background checks and identity verification for shelter staff</Typography>
+                </Box>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<VerifiedUser />}
+                    onClick={() => handleOpenDialog('CREDENTIAL' as any)}
+                    sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
+                >
+                    Register Credential
+                </Button>
+            </Box>
+            <TableContainer>
+                <Table>
+                    <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+                        <TableRow>
+                            <TableCell sx={{ fontWeight: 600 }}>Staff Name</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Position</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>ID / Passport</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Good Conduct</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Verification</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {staffCredentials.map((cred: any) => (
+                            <TableRow key={cred.id} hover>
+                                <TableCell>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                        <Avatar sx={{ width: 32, height: 32, bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main', fontWeight: 'bold', fontSize: '0.8rem' }}>{cred.staff_name?.[0]}</Avatar>
+                                        <Typography variant="body2" fontWeight="600">{cred.staff_name}</Typography>
+                                    </Box>
+                                </TableCell>
+                                <TableCell>{cred.position}</TableCell>
+                                <TableCell color="text.secondary">{cred.id_number}</TableCell>
+                                <TableCell>
+                                    <Chip
+                                        label={cred.certificate_of_good_conduct ? "Present" : "Missing"}
+                                        size="small"
+                                        color={cred.certificate_of_good_conduct ? "success" : "error"}
+                                        variant="outlined"
+                                        sx={{ borderRadius: 1.5, height: 24 }}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <StatusChip status={cred.is_verified ? "Verified" : "Pending"} />
+                                        {!cred.is_verified && (
+                                            <Button
+                                                size="small"
+                                                onClick={() => dispatch(verifyStaffCredential({ id: cred.id, is_verified: true }))}
+                                                sx={{ textTransform: 'none', py: 0 }}
+                                            >
+                                                Verify Now
+                                            </Button>
+                                        )}
+                                    </Box>
+                                </TableCell>
+                                <TableCell align="right">
+                                    <IconButton size="small" color="error" onClick={() => {
+                                        setConfirmDialog({
+                                            open: true,
+                                            title: 'Remove Credential?',
+                                            message: `Are you sure you want to remove the credential entry for ${cred.staff_name}?`,
+                                            severity: 'error',
+                                            onConfirm: async () => {
+                                                await dispatch(deleteStaffCredential(cred.id));
+                                                setConfirmDialog(prev => ({ ...prev, open: false }));
+                                            }
+                                        });
+                                    }}>
+                                        <Delete fontSize="small" />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                        {staffCredentials.length === 0 && (
+                            <TableRow><TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>No staff credentials registered.</TableCell></TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Paper>
+    );
+
     const renderPlacements = () => (
         <Paper sx={{
             p: 0,
@@ -696,6 +815,13 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
             ),
             hidden: !isAdmin
         },
+        {
+            id: 'staff_creds',
+            label: 'Credentials',
+            icon: <VerifiedUser />,
+            component: renderStaffCredentials(),
+            hidden: !isAdmin
+        },
         { id: 'resources', label: 'Inventory', icon: <Inventory />, component: renderResources() },
         { id: 'events', label: 'Partner Events', icon: <EventIcon />, component: renderPartnerEvents() },
     ].filter(t => !t.hidden);
@@ -792,6 +918,64 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                                     <MenuItem value="LOGISTICS">Logistics Manager</MenuItem>
                                     <MenuItem value="SECURITY">Security Lead</MenuItem>
                                 </TextField>
+                                <Button variant="contained" onClick={handleStaffAssignment} sx={{ py: 1.5, borderRadius: 3 }}>Assign Now</Button>
+                            </>
+                        )}
+                        {(dialogType as any) === 'CREDENTIAL' && (
+                            <>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    label="Assigned Home"
+                                    value={credentialForm.shelter_home}
+                                    onChange={(e) => setCredentialForm({ ...credentialForm, shelter_home: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                >
+                                    {shelters.map((s: any) => (
+                                        <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>
+                                    ))}
+                                </TextField>
+                                <TextField
+                                    fullWidth
+                                    label="Staff Name"
+                                    value={credentialForm.staff_name}
+                                    onChange={(e) => setCredentialForm({ ...credentialForm, staff_name: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    label="Position"
+                                    value={credentialForm.position}
+                                    onChange={(e) => setCredentialForm({ ...credentialForm, position: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    label="ID / Passport Number"
+                                    value={credentialForm.id_number}
+                                    onChange={(e) => setCredentialForm({ ...credentialForm, id_number: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    label="Phone Number"
+                                    value={credentialForm.phone_number}
+                                    onChange={(e) => setCredentialForm({ ...credentialForm, phone_number: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+                                <FormControl fullWidth>
+                                    <InputLabel>Certificate of Good Conduct</InputLabel>
+                                    <Select
+                                        label="Certificate of Good Conduct"
+                                        value={credentialForm.certificate_of_good_conduct ? "yes" : "no"}
+                                        onChange={(e) => setCredentialForm({ ...credentialForm, certificate_of_good_conduct: e.target.value === "yes" })}
+                                        sx={{ borderRadius: 3 }}
+                                    >
+                                        <MenuItem value="yes">Yes, verified</MenuItem>
+                                        <MenuItem value="no">No / Pending</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <Button variant="contained" onClick={handleStaffCredentialSubmit} sx={{ py: 1.5, borderRadius: 3 }}>Register Now</Button>
                             </>
                         )}
                         {dialogType === 'SHELTER' && (
