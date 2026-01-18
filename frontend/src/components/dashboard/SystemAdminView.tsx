@@ -692,6 +692,101 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         </Paper>
     );
 
+    const renderAuditLogs = () => (
+        <Box>
+            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box>
+                    <Typography variant="h5" fontWeight="bold">Global System Audit Trail</Typography>
+                    <Typography variant="body2" color="text.secondary">Real-time immutable record of all administrative and system operations</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <TextField
+                        size="small"
+                        placeholder="Filter by event type or detail..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment>,
+                            sx: { borderRadius: 1, width: 300, bgcolor: 'background.paper' }
+                        }}
+                    />
+                    <Button variant="contained" startIcon={<Refresh />} onClick={() => dispatch(fetchAuditLogs())} sx={{ borderRadius: 1 }}>Refresh Logs</Button>
+                </Box>
+            </Box>
+
+            <Paper elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
+                <TableContainer sx={{ maxHeight: '60vh' }}>
+                    <Table stickyHeader size="small">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>TIMESTAMP</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>EVENT TYPE</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>DESCRIPTION</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>ACTOR</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>IP ADDRESS</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {auditLogs.filter((log: any) =>
+                                log.event_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                log.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                log.user_name?.toLowerCase().includes(searchTerm.toLowerCase())
+                            ).map((log: any) => {
+                                const isSecurity = ['USER_LOGIN', 'USER_REGISTERED', 'USER_APPROVED'].includes(log.event_type);
+                                const isDeletion = log.event_type?.includes('DELETE') || log.event_type?.includes('REJECT');
+
+                                return (
+                                    <TableRow key={log.id} hover>
+                                        <TableCell sx={{ whiteSpace: 'nowrap', color: 'text.secondary', fontWeight: 500 }}>
+                                            {new Date(log.timestamp).toLocaleString()}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Chip
+                                                label={log.event_type?.replace(/_/g, ' ')}
+                                                size="small"
+                                                variant="outlined"
+                                                sx={{
+                                                    fontWeight: 'bold',
+                                                    fontSize: '0.65rem',
+                                                    color: isSecurity ? 'primary.main' : isDeletion ? 'error.main' : 'info.main',
+                                                    borderColor: isSecurity ? 'primary.light' : isDeletion ? 'error.light' : 'info.light',
+                                                    bgcolor: isSecurity ? alpha(theme.palette.primary.main, 0.05) : isDeletion ? alpha(theme.palette.error.main, 0.05) : alpha(theme.palette.info.main, 0.05)
+                                                }}
+                                            />
+                                        </TableCell>
+                                        <TableCell sx={{ fontWeight: 600 }}>{log.description}</TableCell>
+                                        <TableCell>
+                                            {log.user_name ? (
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Box sx={{ width: 24, height: 24, borderRadius: '50%', bgcolor: 'primary.main', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 'bold' }}>
+                                                        {log.user_name[0].toUpperCase()}
+                                                    </Box>
+                                                    <Typography variant="body2" fontWeight="bold">{log.user_name}</Typography>
+                                                </Box>
+                                            ) : (
+                                                <Typography variant="caption" color="text.disabled">SYSTEM</Typography>
+                                            )}
+                                        </TableCell>
+                                        <TableCell sx={{ fontFamily: 'monospace', color: 'text.secondary', fontSize: '0.75rem' }}>
+                                            {log.ip_address || 'Internal'}
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                            {auditLogs.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={5} sx={{ py: 10, textAlign: 'center' }}>
+                                        <Typography variant="body2" color="text.secondary">No activity logs found in current registry.</Typography>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
+        </Box>
+    );
+
     const renderDefault = () => (
         <Box sx={{ py: 12, textAlign: 'center', bgcolor: alpha(theme.palette.background.paper, 0.5), borderRadius: 2, border: '2px dashed', borderColor: 'divider' }}>
             <AdminPanelSettings sx={{ fontSize: 80, mb: 2, opacity: 0.1 }} />
@@ -729,7 +824,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             activeTab === 'pending_approvals' ? renderPendingApprovals() :
                                 activeTab === 'periodic_tasks' ? renderPeriodicTasks() :
                                     activeTab === 'groups' ? renderGroups() :
-                                        renderDefault()}
+                                        activeTab === 'audit_logs' ? renderAuditLogs() :
+                                            renderDefault()}
                 </motion.div>
             </AnimatePresence>
 

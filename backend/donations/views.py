@@ -21,6 +21,8 @@ from .services import DonationService, PaymentService, NotificationService
 from accounts.models import User, Notification, AuditLog
 from accounts.permissions import IsAdminOrManagement
 from kindra_cbo.throttling import PaymentRateThrottle, RegistrationRateThrottle
+from reporting.utils import log_analytics_event
+from reporting.models import AnalyticsEvent
 
 logger = logging.getLogger('kindra_cbo')
 
@@ -234,13 +236,12 @@ def approve_donation(request, pk):
         DonationService.finalize_donation(donation)
         
         # Audit log
-        AuditLog.objects.create(
+        log_analytics_event(
+            event_type=AnalyticsEvent.EventType.DONATION_RECEIVED,
+            description=f'Administrator approved donation of {donation.amount} {donation.currency} (Ref: {donation.transaction_id})',
             user=request.user,
-            action=AuditLog.Action.UPDATE,
-            resource_type='Donation',
-            resource_id=str(donation.id),
-            description=f'Approved donation {donation.transaction_id}',
-            ip_address=request.META.get('REMOTE_ADDR')
+            request=request,
+            event_data={'donation_id': str(donation.id), 'amount': float(donation.amount)}
         )
         return Response({'message': 'Donation approved'}, status=status.HTTP_200_OK)
     except Donation.DoesNotExist:
@@ -268,13 +269,12 @@ def reject_donation(request, pk):
         donation.status = Donation.Status.FAILED
         donation.save()
         
-        AuditLog.objects.create(
+        log_analytics_event(
+            event_type='DONATION_REJECTED',
+            description=f'Administrator rejected donation {donation.transaction_id}',
             user=request.user,
-            action=AuditLog.Action.UPDATE,
-            resource_type='Donation',
-            resource_id=str(donation.id),
-            description=f'Rejected donation {donation.transaction_id}',
-            ip_address=request.META.get('REMOTE_ADDR')
+            request=request,
+            event_data={'donation_id': str(donation.id)}
         )
         return Response({'message': 'Donation rejected'}, status=status.HTTP_200_OK)
     except Donation.DoesNotExist:
@@ -309,11 +309,12 @@ def approve_material_donation(request, pk):
                 category=Notification.Category.DONATION
             )
         
-        from accounts.models import AuditLog
-        AuditLog.objects.create(
-            user=request.user, action=AuditLog.Action.UPDATE, resource_type='MaterialDonation',
-            resource_id=str(mat_don.id), description=f'Approved material pickup: {mat_don.category}',
-            ip_address=request.META.get('REMOTE_ADDR')
+        log_analytics_event(
+            event_type='MATERIAL_DONATION_COLLECTED',
+            description=f'Administrator verified collection of {mat_don.category} donation',
+            user=request.user,
+            request=request,
+            event_data={'material_donation_id': str(mat_don.id)}
         )
         return Response({'message': 'Pickup approved'}, status=status.HTTP_200_OK)
     except MaterialDonation.DoesNotExist:

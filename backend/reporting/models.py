@@ -203,6 +203,7 @@ class AnalyticsEvent(models.Model):
     # Event details
     event_type = models.CharField(max_length=30, choices=EventType.choices)
     event_data = models.JSONField(default=dict, help_text=_('Additional event data'))
+    description = models.TextField(blank=True, help_text=_('Human readable description of the event'))
     
     # Context
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)

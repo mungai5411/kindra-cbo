@@ -12,6 +12,8 @@ from .serializers import (
     AssessmentSerializer, DocumentSerializer, CaseNoteSerializer
 )
 from accounts.models import AuditLog, User, Notification
+from reporting.utils import log_analytics_event
+from reporting.models import AnalyticsEvent
 import random
 import string
 
@@ -42,13 +44,12 @@ class FamilyListCreateView(generics.ListCreateAPIView):
         family = serializer.save(family_code=family_code, created_by=self.request.user)
         
         # Log creation
-        AuditLog.objects.create(
+        log_analytics_event(
+            event_type='FAMILY_REGISTERED',
+            description=f'Registered new family: {family.family_code} ({family.primary_contact_name})',
             user=self.request.user,
-            action=AuditLog.Action.CREATE,
-            resource_type='Family',
-            resource_id=str(family.id),
-            description=f'Created family: {family.family_code}',
-            ip_address=self.request.META.get('REMOTE_ADDR')
+            request=self.request,
+            event_data={'family_id': str(family.id), 'county': family.county}
         )
         
         # Notify admins about new family registration
@@ -115,13 +116,12 @@ class CaseListCreateView(generics.ListCreateAPIView):
         case = serializer.save(case_number=case_number, created_by=self.request.user)
         
         # Log creation
-        AuditLog.objects.create(
+        log_analytics_event(
+            event_type='CASE_OPENED',
+            description=f'Opened new case: {case.case_number} - {case.title}',
             user=self.request.user,
-            action=AuditLog.Action.CREATE,
-            resource_type='Case',
-            resource_id=str(case.id),
-            description=f'Created case: {case.case_number}',
-            ip_address=self.request.META.get('REMOTE_ADDR')
+            request=self.request,
+            event_data={'case_id': str(case.id), 'priority': case.priority}
         )
 
         # Notify assigned worker

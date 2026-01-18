@@ -30,6 +30,8 @@ from .serializers import (
 )
 from .permissions import IsAdminOrManagement
 from kindra_cbo.throttling import RegistrationRateThrottle
+from reporting.utils import log_analytics_event
+from reporting.models import AnalyticsEvent
 
 # Rate limiting decorator
 def rate_limit(key_prefix, limit, period):
@@ -111,13 +113,11 @@ class UserRegistrationView(generics.CreateAPIView):
         )
         
         # Log registration
-        AuditLog.objects.create(
+        log_analytics_event(
+            event_type=AnalyticsEvent.EventType.VOLUNTEER_JOINED if role == 'VOLUNTEER' else 'USER_REGISTERED',
+            description=f'New {role.lower()} registered: {user.email} (Approved: {not approval_needed})',
             user=user,
-            action=AuditLog.Action.CREATE,
-            resource_type='User',
-            resource_id=str(user.id),
-            description=f'New user registered: {user.email} (Role: {role}, Approved: {not approval_needed})',
-            ip_address=self.get_client_ip(request)
+            request=request
         )
         
         # Create response
@@ -241,13 +241,11 @@ class LoginView(APIView):
         refresh = RefreshToken.for_user(user)
         
         # Audit log successful login
-        AuditLog.objects.create(
+        log_analytics_event(
+            event_type='USER_LOGIN',
+            description=f'Successful login: {user.email}',
             user=user,
-            action=AuditLog.Action.LOGIN,
-            resource_type='User',
-            resource_id=str(user.id),
-            description=f'User logged in: {user.email}',
-            ip_address=self.get_client_ip(request)
+            request=request
         )
         
         # Create response
@@ -613,13 +611,12 @@ def approve_user_view(request, pk):
         )
         
         # Log approval
-        AuditLog.objects.create(
+        log_analytics_event(
+            event_type='USER_APPROVED',
+            description=f'Administrator approved account: {user.email}',
             user=request.user,
-            action=AuditLog.Action.UPDATE,
-            resource_type='User',
-            resource_id=str(user.id),
-            description=f'Approved account for {user.email}',
-            ip_address=request.META.get('REMOTE_ADDR')
+            request=request,
+            event_data={'approved_user_id': str(user.id)}
         )
         
         return Response({'success': True, 'message': f'User {user.email} has been approved.'})
