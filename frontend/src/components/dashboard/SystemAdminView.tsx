@@ -22,7 +22,6 @@ import {
     DialogActions,
     MenuItem,
     Alert,
-    Tooltip,
     CircularProgress,
     Snackbar,
     alpha,
@@ -52,7 +51,7 @@ import {
     fetchCases,
     deleteFamily
 } from '../../features/caseManagement/caseManagementSlice';
-import { fetchUsers, deleteUser, triggerInactivityCleanup, fetchAuditLogs, fetchPendingUsers, approveUser } from '../../features/admin/adminSlice';
+import { fetchUsers, deleteUser, triggerInactivityCleanup, fetchAuditLogs, fetchPendingUsers, approveUser, fetchPeriodicTasks, fetchTaskResults } from '../../features/admin/adminSlice';
 import { fetchGroups, createGroup, deleteGroup, updateGroup } from '../../features/volunteers/groupsSlice';
 import { GroupWork, Forum, VerifiedUser, HourglassTop } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -601,7 +600,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             <Button size="small" variant="text" onClick={() => dispatch(fetchTaskResults())} startIcon={<Refresh />}>Refresh</Button>
                         </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {taskResults.length > 0 ? taskResults.slice(0, 5).map((result: any, i) => (
+                            {taskResults.length > 0 ? taskResults.slice(0, 5).map((result: any) => (
                                 <Box key={result.id} sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.4), borderRadius: 1.5, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1) }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                         <Typography variant="body2" fontWeight="bold" sx={{ fontFamily: 'monospace' }}>{result.task_name?.split('.').pop()}</Typography>
