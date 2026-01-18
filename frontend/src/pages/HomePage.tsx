@@ -34,9 +34,9 @@ import {
     PlayArrow,
     ExpandMore,
 } from '@mui/icons-material';
-import { 
-    Accordion, 
-    AccordionSummary, 
+import {
+    Accordion,
+    AccordionSummary,
     AccordionDetails,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -544,42 +544,80 @@ export default function HomePage() {
                         </Typography>
                     </Box>
 
-                    <Box>
-                        {FAQS.map((faq, index) => (
-                            <Accordion 
-                                key={index} 
-                                sx={{ 
-                                    mb: 1, 
-                                    borderRadius: '12px !important',
-                                    '&:before': { display: 'none' },
-                                    boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-                                    border: '1px solid',
-                                    borderColor: alpha(theme.palette.divider, 0.08),
-                                    overflow: 'hidden'
-                                }}
-                                elevation={0}
-                            >
-                                <AccordionSummary
-                                    expandIcon={<ExpandMore color="primary" sx={{ fontSize: '1.2rem' }} />}
-                                    sx={{ 
-                                        px: 2.5, 
-                                        py: 0,
-                                        minHeight: '48px !important',
-                                        '& .MuiAccordionSummary-content': { my: 1.2 }
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                            {FAQS.slice(0, Math.ceil(FAQS.length / 2)).map((faq, index) => (
+                                <Accordion
+                                    key={index}
+                                    sx={{
+                                        mb: 1,
+                                        borderRadius: '12px !important',
+                                        '&:before': { display: 'none' },
+                                        boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                                        border: '1px solid',
+                                        borderColor: alpha(theme.palette.divider, 0.08),
+                                        overflow: 'hidden'
                                     }}
+                                    elevation={0}
                                 >
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                                        {faq.question}
-                                    </Typography>
-                                </AccordionSummary>
-                                <AccordionDetails sx={{ px: 2.5, pb: 2, pt: 0 }}>
-                                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, fontSize: '0.875rem' }}>
-                                        {faq.answer}
-                                    </Typography>
-                                </AccordionDetails>
-                            </Accordion>
-                        ))}
-                    </Box>
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMore color="primary" sx={{ fontSize: '1.2rem' }} />}
+                                        sx={{
+                                            px: 2.5,
+                                            py: 0,
+                                            minHeight: '48px !important',
+                                            '& .MuiAccordionSummary-content': { my: 1.2 }
+                                        }}
+                                    >
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                            {faq.question}
+                                        </Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails sx={{ px: 2.5, pb: 2, pt: 0 }}>
+                                        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, fontSize: '0.875rem' }}>
+                                            {faq.answer}
+                                        </Typography>
+                                    </AccordionDetails>
+                                </Accordion>
+                            ))}
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            {FAQS.slice(Math.ceil(FAQS.length / 2)).map((faq, index) => (
+                                <Accordion
+                                    key={index}
+                                    sx={{
+                                        mb: 1,
+                                        borderRadius: '12px !important',
+                                        '&:before': { display: 'none' },
+                                        boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                                        border: '1px solid',
+                                        borderColor: alpha(theme.palette.divider, 0.08),
+                                        overflow: 'hidden'
+                                    }}
+                                    elevation={0}
+                                >
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMore color="primary" sx={{ fontSize: '1.2rem' }} />}
+                                        sx={{
+                                            px: 2.5,
+                                            py: 0,
+                                            minHeight: '48px !important',
+                                            '& .MuiAccordionSummary-content': { my: 1.2 }
+                                        }}
+                                    >
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                            {faq.question}
+                                        </Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails sx={{ px: 2.5, pb: 2, pt: 0 }}>
+                                        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, fontSize: '0.875rem' }}>
+                                            {faq.answer}
+                                        </Typography>
+                                    </AccordionDetails>
+                                </Accordion>
+                            ))}
+                        </Grid>
+                    </Grid>
                 </Container>
             </Box>
 
