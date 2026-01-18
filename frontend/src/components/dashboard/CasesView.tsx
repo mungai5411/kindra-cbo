@@ -254,6 +254,20 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                         </Box>
                                     </Tooltip>
                                 </TableCell>
+                                <TableCell align="right">
+                                    <Button
+                                        size="small"
+                                        variant="outlined"
+                                        color="primary"
+                                        onClick={() => {
+                                            const baseUrl = window.location.origin.includes('localhost') ? 'http://localhost:8000' : '';
+                                            window.open(`${baseUrl}/api/v1/cases/cases/${c.id}/export-summary/`, '_blank');
+                                        }}
+                                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
+                                    >
+                                        Summary
+                                    </Button>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -403,9 +417,12 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                         size="small"
                                         variant="outlined"
                                         sx={{ borderRadius: 2, textTransform: 'none' }}
-                                        onClick={() => setSnackbar({ open: true, message: `Accessing clinical report for ID: ${item.id}`, severity: 'info' })}
+                                        onClick={() => {
+                                            const baseUrl = window.location.origin.includes('localhost') ? 'http://localhost:8000' : '';
+                                            window.open(`${baseUrl}/api/v1/cases/assessments/${item.id}/export-pdf/`, '_blank');
+                                        }}
                                     >
-                                        View Case
+                                        Export PDF
                                     </Button>
                                 </TableCell>
                             </TableRow>

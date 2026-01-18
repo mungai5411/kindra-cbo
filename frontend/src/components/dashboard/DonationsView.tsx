@@ -698,14 +698,10 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                         variant="outlined"
                         sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
                         onClick={() => {
-                            const csvContent = "Date,Donor,Amount,Status\n2023-11-15,Anonymous,5000,COMPLETED";
-                            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                            const link = document.createElement("a");
-                            link.href = URL.createObjectURL(blob);
-                            link.setAttribute("download", "donations_export.csv");
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
+                            const baseUrl = window.location.origin.includes('localhost') ? 'http://localhost:8000' : '';
+                            const exportUrl = `${baseUrl}/api/v1/reporting/reports/?format=CSV&report_type=DONATIONS`;
+                            window.open(exportUrl, '_blank');
+                            setSnackbar({ open: true, message: 'Generating donations report...', severity: 'info' });
                         }}
                     >
                         Export CSV
@@ -946,6 +942,22 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                         Reject
                                     </Button>
                                 </Box>
+                            )}
+
+                            {md.status === 'COLLECTED' && (
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    color="primary"
+                                    startIcon={<Receipt />}
+                                    onClick={() => {
+                                        const baseUrl = window.location.origin.includes('localhost') ? 'http://localhost:8000' : '';
+                                        window.open(`${baseUrl}/api/v1/donations/material-donations/${md.id}/acknowledgment/`, '_blank');
+                                    }}
+                                    sx={{ borderRadius: 2, mt: 1, textTransform: 'none', fontWeight: 600 }}
+                                >
+                                    Acknowledgment
+                                </Button>
                             )}
                         </Paper>
                     </Grid>

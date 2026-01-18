@@ -17,8 +17,9 @@ from .serializers import (
     DonorSerializer, CampaignSerializer, DonationSerializer, 
     ReceiptSerializer, SocialMediaPostSerializer, MaterialDonationSerializer
 )
-from .services import DonationService, PaymentService, NotificationService
+from .services import DonationService, PaymentService, NotificationService, MaterialAcknowledgmentService
 from accounts.models import User, Notification, AuditLog
+from django.http import HttpResponse
 from accounts.permissions import IsAdminOrManagement
 from kindra_cbo.throttling import PaymentRateThrottle, RegistrationRateThrottle
 from reporting.utils import log_analytics_event
@@ -93,6 +94,17 @@ class CampaignDetailView(generics.RetrieveUpdateDestroyAPIView):
         self.check_object_permissions(self.request, obj)
         return obj
 
+    def perform_destroy(self, instance):
+        title = instance.title
+        instance.delete()
+        log_analytics_event(
+            event_type='CAMPAIGN_DELETED',
+            description=f'Administrator deleted campaign: {title}',
+            user=self.request.user,
+            request=self.request,
+            event_data={'deleted_campaign_title': title}
+        )
+
 
 class DonationListCreateView(generics.ListCreateAPIView):
     queryset = Donation.objects.all()
@@ -106,6 +118,18 @@ class DonationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Donation.objects.all()
     serializer_class = DonationSerializer
     permission_classes = [permissions.AllowAny]
+
+    def perform_destroy(self, instance):
+        tx_id = instance.transaction_id
+        amount = instance.amount
+        instance.delete()
+        log_analytics_event(
+            event_type='DONOR_RECORD_DELETED',
+            description=f'Administrator deleted donation record: {tx_id} ({amount})',
+            user=self.request.user,
+            request=self.request,
+            event_data={'deleted_transaction_id': tx_id, 'amount': float(amount.amount) if hasattr(amount, 'amount') else float(amount)}
+        )
 
     def perform_update(self, serializer):
         old_status = self.get_object().status
@@ -126,6 +150,12 @@ class ReceiptListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['donation__campaign', 'tax_year']
+
+
+class ReceiptDetailView(generics.RetrieveAPIView):
+    queryset = Receipt.objects.all()
+    serializer_class = ReceiptSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 # Business logic moved to services.py
@@ -217,6 +247,17 @@ class MaterialDonationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = MaterialDonation.objects.all()
     serializer_class = MaterialDonationSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def perform_destroy(self, instance):
+        category = instance.category
+        instance.delete()
+        log_analytics_event(
+            event_type='MATERIAL_DONATION_DELETED',
+            description=f'Administrator deleted material donation request: {category}',
+            user=self.request.user,
+            request=self.request,
+            event_data={'deleted_material_category': category}
+        )
 
 
 # Admin Approval Endpoints (Secured)
@@ -340,5 +381,25 @@ def reject_material_donation(request, pk):
             ip_address=request.META.get('REMOTE_ADDR')
         )
         return Response({'message': 'Material donation rejected'}, status=status.HTTP_200_OK)
+    except MaterialDonation.DoesNotExist:
+        return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def download_material_acknowledgment(request, pk):
+    """Download PDF acknowledgment for a material donation"""
+    try:
+        mat_don = MaterialDonation.objects.get(pk=pk)
+        if mat_don.status != MaterialDonation.Status.COLLECTED:
+            return Response(
+                {'error': 'Acknowledgment only available for collected donations'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        pdf_content = MaterialAcknowledgmentService.generate_acknowledgment_pdf(mat_don)
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="acknowledgment_{mat_don.id.hex[:8]}.pdf"'
+        return response
     except MaterialDonation.DoesNotExist:
         return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)

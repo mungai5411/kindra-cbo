@@ -16,6 +16,7 @@ from .serializers import (
     StaffCredentialSerializer, ResourceRequestSerializer, IncidentReportSerializer
 )
 from accounts.models import User, Notification
+from reporting.utils import log_analytics_event
 
 
 class ShelterHomeListCreateView(generics.ListCreateAPIView):
@@ -67,6 +68,17 @@ class ShelterHomeDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ShelterHomeSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    def perform_destroy(self, instance):
+        name = instance.name
+        instance.delete()
+        log_analytics_event(
+            event_type='SHELTER_DELETED',
+            description=f'Administrator deleted shelter home: {name}',
+            user=self.request.user,
+            request=self.request,
+            event_data={'deleted_shelter_name': name}
+        )
+
 
 class PlacementListCreateView(generics.ListCreateAPIView):
     serializer_class = PlacementSerializer
@@ -115,6 +127,18 @@ class StaffCredentialDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = StaffCredential.objects.all()
     serializer_class = StaffCredentialSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def perform_destroy(self, instance):
+        name = instance.full_name
+        id_num = instance.id_number
+        instance.delete()
+        log_analytics_event(
+            event_type='STAFF_CREDENTIAL_DELETED',
+            description=f'Administrator deleted staff credential for: {name} ({id_num})',
+            user=self.request.user,
+            request=self.request,
+            event_data={'deleted_staff_name': name}
+        )
 
 
 class ResourceRequestListCreateView(generics.ListCreateAPIView):

@@ -14,6 +14,8 @@ from .serializers import (
 from accounts.models import AuditLog, User, Notification
 from reporting.utils import log_analytics_event
 from reporting.models import AnalyticsEvent
+from .services import CaseExportService
+from django.http import HttpResponse
 import random
 import string
 
@@ -70,6 +72,18 @@ class FamilyDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Family.objects.all()
     serializer_class = FamilySerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def perform_destroy(self, instance):
+        code = instance.family_code
+        name = instance.primary_contact_name
+        instance.delete()
+        log_analytics_event(
+            event_type='FAMILY_DELETED',
+            description=f'Administrator deleted family record: {code} ({name})',
+            user=self.request.user,
+            request=self.request,
+            event_data={'deleted_family_code': code}
+        )
 
 
 class ChildListCreateView(generics.ListCreateAPIView):
@@ -154,6 +168,18 @@ class CaseDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Case.objects.all()
     serializer_class = CaseSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def perform_destroy(self, instance):
+        case_num = instance.case_number
+        title = instance.title
+        instance.delete()
+        log_analytics_event(
+            event_type='CASE_DELETED',
+            description=f'Administrator deleted case record: {case_num} - {title}',
+            user=self.request.user,
+            request=self.request,
+            event_data={'deleted_case_number': case_num}
+        )
 
     def perform_update(self, serializer):
         old_status = self.get_object().status
@@ -245,3 +271,33 @@ def case_statistics(request):
         'critical_families': Family.objects.filter(vulnerability_level=Family.VulnerabilityLevel.CRITICAL).count(),
     }
     return Response(stats)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def export_assessment_pdf(request, pk):
+    """Export assessment to PDF"""
+    try:
+        assessment = Assessment.objects.get(pk=pk)
+        pdf_content = CaseExportService.generate_assessment_report_pdf(assessment)
+        
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="assessment_{assessment.id.hex[:8]}.pdf"'
+        return response
+    except Assessment.DoesNotExist:
+        return Response({'error': 'Assessment not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def export_case_summary_pdf(request, pk):
+    """Export case summary to PDF"""
+    try:
+        case = Case.objects.get(pk=pk)
+        pdf_content = CaseExportService.generate_case_summary_pdf(case)
+        
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="case_summary_{case.case_number}.pdf"'
+        return response
+    except Case.DoesNotExist:
+        return Response({'error': 'Case not found'}, status=status.HTTP_404_NOT_FOUND)

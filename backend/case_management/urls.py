@@ -11,6 +11,7 @@ from .views import (
     DocumentListCreateView, DocumentDetailView,
     CaseNoteListCreateView,
     case_statistics,
+    export_assessment_pdf, export_case_summary_pdf
 )
 
 app_name = 'case_management'
@@ -41,4 +42,8 @@ urlpatterns = [
     
     # Statistics
     path('statistics/', case_statistics, name='statistics'),
+    
+    # Exports
+    path('assessments/<uuid:pk>/export-pdf/', export_assessment_pdf, name='assessment-export-pdf'),
+    path('cases/<uuid:pk>/export-summary/', export_case_summary_pdf, name='case-export-pdf'),
 ]

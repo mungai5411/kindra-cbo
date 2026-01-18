@@ -19,6 +19,7 @@ from .serializers import (
     AnalyticsEventSerializer, ComplianceReportSerializer,
     PeriodicTaskSerializer, TaskResultSerializer
 )
+from .services import ReportService
 from accounts.permissions import IsAdminOrManagement
 
 
@@ -128,38 +129,13 @@ class ReportListCreateView(generics.ListCreateAPIView):
 
     def generate_report_content(self, report):
         """
-        Generate a dummy CSV file for the report so downloads work
-        In a real app, this would be a Celery task generating real PDFs/Excels
+        Use ReportService to generate real content based on database state
         """
-        import csv
-        import io
-        from django.core.files.base import ContentFile
-        from donations.models import Donation
-        from volunteers.models import Volunteer
-        
-        output = io.StringIO()
-        writer = csv.writer(output)
-        
-        if report.report_type == 'DONATION':
-            writer.writerow(['Date', 'Donor', 'Amount', 'Method', 'Status'])
-            donations = Donation.objects.all()[:100]
-            for d in donations:
-                writer.writerow([d.donation_date, d.donor_name or str(d.donor), d.amount, d.payment_method, d.status])
-        elif report.report_type == 'VOLUNTEER':
-            writer.writerow(['Name', 'Email', 'Role', 'Status', 'Total Hours'])
-            volunteers = Volunteer.objects.all()[:100]
-            for v in volunteers:
-                writer.writerow([v.full_name, v.email, 'VOLUNTEER', v.status, v.total_hours])
-        else:
-            writer.writerow(['Report Title', report.title])
-            writer.writerow(['Generated At', report.generated_at])
-            writer.writerow(['Type', report.report_type])
-            writer.writerow(['Summary', 'Generic system data dump established.'])
-
-        content = output.getvalue()
-        filename = f"report_{report.report_type.lower()}_{report.id.hex[:8]}.csv"
-        report.file.save(filename, ContentFile(content.encode('utf-8')))
-        report.save()
+        try:
+            ReportService.generate_report_file(report)
+        except Exception as e:
+            # Service already logs and marks as FAILED
+            pass
 
 
 class ReportDetailView(generics.RetrieveUpdateDestroyAPIView):

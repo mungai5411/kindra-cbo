@@ -394,11 +394,35 @@ class UserAdminDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
 
+    def perform_update(self, serializer):
+        old_role = self.get_object().role
+        user = serializer.save()
+        
+        if old_role != user.role:
+            log_analytics_event(
+                event_type='USER_ROLE_CHANGED',
+                description=f'Administrator changed role for {user.email} from {old_role} to {user.role}',
+                user=self.request.user,
+                request=self.request,
+                event_data={'affected_user_id': str(user.id), 'old_role': old_role, 'new_role': user.role}
+            )
+
     def perform_destroy(self, instance):
         # Prevent deleting yourself
         if instance == self.request.user:
             raise exceptions.ValidationError("You cannot delete your own account.")
+        
+        email = instance.email
         instance.delete()
+        
+        # Log deletion
+        log_analytics_event(
+            event_type='USER_DELETED',
+            description=f'Administrator deleted user account: {email}',
+            user=self.request.user,
+            request=self.request,
+            event_data={'deleted_user_email': email}
+        )
 
 
 class AuditLogListView(generics.ListAPIView):
@@ -523,6 +547,14 @@ class PasswordResetConfirmView(APIView):
                 
             user.set_password(new_password)
             user.save()
+            
+            # Log password reset
+            log_analytics_event(
+                event_type='PASSWORD_RESET_CONFIRMED',
+                description=f'Password reset confirmed via token for: {user.email}',
+                user=user,
+                request=request
+            )
             
             return Response({'message': 'Password has been reset successfully'})
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):

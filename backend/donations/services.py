@@ -9,6 +9,12 @@ from django.utils import timezone
 from django.db import transaction
 from .models import Donor, Campaign, Donation, Receipt, MaterialDonation
 from accounts.models import User, Notification, AuditLog
+from django.core.files.base import ContentFile
+import io
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.lib import colors
 
 logger = logging.getLogger('kindra_cbo')
 
@@ -55,6 +61,9 @@ class DonationService:
                 tax_year=timezone.now().year
             )
             logger.info(f"Created receipt {receipt.receipt_number} for donation {donation.id}")
+            
+            # Generate PDF File
+            ReceiptService.generate_pdf_receipt(receipt)
             
             # Send notifications
             NotificationService.notify_donation_completed(donation)
@@ -201,6 +210,144 @@ class PaymentService:
         
         logger.info(f"Processed Stripe payment: {donation.transaction_id}")
         return donation
+
+
+class ReceiptService:
+    """
+    Service for generating donation receipts
+    """
+    
+    @staticmethod
+    def generate_pdf_receipt(receipt):
+        """
+        Generate a professional PDF receipt for a donation
+        """
+        donation = receipt.donation
+        buffer = io.BytesIO()
+        p = canvas.Canvas(buffer, pagesize=letter)
+        width, height = letter
+        
+        # Header
+        p.setFont("Helvetica-Bold", 24)
+        p.drawCentredString(width/2, height - inch, "KINDRA CBO")
+        
+        p.setFont("Helvetica", 12)
+        p.drawCentredString(width/2, height - 1.3*inch, "Official Donation Receipt")
+        p.drawCentredString(width/2, height - 1.5*inch, "Nairobi, Kenya | info@kindra.org")
+        
+        p.line(inch, height - 1.8*inch, width - inch, height - 1.8*inch)
+        
+        # Receipt Info
+        p.setFont("Helvetica-Bold", 12)
+        p.drawString(inch, height - 2.2*inch, f"Receipt Number: {receipt.receipt_number}")
+        p.drawRightString(width-inch, height - 2.2*inch, f"Date: {timezone.now().strftime('%d %b %Y')}")
+        
+        # Donor Info
+        p.setFont("Helvetica", 12)
+        p.drawString(inch, height - 2.7*inch, "Donor Information:")
+        p.setFont("Helvetica-Bold", 12)
+        p.drawString(inch, height - 2.9*inch, donation.donor_name or str(donation.donor or "Valued Supporter"))
+        
+        # Table Header
+        p.setFillColor(colors.grey)
+        p.rect(inch, height - 3.5*inch, width - 2*inch, 0.3*inch, fill=1)
+        p.setFillColor(colors.whitesmoke)
+        p.setFont("Helvetica-Bold", 10)
+        p.drawString(inch + 0.1*inch, height - 3.4*inch, "DESCRIPTION")
+        p.drawRightString(width - inch - 0.1*inch, height - 3.4*inch, "AMOUNT")
+        
+        # Table Content
+        p.setFillColor(colors.black)
+        p.setFont("Helvetica", 11)
+        description = f"Donation to {donation.campaign.title if donation.campaign else 'General Fund'}"
+        p.drawString(inch + 0.1*inch, height - 3.8*inch, description)
+        p.drawRightString(width - inch - 0.1*inch, height - 3.8*inch, f"{donation.currency} {donation.amount:,.2f}")
+        
+        p.line(inch, height - 4*inch, width - inch, height - 4*inch)
+        
+        # Total
+        p.setFont("Helvetica-Bold", 12)
+        p.drawRightString(width - inch - 0.1*inch, height - 4.3*inch, f"Total: {donation.currency} {donation.amount:,.2f}")
+        
+        # Footer / Signature
+        p.setFont("Helvetica", 10)
+        p.drawString(inch, height - 5.5*inch, "Authorized Signature:")
+        p.line(inch + 1.5*inch, height - 5.5*inch, inch + 4*inch, height - 5.5*inch)
+        
+        p.setFont("Helvetica-Oblique", 10)
+        p.drawCentredString(width/2, inch, "Thank you for your generous support. Your donation is tax deductible for the year " + str(receipt.tax_year))
+        
+        p.showPage()
+        p.save()
+        
+        buffer.seek(0)
+        filename = f"receipt_{receipt.receipt_number}.pdf"
+        receipt.receipt_file.save(filename, ContentFile(buffer.read()), save=True)
+        logger.info(f"Generated PDF file for receipt {receipt.receipt_number}")
+        return receipt
+
+
+class MaterialAcknowledgmentService:
+    """
+    Service for generating "Gift in Kind" acknowledgments
+    """
+
+    @staticmethod
+    def generate_acknowledgment_pdf(material_donation):
+        """
+        Generate a professional PDF acknowledgment for physical donations
+        """
+        buffer = io.BytesIO()
+        p = canvas.Canvas(buffer, pagesize=letter)
+        width, height = letter
+        
+        # Header
+        p.setFont("Helvetica-Bold", 20)
+        p.drawCentredString(width/2, height - inch, "KINDRA CBO")
+        p.setFont("Helvetica", 12)
+        p.drawCentredString(width/2, height - 1.3*inch, "Official Gift-in-Kind Acknowledgment")
+        
+        p.line(inch, height - 1.6*inch, width - inch, height - 1.6*inch)
+        
+        # Content
+        lines = [
+            f"Date: {timezone.now().strftime('%d %b %Y')}",
+            "",
+            "Dear " + (material_donation.donor.user.get_full_name() if material_donation.donor and material_donation.donor.user else "Valued Donor") + ",",
+            "",
+            "On behalf of Kindra CBO, we would like to express our deepest gratitude for your",
+            f"generous donation of the following items received on {material_donation.updated_at.strftime('%d %b %Y')}:",
+            "",
+            f"Category: {material_donation.category}",
+            f"Description: {material_donation.description}",
+            f"Quantity: {material_donation.quantity}",
+            "",
+            "Your contribution is vital to our mission of empowering lives and building futures",
+            "for our community members. Your kindness makes a real difference.",
+            "",
+            "Please note that as per standard regulations, we do not provide a dollar value for",
+            "gift-in-kind donations. This acknowledgment serves as your official record for tax",
+            "purposes.",
+            "",
+            "With sincere gratitude,",
+            "",
+            "The Kindra CBO Team"
+        ]
+        
+        y = height - 2.2*inch
+        p.setFont("Helvetica", 11)
+        for line in lines:
+            if line.startswith("Dear") or line.startswith("Category"):
+                p.setFont("Helvetica-Bold", 11)
+            else:
+                p.setFont("Helvetica", 11)
+            p.drawString(inch, y, line)
+            y -= 0.2*inch if line else 0.15*inch
+
+        p.showPage()
+        p.save()
+        buffer.seek(0)
+        return buffer.read()
 
 
 class NotificationService:

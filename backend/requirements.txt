@@ -44,3 +44,7 @@ pytz==2024.1
 
 # Security
 django-ratelimit==4.1.0
+
+# Reporting & File Generation
+reportlab==4.0.9
+openpyxl==3.1.2
