@@ -484,138 +484,97 @@ export default function HomePage() {
                 </Container>
             </Box>
 
-            {/* CTA Section */}
-            <Box sx={{ py: 8 }}>
-                <Container maxWidth="md">
-                    <Card sx={{
-                        borderRadius: 6,
-                        p: { xs: 3, md: 5 },
-                        textAlign: 'center',
-                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                        color: 'white',
-                        boxShadow: '0 24px 48px rgba(99, 102, 241, 0.3)',
-                        position: 'relative',
-                        overflow: 'hidden'
-                    }}>
-                        {/* Decorative circles */}
-                        <Box sx={{ position: 'absolute', top: -50, right: -50, width: 150, height: 150, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.1)' }} />
-                        <Box sx={{ position: 'absolute', bottom: -50, left: -50, width: 120, height: 120, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.1)' }} />
+            {/* Integrated CTA & FAQ Section */}
+            <Box sx={{ py: 8, bgcolor: alpha(theme.palette.divider, 0.02) }}>
+                <Container maxWidth="lg">
+                    <Grid container spacing={6} alignItems="center">
+                        {/* Left Side: Transform Lives Today CTA */}
+                        <Grid item xs={12} md={5}>
+                            <Card sx={{
+                                borderRadius: 6,
+                                p: { xs: 4, md: 5 },
+                                textAlign: 'left',
+                                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                                color: 'white',
+                                boxShadow: '0 24px 48px rgba(99, 102, 241, 0.3)',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                height: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center'
+                            }}>
+                                <Box sx={{ position: 'absolute', top: -50, right: -50, width: 150, height: 150, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.1)' }} />
+                                <Box sx={{ position: 'absolute', bottom: -50, left: -50, width: 120, height: 120, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.1)' }} />
 
-                        <Typography variant="h4" sx={{ fontWeight: 900, mb: 1.5, color: 'common.white', fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' } }}>
-                            Transform Lives Today
-                        </Typography>
-                        <Typography variant="body1" sx={{ mb: 3, opacity: 0.9, color: 'common.white', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-                            Your support directly impacts vulnerable children and families. Every contribution brings hope, education, and opportunity to those who need it most.
-                        </Typography>
-                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
-
-                            <Button
-                                variant="outlined"
-                                size="medium"
-                                component={Link}
-                                to="/register"
-                                sx={{
-                                    borderColor: 'white',
-                                    color: 'white',
-                                    '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' },
-                                    px: 4,
-                                    py: 1.5,
-                                    borderRadius: '12px',
-                                    fontWeight: 800,
-                                    fontSize: '1rem',
-                                    borderWidth: '2px'
-                                }}
-                            >
-                                Start Volunteering
-                            </Button>
-                        </Stack>
-                    </Card>
-                </Container>
-            </Box>
-
-            {/* FAQ Section */}
-            <Box sx={{ py: 6, bgcolor: alpha(theme.palette.divider, 0.02) }}>
-                <Container maxWidth="md">
-                    <Box sx={{ textAlign: 'center', mb: 4 }}>
-                        <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: 2 }}>QUESTIONS?</Typography>
-                        <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, fontSize: { xs: '1.8rem', md: '2.5rem' } }}>Frequently Asked Questions</Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Quick answers to common questions about Kindra CBO.
-                        </Typography>
-                    </Box>
-
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} md={6}>
-                            {FAQS.slice(0, Math.ceil(FAQS.length / 2)).map((faq, index) => (
-                                <Accordion
-                                    key={index}
+                                <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, color: 'common.white', fontSize: { xs: '2rem', md: '2.5rem' } }}>
+                                    Transform <br /> Lives Today
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 4, opacity: 0.95, color: 'common.white', lineHeight: 1.6 }}>
+                                    Your support directly impacts vulnerable children and families. Every contribution brings hope and opportunity.
+                                </Typography>
+                                <Button
+                                    variant="outlined"
+                                    size="large"
+                                    component={Link}
+                                    to="/register"
                                     sx={{
-                                        mb: 1,
-                                        borderRadius: '12px !important',
-                                        '&:before': { display: 'none' },
-                                        boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-                                        border: '1px solid',
-                                        borderColor: alpha(theme.palette.divider, 0.08),
-                                        overflow: 'hidden'
+                                        borderColor: 'white',
+                                        color: 'white',
+                                        alignSelf: 'flex-start',
+                                        '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' },
+                                        px: 4,
+                                        py: 1.5,
+                                        borderRadius: '12px',
+                                        fontWeight: 800,
+                                        borderWidth: '2px'
                                     }}
-                                    elevation={0}
                                 >
-                                    <AccordionSummary
-                                        expandIcon={<ExpandMore color="primary" sx={{ fontSize: '1.2rem' }} />}
-                                        sx={{
-                                            px: 2.5,
-                                            py: 0,
-                                            minHeight: '48px !important',
-                                            '& .MuiAccordionSummary-content': { my: 1.2 }
-                                        }}
-                                    >
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                                            {faq.question}
-                                        </Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails sx={{ px: 2.5, pb: 2, pt: 0 }}>
-                                        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, fontSize: '0.875rem' }}>
-                                            {faq.answer}
-                                        </Typography>
-                                    </AccordionDetails>
-                                </Accordion>
-                            ))}
+                                    Start Volunteering
+                                </Button>
+                            </Card>
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                            {FAQS.slice(Math.ceil(FAQS.length / 2)).map((faq, index) => (
-                                <Accordion
-                                    key={index}
-                                    sx={{
-                                        mb: 1,
-                                        borderRadius: '12px !important',
-                                        '&:before': { display: 'none' },
-                                        boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-                                        border: '1px solid',
-                                        borderColor: alpha(theme.palette.divider, 0.08),
-                                        overflow: 'hidden'
-                                    }}
-                                    elevation={0}
-                                >
-                                    <AccordionSummary
-                                        expandIcon={<ExpandMore color="primary" sx={{ fontSize: '1.2rem' }} />}
+
+                        {/* Right Side: FAQ Accordions */}
+                        <Grid item xs={12} md={7}>
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: 2 }}>QUESTIONS?</Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>Common Inquiries</Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Quick help for our community members.
+                                </Typography>
+                            </Box>
+
+                            <Box>
+                                {FAQS.map((faq, index) => (
+                                    <Accordion
+                                        key={index}
                                         sx={{
-                                            px: 2.5,
-                                            py: 0,
-                                            minHeight: '48px !important',
-                                            '& .MuiAccordionSummary-content': { my: 1.2 }
+                                            mb: 1.5,
+                                            borderRadius: '12px !important',
+                                            '&:before': { display: 'none' },
+                                            boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                                            border: '1px solid',
+                                            borderColor: alpha(theme.palette.divider, 0.08),
                                         }}
+                                        elevation={0}
                                     >
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                                            {faq.question}
-                                        </Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails sx={{ px: 2.5, pb: 2, pt: 0 }}>
-                                        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, fontSize: '0.875rem' }}>
-                                            {faq.answer}
-                                        </Typography>
-                                    </AccordionDetails>
-                                </Accordion>
-                            ))}
+                                        <AccordionSummary
+                                            expandIcon={<ExpandMore color="primary" />}
+                                            sx={{ px: 2.5 }}
+                                        >
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                                {faq.question}
+                                            </Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails sx={{ px: 2.5, pb: 2, pt: 0 }}>
+                                            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                                                {faq.answer}
+                                            </Typography>
+                                        </AccordionDetails>
+                                    </Accordion>
+                                ))}
+                            </Box>
                         </Grid>
                     </Grid>
                 </Container>
