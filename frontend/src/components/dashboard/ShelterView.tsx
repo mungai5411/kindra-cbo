@@ -71,7 +71,11 @@ import {
     fetchStaffCredentials,
     createStaffCredential,
     verifyStaffCredential,
-    deleteStaffCredential
+    fetchStaffCredentials,
+    createStaffCredential,
+    verifyStaffCredential,
+    deleteStaffCredential,
+    updateShelter
 } from '../../features/shelters/shelterSlice';
 import { fetchChildren } from '../../features/cases/casesSlice';
 import { fetchEvents } from '../../features/volunteers/volunteersSlice';
@@ -281,18 +285,25 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
     };
 
     // Shelter CRUD Handlers
-    const handleCreateShelter = async (data: any) => {
+    const handleShelterSubmit = async (data: any) => {
         try {
-            await dispatch(createShelter(data)).unwrap();
+            if (data.id) {
+                // Update
+                await dispatch(updateShelter({ id: data.id, data })).unwrap();
+                setSnackbar({ open: true, message: 'Shelter updated successfully!', severity: 'success' });
+            } else {
+                // Create
+                await dispatch(createShelter(data)).unwrap();
+                setSnackbar({ open: true, message: 'Shelter registered successfully!', severity: 'success' });
+            }
             setShowRegisterDialog(false);
             setSelectedShelter(null);
-            setSnackbar({ open: true, message: 'Shelter registered successfully!', severity: 'success' });
             dispatch(fetchShelters());
             if (isAdmin) {
                 dispatch(fetchPendingShelters());
             }
         } catch (err: any) {
-            setSnackbar({ open: true, message: err?.message || 'Failed to create shelter', severity: 'error' });
+            setSnackbar({ open: true, message: err?.message || 'Failed to save shelter', severity: 'error' });
         }
     };
 
@@ -1089,7 +1100,8 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                     setShowRegisterDialog(false);
                     setSelectedShelter(null);
                 }}
-                onSubmit={handleCreateShelter}
+                onSubmit={handleShelterSubmit}
+                initialData={selectedShelter}
             />
 
             {/* Admin Review Dialog */}

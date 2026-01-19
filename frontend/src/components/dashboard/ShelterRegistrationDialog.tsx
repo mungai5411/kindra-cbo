@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -15,20 +15,21 @@ import {
     MenuItem,
     FormControlLabel,
     Checkbox,
-    IconButton,
     Alert,
     Chip,
     useTheme,
     alpha,
     Snackbar
 } from '@mui/material';
-import { Delete, PhotoCamera } from '@mui/icons-material';
 import { KENYA_COUNTIES } from '../../utils/locationData';
+import { ImageGallery, ImageItem } from '../common/ImageGallery';
+import apiClient, { endpoints } from '../../api/client';
 
 interface ShelterRegistrationDialogProps {
     open: boolean;
     onClose: () => void;
     onSubmit: (data: any) => void;
+    initialData?: any;
 }
 
 const DISABILITY_TYPES = [
@@ -41,7 +42,7 @@ const DISABILITY_TYPES = [
     'Multiple Disabilities'
 ];
 
-export function ShelterRegistrationDialog({ open, onClose, onSubmit }: ShelterRegistrationDialogProps) {
+export function ShelterRegistrationDialog({ open, onClose, onSubmit, initialData }: ShelterRegistrationDialogProps) {
     const theme = useTheme();
 
     const [formData, setFormData] = useState({
@@ -69,42 +70,174 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit }: ShelterRe
         license_number: '',
     });
 
-    const [photos, setPhotos] = useState<File[]>([]);
-    const [photoPreview, setPhotoPreview] = useState<string[]>([]);
+    // For new registrations (files)
+    const [newPhotos, setNewPhotos] = useState<File[]>([]);
+    const [newPhotoPreviews, setNewPhotoPreviews] = useState<ImageItem[]>([]);
+
+    // For existing shelters (remote photos)
+    const [existingPhotos, setExistingPhotos] = useState<ImageItem[]>([]);
+
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' as 'success' | 'info' | 'warning' | 'error' });
+
+    useEffect(() => {
+        if (initialData) {
+            setFormData({
+                name: initialData.name || '',
+                registration_number: initialData.registration_number || '',
+                contact_person: initialData.contact_person || '',
+                phone_number: initialData.phone_number || '',
+                emergency_contact: initialData.emergency_contact || '',
+                email: initialData.email || '',
+                county: initialData.county || '',
+                sub_county: initialData.sub_county || '',
+                physical_address: initialData.physical_address || '',
+                total_capacity: initialData.total_capacity || '',
+                age_range_min: initialData.age_range_min || '0',
+                age_range_max: initialData.age_range_max || '18',
+                gender_policy: initialData.gender_policy || 'CO_ED',
+                disability_accommodations: initialData.disability_accommodations || false,
+                disability_capacity: initialData.disability_capacity || '0',
+                disability_types_supported: initialData.disability_types_supported || [],
+                fire_safety_certified: initialData.fire_safety_certified || false,
+                security_measures: initialData.security_measures || '',
+                has_medical_facility: initialData.has_medical_facility || false,
+                has_education_facility: initialData.has_education_facility || false,
+                has_counseling_services: initialData.has_counseling_services || false,
+                license_number: initialData.license_number || '',
+            });
+
+            // Map existing photos
+            if (initialData.photos && Array.isArray(initialData.photos)) {
+                setExistingPhotos(initialData.photos.map((p: any) => ({
+                    id: p.id,
+                    url: p.image,
+                    isPrimary: p.is_primary
+                })));
+            } else {
+                setExistingPhotos([]);
+            }
+            // Clear new photos when editing starts
+            setNewPhotos([]);
+            setNewPhotoPreviews([]);
+        } else {
+            // Reset for new registration
+            setFormData({
+                name: '',
+                registration_number: '',
+                contact_person: '',
+                phone_number: '',
+                emergency_contact: '',
+                email: '',
+                county: '',
+                sub_county: '',
+                physical_address: '',
+                total_capacity: '',
+                age_range_min: '0',
+                age_range_max: '18',
+                gender_policy: 'CO_ED',
+                disability_accommodations: false,
+                disability_capacity: '0',
+                disability_types_supported: [],
+                fire_safety_certified: false,
+                security_measures: '',
+                has_medical_facility: false,
+                has_education_facility: false,
+                has_counseling_services: false,
+                license_number: '',
+            });
+            setNewPhotos([]);
+            setNewPhotoPreviews([]);
+            setExistingPhotos([]);
+        }
+    }, [initialData, open]);
 
     const handleChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        if (photos.length + files.length > 10) {
-            setSnackbar({ open: true, message: 'Maximum 10 photos allowed', severity: 'warning' });
-            return;
+    const handleGalleryAdd = async (files: File[]) => {
+        if (initialData?.id) {
+            // Editing mode: Upload immediately
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('photo_type', 'EXTERIOR'); // Default type
+                try {
+                    await apiClient.post(`${endpoints.shelters.shelters}${initialData.id}/photos/add/`, formData, {
+                        headers: { 'Content-Type': 'multipart/form-data' }
+                    });
+                } catch (error) {
+                    console.error('Failed to upload photo', error);
+                    setSnackbar({ open: true, message: 'Failed to upload photo', severity: 'error' });
+                }
+            }
+            // Reload photos (would involve fetching shelter detail, but we can hack it by reloading parent)
+            // Ideally we call an onSubmit or similar to trigger parent refresh, or just rely on state update if we returned data.
+            // For now, let's just trigger a soft refresh message or manual reload logic.
+            // Since we can't easily refresh `initialData` from here without parent help, we'll verify via `onSubmit` or `onClose`.
+            setSnackbar({ open: true, message: 'Photos added successfully', severity: 'success' });
+            if (onClose) onClose(); // Close nicely or find a way to refresh.
+        } else {
+            // Creation mode: Add to local state
+            const updatedPhotos = [...newPhotos, ...files];
+            setNewPhotos(updatedPhotos);
+
+            // Generate previews
+            const newPreviews: ImageItem[] = [];
+            for (const file of files) {
+                newPreviews.push({
+                    id: URL.createObjectURL(file), // Temporary ID
+                    url: URL.createObjectURL(file),
+                    isPrimary: false
+                });
+            }
+            setNewPhotoPreviews([...newPhotoPreviews, ...newPreviews]);
         }
-
-        const newPhotos = [...photos, ...files];
-        setPhotos(newPhotos);
-
-        // Create previews
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPhotoPreview(prev => [...prev, reader.result as string]);
-            };
-            reader.readAsDataURL(file);
-        });
     };
 
-    const removePhoto = (index: number) => {
-        setPhotos(prev => prev.filter((_, i) => i !== index));
-        setPhotoPreview(prev => prev.filter((_, i) => i !== index));
+    const handleGalleryDelete = async (id: string) => {
+        if (initialData?.id) {
+            // Edit mode: API call
+            try {
+                await apiClient.delete(`${endpoints.shelters.shelters}${initialData.id}/photos/${id}/delete/`);
+                setExistingPhotos(prev => prev.filter(p => p.id !== id));
+                setSnackbar({ open: true, message: 'Photo deleted', severity: 'success' });
+            } catch (error) {
+                setSnackbar({ open: true, message: 'Failed to delete photo', severity: 'error' });
+            }
+        } else {
+            // Create mode: Local remove
+            // Find index in previews to remove from files (assuming order logic holds or using unique temporary IDs)
+            const idx = newPhotoPreviews.findIndex(p => p.id === id);
+            if (idx !== -1) {
+                const updatedFiles = [...newPhotos];
+                updatedFiles.splice(idx, 1);
+                setNewPhotos(updatedFiles);
+
+                const updatedPreviews = [...newPhotoPreviews];
+                updatedPreviews.splice(idx, 1);
+                setNewPhotoPreviews(updatedPreviews);
+            }
+        }
+    };
+
+    const handleGallerySetPrimary = async (id: string) => {
+        if (initialData?.id) {
+            try {
+                await apiClient.patch(`${endpoints.shelters.shelters}${initialData.id}/photos/${id}/set-primary/`);
+                setExistingPhotos(prev => prev.map(p => ({ ...p, isPrimary: p.id === id })));
+                setSnackbar({ open: true, message: 'Primary photo updated', severity: 'success' });
+            } catch (error) {
+                setSnackbar({ open: true, message: 'Failed to set primary', severity: 'error' });
+            }
+        }
+        // Local mode doesn't really support primary setting logic in this simple implementation yet,
+        // but ImageGallery allows distinguishing it. We can add state for it if needed.
     };
 
     const handleSubmit = () => {
-        // Validation
-        if (photos.length < 3) {
+        // Validation for new shelter
+        if (!initialData && newPhotos.length < 3) {
             setSnackbar({ open: true, message: 'Please upload at least 3 photos of your shelter', severity: 'warning' });
             return;
         }
@@ -123,7 +256,8 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit }: ShelterRe
 
         const submissionData = {
             ...formData,
-            photos
+            photos: newPhotos, // Only used for new registration
+            id: initialData?.id // Pass ID if editing
         };
         onSubmit(submissionData);
     };
@@ -147,7 +281,7 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit }: ShelterRe
                 borderColor: 'divider',
                 background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)}, ${alpha(theme.palette.secondary.main, 0.05)})`
             }}>
-                Register Shelter Home
+                {initialData ? 'Edit Shelter Home' : 'Register Shelter Home'}
             </DialogTitle>
 
             <DialogContent sx={{ pt: 3 }}>
@@ -413,66 +547,17 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit }: ShelterRe
 
                     {/* Photos */}
                     <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', mt: 2 }}>
-                        Shelter Photos * (Minimum 3 required)
+                        Shelter Photos * {initialData ? '(Manage)' : '(Minimum 3 required)'}
                     </Typography>
-                    <Button
-                        variant="outlined"
-                        component="label"
-                        fullWidth
-                        disabled={photos.length >= 10}
-                        startIcon={<PhotoCamera />}
-                        sx={{
-                            borderStyle: 'dashed',
-                            py: 2,
-                            borderColor: photos.length < 3 ? 'error.main' : 'divider'
-                        }}
-                    >
-                        Upload Photos ({photos.length}/10)
-                        <input
-                            type="file"
-                            hidden
-                            multiple
-                            accept="image/*"
-                            onChange={handlePhotoUpload}
-                        />
-                    </Button>
 
-                    {photos.length < 3 && (
-                        <Alert severity="warning">
-                            Please upload at least 3 photos of your shelter facilities (exterior, dormitory, facilities)
-                        </Alert>
-                    )}
-
-                    {/* Photo Previews */}
-                    {photoPreview.length > 0 && (
-                        <Grid container spacing={1}>
-                            {photoPreview.map((preview, idx) => (
-                                <Grid item xs={4} key={idx}>
-                                    <Box sx={{ position: 'relative', borderRadius: 2, overflow: 'hidden' }}>
-                                        <img
-                                            src={preview}
-                                            alt={`Preview ${idx + 1}`}
-                                            style={{ width: '100%', height: 120, objectFit: 'cover' }}
-                                        />
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => removePhoto(idx)}
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 4,
-                                                right: 4,
-                                                bgcolor: 'error.main',
-                                                color: 'white',
-                                                '&:hover': { bgcolor: 'error.dark' }
-                                            }}
-                                        >
-                                            <Delete fontSize="small" />
-                                        </IconButton>
-                                    </Box>
-                                </Grid>
-                            ))}
-                        </Grid>
-                    )}
+                    <ImageGallery
+                        images={initialData ? existingPhotos : newPhotoPreviews}
+                        onAdd={handleGalleryAdd}
+                        onDelete={handleGalleryDelete}
+                        onSetPrimary={initialData ? handleGallerySetPrimary : undefined}
+                        maxImages={10}
+                        minImages={initialData ? 0 : 3}
+                    />
                 </Box>
             </DialogContent>
 
@@ -481,10 +566,10 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit }: ShelterRe
                 <Button
                     variant="contained"
                     onClick={handleSubmit}
-                    disabled={photos.length < 3}
+                    disabled={!initialData && newPhotos.length < 3}
                     sx={{ px: 4 }}
                 >
-                    Submit for Approval
+                    {initialData ? 'Update Shelter' : 'Submit for Approval'}
                 </Button>
             </DialogActions>
 

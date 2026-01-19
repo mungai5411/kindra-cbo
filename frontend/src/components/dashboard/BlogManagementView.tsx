@@ -490,111 +490,119 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                     {selectedPost ? 'Edit Story' : 'Compose New Story'}
                 </DialogTitle>
                 <DialogContent>
-                    <Box sx={{ pt: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        <TextField
-                            fullWidth
-                            label="Post Title"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
-                        />
-                        <Grid container spacing={2}>
-                            <Grid item xs={6}>
+                    <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                        <Grid container spacing={2.5}>
+                            <Grid item xs={12} md={8}>
                                 <TextField
                                     fullWidth
-                                    select
-                                    label="Category"
-                                    value={formData.category}
-                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
-                                >
-                                    <MenuItem value=""><em>None</em></MenuItem>
-                                    {categories.map((cat: any) => (
-                                        <MenuItem key={cat.id || cat} value={cat.id || cat}>{cat.name || cat}</MenuItem>
-                                    ))}
-                                    {/* Fallback items if categories empty */}
-                                    <MenuItem value="Success Stories">Success Stories</MenuItem>
-                                    <MenuItem value="Updates">Updates</MenuItem>
-                                </TextField>
+                                    label="Post Title"
+                                    value={formData.title}
+                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                    size="small"
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid item xs={6} md={2}>
                                 <TextField
                                     fullWidth
                                     select
                                     label="Status"
                                     value={formData.status}
                                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                    size="small"
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                                 >
                                     <MenuItem value="DRAFT">Draft</MenuItem>
                                     <MenuItem value="PUBLISHED">Published</MenuItem>
                                     <MenuItem value="ARCHIVED">Archived</MenuItem>
                                 </TextField>
                             </Grid>
+                            <Grid item xs={6} md={2}>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    label="Category"
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    size="small"
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                >
+                                    <MenuItem value=""><em>None</em></MenuItem>
+                                    {categories.map((cat: any) => (
+                                        <MenuItem key={cat.id || cat} value={cat.id || cat}>{cat.name || cat}</MenuItem>
+                                    ))}
+                                    {categories.length === 0 && [
+                                        <MenuItem key="success" value="Success Stories">Success Stories</MenuItem>,
+                                        <MenuItem key="updates" value="Updates">Updates</MenuItem>
+                                    ]}
+                                </TextField>
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    label="Tags"
+                                    SelectProps={{
+                                        multiple: true,
+                                        renderValue: (selected: any) => (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                {selected.map((value: string) => (
+                                                    <Chip
+                                                        key={value}
+                                                        label={tags.find(t => t.id === value)?.name || value}
+                                                        size="small"
+                                                        sx={{ height: 20, fontSize: '0.75rem' }}
+                                                    />
+                                                ))}
+                                            </Box>
+                                        ),
+                                    }}
+                                    value={formData.tag_ids}
+                                    onChange={(e) => setFormData({ ...formData, tag_ids: typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value })}
+                                    size="small"
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                >
+                                    {tags.map((tag: any) => (
+                                        <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem>
+                                    ))}
+                                </TextField>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Excerpt (Short Summary)"
+                                    value={formData.excerpt}
+                                    onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                                    size="small"
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                />
+                            </Grid>
                         </Grid>
 
                         <TextField
                             fullWidth
-                            select
-                            label="Tags"
-                            SelectProps={{
-                                multiple: true,
-                                renderValue: (selected: any) => (
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        {selected.map((value: string) => (
-                                            <Chip
-                                                key={value}
-                                                label={tags.find(t => t.id === value)?.name || value}
-                                                size="small"
-                                            />
-                                        ))}
-                                    </Box>
-                                ),
-                            }}
-                            value={formData.tag_ids}
-                            onChange={(e) => setFormData({ ...formData, tag_ids: typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value })}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
-                        >
-                            {tags.map((tag: any) => (
-                                <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem>
-                            ))}
-                        </TextField>
-
-                        <TextField
-                            fullWidth
                             multiline
-                            rows={3}
-                            label="Excerpt (Short Summary)"
-                            value={formData.excerpt}
-                            onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
-                        />
-
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={8}
+                            rows={6}
                             label="Story Content"
                             placeholder="Write the impact story here..."
                             value={formData.content}
                             onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                         />
 
-                        <Box sx={{ mt: 1 }}>
+                        <Box sx={{ mt: 0 }}>
                             <ImageUploader
                                 label="Featured Image"
-                                helperText="High-impact visual for the story header (Max 5MB)"
+                                helperText="High-impact visual (Max 5MB)"
                                 value={formData.featured_image || selectedPost?.featured_image}
                                 onChange={(file) => setFormData({ ...formData, featured_image: file })}
                                 onDelete={async () => {
                                     if (selectedPost?.id) {
                                         try {
                                             await axios.delete(`/api/v1/blog/admin/posts/${selectedPost.id}/featured-image/`);
-                                            // Update local state to reflect deletion
                                             setSelectedPost({ ...selectedPost, featured_image: null });
                                             setFormData({ ...formData, featured_image: null });
-                                            // Refresh posts list in background
                                             dispatch(fetchAdminPosts());
                                         } catch (error) {
                                             console.error('Failed to delete image:', error);
@@ -609,7 +617,7 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                             />
                         </Box>
 
-                        <Alert severity="info" sx={{ borderRadius: 2 }}>
+                        <Alert severity="info" sx={{ borderRadius: 2, py: 0, '& .MuiAlert-message': { py: 1 } }}>
                             Stories are immediately optimized for SEO and cross-platform sharing.
                         </Alert>
                     </Box>

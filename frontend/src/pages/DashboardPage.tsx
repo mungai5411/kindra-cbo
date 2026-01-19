@@ -63,6 +63,8 @@ const USER_ROLES = [
     { value: 'SHELTER_PARTNER', label: 'Shelter Partner' },
 ];
 
+import { ImageUploader } from '../components/common/ImageUploader';
+
 export default function DashboardPage() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -172,16 +174,21 @@ export default function DashboardPage() {
         return false;
     };
 
+    // Force fetch profile on mount to ensure fresh data (fixes cross-device sync)
+    useEffect(() => {
+        if (isAuthenticated) {
+            dispatch(fetchProfile());
+        }
+    }, [dispatch, isAuthenticated]);
+
     useEffect(() => {
         if (!isAuthenticated && !authLoading) {
             navigate('/login');
-        } else if (isAuthenticated && !user) {
-            dispatch(fetchProfile());
         } else if (user && !canViewModule(activeTab)) {
             // Redirect to overview if user tries to access restricted tab
             navigate('/dashboard/overview');
         }
-    }, [isAuthenticated, user, dispatch, navigate, authLoading, activeTab]);
+    }, [isAuthenticated, user, navigate, authLoading, activeTab]);
 
     // Handle form submissions
     const handleAddVolunteer = async () => {
@@ -557,39 +564,14 @@ export default function DashboardPage() {
                             onChange={(e) => setCampaignForm({ ...campaignForm, description: e.target.value })}
                         />
                         <Box sx={{ mt: 1 }}>
-                            <Button
-                                variant="outlined"
-                                component="label"
-                                fullWidth
-                                sx={{
-                                    borderRadius: 2,
-                                    textTransform: 'none',
-                                    py: 1.5,
-                                    borderStyle: 'dashed'
-                                }}
-                            >
-                                {campaignForm.image ? `📷 ${campaignForm.image.name}` : '📷 Upload Campaign Image (Optional)'}
-                                <input
-                                    type="file"
-                                    hidden
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                            setCampaignForm({ ...campaignForm, image: file });
-                                        }
-                                    }}
-                                />
-                            </Button>
-                            {campaignForm.image && (
-                                <Button
-                                    size="small"
-                                    onClick={() => setCampaignForm({ ...campaignForm, image: null })}
-                                    sx={{ mt: 1, textTransform: 'none' }}
-                                >
-                                    Remove Image
-                                </Button>
-                            )}
+                            <ImageUploader
+                                label="Campaign Image"
+                                helperText="Attractive visual for the campaign"
+                                value={campaignForm.image}
+                                onChange={(file) => setCampaignForm({ ...campaignForm, image: file })}
+                                maxSizeMB={5}
+                                showPreview={true}
+                            />
                         </Box>
                     </Box>
                 </DialogContent>

@@ -46,6 +46,7 @@ import { fetchVolunteers, fetchTasks, fetchEvents, logTimeEntry, addTask, addEve
 import { SubTabView } from './SubTabView';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
+import { ImageGallery, ImageItem } from '../common/ImageGallery';
 
 interface VolunteersViewProps {
     setOpenDialog?: (open: boolean) => void;
@@ -101,7 +102,33 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
         post_to_donors: false,
         post_to_shelters: false,
     });
-    const [eventPhotos, setEventPhotos] = useState<FileList | null>(null);
+    const [eventPhotos, setEventPhotos] = useState<File[]>([]);
+    const [eventPhotoPreviews, setEventPhotoPreviews] = useState<ImageItem[]>([]);
+
+    const handleEventGalleryAdd = (files: File[]) => {
+        const updatedPhotos = [...eventPhotos, ...files];
+        setEventPhotos(updatedPhotos);
+
+        const newPreviews: ImageItem[] = files.map(file => ({
+            id: URL.createObjectURL(file), // Temporary ID
+            url: URL.createObjectURL(file),
+            isPrimary: false
+        }));
+        setEventPhotoPreviews([...eventPhotoPreviews, ...newPreviews]);
+    };
+
+    const handleEventGalleryDelete = (id: string) => {
+        const idx = eventPhotoPreviews.findIndex(p => p.id === id);
+        if (idx !== -1) {
+            const updatedFiles = [...eventPhotos];
+            updatedFiles.splice(idx, 1);
+            setEventPhotos(updatedFiles);
+
+            const updatedPreviews = [...eventPhotoPreviews];
+            updatedPreviews.splice(idx, 1);
+            setEventPhotoPreviews(updatedPreviews);
+        }
+    };
 
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'info' | 'warning' | 'error' });
 
@@ -240,10 +267,10 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
             formData.append(key, String((eventForm as any)[key]));
         });
 
-        if (eventPhotos) {
-            for (let i = 0; i < eventPhotos.length; i++) {
-                formData.append('photos', eventPhotos[i]);
-            }
+        if (eventPhotos.length > 0) {
+            eventPhotos.forEach(photo => {
+                formData.append('photos', photo);
+            });
         }
 
         dispatch(addEvent(formData)).unwrap().then(() => {
@@ -259,7 +286,8 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 post_to_donors: false,
                 post_to_shelters: false,
             });
-            setEventPhotos(null);
+            setEventPhotos([]);
+            setEventPhotoPreviews([]);
             setSnackbar({ open: true, message: 'Event created and posted successfully', severity: 'success' });
         }).catch(() => {
             setSnackbar({ open: true, message: 'Failed to create event. Check inputs.', severity: 'error' });
@@ -1014,22 +1042,13 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
 
                         <Box sx={{ mt: 1 }}>
                             <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Event Photos</Typography>
-                            <Button
-                                component="label"
-                                variant="outlined"
-                                startIcon={<CloudUpload />}
-                                fullWidth
-                                sx={{ borderRadius: 3, py: 2, borderStyle: 'dashed' }}
-                            >
-                                {eventPhotos ? `${eventPhotos.length} photos selected` : 'Upload Event Photos'}
-                                <input
-                                    type="file"
-                                    hidden
-                                    multiple
-                                    accept="image/*"
-                                    onChange={(e) => setEventPhotos(e.target.files)}
-                                />
-                            </Button>
+                            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Event Photos</Typography>
+                            <ImageGallery
+                                images={eventPhotoPreviews}
+                                onAdd={handleEventGalleryAdd}
+                                onDelete={handleEventGalleryDelete}
+                                maxImages={10}
+                            />
                         </Box>
                     </Box>
                 </DialogContent>
