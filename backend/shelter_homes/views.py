@@ -171,3 +171,157 @@ class IncidentReportListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(reported_by=self.request.user)
+
+
+# Shelter Photo Management Endpoints
+from rest_framework.decorators import api_view, permission_classes
+from .models import ShelterPhoto
+from accounts.permissions import IsAdminOrManagement
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def add_shelter_photo(request, shelter_id):
+    """Add a photo to a shelter"""
+    try:
+        shelter = ShelterHome.objects.get(pk=shelter_id)
+        
+        # Check permissions: Admin, Management, or Shelter Owner
+        user = request.user
+        if not (user.is_staff or user.role in ['ADMIN', 'MANAGEMENT'] or shelter.partner_user == user):
+            return Response(
+                {'error': 'You do not have permission to manage this shelter'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        if 'image' not in request.FILES:
+            return Response(
+                {'error': 'No image file provided'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate image using utility
+        from accounts.image_utils import validate_image_file
+        validate_image_file(request.FILES['image'])
+        
+        # Create photo
+        photo_type = request.data.get('photo_type', 'FACILITY')
+        caption = request.data.get('caption', '')
+        
+        photo = ShelterPhoto.objects.create(
+            shelter_home=shelter,
+            image=request.FILES['image'],
+            photo_type=photo_type,
+            caption=caption
+        )
+        
+        # If this is the first photo, make it primary
+        if shelter.photos.count() == 1:
+            shelter.primary_photo = photo
+            shelter.save()
+        
+        log_analytics_event(
+            event_type='SHELTER_PHOTO_ADDED',
+            description=f'Photo added to shelter: {shelter.name}',
+            user=request.user,
+            request=request,
+            event_data={'shelter_id': str(shelter.id), 'photo_id': str(photo.id)}
+        )
+        
+        return Response({
+            'success': True,
+            'message': 'Photo added successfully',
+            'photo': {
+                'id': str(photo.id),
+                'image': photo.image.url if photo.image else None,
+                'photo_type': photo.photo_type,
+                'caption': photo.caption,
+                'is_primary': shelter.primary_photo == photo
+            }
+        }, status=status.HTTP_201_CREATED)
+    except ShelterHome.DoesNotExist:
+        return Response({'error': 'Shelter not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to add photo: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['DELETE'])
+@permission_classes([permissions.IsAuthenticated])
+def delete_shelter_photo(request, shelter_id, photo_id):
+    """Delete a photo from a shelter"""
+    try:
+        shelter = ShelterHome.objects.get(pk=shelter_id)
+        photo = ShelterPhoto.objects.get(pk=photo_id, shelter_home=shelter)
+        
+        # Check permissions
+        user = request.user
+        if not (user.is_staff or user.role in ['ADMIN', 'MANAGEMENT'] or shelter.partner_user == user):
+            return Response(
+                {'error': 'You do not have permission to manage this shelter'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Delete from Cloudinary
+        from accounts.image_utils import delete_cloudinary_image
+        if hasattr(photo.image, 'url'):
+            delete_cloudinary_image(photo.image.url)
+        
+        # If this was the primary photo, clear it
+        if shelter.primary_photo == photo:
+            shelter.primary_photo = None
+            shelter.save()
+        
+        photo.delete()
+        
+        log_analytics_event(
+            event_type='SHELTER_PHOTO_DELETED',
+            description=f'Photo deleted from shelter: {shelter.name}',
+            user=request.user,
+            request=request,
+            event_data={'shelter_id': str(shelter.id)}
+        )
+        
+        return Response({'success': True, 'message': 'Photo deleted successfully'})
+    except ShelterHome.DoesNotExist:
+        return Response({'error': 'Shelter not found'}, status=status.HTTP_404_NOT_FOUND)
+    except ShelterPhoto.DoesNotExist:
+        return Response({'error': 'Photo not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to delete photo: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['PATCH'])
+@permission_classes([permissions.IsAuthenticated])
+def set_primary_shelter_photo(request, shelter_id, photo_id):
+    """Set a photo as the primary photo for a shelter"""
+    try:
+        shelter = ShelterHome.objects.get(pk=shelter_id)
+        photo = ShelterPhoto.objects.get(pk=photo_id, shelter_home=shelter)
+        
+        # Check permissions
+        user = request.user
+        if not (user.is_staff or user.role in ['ADMIN', 'MANAGEMENT'] or shelter.partner_user == user):
+            return Response(
+                {'error': 'You do not have permission to manage this shelter'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        shelter.primary_photo = photo
+        shelter.save()
+        
+        return Response({'success': True, 'message': 'Primary photo updated successfully'})
+    except ShelterHome.DoesNotExist:
+        return Response({'error': 'Shelter not found'}, status=status.HTTP_404_NOT_FOUND)
+    except ShelterPhoto.DoesNotExist:
+        return Response({'error': 'Photo not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to set primary photo: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

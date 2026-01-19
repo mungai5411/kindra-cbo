@@ -9,6 +9,7 @@ from .views import (
     ResourceListCreateView, ResourceDetailView,
     StaffCredentialListCreateView, StaffCredentialDetailView,
     ResourceRequestListCreateView, IncidentReportListCreateView,
+    add_shelter_photo, delete_shelter_photo, set_primary_shelter_photo,
 )
 from .approval_views import ShelterApprovalView, PendingSheltersView
 
@@ -32,4 +33,9 @@ urlpatterns = [
     # New interactive features
     path('requests/', ResourceRequestListCreateView.as_view(), name='resource-request-list'),
     path('incidents/', IncidentReportListCreateView.as_view(), name='incident-report-list'),
+    
+    # Photo Management
+    path('<uuid:shelter_id>/photos/add/', add_shelter_photo, name='add-shelter-photo'),
+    path('<uuid:shelter_id>/photos/<uuid:photo_id>/delete/', delete_shelter_photo, name='delete-shelter-photo'),
+    path('<uuid:shelter_id>/photos/<uuid:photo_id>/set-primary/', set_primary_shelter_photo, name='set-primary-photo'),
 ]
