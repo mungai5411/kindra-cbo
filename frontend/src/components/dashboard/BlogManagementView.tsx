@@ -531,10 +531,11 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                                     {categories.map((cat: any) => (
                                         <MenuItem key={cat.id || cat} value={cat.id || cat}>{cat.name || cat}</MenuItem>
                                     ))}
-                                    {categories.length === 0 && [
-                                        <MenuItem key="success" value="Success Stories">Success Stories</MenuItem>,
-                                        <MenuItem key="updates" value="Updates">Updates</MenuItem>
-                                    ]}
+                                    {categories.length === 0 && (
+                                        <MenuItem value="">
+                                            <em>No categories found - Create one first</em>
+                                        </MenuItem>
+                                    )}
                                 </TextField>
                             </Grid>
 
