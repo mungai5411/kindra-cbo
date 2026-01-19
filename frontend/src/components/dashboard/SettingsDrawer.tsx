@@ -121,139 +121,139 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
     const renderProfileSection = () => (
         <Box>
             {/* Profile Header */}
-            <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 3,
-                mb: 4,
+            <Paper elevation={0} sx={{
                 p: 3,
-                borderRadius: 3,
-                bgcolor: alpha(theme.palette.primary.main, 0.03),
+                mb: 4,
+                borderRadius: 4,
+                bgcolor: alpha(theme.palette.primary.main, 0.04),
                 border: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.1)
+                borderColor: alpha(theme.palette.primary.main, 0.1),
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                justifyContent: 'space-between',
+                gap: 3
             }}>
-                {editMode ? (
-                    <Box sx={{ width: '100%', maxWidth: 400 }}>
-                        <ImageUploader
-                            value={formData.profile_picture}
-                            onChange={(file) => setFormData({ ...formData, profile_picture: file || '' })}
-                            onDelete={async () => {
-                                try {
-                                    await axios.delete('/api/v1/accounts/profile/picture/');
-                                    setFormData({ ...formData, profile_picture: '' });
-                                } catch (error) {
-                                    console.error('Failed to delete profile picture:', error);
-                                    throw error;
-                                }
-                            }}
-                            maxSizeMB={5}
-                            label="Profile Picture"
-                            helperText="Upload a profile photo (max 5MB, JPG/PNG/GIF)"
-                            showPreview={true}
-                        />
-                    </Box>
-                ) : (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flex: 1 }}>
-                        <Avatar
-                            src={typeof formData.profile_picture === 'string' ? formData.profile_picture : undefined}
-                            sx={{
-                                width: 80,
-                                height: 80,
-                                border: '3px solid',
-                                borderColor: 'primary.main',
-                                fontSize: '2rem',
-                                fontWeight: 600
-                            }}
-                        >
-                            {user?.firstName?.[0]}{user?.lastName?.[0]}
-                        </Avatar>
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" fontWeight="bold" sx={{ mb: 0.5 }}>
-                                {user?.firstName} {user?.lastName}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                {user?.email}
-                            </Typography>
-                            <Box sx={{
-                                display: 'inline-flex',
-                                px: 1.5,
-                                py: 0.5,
-                                borderRadius: 2,
-                                bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                border: '1px solid',
-                                borderColor: alpha(theme.palette.primary.main, 0.2)
-                            }}>
-                                <Typography variant="caption" fontWeight="600" color="primary.main">
-                                    {user?.role || 'User'}
-                                </Typography>
-                            </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, width: editMode ? '100%' : 'auto' }}>
+                    {editMode ? (
+                        <Box sx={{ width: '100%' }}>
+                            <ImageUploader
+                                value={formData.profile_picture}
+                                onChange={(file) => setFormData({ ...formData, profile_picture: file || '' })}
+                                onDelete={async () => {
+                                    try {
+                                        await axios.delete('/api/v1/accounts/profile/picture/');
+                                        setFormData({ ...formData, profile_picture: '' });
+                                    } catch (error) {
+                                        console.error('Failed to delete profile picture:', error);
+                                        throw error;
+                                    }
+                                }}
+                                maxSizeMB={5}
+                                label="Profile Picture"
+                                helperText="Max 5MB (JPG/PNG)"
+                                showPreview={true}
+                            />
                         </Box>
-                    </Box>
-                )}
+                    ) : (
+                        <>
+                            <Avatar
+                                src={typeof formData.profile_picture === 'string' ? formData.profile_picture : undefined}
+                                sx={{
+                                    width: 72,
+                                    height: 72,
+                                    border: '3px solid',
+                                    borderColor: 'background.paper',
+                                    boxShadow: theme.shadows[2],
+                                    fontSize: '1.75rem',
+                                    fontWeight: 700,
+                                    bgcolor: 'primary.main',
+                                    color: 'primary.contrastText'
+                                }}
+                            >
+                                {user?.firstName?.[0]}{user?.lastName?.[0]}
+                            </Avatar>
+                            <Box>
+                                <Typography variant="h6" fontWeight="800" sx={{ mb: 0.5 }}>
+                                    {user?.firstName} {user?.lastName}
+                                </Typography>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {user?.email}
+                                    </Typography>
+                                    <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'text.disabled' }} />
+                                    <Typography variant="caption" fontWeight="600" color="primary.main" sx={{
+                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                        px: 1,
+                                        py: 0.25,
+                                        borderRadius: 1
+                                    }}>
+                                        {user?.role || 'User'}
+                                    </Typography>
+                                </Stack>
+                            </Box>
+                        </>
+                    )}
+                </Box>
 
                 {!editMode ? (
                     <Button
-                        variant="outlined"
-                        size="small"
+                        variant="contained"
                         onClick={() => setEditMode(true)}
                         sx={{
-                            borderRadius: 2,
+                            borderRadius: 2.5,
                             textTransform: 'none',
-                            fontWeight: 600
+                            fontWeight: 600,
+                            px: 3,
+                            boxShadow: theme.shadows[2]
                         }}
                     >
                         Edit Profile
                     </Button>
                 ) : (
-                    <Stack direction="row" spacing={1}>
-                        <Button
-                            variant="contained"
-                            size="small"
-                            startIcon={<Check />}
-                            onClick={handleSave}
-                            sx={{
-                                borderRadius: 2,
-                                textTransform: 'none',
-                                fontWeight: 600
-                            }}
-                        >
-                            Save
-                        </Button>
+                    <Stack direction="row" spacing={1} sx={{ alignSelf: 'flex-start' }}>
                         <Button
                             variant="outlined"
-                            size="small"
                             onClick={() => setEditMode(false)}
                             sx={{
-                                borderRadius: 2,
+                                borderRadius: 2.5,
                                 textTransform: 'none',
                                 fontWeight: 600
                             }}
                         >
                             Cancel
                         </Button>
+                        <Button
+                            variant="contained"
+                            startIcon={<Check />}
+                            onClick={handleSave}
+                            sx={{
+                                borderRadius: 2.5,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                boxShadow: theme.shadows[2]
+                            }}
+                        >
+                            Save Changes
+                        </Button>
                     </Stack>
                 )}
-            </Box>
+            </Paper>
 
             {/* Personal Information */}
-            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: 'text.secondary' }}>
+            <Typography variant="subtitle2" fontWeight="700" sx={{ mb: 2.5, color: 'text.primary', fontSize: '0.95rem' }}>
                 Personal Information
             </Typography>
             <Stack spacing={2.5} sx={{ mb: 4 }}>
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2.5 }}>
                     <TextField
                         label="First Name"
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                         disabled={!editMode}
                         fullWidth
-                        variant="outlined"
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: 2,
-                                bgcolor: editMode ? 'background.paper' : alpha(theme.palette.action.hover, 0.02)
-                            }
-                        }}
+                        size="medium"
+                        InputProps={{ sx: { borderRadius: 2 } }}
                     />
                     <TextField
                         label="Last Name"
@@ -261,50 +261,35 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                         disabled={!editMode}
                         fullWidth
-                        variant="outlined"
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: 2,
-                                bgcolor: editMode ? 'background.paper' : alpha(theme.palette.action.hover, 0.02)
-                            }
-                        }}
+                        size="medium"
+                        InputProps={{ sx: { borderRadius: 2 } }}
                     />
                 </Box>
-                <TextField
-                    label="Email Address"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    disabled={!editMode}
-                    fullWidth
-                    variant="outlined"
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            borderRadius: 2,
-                            bgcolor: editMode ? 'background.paper' : alpha(theme.palette.action.hover, 0.02)
-                        }
-                    }}
-                />
-                <TextField
-                    label="Phone Number"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    disabled={!editMode}
-                    fullWidth
-                    variant="outlined"
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            borderRadius: 2,
-                            bgcolor: editMode ? 'background.paper' : alpha(theme.palette.action.hover, 0.02)
-                        }
-                    }}
-                />
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1.5fr 1fr' }, gap: 2.5 }}>
+                    <TextField
+                        label="Email Address"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        disabled={!editMode}
+                        fullWidth
+                        InputProps={{ sx: { borderRadius: 2 } }}
+                    />
+                    <TextField
+                        label="Phone Number"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        disabled={!editMode}
+                        fullWidth
+                        InputProps={{ sx: { borderRadius: 2 } }}
+                    />
+                </Box>
             </Stack>
 
             {/* Donor Details */}
             {user?.role === 'DONOR' && (
                 <>
-                    <Divider sx={{ my: 3 }} />
-                    <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: 'text.secondary' }}>
+                    <Divider sx={{ my: 4, borderStyle: 'dashed' }} />
+                    <Typography variant="subtitle2" fontWeight="700" sx={{ mb: 2.5, color: 'text.primary', fontSize: '0.95rem' }}>
                         Organization Details
                     </Typography>
                     <Stack spacing={2.5}>
@@ -314,28 +299,16 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
                             onChange={(e) => setFormData({ ...formData, organization_name: e.target.value })}
                             disabled={!editMode}
                             fullWidth
-                            variant="outlined"
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: 2,
-                                    bgcolor: editMode ? 'background.paper' : alpha(theme.palette.action.hover, 0.02)
-                                }
-                            }}
+                            InputProps={{ sx: { borderRadius: 2 } }}
                         />
-                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2.5 }}>
                             <TextField
                                 label="Country"
                                 value={formData.country}
                                 onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                                 disabled={!editMode}
                                 fullWidth
-                                variant="outlined"
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: 2,
-                                        bgcolor: editMode ? 'background.paper' : alpha(theme.palette.action.hover, 0.02)
-                                    }
-                                }}
+                                InputProps={{ sx: { borderRadius: 2 } }}
                             />
                             <TextField
                                 label="City"
@@ -343,13 +316,7 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
                                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                                 disabled={!editMode}
                                 fullWidth
-                                variant="outlined"
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: 2,
-                                        bgcolor: editMode ? 'background.paper' : alpha(theme.palette.action.hover, 0.02)
-                                    }
-                                }}
+                                InputProps={{ sx: { borderRadius: 2 } }}
                             />
                         </Box>
                         <TextField
@@ -359,14 +326,8 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
                             disabled={!editMode}
                             fullWidth
                             multiline
-                            rows={2}
-                            variant="outlined"
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: 2,
-                                    bgcolor: editMode ? 'background.paper' : alpha(theme.palette.action.hover, 0.02)
-                                }
-                            }}
+                            rows={3}
+                            InputProps={{ sx: { borderRadius: 2 } }}
                         />
                     </Stack>
                 </>

@@ -42,6 +42,8 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { SubTabView } from './SubTabView';
+import { ImageUploader } from '../common/ImageUploader';
+import axios from 'axios';
 
 // Status Chip Component
 const StatusChip = ({ status }: { status: string }) => {
@@ -580,40 +582,31 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                         />
 
                         <Box sx={{ mt: 1 }}>
-                            <Button
-                                variant="outlined"
-                                component="label"
-                                fullWidth
-                                sx={{
-                                    borderRadius: 2,
-                                    textTransform: 'none',
-                                    py: 1.5,
-                                    borderStyle: 'dashed',
-                                    justifyContent: 'flex-start'
-                                }}
-                            >
-                                {formData.featured_image ? `🖼️ Featured Image: ${formData.featured_image.name}` : '🖼️ Add Featured Image (Optional)'}
-                                <input
-                                    type="file"
-                                    hidden
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                            setFormData({ ...formData, featured_image: file });
+                            <ImageUploader
+                                label="Featured Image"
+                                helperText="High-impact visual for the story header (Max 5MB)"
+                                value={formData.featured_image || selectedPost?.featured_image}
+                                onChange={(file) => setFormData({ ...formData, featured_image: file })}
+                                onDelete={async () => {
+                                    if (selectedPost?.id) {
+                                        try {
+                                            await axios.delete(`/api/v1/blog/admin/posts/${selectedPost.id}/featured-image/`);
+                                            // Update local state to reflect deletion
+                                            setSelectedPost({ ...selectedPost, featured_image: null });
+                                            setFormData({ ...formData, featured_image: null });
+                                            // Refresh posts list in background
+                                            dispatch(fetchAdminPosts());
+                                        } catch (error) {
+                                            console.error('Failed to delete image:', error);
+                                            throw error;
                                         }
-                                    }}
-                                />
-                            </Button>
-                            {formData.featured_image && (
-                                <Button
-                                    size="small"
-                                    onClick={() => setFormData({ ...formData, featured_image: null })}
-                                    sx={{ mt: 1, textTransform: 'none', color: 'error.main' }}
-                                >
-                                    Remove Image
-                                </Button>
-                            )}
+                                    } else {
+                                        setFormData({ ...formData, featured_image: null });
+                                    }
+                                }}
+                                maxSizeMB={5}
+                                showPreview={true}
+                            />
                         </Box>
 
                         <Alert severity="info" sx={{ borderRadius: 2 }}>
