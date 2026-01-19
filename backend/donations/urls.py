@@ -12,6 +12,7 @@ from .views import (
     approve_donation, reject_donation,
     approve_material_donation, reject_material_donation,
     download_material_acknowledgment, download_receipt,
+    delete_campaign_image,
 )
 
 app_name = 'donations'
@@ -41,4 +42,7 @@ urlpatterns = [
     path('<uuid:pk>/reject/', reject_donation, name='donation-reject'),
     path('material-donations/<uuid:pk>/approve/', approve_material_donation, name='material-approve'),
     path('material-donations/<uuid:pk>/reject/', reject_material_donation, name='material-reject'),
+    
+    # Image Management
+    path('campaigns/<uuid:pk>/image/', delete_campaign_image, name='delete-campaign-image'),
 ]

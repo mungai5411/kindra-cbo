@@ -432,3 +432,50 @@ def download_material_acknowledgment(request, pk):
         return response
     except MaterialDonation.DoesNotExist:
         return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# Image Management Endpoints
+@api_view(['DELETE'])
+@permission_classes([permissions.IsAuthenticated, IsAdminOrManagement])
+def delete_campaign_image(request, pk):
+    """Delete featured image from a campaign"""
+    try:
+        campaign = Campaign.objects.get(pk=pk)
+        
+        if not campaign.featured_image:
+            return Response(
+                {'error': 'No featured image to delete'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Import here to avoid circular import
+        from accounts.image_utils import delete_cloudinary_image
+        
+        # Delete from Cloudinary if using cloud storage
+        if hasattr(campaign.featured_image, 'url'):
+            delete_cloudinary_image(campaign.featured_image.url)
+        
+        # Clear the field
+        campaign.featured_image = None
+        campaign.save()
+        
+        log_analytics_event(
+            event_type='CAMPAIGN_IMAGE_DELETED',
+            description=f'Administrator deleted featured image from campaign: {campaign.title}',
+            user=request.user,
+            request=request,
+            event_data={'campaign_id': str(campaign.id)}
+        )
+        
+        return Response({'success': True, 'message': 'Campaign image deleted successfully'})
+    except Campaign.DoesNotExist:
+        return Response(
+            {'error': 'Campaign not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        logger.error(f'Error deleting campaign image: {str(e)}')
+        return Response(
+            {'error': f'Failed to delete image: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

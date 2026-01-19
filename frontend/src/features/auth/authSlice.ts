@@ -140,7 +140,7 @@ export const fetchProfile = createAsyncThunk(
 
 export const updateProfile = createAsyncThunk(
     'auth/updateProfile',
-    async (data: any, { rejectWithValue, getState }) => {
+    async (data: any, { rejectWithValue, getState, dispatch }) => {
         try {
             const { auth } = getState() as any;
             const currentUser = auth.user;
@@ -194,10 +194,18 @@ export const updateProfile = createAsyncThunk(
                 lastName: user.last_name || user.lastName,
                 // Preserve existing role if backend doesn't return it, otherwise default to DONOR
                 role: (user.role || currentUser?.role || 'DONOR').toUpperCase(),
+                // Preserve profile_picture from response
+                profile_picture: user.profile_picture,
+                phone_number: user.phone_number,
             };
 
             // Sync sessionStorage
             sessionStorage.setItem('user', JSON.stringify(normalizedUser));
+
+            // Force refresh to get latest data from server
+            setTimeout(() => {
+                (dispatch as any)(fetchProfile());
+            }, 500);
 
             return normalizedUser;
         } catch (error: any) {
@@ -329,6 +337,10 @@ const normalizeUser = (user: any): User => {
         if (!normalized.lastName && parts.length > 1) normalized.lastName = parts.slice(1).join(' ');
     }
     if (user.donor_id) normalized.donorId = user.donor_id;
+    // Preserve profile_picture (critical for cross-browser sync)
+    if (user.profile_picture !== undefined) normalized.profile_picture = user.profile_picture;
+    // Preserve phone_number
+    if (user.phone_number !== undefined) normalized.phone_number = user.phone_number;
     // Set is_approved (default to true if not present, though backend should provide it)
     normalized.is_approved = user.is_approved !== undefined ? user.is_approved : true;
     return normalized;
