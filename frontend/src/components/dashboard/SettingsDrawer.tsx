@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Drawer,
     Box,
@@ -23,7 +23,6 @@ import {
     Person,
     Lock,
     Notifications,
-    CameraAlt,
     Check
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,6 +30,8 @@ import { updateProfile } from '../../features/auth/authSlice';
 import { updateDonor } from '../../features/donations/donationsSlice';
 import { RootState, AppDispatch } from '../../store';
 import { fetchDonors } from '../../features/donations/donationsSlice';
+import { ImageUploader } from '../common/ImageUploader';
+import axios from 'axios';
 
 interface SettingsDrawerProps {
     open: boolean;
@@ -44,11 +45,9 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
     const { donors } = useSelector((state: RootState) => state.donations);
     const donorProfile = donors.find(d => d.user === user?.id || d.email === user?.email);
 
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const [activeTab, setActiveTab] = useState(0);
     const [editMode, setEditMode] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
-    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         firstName: user?.firstName || '',
         lastName: user?.lastName || '',
@@ -80,22 +79,9 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
                 address: donorProfile?.address || '',
                 organization_name: donorProfile?.organization_name || '',
             });
-            setPhotoPreview(null);
             setEditMode(false);
         }
     }, [open, user, donorProfile]);
-
-    const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPhotoPreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-            setFormData({ ...formData, profile_picture: file as any });
-        }
-    };
 
     const handleSave = async () => {
         try {
@@ -127,7 +113,6 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
 
             setEditMode(false);
             setSaveSuccess(true);
-            setPhotoPreview(null);
         } catch (error) {
             console.error('Failed to save settings:', error);
         }
@@ -147,74 +132,64 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
                 border: '1px solid',
                 borderColor: alpha(theme.palette.primary.main, 0.1)
             }}>
-                <Box sx={{ position: 'relative' }}>
-                    <Avatar
-                        src={photoPreview || (typeof formData.profile_picture === 'string' ? formData.profile_picture : undefined)}
-                        sx={{
-                            width: 80,
-                            height: 80,
-                            border: '3px solid',
-                            borderColor: 'primary.main',
-                            fontSize: '2rem',
-                            fontWeight: 600,
-                            transition: 'all 0.2s',
-                            '&:hover': editMode ? { transform: 'scale(1.05)' } : {}
-                        }}
-                    >
-                        {user?.firstName?.[0]}{user?.lastName?.[0]}
-                    </Avatar>
-                    {editMode && (
-                        <IconButton
-                            onClick={() => fileInputRef.current?.click()}
+                {editMode ? (
+                    <Box sx={{ width: '100%', maxWidth: 400 }}>
+                        <ImageUploader
+                            value={formData.profile_picture}
+                            onChange={(file) => setFormData({ ...formData, profile_picture: file || '' })}
+                            onDelete={async () => {
+                                try {
+                                    await axios.delete('/api/v1/accounts/profile/picture/');
+                                    setFormData({ ...formData, profile_picture: '' });
+                                } catch (error) {
+                                    console.error('Failed to delete profile picture:', error);
+                                    throw error;
+                                }
+                            }}
+                            maxSizeMB={5}
+                            label="Profile Picture"
+                            helperText="Upload a profile photo (max 5MB, JPG/PNG/GIF)"
+                            showPreview={true}
+                        />
+                    </Box>
+                ) : (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flex: 1 }}>
+                        <Avatar
+                            src={typeof formData.profile_picture === 'string' ? formData.profile_picture : undefined}
                             sx={{
-                                position: 'absolute',
-                                bottom: -4,
-                                right: -4,
-                                bgcolor: 'primary.main',
-                                color: 'white',
-                                width: 32,
-                                height: 32,
-                                '&:hover': {
-                                    bgcolor: 'primary.dark',
-                                    transform: 'scale(1.1)'
-                                },
-                                transition: 'all 0.2s',
-                                boxShadow: 2
+                                width: 80,
+                                height: 80,
+                                border: '3px solid',
+                                borderColor: 'primary.main',
+                                fontSize: '2rem',
+                                fontWeight: 600
                             }}
                         >
-                            <CameraAlt sx={{ fontSize: 16 }} />
-                        </IconButton>
-                    )}
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoChange}
-                        style={{ display: 'none' }}
-                    />
-                </Box>
-
-                <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" fontWeight="bold" sx={{ mb: 0.5 }}>
-                        {user?.firstName} {user?.lastName}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        {user?.email}
-                    </Typography>
-                    <Box sx={{
-                        display: 'inline-flex',
-                        px: 1.5,
-                        py: 0.5,
-                        borderRadius: 2,
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                        border: '1px solid',
-                        borderColor: alpha(theme.palette.primary.main, 0.2)
-                    }}>
-                        <Typography variant="caption" fontWeight="600" color="primary.main">
-                            {user?.role || 'User'}
-                        </Typography>
+                            {user?.firstName?.[0]}{user?.lastName?.[0]}
+                        </Avatar>
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" fontWeight="bold" sx={{ mb: 0.5 }}>
+                                {user?.firstName} {user?.lastName}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                {user?.email}
+                            </Typography>
+                            <Box sx={{
+                                display: 'inline-flex',
+                                px: 1.5,
+                                py: 0.5,
+                                borderRadius: 2,
+                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                border: '1px solid',
+                                borderColor: alpha(theme.palette.primary.main, 0.2)
+                            }}>
+                                <Typography variant="caption" fontWeight="600" color="primary.main">
+                                    {user?.role || 'User'}
+                                </Typography>
+                            </Box>
+                        </Box>
                     </Box>
-                </Box>
+                )}
 
                 {!editMode ? (
                     <Button

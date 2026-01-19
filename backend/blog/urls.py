@@ -11,6 +11,7 @@ from .views import (
     CommentListView, CommentCreateView,
     CommentAdminListView, CommentModerationView,
     NewsletterSubscribeView, NewsletterAdminListView,
+    delete_blog_post_featured_image, delete_blog_post_og_image,
 )
 
 app_name = 'blog'
@@ -35,5 +36,9 @@ urlpatterns = [
     path('admin/comments/', CommentAdminListView.as_view(), name='admin-comment-list'),
     path('admin/comments/<uuid:pk>/moderate/', CommentModerationView.as_view(), name='comment-moderate'),
     path('admin/newsletter/', NewsletterAdminListView.as_view(), name='admin-newsletter-list'),
+    
+    # Image Management
+    path('admin/posts/<uuid:pk>/featured-image/', delete_blog_post_featured_image, name='delete-featured-image'),
+    path('admin/posts/<uuid:pk>/og-image/', delete_blog_post_og_image, name='delete-og-image'),
 ]
 

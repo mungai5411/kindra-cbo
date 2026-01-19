@@ -261,3 +261,92 @@ class NewsletterAdminListView(generics.ListAPIView):
     filterset_fields = ['status', 'is_verified']
     search_fields = ['email', 'name']
     ordering = ['-subscribed_at']
+
+
+# Image Management Endpoints
+from rest_framework.decorators import api_view, permission_classes
+
+
+@api_view(['DELETE'])
+@permission_classes([permissions.IsAuthenticated, IsAdminManagementOrSocialMedia])
+def delete_blog_post_featured_image(request, pk):
+    """Delete featured image from a blog post"""
+    try:
+        post = BlogPost.objects.get(pk=pk)
+        
+        # Check if user has permission (post author or admin/management)
+        if not (request.user.is_staff or post.author == request.user):
+            return Response(
+                {'error': 'You do not have permission to edit this post'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        if not post.featured_image:
+            return Response(
+                {'error': 'No featured image to delete'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Import here to avoid circular import
+        from accounts.image_utils import delete_cloudinary_image
+        
+        # Delete from Cloudinary if using cloud storage
+        if hasattr(post.featured_image, 'url'):
+            delete_cloudinary_image(post.featured_image.url)
+        
+        # Clear the field
+        post.featured_image = None
+        post.save()
+        
+        return Response({'success': True, 'message': 'Featured image deleted successfully'})
+    except BlogPost.DoesNotExist:
+        return Response(
+            {'error': 'Blog post not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to delete image: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['DELETE'])
+@permission_classes([permissions.IsAuthenticated, IsAdminManagementOrSocialMedia])
+def delete_blog_post_og_image(request, pk):
+    """Delete OG (Open Graph) image from a blog post"""
+    try:
+        post = BlogPost.objects.get(pk=pk)
+        
+        # Check if user has permission (post author or admin/management)
+        if not (request.user.is_staff or post.author == request.user):
+            return Response(
+                {'error': 'You do not have permission to edit this post'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        if not post.og_image:
+            return Response(
+                {'error': 'No OG image to delete'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        from accounts.image_utils import delete_cloudinary_image
+        
+        if hasattr(post.og_image, 'url'):
+            delete_cloudinary_image(post.og_image.url)
+        
+        post.og_image = None
+        post.save()
+        
+        return Response({'success': True, 'message': 'OG image deleted successfully'})
+    except BlogPost.DoesNotExist:
+        return Response(
+            {'error': 'Blog post not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to delete OG image: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

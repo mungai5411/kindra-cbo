@@ -19,6 +19,7 @@ from .views import (
     trigger_cleanup_view,
     PendingApprovalsListView,
     approve_user_view,
+    delete_profile_picture_view,
 )
 
 app_name = 'accounts'
@@ -32,6 +33,7 @@ urlpatterns = [
     
     # User Profile
     path('profile/', UserProfileView.as_view(), name='profile'),
+    path('profile/picture/', delete_profile_picture_view, name='delete_profile_picture'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
     
     # User Management (Admin)

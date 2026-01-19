@@ -664,3 +664,41 @@ def approve_user_view(request, pk):
         return Response({'success': True, 'message': f'User {user.email} has been approved.'})
     except User.DoesNotExist:
         return Response({'success': False, 'message': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['DELETE'])
+@permission_classes([permissions.IsAuthenticated])
+def delete_profile_picture_view(request):
+    """Delete the current user's profile picture"""
+    user = request.user
+    
+    if not user.profile_picture:
+        return Response({'error': 'No profile picture to delete'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Import here to avoid circular import
+        from .image_utils import delete_cloudinary_image
+        
+        # Delete from Cloudinary if using cloud storage
+        if hasattr(user.profile_picture, 'url'):
+            delete_cloudinary_image(user.profile_picture.url)
+        
+        # Clear the field
+        user.profile_picture = None
+        user.save()
+        
+        # Log the action
+        log_analytics_event(
+            event_type='PROFILE_PICTURE_DELETED',
+            description=f'User deleted their profile picture: {user.email}',
+            user=user,
+            request=request
+        )
+        
+        return Response({'success': True, 'message': 'Profile picture deleted successfully'})
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'Failed to delete profile picture: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
