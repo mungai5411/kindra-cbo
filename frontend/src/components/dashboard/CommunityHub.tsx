@@ -14,19 +14,13 @@ import {
     TextField,
     IconButton,
     Avatar,
-    Switch,
-    FormControlLabel,
     Autocomplete,
     useTheme,
     Button,
     useMediaQuery,
-    Backdrop,
     alpha,
     Tooltip,
     Chip,
-    Dialog,
-    DialogContent,
-    DialogActions
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { glassCard, glassChatBubble } from '../../theme/glassmorphism';
@@ -62,6 +56,7 @@ interface Notification {
     read: boolean;
     category?: string;
     targetRoles?: string[];
+    link?: string;
 }
 
 
@@ -213,11 +208,10 @@ export const CommunityHub = () => {
                                 ...glassCard(theme, 'elevated'),
                                 height: '100%',
                                 display: 'flex',
-                                overflow: 'hidden',
                                 borderRadius: isMobile ? 0 : 4,
                                 border: '1px solid rgba(0,0,0,0.05)',
                                 bgcolor: 'rgba(255,255,255,0.95)',
-                                overflow: 'visible' // Changed from hidden to allow Autocomplete dropdown
+                                overflow: 'visible' // Enabled to allow Autocomplete dropdown
                             }}
                         >
 
