@@ -261,7 +261,7 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
                         gap: { xs: 2, sm: 0 }
                     }}>
                         <Box>
-                            <Typography variant="h4" fontWeight="bold" sx={{ fontSize: { xs: '1.75rem', sm: '2.125rem', md: '2.5rem' } }}>
+                            <Typography variant="h4" fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem', md: '2.5rem' } }}>
                                 {greeting}, {user?.firstName || 'User'}!
                             </Typography>
                             <Typography variant="body1" sx={{ opacity: 0.9, mt: 0.5 }}>

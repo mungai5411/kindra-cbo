@@ -11,7 +11,8 @@ import {
     IconButton,
     Chip,
     useTheme,
-    alpha
+    alpha,
+    useMediaQuery
 } from '@mui/material';
 import {
     Email,
@@ -32,6 +33,7 @@ interface ProfileDialogProps {
 
 export const ProfileDialog = ({ open, onClose, user, onEdit }: ProfileDialogProps) => {
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     if (!user) return null;
 
@@ -43,8 +45,10 @@ export const ProfileDialog = ({ open, onClose, user, onEdit }: ProfileDialogProp
             fullWidth
             PaperProps={{
                 sx: {
-                    borderRadius: 5,
-                    overflow: 'hidden'
+                    borderRadius: isMobile ? 3 : 5,
+                    overflow: 'hidden',
+                    mx: isMobile ? 2 : 'auto',
+                    width: isMobile ? 'calc(100% - 32px)' : 'auto'
                 }
             }}
         >

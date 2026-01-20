@@ -137,17 +137,18 @@ export const RegisterModal = () => {
         <Dialog
             open={isRegisterOpen}
             onClose={closeRegisterModal}
-            maxWidth="xs" // Extra small width for "much smaller" request
+            maxWidth="xs"
             fullWidth
-            fullScreen={isMobile}
             PaperProps={{
                 sx: {
-                    borderRadius: isMobile ? 0 : 3,
+                    borderRadius: 3,
                     bgcolor: '#fafafa',
                     backgroundImage: 'none',
                     boxShadow: theme.shadows[24],
                     overflow: 'visible',
-                    mx: isMobile ? 0 : 2,
+                    mx: isMobile ? 2 : 'auto',
+                    width: isMobile ? 'calc(100% - 32px)' : '400px',
+                    maxWidth: '400px',
                     maxHeight: 'calc(100% - 32px)'
                 }
             }}

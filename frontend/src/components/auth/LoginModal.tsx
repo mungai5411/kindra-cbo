@@ -125,10 +125,9 @@ export const LoginModal = () => {
             onClose={closeLoginModal}
             maxWidth="xs"
             fullWidth
-            fullScreen={isMobile}
             PaperProps={{
                 sx: {
-                    borderRadius: isMobile ? 0 : 3,
+                    borderRadius: 3,
                     backdropFilter: 'blur(10px)',
                     backgroundColor: alpha(theme.palette.background.paper, 0.95),
                     backgroundImage: 'none',
@@ -136,8 +135,9 @@ export const LoginModal = () => {
                     overflow: 'visible',
                     border: '1px solid',
                     borderColor: alpha(theme.palette.divider, 0.1),
-                    mx: isMobile ? 0 : 'auto',
-                    maxWidth: isMobile ? '100%' : '400px'
+                    mx: isMobile ? 2 : 'auto',
+                    width: isMobile ? 'calc(100% - 32px)' : '400px',
+                    maxWidth: '400px'
                 }
             }}
         >
