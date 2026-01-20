@@ -1,5 +1,5 @@
-import { Box, Typography, CircularProgress, useTheme, alpha, IconButton, TextField, InputAdornment } from '@mui/material';
-import { Search, NotificationsNone } from '@mui/icons-material';
+import { Box, Typography, CircularProgress, useTheme, alpha } from '@mui/material';
+
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import {
@@ -189,55 +189,20 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
     return (
         <Box sx={{ p: { xs: 2, sm: 3 } }}>
             {/* Header / Greeting Area */}
-            <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                mb: 3
-            }}>
-                <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, letterSpacing: 0.5 }}>
-                        Holla, {user?.firstName} {user?.lastName}
-                    </Typography>
-                    <Typography variant="h4" fontWeight="900" sx={{
-                        letterSpacing: -1,
-                        mt: 0.5,
-                        fontSize: { xs: '1.75rem', sm: '2.25rem' }
-                    }}>
-                        Ready for your Task?
-                    </Typography>
-                </Box>
-                <IconButton sx={{
-                    bgcolor: 'white',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05) }
+            <Box sx={{ mb: 3 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, letterSpacing: 0.5 }}>
+                    Holla, {user?.firstName} {user?.lastName}
+                </Typography>
+                <Typography variant="h4" fontWeight="900" sx={{
+                    letterSpacing: -1,
+                    mt: 0.5,
+                    fontSize: { xs: '1.75rem', sm: '2.25rem' }
                 }}>
-                    <NotificationsNone />
-                </IconButton>
+                    Ready for your Task?
+                </Typography>
             </Box>
 
-            {/* Search Bar */}
-            <Box sx={{ mb: 4 }}>
-                <TextField
-                    fullWidth
-                    placeholder="Search tasks, donors, or campaigns..."
-                    variant="outlined"
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <Search sx={{ color: 'text.secondary', opacity: 0.5 }} />
-                            </InputAdornment>
-                        ),
-                        sx: {
-                            borderRadius: 4,
-                            bgcolor: 'white',
-                            '& fieldset': { border: 'none' },
-                            boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
-                            py: 0.5
-                        }
-                    }}
-                />
-            </Box>
+
 
             {/* Content Refresh (Optional floating button or integrated) */}
             {renderRoleSpecificOverview()}

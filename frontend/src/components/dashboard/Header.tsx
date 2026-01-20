@@ -94,10 +94,21 @@ export const Header = ({ handleDrawerToggle, user, handleLogout }: HeaderProps) 
                         <MenuIcon />
                     </IconButton>
 
-                    {/* Search placeholder - hide on mobile, keep on sm+ */}
-                    <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', opacity: 0.5, gap: 1 }}>
-                        <Search fontSize="small" />
-                        <Typography variant="body2">Search...</Typography>
+                    <Box sx={{ display: { xs: 'none', lg: 'flex' }, flexGrow: 1, maxWidth: 400, ml: 4 }}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            placeholder="Search tasks, donors..."
+                            InputProps={{
+                                startAdornment: <Search fontSize="small" sx={{ mr: 1, opacity: 0.5 }} />,
+                                sx: {
+                                    borderRadius: 3,
+                                    bgcolor: alpha(theme.palette.common.black, 0.03),
+                                    '& fieldset': { border: 'none' },
+                                    '&:hover': { bgcolor: alpha(theme.palette.common.black, 0.05) }
+                                }
+                            }}
+                        />
                     </Box>
 
                     <Box sx={{ flexGrow: 1 }} />
