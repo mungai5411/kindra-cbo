@@ -415,7 +415,9 @@ export const CommunityHub = () => {
                                                                                 sx={{ mt: 2, borderRadius: 2, textTransform: 'none', fontSize: '0.75rem' }}
                                                                                 onClick={(e) => {
                                                                                     e.stopPropagation();
-                                                                                    window.location.href = notif.link;
+                                                                                    if (notif.link) {
+                                                                                        window.location.href = notif.link;
+                                                                                    }
                                                                                 }}
                                                                             >
                                                                                 View Details
