@@ -19,17 +19,7 @@ export const CaseWorkerOverview = ({ stats, recentCases, pendingTasks, onNavigat
 
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Typography
-                variant="h6"
-                fontWeight="900"
-                sx={{
-                    mb: 2,
-                    color: 'text.primary',
-                    letterSpacing: -0.5
-                }}
-            >
-                Case Load Overview
-            </Typography>
+
 
             <Box sx={{
                 display: 'flex',

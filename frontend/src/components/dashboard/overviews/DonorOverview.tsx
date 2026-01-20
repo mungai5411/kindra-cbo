@@ -37,17 +37,7 @@ export const DonorOverview = ({ stats, charts, activeCampaigns, onDonate }: Dono
 
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Typography
-                variant="h6"
-                fontWeight="900"
-                sx={{
-                    mb: 2,
-                    color: 'text.primary',
-                    letterSpacing: -0.5
-                }}
-            >
-                My Giving Impact
-            </Typography>
+
 
             <Box sx={{
                 display: 'flex',

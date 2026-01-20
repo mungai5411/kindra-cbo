@@ -67,7 +67,7 @@ interface Notification {
 }
 
 
-const SIDEBAR_WIDTH = 220;
+
 
 export const CommunityHub = () => {
     const theme = useTheme();
@@ -224,60 +224,7 @@ export const CommunityHub = () => {
                                 bgcolor: 'rgba(255,255,255,0.95)'
                             }}
                         >
-                            {!isMobile && (
-                                <Box sx={{
-                                    width: SIDEBAR_WIDTH,
-                                    borderRight: '1px solid rgba(0,0,0,0.05)',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    p: 2,
-                                    bgcolor: '#f8faf9'
-                                }}>
-                                    <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#1a1a1a' }}>Center</Typography>
-                                    </Box>
 
-                                    <TextField
-                                        size="small"
-                                        placeholder="Search..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        InputProps={{
-                                            startAdornment: <Search sx={{ fontSize: 18, mr: 1, color: 'text.secondary' }} />,
-                                            sx: { borderRadius: 2, bgcolor: 'white', mb: 3 }
-                                        }}
-                                    />
-
-                                    <List sx={{ p: 0 }}>
-                                        {sections.map(section => (
-                                            <ListItem
-                                                key={section}
-                                                disablePadding
-                                                sx={{ mb: 0.5 }}
-                                            >
-                                                <Button
-                                                    fullWidth
-                                                    onClick={() => setActiveSection(section)}
-                                                    startIcon={getIcon(section)}
-                                                    sx={{
-                                                        justifyContent: 'flex-start',
-                                                        textTransform: 'none',
-                                                        fontWeight: activeSection === section ? 700 : 500,
-                                                        color: activeSection === section ? theme.palette.primary.main : 'text.secondary',
-                                                        bgcolor: activeSection === section ? alpha(theme.palette.primary.main, 0.05) : 'transparent',
-                                                        borderRadius: 2,
-                                                        py: 1,
-                                                        px: 2,
-                                                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.03) }
-                                                    }}
-                                                >
-                                                    {section}
-                                                </Button>
-                                            </ListItem>
-                                        ))}
-                                    </List>
-                                </Box>
-                            )}
 
                             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', bgcolor: 'white' }}>
                                 <Box sx={{
@@ -287,13 +234,38 @@ export const CommunityHub = () => {
                                     justifyContent: 'space-between',
                                     alignItems: 'center'
                                 }}>
-                                    <Box>
-                                        <Typography variant="h5" sx={{ fontWeight: 900, color: '#1a1a1a', mb: 0.5 }}>
-                                            {activeSection} messages
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Manage and view all your {activeSection.toLowerCase()} interactions.
-                                        </Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                            {sections.map(section => (
+                                                <Button
+                                                    key={section}
+                                                    onClick={() => setActiveSection(section)}
+                                                    startIcon={getIcon(section)}
+                                                    sx={{
+                                                        textTransform: 'none',
+                                                        fontWeight: activeSection === section ? 800 : 500,
+                                                        color: activeSection === section ? theme.palette.primary.main : 'text.secondary',
+                                                        borderBottom: activeSection === section ? `3px solid ${theme.palette.primary.main}` : 'none',
+                                                        borderRadius: 0,
+                                                        px: 2,
+                                                        pb: 1,
+                                                        '&:hover': { bgcolor: 'transparent', opacity: 0.8 }
+                                                    }}
+                                                >
+                                                    {section}
+                                                </Button>
+                                            ))}
+                                        </Box>
+                                        <TextField
+                                            size="small"
+                                            placeholder="Search messages..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            InputProps={{
+                                                startAdornment: <Search sx={{ fontSize: 18, mr: 1, color: 'text.secondary', opacity: 0.5 }} />,
+                                                sx: { borderRadius: 3, bgcolor: '#f8faf9', '& fieldset': { border: 'none' }, width: 200 }
+                                            }}
+                                        />
                                     </Box>
                                     <Box sx={{ display: 'flex', gap: 1 }}>
                                         <Tooltip title="View Preferences">
