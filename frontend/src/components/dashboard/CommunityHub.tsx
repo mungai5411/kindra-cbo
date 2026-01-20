@@ -3,13 +3,8 @@ import {
     Close,
     ChatBubbleOutline,
     Notifications as NotificationsIcon,
-    Campaign,
-    Info,
     Search,
     Tune,
-    People,
-    Link as LinkIcon,
-    Settings,
     MoreVert
 } from '@mui/icons-material';
 import {
@@ -19,7 +14,6 @@ import {
     TextField,
     IconButton,
     Avatar,
-    Badge,
     Switch,
     FormControlLabel,
     Autocomplete,
@@ -72,13 +66,14 @@ interface Notification {
     targetRoles?: string[];
 }
 
+
 const SIDEBAR_WIDTH = 220;
 
 export const CommunityHub = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [isOpen, setIsOpen] = useState(false);
-    const [activeSection, setActiveSection] = useState('Team');
+    const [activeSection, setActiveSection] = useState('Activity');
 
     // Chat & Notif State
     const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -145,6 +140,16 @@ export const CommunityHub = () => {
         }
     }, [isOpen, activeSection]);
 
+    useEffect(() => {
+        const handleOpen = (e: any) => {
+            setIsOpen(true);
+            if (e.detail?.tab === 1) setActiveSection('Community');
+            else setActiveSection('Activity');
+        };
+        window.addEventListener('open-community-hub', handleOpen);
+        return () => window.removeEventListener('open-community-hub', handleOpen);
+    }, []);
+
     const handleSend = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!newMessage.trim()) return;
@@ -167,27 +172,15 @@ export const CommunityHub = () => {
             setLoading(false);
         }
     };
-
     const getIcon = (section: string) => {
         switch (section) {
-            case 'Notification Preferences': return <Tune fontSize="small" />;
-            case 'Team': return <People fontSize="small" />;
-            case 'Searcheye Ai': return <Info fontSize="small" />;
-            case 'Campaigns': return <Campaign fontSize="small" />;
-            case 'Link-building': return <LinkIcon fontSize="small" />;
-            case 'System': return <Settings fontSize="small" />;
             case 'Community': return <ChatBubbleOutline fontSize="small" />;
             default: return <NotificationsIcon fontSize="small" />;
         }
     };
 
     const sections = [
-        'Notification Preferences',
-        'Team',
-        'Searcheye Ai',
-        'Campaigns',
-        'Link-building',
-        'System',
+        'Activity',
         'Community'
     ];
 
@@ -215,8 +208,8 @@ export const CommunityHub = () => {
                             bottom: isMobile ? 0 : 40,
                             right: isMobile ? 0 : 40,
                             zIndex: 1399,
-                            width: isMobile ? '100%' : 1000,
-                            height: isMobile ? '100%' : 650,
+                            width: isMobile ? '100%' : 700,
+                            height: isMobile ? '100%' : 700,
                         }}
                     >
                         <Paper
@@ -473,31 +466,7 @@ export const CommunityHub = () => {
                 )}
             </AnimatePresence>
 
-            {!isOpen && (
-                <IconButton
-                    onClick={() => setIsOpen(true)}
-                    sx={{
-                        position: 'fixed',
-                        bottom: 25,
-                        right: 25,
-                        width: 56,
-                        height: 56,
-                        bgcolor: theme.palette.primary.main,
-                        color: 'white',
-                        boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
-                        zIndex: 1300,
-                        '&:hover': {
-                            bgcolor: theme.palette.primary.dark,
-                            transform: 'scale(1.1)'
-                        },
-                        transition: 'all 0.3s'
-                    }}
-                >
-                    <Badge badgeContent={notifications.filter(n => !n.read).length} color="error">
-                        <NotificationsIcon />
-                    </Badge>
-                </IconButton>
-            )}
+
 
             <Dialog open={!!selectedNotif} onClose={() => setSelectedNotif(null)} maxWidth="xs" fullWidth>
                 {selectedNotif && (
