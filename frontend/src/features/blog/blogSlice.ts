@@ -13,10 +13,23 @@ interface BlogPost {
     content: string;
     featuredImage: string;
     category: any;
+    categoryName?: string;
     tags: any[];
     author: any;
+    authorName?: string;
     publishedAt: string;
     viewCount: number;
+    status: string;
+    likesCount?: number;
+    hasLiked?: boolean;
+    commentCount?: number;
+}
+
+interface BlogComment {
+    id: string;
+    name: string;
+    content: string;
+    createdAt: string;
     status: string;
 }
 
@@ -25,6 +38,7 @@ interface BlogState {
     currentPost: BlogPost | null;
     categories: any[];
     tags: any[];
+    comments: BlogComment[];
     isLoading: boolean;
     error: string | null;
 }
@@ -34,6 +48,7 @@ const initialState: BlogState = {
     currentPost: null,
     categories: [],
     tags: [],
+    comments: [],
     isLoading: false,
     error: null,
 };
@@ -71,6 +86,42 @@ export const fetchPostBySlug = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch post');
+        }
+    }
+);
+
+export const fetchComments = createAsyncThunk(
+    'blog/fetchComments',
+    async (postSlug: string, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get(`${endpoints.blog.posts}${postSlug}/comments/`);
+            return response.data.results || response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch comments');
+        }
+    }
+);
+
+export const submitComment = createAsyncThunk(
+    'blog/submitComment',
+    async (commentData: { post: string; name: string; email: string; content: string }, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post(`${endpoints.blog.comments}create/`, commentData);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.detail || error.response?.data?.error || 'Failed to submit comment');
+        }
+    }
+);
+
+export const likePost = createAsyncThunk(
+    'blog/likePost',
+    async (slug: string, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post(`${endpoints.blog.posts}${slug}/like/`);
+            return { slug, ...response.data };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to like post');
         }
     }
 );
@@ -214,6 +265,7 @@ const blogSlice = createSlice({
     reducers: {
         clearCurrentPost: (state) => {
             state.currentPost = null;
+            state.comments = [];
         },
     },
     extraReducers: (builder) => {
@@ -256,6 +308,34 @@ const blogSlice = createSlice({
         builder.addCase(fetchPostBySlug.rejected, (state, action) => {
             state.isLoading = false;
             state.error = action.payload as string;
+        });
+
+        // Fetch Comments
+        builder.addCase(fetchComments.fulfilled, (state, action) => {
+            state.comments = action.payload;
+        });
+
+        // Like Post
+        builder.addCase(likePost.fulfilled, (state, action) => {
+            const { slug, liked, likes_count } = action.payload;
+
+            // Update current post if it's the one liked
+            if (state.currentPost && state.currentPost.slug === slug) {
+                state.currentPost.hasLiked = liked;
+                state.currentPost.likesCount = likes_count;
+            }
+
+            // Update post in list if it's there
+            const postIndex = state.posts.findIndex(p => p.slug === slug);
+            if (postIndex !== -1) {
+                state.posts[postIndex].hasLiked = liked;
+                state.posts[postIndex].likesCount = likes_count;
+            }
+        });
+
+        // Submit Comment
+        builder.addCase(submitComment.fulfilled, () => {
+            // Comments require moderation, no state update needed here
         });
 
         // Fetch Categories

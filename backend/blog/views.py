@@ -2,17 +2,18 @@
 Blog & Public Campaigns Views
 """
 
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, throttling
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.utils import timezone
-from .models import Category, Tag, BlogPost, Comment, Newsletter
+from .models import Category, Tag, BlogPost, Comment, Newsletter, Like
 from .serializers import (
     CategorySerializer, TagSerializer, BlogPostListSerializer,
     BlogPostDetailSerializer, CommentSerializer, CommentCreateSerializer,
-    CommentModerationSerializer, NewsletterSerializer, NewsletterSubscribeSerializer
+    CommentModerationSerializer, NewsletterSerializer, NewsletterSubscribeSerializer,
+    LikeSerializer
 )
 from accounts.permissions import IsAdminManagementOrSocialMedia
 
@@ -168,15 +169,70 @@ class CommentListView(generics.ListAPIView):
 class CommentCreateView(generics.CreateAPIView):
     """
     Public endpoint for creating comments (requires moderation)
+    Includes anti-spam logic
     """
     serializer_class = CommentCreateSerializer
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [throttling.AnonRateThrottle, throttling.UserRateThrottle]
     
     def perform_create(self, serializer):
         # Capture IP address for spam detection
         ip_address = self.request.META.get('REMOTE_ADDR')
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+        
+        # Anti-spam: check for duplicate content from same IP within last hour
+        one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
+        is_duplicate = Comment.objects.filter(
+            ip_address=ip_address,
+            content=serializer.validated_data['content'],
+            created_at__gte=one_hour_ago
+        ).exists()
+        
+        if is_duplicate:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError("You have already posted this comment recently.")
+            
         serializer.save(ip_address=ip_address, user_agent=user_agent)
+
+
+class PostLikeView(generics.GenericAPIView):
+    """
+    Endpoint for liking/unliking a blog post
+    One like per user or IP address
+    """
+    permission_classes = [permissions.AllowAny]
+    serializer_class = LikeSerializer
+    throttle_classes = [throttling.AnonRateThrottle, throttling.UserRateThrottle]
+
+    def post(self, request, slug):
+        try:
+            post = BlogPost.objects.get(slug=slug, status='PUBLISHED')
+        except BlogPost.DoesNotExist:
+            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        ip_address = request.META.get('REMOTE_ADDR')
+        user = request.user if request.user.is_authenticated else None
+
+        # Check for existing like
+        if user:
+            existing_like = Like.objects.filter(post=post, user=user).first()
+        else:
+            existing_like = Like.objects.filter(post=post, ip_address=ip_address, user__isnull=True).first()
+
+        if existing_like:
+            # Unlike if already liked
+            existing_like.delete()
+            return Response({
+                'liked': False, 
+                'likes_count': post.likes.count()
+            }, status=status.HTTP_200_OK)
+        
+        # Create new like
+        Like.objects.create(post=post, user=user, ip_address=ip_address)
+        return Response({
+            'liked': True, 
+            'likes_count': post.likes.count()
+        }, status=status.HTTP_201_CREATED)
 
 
 class CommentAdminListView(generics.ListAPIView):

@@ -40,7 +40,7 @@ import {
     AttachMoney,
     Handshake,
     Inventory,
-
+    Forum
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -267,6 +267,7 @@ export default function StoriesPage() {
                                             transition={{ delay: 0.05 * index }}
                                         >
                                             <Card
+                                                onClick={() => navigate(`/stories/${story.slug}`)}
                                                 sx={{
                                                     height: '100%',
                                                     display: 'flex',
@@ -275,6 +276,7 @@ export default function StoriesPage() {
                                                     border: '1px solid',
                                                     borderColor: alpha(theme.palette.divider, 0.1),
                                                     boxShadow: theme.shadows[1],
+                                                    cursor: 'pointer',
                                                     transition: 'transform 0.3s, box-shadow 0.3s',
                                                     '&:hover': {
                                                         transform: 'translateY(-4px)',
@@ -292,7 +294,7 @@ export default function StoriesPage() {
                                                         sx={{ objectFit: 'cover' }}
                                                     />
                                                     <Chip
-                                                        label={story.category?.name || 'Update'}
+                                                        label={story.category_name || story.category?.name || 'Update'}
                                                         size="small"
                                                         sx={{
                                                             position: 'absolute',
@@ -311,7 +313,14 @@ export default function StoriesPage() {
                                                             {new Date(story.published_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                                         </Typography>
                                                         <Typography variant="caption">•</Typography>
-                                                        <Typography variant="caption" fontWeight="medium">5 min read</Typography>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                            <Favorite sx={{ fontSize: 14, color: theme.palette.error.main }} />
+                                                            <Typography variant="caption" fontWeight="bold">{story.likes_count || 0}</Typography>
+                                                        </Box>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                            <Forum sx={{ fontSize: 14, color: theme.palette.primary.main }} />
+                                                            <Typography variant="caption" fontWeight="bold">{story.comment_count || 0}</Typography>
+                                                        </Box>
                                                     </Box>
                                                     <Typography variant="h5" fontWeight="800" gutterBottom sx={{ lineHeight: 1.3 }}>
                                                         {story.title}

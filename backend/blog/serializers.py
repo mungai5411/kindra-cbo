@@ -4,7 +4,7 @@ Blog & Public Campaigns Serializers
 
 from rest_framework import serializers
 from django.utils.html import strip_tags
-from .models import Category, Tag, BlogPost, Comment, Newsletter
+from .models import Category, Tag, BlogPost, Comment, Newsletter, Like
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -31,6 +31,16 @@ class TagSerializer(serializers.ModelSerializer):
         return obj.posts.filter(status='PUBLISHED').count()
 
 
+class LikeSerializer(serializers.ModelSerializer):
+    """
+    Serializer for likes
+    """
+    class Meta:
+        model = Like
+        fields = ['id', 'post', 'user', 'ip_address', 'created_at']
+        read_only_fields = ('id', 'user', 'ip_address', 'created_at')
+
+
 class BlogPostListSerializer(serializers.ModelSerializer):
     """
     Serializer for blog post listings (summary view)
@@ -39,6 +49,8 @@ class BlogPostListSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.get_full_name', read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     comment_count = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+    has_liked = serializers.SerializerMethodField()
     
     class Meta:
         model = BlogPost
@@ -46,12 +58,26 @@ class BlogPostListSerializer(serializers.ModelSerializer):
             'id', 'title', 'slug', 'excerpt', 'featured_image', 'featured_image_alt',
             'category', 'category_name', 'tags', 'status', 'is_featured',
             'view_count', 'author', 'author_name', 'published_at',
-            'created_at', 'updated_at', 'comment_count'
+            'created_at', 'updated_at', 'comment_count', 'likes_count', 'has_liked'
         ]
         read_only_fields = ('id', 'view_count', 'created_at', 'updated_at')
     
     def get_comment_count(self, obj):
         return obj.comments.filter(status='APPROVED').count()
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+    def get_has_liked(self, obj):
+        request = self.context.get('request')
+        if not request:
+            return False
+            
+        if request.user.is_authenticated:
+            return obj.likes.filter(user=request.user).exists()
+        
+        ip_address = request.META.get('REMOTE_ADDR')
+        return obj.likes.filter(ip_address=ip_address, user__isnull=True).exists()
 
 
 class BlogPostDetailSerializer(serializers.ModelSerializer):
@@ -68,11 +94,31 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
         source='tags',
         required=False
     )
+    comment_count = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+    has_liked = serializers.SerializerMethodField()
     
     class Meta:
         model = BlogPost
         fields = '__all__'
         read_only_fields = ('id', 'view_count', 'created_at', 'updated_at')
+
+    def get_comment_count(self, obj):
+        return obj.comments.filter(status='APPROVED').count()
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+    def get_has_liked(self, obj):
+        request = self.context.get('request')
+        if not request:
+            return False
+            
+        if request.user.is_authenticated:
+            return obj.likes.filter(user=request.user).exists()
+        
+        ip_address = request.META.get('REMOTE_ADDR')
+        return obj.likes.filter(ip_address=ip_address, user__isnull=True).exists()
 
 
 class CommentSerializer(serializers.ModelSerializer):

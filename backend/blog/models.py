@@ -227,3 +227,37 @@ class Newsletter(models.Model):
     
     def __str__(self):
         return self.email
+class Like(models.Model):
+    """
+    Likes/Claps on blog posts to track engagement (no spam allowed)
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='likes')
+    
+    # Optional user (for authenticated likes)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='blog_likes')
+    
+    # Anonymized or literal IP for guest likes and spam prevention
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = _('like')
+        verbose_name_plural = _('likes')
+        # Ensure one like per post per user OR per IP
+        constraints = [
+            models.UniqueConstraint(
+                fields=['post', 'user'], 
+                name='unique_user_post_like',
+                condition=models.Q(user__isnull=False)
+            ),
+            models.UniqueConstraint(
+                fields=['post', 'ip_address'], 
+                name='unique_ip_post_like',
+                condition=models.Q(user__isnull=True)
+            )
+        ]
+
+    def __str__(self):
+        return f"Like on {self.post.title}"

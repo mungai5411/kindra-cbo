@@ -3,7 +3,7 @@
  * Displays a single blog post content
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -19,16 +19,19 @@ import {
     useTheme,
     alpha
 } from '@mui/material';
-import { ArrowBack, AccessTime, Person, Tag, CalendarToday, Share } from '@mui/icons-material';
+import { ArrowBack, AccessTime, Person, CalendarToday } from '@mui/icons-material';
 import { AppDispatch, RootState } from '../store';
-import { fetchPostBySlug } from '../features/blog/blogSlice';
+import { fetchPostBySlug, clearCurrentPost } from '../features/blog/blogSlice';
 import { motion } from 'framer-motion';
+import { PostInteractions } from '../components/blog/PostInteractions';
+import { CommentSection } from '../components/blog/CommentSection';
 
 export default function BlogPostPage() {
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const theme = useTheme();
+    const commentSectionRef = useRef<HTMLDivElement>(null);
 
     // Access Redux state
     const { currentPost, isLoading, error } = useSelector((state: RootState) => state.blog);
@@ -37,7 +40,14 @@ export default function BlogPostPage() {
         if (slug) {
             dispatch(fetchPostBySlug(slug));
         }
+        return () => {
+            dispatch(clearCurrentPost());
+        };
     }, [dispatch, slug]);
+
+    const scrollToComments = () => {
+        commentSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
 
     if (isLoading) {
         return (
@@ -122,25 +132,26 @@ export default function BlogPostPage() {
                         </Button>
                         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
                             <Chip
-                                label={currentPost.category || 'Update'}
+                                label={currentPost.categoryName || 'Update'}
                                 sx={{ bgcolor: theme.palette.primary.main, color: 'white', fontWeight: 'bold', mb: 2 }}
                             />
                             <Typography variant="h2" fontWeight="900" sx={{
-                                fontSize: { xs: '2rem', md: '3.5rem' },
+                                fontSize: { xs: '2.5rem', md: '3.5rem' },
                                 lineHeight: 1.1,
                                 textShadow: '0 2px 10px rgba(0,0,0,0.3)',
-                                mb: 2
+                                mb: 2,
+                                letterSpacing: -1
                             }}>
                                 {currentPost.title}
                             </Typography>
 
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-                                        {currentPost.author?.[0] || <Person />}
+                                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '1rem' }}>
+                                        {currentPost.authorName?.[0] || <Person />}
                                     </Avatar>
                                     <Typography variant="subtitle1" fontWeight="medium">
-                                        {currentPost.author || 'Anonymous'}
+                                        {currentPost.authorName || 'Anonymous'}
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, opacity: 0.8 }}>
@@ -162,9 +173,9 @@ export default function BlogPostPage() {
             {/* Content Section */}
             <Container maxWidth="md" sx={{ mt: -6, position: 'relative', zIndex: 2 }}>
                 <Paper component={motion.div} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} elevation={0} sx={{
-                    p: { xs: 2.5, md: 5 },
-                    borderRadius: 2,
-                    boxShadow: theme.shadows[4],
+                    p: { xs: 2.5, md: 6 },
+                    borderRadius: 4,
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.04)',
                     border: '1px solid',
                     borderColor: alpha(theme.palette.divider, 0.1),
                     bgcolor: 'background.paper',
@@ -173,28 +184,44 @@ export default function BlogPostPage() {
                     <Typography
                         variant="body1"
                         sx={{
-                            fontSize: '1.25rem',
+                            fontSize: '1.2rem',
                             lineHeight: 1.8,
                             color: 'text.primary',
-                            fontFamily: 'Georgia, "Times New Roman", Times, serif', // More editorial feel for content
-                            whiteSpace: 'pre-wrap', // Preserve line breaks
+                            fontFamily: '"Outfit", sans-serif',
+                            whiteSpace: 'pre-wrap',
                             '& p': { mb: 3 }
                         }}
                     >
                         {currentPost.content}
                     </Typography>
 
-                    <Divider sx={{ my: 6 }} />
+                    <Divider sx={{ my: 4 }} />
 
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                         <Box sx={{ display: 'flex', gap: 1 }}>
-                            {['Community', 'Impact'].map(tag => (
-                                <Chip key={tag} icon={<Tag sx={{ fontSize: 16 }} />} label={tag} variant="outlined" size="small" />
-                            ))}
+                            {currentPost.tags?.map((tag: any) => (
+                                <Chip key={tag.id} label={tag.name} variant="outlined" size="small" sx={{ borderRadius: 1 }} />
+                            )) || (
+                                    <>
+                                        <Chip label="Community" variant="outlined" size="small" sx={{ borderRadius: 1 }} />
+                                        <Chip label="Impact" variant="outlined" size="small" sx={{ borderRadius: 1 }} />
+                                    </>
+                                )}
                         </Box>
-                        <Button startIcon={<Share />} color="inherit">
-                            Share Story
-                        </Button>
+                    </Box>
+
+                    {/* Likes & Share Interactions */}
+                    <PostInteractions
+                        slug={currentPost.slug}
+                        likesCount={currentPost.likesCount || 0}
+                        hasLiked={!!currentPost.hasLiked}
+                        commentCount={currentPost.commentCount || 0}
+                        onCommentClick={scrollToComments}
+                    />
+
+                    {/* Discussion Section */}
+                    <Box ref={commentSectionRef}>
+                        <CommentSection postSlug={currentPost.slug} postId={currentPost.id} />
                     </Box>
                 </Paper>
 
@@ -204,10 +231,10 @@ export default function BlogPostPage() {
                         Inspired by this story?
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 2 }}>
-                        <Button variant="contained" size="large" sx={{ borderRadius: 3, px: 4 }}>
+                        <Button variant="contained" size="large" sx={{ borderRadius: 3, px: 4, fontWeight: 'bold' }}>
                             Donate Now
                         </Button>
-                        <Button variant="outlined" size="large" onClick={() => navigate('/stories')} sx={{ borderRadius: 3, px: 4 }}>
+                        <Button variant="outlined" size="large" onClick={() => navigate('/stories')} sx={{ borderRadius: 3, px: 4, fontWeight: 'bold' }}>
                             Read More Stories
                         </Button>
                     </Box>
