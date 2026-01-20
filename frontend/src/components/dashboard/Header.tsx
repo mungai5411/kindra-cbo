@@ -86,7 +86,10 @@ export const Header = ({ handleDrawerToggle, user, handleLogout }: HeaderProps) 
                         aria-label="open drawer"
                         edge="start"
                         onClick={handleDrawerToggle}
-                        sx={{ mr: { xs: 1, sm: 2 }, display: { md: 'none' } }}
+                        sx={{
+                            mr: { xs: 1, sm: 2 },
+                            display: { xs: 'none', sm: 'inline-flex', md: 'none' }
+                        }}
                     >
                         <MenuIcon />
                     </IconButton>
