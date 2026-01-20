@@ -1,4 +1,4 @@
-import { Box, Typography, Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Campaign, VolunteerActivism, FolderShared, Home } from '@mui/icons-material';
 import { StatsCard } from '../StatCards';
