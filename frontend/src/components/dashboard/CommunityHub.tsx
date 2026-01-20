@@ -205,11 +205,11 @@ export const CommunityHub = () => {
                         exit={{ opacity: 0, y: 50, scale: 0.95 }}
                         style={{
                             position: 'fixed',
-                            bottom: isMobile ? 0 : 40,
-                            right: isMobile ? 0 : 40,
+                            bottom: isMobile ? 0 : 20,
+                            right: isMobile ? 0 : 20,
                             zIndex: 1399,
-                            width: isMobile ? '100%' : 700,
-                            height: isMobile ? '100%' : 700,
+                            width: isMobile ? '100%' : 400,
+                            height: isMobile ? '100%' : 600,
                         }}
                     >
                         <Paper
@@ -228,27 +228,33 @@ export const CommunityHub = () => {
 
                             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', bgcolor: 'white' }}>
                                 <Box sx={{
-                                    p: 3,
+                                    p: 2,
                                     borderBottom: '1px solid rgba(0,0,0,0.05)',
                                     display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center'
+                                    flexDirection: 'column',
+                                    gap: 1.5
                                 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
+                                    }}>
+                                        <Box sx={{ display: 'flex', gap: 0.5 }}>
                                             {sections.map(section => (
                                                 <Button
                                                     key={section}
                                                     onClick={() => setActiveSection(section)}
                                                     startIcon={getIcon(section)}
+                                                    size="small"
                                                     sx={{
                                                         textTransform: 'none',
                                                         fontWeight: activeSection === section ? 800 : 500,
                                                         color: activeSection === section ? theme.palette.primary.main : 'text.secondary',
-                                                        borderBottom: activeSection === section ? `3px solid ${theme.palette.primary.main}` : 'none',
+                                                        borderBottom: activeSection === section ? `2px solid ${theme.palette.primary.main}` : 'none',
                                                         borderRadius: 0,
-                                                        px: 2,
-                                                        pb: 1,
+                                                        px: 1,
+                                                        pb: 0.5,
+                                                        minWidth: 'auto',
                                                         '&:hover': { bgcolor: 'transparent', opacity: 0.8 }
                                                     }}
                                                 >
@@ -256,26 +262,27 @@ export const CommunityHub = () => {
                                                 </Button>
                                             ))}
                                         </Box>
-                                        <TextField
-                                            size="small"
-                                            placeholder="Search messages..."
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            InputProps={{
-                                                startAdornment: <Search sx={{ fontSize: 18, mr: 1, color: 'text.secondary', opacity: 0.5 }} />,
-                                                sx: { borderRadius: 3, bgcolor: '#f8faf9', '& fieldset': { border: 'none' }, width: 200 }
-                                            }}
-                                        />
+                                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                            <Tooltip title="View Preferences">
+                                                <IconButton size="small"><Tune sx={{ fontSize: 16 }} /></IconButton>
+                                            </Tooltip>
+                                            <IconButton size="small" onClick={() => setIsOpen(false)}><Close sx={{ fontSize: 16 }} /></IconButton>
+                                        </Box>
                                     </Box>
-                                    <Box sx={{ display: 'flex', gap: 1 }}>
-                                        <Tooltip title="View Preferences">
-                                            <IconButton size="small"><Tune fontSize="small" /></IconButton>
-                                        </Tooltip>
-                                        <IconButton size="small" onClick={() => setIsOpen(false)}><Close fontSize="small" /></IconButton>
-                                    </Box>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        placeholder={`Search ${activeSection.toLowerCase()}...`}
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        InputProps={{
+                                            startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: 'text.secondary', opacity: 0.5 }} />,
+                                            sx: { borderRadius: 2, bgcolor: '#f8faf9', '& fieldset': { border: 'none' }, height: 36 }
+                                        }}
+                                    />
                                 </Box>
 
-                                <Box sx={{ flex: 1, overflowY: 'auto', p: 4, position: 'relative' }}>
+                                <Box sx={{ flex: 1, overflowY: 'auto', p: 2, position: 'relative' }}>
                                     {activeSection === 'Community' ? (
                                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                             {messages.map((msg) => (
@@ -310,7 +317,7 @@ export const CommunityHub = () => {
                                         <Box sx={{ position: 'relative', pl: 8 }}>
                                             <Box sx={{
                                                 position: 'absolute',
-                                                left: 71,
+                                                left: 51,
                                                 top: 0,
                                                 bottom: 0,
                                                 width: 1.5,
@@ -322,23 +329,23 @@ export const CommunityHub = () => {
                                                 <Box key={notif.id} sx={{ mb: 4, display: 'flex', alignItems: 'flex-start', position: 'relative' }}>
                                                     <Box sx={{
                                                         position: 'absolute',
-                                                        left: -70,
+                                                        left: -50,
                                                         top: 4,
                                                         display: 'flex',
                                                         alignItems: 'center',
-                                                        gap: 1.5,
-                                                        width: 100,
+                                                        gap: 1,
+                                                        width: 80,
                                                         zIndex: 1
                                                     }}>
-                                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', width: 45 }}>
+                                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', width: 40, fontSize: '0.7rem' }}>
                                                             {notif.formattedTime}
                                                         </Typography>
                                                         <Box sx={{
-                                                            width: 10,
-                                                            height: 10,
+                                                            width: 8,
+                                                            height: 8,
                                                             borderRadius: '50%',
                                                             bgcolor: notif.read ? 'divider' : theme.palette.primary.main,
-                                                            border: '3px solid white',
+                                                            border: '2.5px solid white',
                                                             boxShadow: '0 0 0 1px rgba(0,0,0,0.05)'
                                                         }} />
                                                     </Box>
@@ -391,12 +398,12 @@ export const CommunityHub = () => {
                                 </Box>
 
                                 {activeSection === 'Community' && (
-                                    <Box component="form" onSubmit={handleSend} sx={{ p: 3, borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                                    <Box component="form" onSubmit={handleSend} sx={{ p: 2, borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
                                             <FormControlLabel
                                                 control={<Switch size="small" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} color="success" />}
-                                                label={<Typography sx={{ fontSize: '0.65rem', fontWeight: 800 }}>PRIVATE</Typography>}
-                                                sx={{ m: 0 }}
+                                                label={<Typography sx={{ fontSize: '0.6rem', fontWeight: 800 }}>PRIVATE</Typography>}
+                                                sx={{ m: 0, '& .MuiFormControlLabel-label': { ml: 0.5 } }}
                                             />
                                             {isPrivate && (
                                                 <Autocomplete
@@ -405,30 +412,30 @@ export const CommunityHub = () => {
                                                     getOptionLabel={(o: User) => (o?.first_name || o?.username || 'Unknown')}
                                                     value={recipient}
                                                     onChange={(_: any, v: User | null) => setRecipient(v)}
-                                                    renderInput={(p: any) => <TextField {...p} placeholder="Select recipient..." variant="standard" sx={{ width: 150 }} />}
+                                                    renderInput={(p: any) => <TextField {...p} placeholder="Select user..." variant="standard" sx={{ width: 120, '& .MuiInput-input': { fontSize: '0.75rem' } }} />}
                                                 />
                                             )}
                                         </Box>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <TextField
                                                 fullWidth
-                                                placeholder="Ask your community anything..."
+                                                placeholder="Ask community..."
                                                 value={newMessage}
                                                 onChange={(e) => setNewMessage(e.target.value)}
                                                 variant="outlined"
                                                 size="small"
                                                 InputProps={{
-                                                    sx: { borderRadius: 3, bgcolor: '#f8faf9' }
+                                                    sx: { borderRadius: 2, bgcolor: '#f8faf9', height: 36, fontSize: '0.875rem' }
                                                 }}
                                             />
-                                            <Button
+                                            <IconButton
                                                 type="submit"
-                                                variant="contained"
+                                                color="primary"
                                                 disabled={!newMessage.trim() || loading || (isPrivate && !recipient)}
-                                                sx={{ borderRadius: 3, px: 3, fontWeight: 'bold' }}
+                                                sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), borderRadius: 2, p: 1 }}
                                             >
-                                                Send
-                                            </Button>
+                                                <ChatBubbleOutline sx={{ fontSize: 20 }} />
+                                            </IconButton>
                                         </Box>
                                     </Box>
                                 )}
