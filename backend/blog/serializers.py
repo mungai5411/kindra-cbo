@@ -60,7 +60,7 @@ class BlogPostListSerializer(serializers.ModelSerializer):
             'view_count', 'author', 'author_name', 'published_at',
             'created_at', 'updated_at', 'comment_count', 'likes_count', 'has_liked'
         ]
-        read_only_fields = ('id', 'slug', 'view_count', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'slug', 'view_count', 'author', 'created_at', 'updated_at')
     
     def get_comment_count(self, obj):
         return obj.comments.filter(status='APPROVED').count()
@@ -101,7 +101,7 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
         fields = '__all__'
-        read_only_fields = ('id', 'slug', 'view_count', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'slug', 'view_count', 'author', 'created_at', 'updated_at')
 
     def get_comment_count(self, obj):
         return obj.comments.filter(status='APPROVED').count()
