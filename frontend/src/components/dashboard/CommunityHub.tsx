@@ -314,13 +314,13 @@ export const CommunityHub = () => {
                                                     alignSelf: msg.is_sender ? 'flex-end' : 'flex-start',
                                                     maxWidth: '80%'
                                                 }}>
-                                                    <Avatar src={msg.user.profile_picture || undefined} sx={{ width: 32, height: 32 }}>
-                                                        {msg.user.username[0]}
+                                                    <Avatar src={msg.user?.profile_picture || undefined} sx={{ width: 32, height: 32 }}>
+                                                        {msg.user?.username?.[0] || '?'}
                                                     </Avatar>
                                                     <Box>
                                                         <Box sx={{ display: 'flex', gap: 1, mb: 0.5, flexDirection: msg.is_sender ? 'row-reverse' : 'row' }}>
                                                             <Typography variant="caption" fontWeight="bold">
-                                                                {msg.user.first_name || msg.user.username}
+                                                                {msg.user?.first_name || msg.user?.username || 'Unknown'}
                                                             </Typography>
                                                             <Typography variant="caption" color="text.secondary">
                                                                 {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -383,11 +383,11 @@ export const CommunityHub = () => {
                                                         '&:hover': { bgcolor: '#fafafa', borderColor: theme.palette.primary.main }
                                                     }} onClick={() => setSelectedNotif(notif)}>
                                                         <Avatar sx={{ width: 32, height: 32, bgcolor: alpha(theme.palette.primary.main, 0.1), color: theme.palette.primary.main }}>
-                                                            {notif.type[0].toUpperCase()}
+                                                            {(notif.type?.[0] || 'N').toUpperCase()}
                                                         </Avatar>
                                                         <Box sx={{ flex: 1 }}>
                                                             <Typography variant="body2" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 0.5 }}>
-                                                                <span style={{ color: theme.palette.primary.main }}>{notif.title.split(' ')[0]}</span> {notif.title.split(' ').slice(1).join(' ')}
+                                                                <span style={{ color: theme.palette.primary.main }}>{(notif.title || '').split(' ')[0]}</span> {(notif.title || '').split(' ').slice(1).join(' ')}
                                                             </Typography>
                                                             <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8rem', mb: 1.5 }}>
                                                                 {notif.message}
@@ -430,7 +430,7 @@ export const CommunityHub = () => {
                                                 <Autocomplete
                                                     size="small"
                                                     options={availableUsers}
-                                                    getOptionLabel={(o: User) => o.first_name || o.username}
+                                                    getOptionLabel={(o: User) => (o?.first_name || o?.username || 'Unknown')}
                                                     value={recipient}
                                                     onChange={(_: any, v: User | null) => setRecipient(v)}
                                                     renderInput={(p: any) => <TextField {...p} placeholder="Select recipient..." variant="standard" sx={{ width: 150 }} />}
