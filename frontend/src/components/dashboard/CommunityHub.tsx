@@ -23,6 +23,7 @@ import {
     Chip,
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { glassCard, glassChatBubble } from '../../theme/glassmorphism';
 import apiClient from '../../api/client';
 
@@ -64,6 +65,7 @@ interface Notification {
 
 export const CommunityHub = () => {
     const theme = useTheme();
+    const navigate = useNavigate();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [isOpen, setIsOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('Activity');
@@ -416,7 +418,7 @@ export const CommunityHub = () => {
                                                                                 onClick={(e) => {
                                                                                     e.stopPropagation();
                                                                                     if (notif.link) {
-                                                                                        window.location.href = notif.link;
+                                                                                        navigate(notif.link);
                                                                                     }
                                                                                 }}
                                                                             >

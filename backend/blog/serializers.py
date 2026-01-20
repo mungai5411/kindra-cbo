@@ -84,11 +84,6 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
     """
     Serializer for full blog post detail view
     """
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(),
-        required=False,
-        allow_null=True
-    )
     category_name = serializers.CharField(source='category.name', read_only=True)
     author_name = serializers.CharField(source='author.get_full_name', read_only=True)
     tags = TagSerializer(many=True, read_only=True)
@@ -99,17 +94,25 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
         source='tags',
         required=False
     )
+    comment_count = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
     has_liked = serializers.SerializerMethodField()
-    excerpt = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     
     class Meta:
         model = BlogPost
-        fields = '__all__'
+        fields = [
+            'id', 'title', 'slug', 'excerpt', 'content', 'featured_image', 
+            'featured_image_alt', 'category', 'category_name', 'tags', 'tag_ids',
+            'meta_description', 'meta_keywords', 'og_image', 'status', 
+            'is_featured', 'allow_comments', 'view_count', 'author', 'author_name',
+            'published_at', 'created_at', 'updated_at', 'has_liked',
+            'comment_count', 'likes_count'
+        ]
         read_only_fields = ('id', 'slug', 'view_count', 'author', 'created_at', 'updated_at')
         extra_kwargs = {
             'featured_image': {'required': False, 'allow_null': True},
             'excerpt': {'required': False, 'allow_blank': True, 'allow_null': True},
-            'tag_ids': {'required': False},
+            'category': {'required': False, 'allow_null': True},
         }
 
     def get_comment_count(self, obj):
