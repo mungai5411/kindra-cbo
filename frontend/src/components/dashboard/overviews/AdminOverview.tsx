@@ -1,4 +1,4 @@
-import { Box, Typography, Grid, useTheme } from '@mui/material';
+import { Box, Typography, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Campaign, VolunteerActivism, FolderShared, Home } from '@mui/icons-material';
 import { StatsCard } from '../StatCards';
@@ -31,62 +31,71 @@ interface AdminOverviewProps {
 }
 
 export const AdminOverview = ({ stats, charts, activities }: AdminOverviewProps) => {
-    const theme = useTheme();
     const deviceType = useDeviceType();
     const isMobile = deviceType === 'MOBILE';
 
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <Typography
-                variant={isMobile ? "h6" : "h5"}
-                fontWeight="bold"
+                variant="h6"
+                fontWeight="900"
                 sx={{
-                    mb: isMobile ? 2 : 3,
-                    color: theme.palette.text.primary,
-                    textShadow: 'none'
+                    mb: 2,
+                    color: 'text.primary',
+                    letterSpacing: -0.5
                 }}
             >
-                Global System Performance
+                Ongoing Tasks
             </Typography>
 
-            <Grid container spacing={2} sx={{ mb: isMobile ? 2 : 3 }}>
-                <Grid item xs={12} sm={6} md={3}>
+            <Box sx={{
+                display: 'flex',
+                gap: 2,
+                mb: 4,
+                overflowX: { xs: 'auto', sm: 'unset' },
+                pb: { xs: 2, sm: 0 },
+                px: { xs: 0.5, sm: 0 },
+                '&::-webkit-scrollbar': { display: 'none' },
+                scrollbarWidth: 'none',
+                flexWrap: { xs: 'nowrap', sm: 'wrap' }
+            }}>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(25% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Total Donations"
                         value={`KES ${stats.totalDonations.toLocaleString()}`}
-                        color={theme.palette.success.main}
+                        color="#5D5FEF" // Vibrant Purple from insight
                         icon={<Campaign />}
                         subtitle={`${stats.donationCount} donations`}
                     />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                </Box>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(25% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Active Volunteers"
                         value={String(stats.activeVolunteers)}
-                        color={theme.palette.info.main}
+                        color="#FF708B" // Vibrant Pink
                         icon={<VolunteerActivism />}
                         subtitle={`${stats.totalVolunteers} total`}
                     />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                </Box>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(25% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Active Cases"
                         value={String(stats.activeCases)}
-                        color={theme.palette.secondary.main}
+                        color="#FFBA69" // Vibrant Orange
                         icon={<FolderShared />}
                         subtitle={`${stats.totalChildren} children`}
                     />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                </Box>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(25% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Shelter Network"
                         value={String(stats.shelterCount)}
-                        color={theme.palette.warning.main}
+                        color="#4ECCA3" // Vibrant Green
                         icon={<Home />}
                         subtitle="Operational"
                     />
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
 
             <Grid container spacing={2} sx={{ mb: isMobile ? 2 : 3 }}>
                 <Grid item xs={12} lg={8}>

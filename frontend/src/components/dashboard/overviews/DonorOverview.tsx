@@ -37,37 +37,57 @@ export const DonorOverview = ({ stats, charts, activeCampaigns, onDonate }: Dono
 
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>Your Giving Impact</Typography>
+            <Typography
+                variant="h6"
+                fontWeight="900"
+                sx={{
+                    mb: 2,
+                    color: 'text.primary',
+                    letterSpacing: -0.5
+                }}
+            >
+                My Giving Impact
+            </Typography>
 
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid item xs={12} sm={4}>
+            <Box sx={{
+                display: 'flex',
+                gap: 2,
+                mb: 4,
+                overflowX: { xs: 'auto', sm: 'unset' },
+                pb: { xs: 2, sm: 0 },
+                px: { xs: 0.5, sm: 0 },
+                '&::-webkit-scrollbar': { display: 'none' },
+                scrollbarWidth: 'none',
+                flexWrap: { xs: 'nowrap', sm: 'wrap' }
+            }}>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="My Total Giving"
                         value={`KES ${stats.myTotalDonations.toLocaleString()}`}
-                        color={theme.palette.primary.main}
+                        color="#5D5FEF"
                         icon={<Favorite />}
                         subtitle="Lifetime contribution"
                     />
-                </Grid>
-                <Grid item xs={12} sm={4}>
+                </Box>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Donor Status"
                         value={impactRank}
-                        color={theme.palette.secondary.main}
+                        color="#FF708B"
                         icon={<TrendingUp />}
                         subtitle="Community impact rank"
                     />
-                </Grid>
-                <Grid item xs={12} sm={4}>
+                </Box>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Campaigns Supported"
                         value={String(stats.supportedCampaigns)}
-                        color={theme.palette.success.main}
+                        color="#4ECCA3"
                         icon={<History />}
                         subtitle="Directly aided"
                     />
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
 
             <Grid container spacing={2} sx={{ mb: 3 }}>
                 <Grid item xs={12} lg={8}>

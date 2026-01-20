@@ -1,5 +1,5 @@
-import { List, ListItem, ListItemText, ListItemAvatar, Avatar, Typography, Paper, Box, Button, IconButton, alpha, useTheme } from '@mui/material';
-import { Campaign, VolunteerActivism, FolderShared, Payments, Refresh } from '@mui/icons-material';
+import { List, ListItem, ListItemText, ListItemAvatar, Avatar, Typography, Paper, Box, Button, alpha, useTheme } from '@mui/material';
+import { Campaign, VolunteerActivism, FolderShared, Payments } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
 interface ActivityItem {
@@ -28,63 +28,94 @@ export const ActivityFeed = ({ activities }: ActivityFeedProps) => {
     };
 
     return (
-        <Paper sx={{ p: 2, height: '100%', borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1] }} component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, alignItems: 'center' }}>
-                <Typography variant="subtitle1" fontWeight="bold">Recent Activity</Typography>
-                <Box>
-                    <IconButton
-                        size="small"
-                        onClick={() => window.dispatchEvent(new CustomEvent('refresh-dashboard'))}
-                        sx={{ mr: 0.5 }}
-                    >
-                        <Refresh fontSize="small" />
-                    </IconButton>
-                    <Button size="small">View All</Button>
-                </Box>
+        <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, alignItems: 'center' }}>
+                <Typography variant="h6" fontWeight="900" sx={{ letterSpacing: -0.5 }}>Past Activity</Typography>
+                <Button size="small" sx={{ textTransform: 'none', fontWeight: 700, color: '#5D5FEF' }}>View All</Button>
             </Box>
-            <List dense>
-                {activities.map((activity) => {
-                    const date = activity.timestamp ? new Date(activity.timestamp) : null;
-                    const formattedDate = !date || isNaN(date.getTime()) ? 'Just now' : date.toLocaleDateString();
 
-                    return (
-                        <ListItem key={activity.id} divider sx={{ px: 1 }}>
-                            <ListItemAvatar sx={{ minWidth: 40 }}>
-                                <Avatar sx={{ bgcolor: 'background.default', width: 32, height: 32 }}>
-                                    {getIcon(activity.type)}
-                                </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText
-                                primary={<Typography variant="body2" fontWeight={600} sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>{activity.title}</Typography>}
-                                secondary={
-                                    <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                        sx={{
-                                            display: '-webkit-box',
-                                            WebkitLineClamp: 2,
-                                            WebkitBoxOrient: 'vertical',
-                                            overflow: 'hidden',
-                                            lineHeight: 1.2,
-                                            mt: 0.25
-                                        }}
-                                    >
-                                        {activity.description}
-                                    </Typography>
-                                }
-                            />
-                            <Typography variant="caption" color="text.secondary" sx={{ ml: 1, whiteSpace: 'nowrap', fontSize: '0.65rem', opacity: 0.7 }}>
-                                {formattedDate}
+            <Paper elevation={0} sx={{
+                borderRadius: 4,
+                border: '1px solid',
+                borderColor: alpha(theme.palette.divider, 0.08),
+                overflow: 'hidden',
+                bgcolor: 'white'
+            }}>
+                <List disablePadding>
+                    {activities.map((activity, index) => {
+                        const date = activity.timestamp ? new Date(activity.timestamp) : null;
+                        const formattedDate = !date || isNaN(date.getTime()) ? 'Just now' : date.toLocaleDateString();
+
+                        return (
+                            <ListItem
+                                key={activity.id}
+                                divider={index !== activities.length - 1}
+                                sx={{
+                                    py: 2,
+                                    px: 2,
+                                    transition: 'background 0.2s',
+                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.01) }
+                                }}
+                            >
+                                <ListItemAvatar sx={{ minWidth: 52 }}>
+                                    <Avatar sx={{
+                                        bgcolor: alpha(
+                                            activity.type === 'donation' ? '#4ECCA3' :
+                                                activity.type === 'volunteer' ? '#5D5FEF' :
+                                                    activity.type === 'case' ? '#FF708B' : '#FFBA69',
+                                            0.1
+                                        ),
+                                        width: 40,
+                                        height: 40,
+                                        color:
+                                            activity.type === 'donation' ? '#4ECCA3' :
+                                                activity.type === 'volunteer' ? '#5D5FEF' :
+                                                    activity.type === 'case' ? '#FF708B' : '#FFBA69'
+                                    }}>
+                                        {getIcon(activity.type)}
+                                    </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText
+                                    primary={
+                                        <Typography variant="body2" fontWeight="700" sx={{ color: 'text.primary' }}>
+                                            {activity.title}
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Box>
+                                            <Typography
+                                                variant="caption"
+                                                color="text.secondary"
+                                                sx={{
+                                                    display: 'block',
+                                                    lineHeight: 1.3,
+                                                    mt: 0.25,
+                                                    fontWeight: 500
+                                                }}
+                                            >
+                                                {activity.description}
+                                            </Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                                                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'success.main' }} />
+                                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', fontWeight: 600 }}>
+                                                    {formattedDate}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                    }
+                                />
+                            </ListItem>
+                        );
+                    })}
+                    {activities.length === 0 && (
+                        <Box sx={{ textAlign: 'center', py: 6 }}>
+                            <Typography variant="body2" color="text.secondary" fontWeight="500">
+                                No recent activity found
                             </Typography>
-                        </ListItem>
-                    );
-                })}
-                {activities.length === 0 && (
-                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-                        No recent activity found
-                    </Typography>
-                )}
-            </List>
-        </Paper>
+                        </Box>
+                    )}
+                </List>
+            </Paper>
+        </Box>
     );
 };

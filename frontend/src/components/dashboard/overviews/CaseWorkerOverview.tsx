@@ -19,40 +19,60 @@ export const CaseWorkerOverview = ({ stats, recentCases, pendingTasks, onNavigat
 
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>Case Management Load</Typography>
+            <Typography
+                variant="h6"
+                fontWeight="900"
+                sx={{
+                    mb: 2,
+                    color: 'text.primary',
+                    letterSpacing: -0.5
+                }}
+            >
+                Case Load Overview
+            </Typography>
 
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid item xs={12} sm={4}>
+            <Box sx={{
+                display: 'flex',
+                gap: 2,
+                mb: 4,
+                overflowX: { xs: 'auto', sm: 'unset' },
+                pb: { xs: 2, sm: 0 },
+                px: { xs: 0.5, sm: 0 },
+                '&::-webkit-scrollbar': { display: 'none' },
+                scrollbarWidth: 'none',
+                flexWrap: { xs: 'nowrap', sm: 'wrap' }
+            }}>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Assigned Children"
                         value={String(stats.assignedChildren)}
-                        color={theme.palette.primary.main}
+                        color="#5D5FEF"
                         icon={<ChildCare />}
                         subtitle="Primary care cases"
                         delay={0}
                     />
-                </Grid>
-                <Grid item xs={12} sm={4}>
+                </Box>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Assessments Due"
                         value={String(stats.pendingAssessments)}
-                        color={theme.palette.error.main}
+                        color="#FF708B"
                         icon={<AssignmentLate />}
                         subtitle="Needs attention"
                         delay={0.1}
                     />
-                </Grid>
-                <Grid item xs={12} sm={4}>
+                </Box>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Total Active cases"
                         value={String(stats.totalCases)}
-                        color={theme.palette.info.main}
+                        color="#4ECCA3"
                         icon={<Assessment />}
                         subtitle="Full registry"
                         delay={0.2}
                     />
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
 
             <Grid container spacing={3}>
                 <Grid item xs={12} md={7}>

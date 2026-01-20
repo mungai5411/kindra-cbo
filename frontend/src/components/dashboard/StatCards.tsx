@@ -16,64 +16,83 @@ export const StatsCard = ({ title, value, color, icon, subtitle, delay = 0 }: St
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: delay }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: delay }}
+            style={{ height: '100%' }}
         >
             <Card sx={{
                 height: '100%',
+                minWidth: { xs: 240, sm: 'auto' }, // Support for horizontal scroller on mobile
                 position: 'relative',
                 overflow: 'hidden',
-                borderRadius: 2,
-                boxShadow: theme.shadows[1],
-                border: '1px solid',
-                borderColor: alpha(cardColor, 0.1),
-                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+                borderRadius: 5, // High radius as per insight
+                boxShadow: `0 4px 20px ${alpha(cardColor, 0.08)}`,
+                border: 'none',
+                bgcolor: cardColor,
+                color: theme.palette.getContrastText(cardColor),
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                    transform: 'translateY(-5px)',
-                    boxShadow: `0 12px 24px ${alpha(cardColor, 0.15)}`
+                    transform: 'translateY(-4px)',
+                    boxShadow: `0 12px 28px ${alpha(cardColor, 0.2)}`
                 }
             }}>
-                {icon && (
-                    <Box sx={{
-                        position: 'absolute',
-                        right: { xs: -20, sm: -10 },
-                        top: { xs: -10, sm: -5 },
-                        opacity: 0.05,
-                        fontSize: { xs: 40, sm: 60 },
-                        color: cardColor,
-                        transform: 'rotate(15deg)',
-                        pointerEvents: 'none'
-                    }}>
-                        {icon}
-                    </Box>
-                )}
+                <Box sx={{
+                    position: 'absolute',
+                    right: -10,
+                    top: -10,
+                    opacity: 0.15,
+                    fontSize: 80,
+                    color: 'white',
+                    transform: 'rotate(15deg)',
+                    pointerEvents: 'none'
+                }}>
+                    {icon}
+                </Box>
+
                 <CardContent sx={{
                     position: 'relative',
                     zIndex: 1,
-                    p: { xs: 1, sm: 1.5 },
-                    '&:last-child': { pb: { xs: 1, sm: 1.5 } }
+                    p: 2.5,
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    '&:last-child': { pb: 2.5 }
                 }}>
-                    <Typography variant="h4" fontWeight="800" sx={{
-                        color: cardColor,
-                        mb: 0,
-                        lineHeight: 1,
-                        fontSize: { xs: '1.15rem', sm: '1.5rem', md: '1.75rem' }
-                    }}>
-                        {value}
-                    </Typography>
-                    <Typography variant="subtitle1" color="text.secondary" fontWeight="700" sx={{
+                    <Typography variant="caption" sx={{
+                        fontWeight: 700,
                         textTransform: 'uppercase',
-                        letterSpacing: 0.5,
-                        fontSize: { xs: '0.625rem', sm: '0.75rem' },
-                        mt: 0.5
+                        letterSpacing: 1.5,
+                        opacity: 0.8,
+                        fontSize: '0.65rem',
+                        mb: 1
                     }}>
                         {title}
                     </Typography>
+
+                    <Typography variant="h4" fontWeight="900" sx={{
+                        lineHeight: 1,
+                        fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.85rem' },
+                        letterSpacing: -0.5
+                    }}>
+                        {value}
+                    </Typography>
+
                     {subtitle && (
-                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, opacity: 0.8, fontSize: { xs: '0.65rem', sm: '0.8rem' } }}>
-                            {subtitle}
-                        </Typography>
+                        <Box sx={{
+                            mt: 2,
+                            pt: 1.5,
+                            borderTop: '1px solid',
+                            borderColor: alpha('#fff', 0.2),
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5
+                        }}>
+                            <Typography variant="caption" sx={{ opacity: 0.9, fontWeight: 600 }}>
+                                {subtitle}
+                            </Typography>
+                        </Box>
                     )}
                 </CardContent>
             </Card>

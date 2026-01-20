@@ -1,13 +1,7 @@
-import { useEffect, useCallback, useState } from 'react';
-import { Box, Typography, CircularProgress, useTheme, Card, alpha, Button } from '@mui/material';
-import { Refresh } from '@mui/icons-material';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../../store';
-import { fetchDashboardData } from '../../features/reporting/reportingSlice';
-import { fetchVolunteers, fetchTasks, fetchEvents } from '../../features/volunteers/volunteersSlice';
-import { fetchCampaigns, fetchDonations } from '../../features/donations/donationsSlice';
-import { fetchCases } from '../../features/cases/casesSlice';
-import { fetchShelters, fetchIncidents } from '../../features/shelters/shelterSlice';
+import { Box, Typography, CircularProgress, useTheme, alpha, IconButton, TextField, InputAdornment } from '@mui/material';
+import { Search, NotificationsNone } from '@mui/icons-material';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 import {
     aggregateDonationsByDay,
     calculateCampaignProgress,
@@ -29,7 +23,6 @@ interface OverviewProps {
 
 export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps) => {
     const theme = useTheme();
-    const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: RootState) => state.auth);
     const { dashboardData, isLoading: dashboardLoading } = useSelector((state: RootState) => state.reporting);
 
@@ -38,40 +31,6 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
     const { campaigns, donations: donationRecords } = useSelector((state: RootState) => state.donations);
     const { cases, children } = useSelector((state: RootState) => state.cases);
     const { shelters, incidents } = useSelector((state: RootState) => state.shelters);
-
-    const [showGreeting, setShowGreeting] = useState(false);
-
-    // Check for daily greeting logic
-    useEffect(() => {
-        const today = new Date().toLocaleDateString();
-        const lastSeen = localStorage.getItem('last_welcome_date');
-
-        if (lastSeen !== today) {
-            setShowGreeting(true);
-            localStorage.setItem('last_welcome_date', today);
-        }
-    }, []);
-
-    const handleRefresh = useCallback(() => {
-        dispatch(fetchDashboardData());
-        dispatch(fetchCampaigns());
-        dispatch(fetchDonations());
-        dispatch(fetchVolunteers());
-        dispatch(fetchCases());
-        dispatch(fetchTasks());
-        dispatch(fetchEvents());
-        dispatch(fetchShelters());
-        dispatch(fetchIncidents());
-    }, [dispatch]);
-
-    useEffect(() => {
-        window.addEventListener('refresh-dashboard', handleRefresh);
-
-        // Initial sync
-        handleRefresh();
-
-        return () => window.removeEventListener('refresh-dashboard', handleRefresh);
-    }, [handleRefresh]);
 
     const isLoading = dashboardLoading;
 
@@ -227,95 +186,60 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
     };
 
 
-
-    const getGreeting = () => {
-        const hour = new Date().getHours();
-        if (hour < 12) return 'Good Morning';
-        if (hour < 18) return 'Good Afternoon';
-        return 'Good Evening';
-    };
-
-    const greeting = getGreeting();
-
     return (
-        <Box>
-            {/* Simple Greeting - Once a day only */}
-            {showGreeting && (
-                <Card
-                    sx={{
-                        mb: 4,
-                        p: 3,
-                        background: theme.palette.mode === 'dark'
-                            ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)} 0%, ${alpha(theme.palette.secondary.main, 0.1)} 100%)`
-                            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        color: 'white',
-                        position: 'relative',
-                        overflow: 'hidden'
-                    }}
-                >
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', sm: 'row' },
-                        justifyContent: 'space-between',
-                        alignItems: { xs: 'flex-start', sm: 'center' },
-                        gap: { xs: 2, sm: 0 }
+        <Box sx={{ p: { xs: 2, sm: 3 } }}>
+            {/* Header / Greeting Area */}
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                mb: 3
+            }}>
+                <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, letterSpacing: 0.5 }}>
+                        Holla, {user?.firstName} {user?.lastName}
+                    </Typography>
+                    <Typography variant="h4" fontWeight="900" sx={{
+                        letterSpacing: -1,
+                        mt: 0.5,
+                        fontSize: { xs: '1.75rem', sm: '2.25rem' }
                     }}>
-                        <Box>
-                            <Typography variant="h4" fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem', md: '2.5rem' } }}>
-                                {greeting}, {user?.firstName || 'User'}!
-                            </Typography>
-                            <Typography variant="body1" sx={{ opacity: 0.9, mt: 0.5, fontSize: { xs: '0.8rem', sm: '1rem' } }}>
-                                {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                            </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Button
-                                variant="contained"
-                                size="small"
-                                onClick={() => setShowGreeting(false)}
-                                sx={{
-                                    borderRadius: 3,
-                                    px: 2,
-                                    bgcolor: alpha('#fff', 0.2),
-                                    backdropFilter: 'blur(10px)',
-                                    '&:hover': { bgcolor: alpha('#fff', 0.3) },
-                                    boxShadow: 'none',
-                                    textTransform: 'none'
-                                }}
-                            >
-                                Dismiss
-                            </Button>
-                            <Button
-                                variant="contained"
-                                fullWidth={false}
-                                startIcon={<Refresh />}
-                                onClick={() => {
-                                    dispatch(fetchDashboardData());
-                                    dispatch(fetchCampaigns());
-                                    // ... other fetches
-                                }}
-                                sx={{
-                                    borderRadius: 3,
-                                    px: 3,
-                                    py: 1,
-                                    bgcolor: alpha('#fff', 0.2),
-                                    backdropFilter: 'blur(10px)',
-                                    border: '1px solid',
-                                    borderColor: alpha('#fff', 0.3),
-                                    '&:hover': { bgcolor: alpha('#fff', 0.3) },
-                                    textTransform: 'none',
-                                    fontWeight: 'bold',
-                                    boxShadow: 'none',
-                                    width: { xs: '100%', sm: 'auto' }
-                                }}
-                            >
-                                Refresh
-                            </Button>
-                        </Box>
-                    </Box>
-                </Card>
-            )}
+                        Ready for your Task?
+                    </Typography>
+                </Box>
+                <IconButton sx={{
+                    bgcolor: 'white',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05) }
+                }}>
+                    <NotificationsNone />
+                </IconButton>
+            </Box>
 
+            {/* Search Bar */}
+            <Box sx={{ mb: 4 }}>
+                <TextField
+                    fullWidth
+                    placeholder="Search tasks, donors, or campaigns..."
+                    variant="outlined"
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Search sx={{ color: 'text.secondary', opacity: 0.5 }} />
+                            </InputAdornment>
+                        ),
+                        sx: {
+                            borderRadius: 4,
+                            bgcolor: 'white',
+                            '& fieldset': { border: 'none' },
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+                            py: 0.5
+                        }
+                    }}
+                />
+            </Box>
+
+            {/* Content Refresh (Optional floating button or integrated) */}
             {renderRoleSpecificOverview()}
         </Box >
     );
