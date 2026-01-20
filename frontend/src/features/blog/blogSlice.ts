@@ -175,10 +175,7 @@ export const createPost = createAsyncThunk(
     'blog/createPost',
     async (postData: any, { rejectWithValue }) => {
         try {
-            const isFormData = postData instanceof FormData;
-            const response = await apiClient.post(endpoints.blog.adminPosts, postData, {
-                headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {}
-            });
+            const response = await apiClient.post(endpoints.blog.adminPosts, postData);
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to create post');
@@ -190,10 +187,7 @@ export const updatePost = createAsyncThunk(
     'blog/updatePost',
     async ({ id, data }: { id: string; data: any }, { rejectWithValue }) => {
         try {
-            const isFormData = data instanceof FormData;
-            const response = await apiClient.patch(`${endpoints.blog.adminPosts}${id}/`, data, {
-                headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {}
-            });
+            const response = await apiClient.patch(`${endpoints.blog.adminPosts}${id}/`, data);
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to update post');

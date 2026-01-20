@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
 import { fetchAdminPosts, fetchCategories, createPost, updatePost, deletePost, fetchTags, createTag, updateTag, deleteTag, createCategory, updateCategory, deleteCategory } from '../../features/blog/blogSlice';
+import apiClient from '../../api/client';
 import {
     Box,
     Typography,
@@ -43,7 +44,6 @@ import {
 import { motion } from 'framer-motion';
 import { SubTabView } from './SubTabView';
 import { ImageUploader } from '../common/ImageUploader';
-import axios from 'axios';
 
 // Status Chip Component
 const StatusChip = ({ status }: { status: string }) => {
@@ -601,7 +601,7 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                                 onDelete={async () => {
                                     if (selectedPost?.id) {
                                         try {
-                                            await axios.delete(`/api/v1/blog/admin/posts/${selectedPost.id}/featured-image/`);
+                                            await apiClient.delete(`/blog/admin/posts/${selectedPost.id}/featured-image/`);
                                             setSelectedPost({ ...selectedPost, featured_image: null });
                                             setFormData({ ...formData, featured_image: null });
                                             dispatch(fetchAdminPosts());
