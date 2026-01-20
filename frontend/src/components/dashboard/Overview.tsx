@@ -264,7 +264,7 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
                             <Typography variant="h4" fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem', md: '2.5rem' } }}>
                                 {greeting}, {user?.firstName || 'User'}!
                             </Typography>
-                            <Typography variant="body1" sx={{ opacity: 0.9, mt: 0.5 }}>
+                            <Typography variant="body1" sx={{ opacity: 0.9, mt: 0.5, fontSize: { xs: '0.8rem', sm: '1rem' } }}>
                                 {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                             </Typography>
                         </Box>

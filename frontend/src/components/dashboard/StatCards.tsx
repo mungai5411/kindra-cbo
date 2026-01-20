@@ -58,20 +58,20 @@ export const StatsCard = ({ title, value, color, icon, subtitle, delay = 0 }: St
                         color: cardColor,
                         mb: 0,
                         lineHeight: 1,
-                        fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
+                        fontSize: { xs: '1.15rem', sm: '1.5rem', md: '1.75rem' }
                     }}>
                         {value}
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary" fontWeight="700" sx={{
                         textTransform: 'uppercase',
                         letterSpacing: 0.5,
-                        fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                        fontSize: { xs: '0.625rem', sm: '0.75rem' },
                         mt: 0.5
                     }}>
                         {title}
                     </Typography>
                     {subtitle && (
-                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, opacity: 0.8, fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, opacity: 0.8, fontSize: { xs: '0.65rem', sm: '0.8rem' } }}>
                             {subtitle}
                         </Typography>
                     )}
@@ -97,7 +97,7 @@ export const DashboardStatCard = ({ title, value, subtitle, color }: StatCardPro
                 <Typography variant="overline" color="text.secondary" sx={{
                     fontWeight: 700,
                     letterSpacing: 0.5,
-                    fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                    fontSize: { xs: '0.625rem', sm: '0.75rem' },
                     lineHeight: 1
                 }}>
                     {title}
@@ -106,12 +106,12 @@ export const DashboardStatCard = ({ title, value, subtitle, color }: StatCardPro
                     fontWeight: 800,
                     my: 0.5,
                     color: 'text.primary',
-                    fontSize: { xs: '1.1rem', sm: '1.4rem', md: '1.6rem' }
+                    fontSize: { xs: '1.05rem', sm: '1.4rem', md: '1.6rem' }
                 }}>
                     {value}
                 </Typography>
                 {subtitle && (
-                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.65rem', sm: '0.8rem' } }}>
                         {subtitle}
                     </Typography>
                 )}

@@ -430,7 +430,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         <Card key={task.id} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                                    <Typography variant="subtitle1" fontWeight="bold">{task.title}</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{task.title}</Typography>
                                     <StatusChip status={task.status} />
                                 </Box>
                                 <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -444,10 +444,11 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                             bgcolor: task.priority === 'HIGH' || task.priority === 'URGENT' ? alpha(theme.palette.error.main, 0.1) : alpha(theme.palette.info.main, 0.1),
                                             color: task.priority === 'HIGH' || task.priority === 'URGENT' ? 'error.dark' : 'info.dark',
                                             fontWeight: 600,
-                                            height: 24
+                                            height: 20,
+                                            fontSize: '0.65rem'
                                         }}
                                     />
-                                    <Chip label={`Due: ${task.due_date || 'N/A'}`} size="small" variant="outlined" sx={{ height: 24 }} />
+                                    <Chip label={`Due: ${task.due_date || 'N/A'}`} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem' }} />
                                 </Stack>
                                 <Typography variant="caption" display="block" color="text.secondary">
                                     Assignee: {task.assignees_details?.map((a: any) => a.name).join(', ') || 'Unassigned'}

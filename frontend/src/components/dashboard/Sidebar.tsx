@@ -198,7 +198,7 @@ export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionTo
                                         primary={item.label}
                                         primaryTypographyProps={{
                                             fontWeight: isActive ? 600 : 500,
-                                            fontSize: '0.95rem'
+                                            fontSize: isMobile ? '0.875rem' : '0.95rem'
                                         }}
                                     />
                                     {hasChildren && (isOpen ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />)}
@@ -254,7 +254,7 @@ export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionTo
                                                 <ListItemText
                                                     primary={child.label}
                                                     primaryTypographyProps={{
-                                                        fontSize: '0.825rem',
+                                                        fontSize: isMobile ? '0.775rem' : '0.825rem',
                                                         fontWeight: activeTab === child.id ? 600 : 400,
                                                         letterSpacing: '0.01em'
                                                     }}
