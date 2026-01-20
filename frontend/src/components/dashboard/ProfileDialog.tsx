@@ -1,27 +1,23 @@
 import {
     Dialog,
     DialogContent,
-    DialogActions,
     Button,
     Box,
     Avatar,
     Typography,
-    Divider,
     Stack,
     IconButton,
     Chip,
+    Paper,
     useTheme,
-    alpha,
-    useMediaQuery
+    alpha
 } from '@mui/material';
 import {
     Email,
     Phone,
-    AdminPanelSettings,
     CalendarMonth,
     Close,
-    Edit,
-    VerifiedUser
+    Edit
 } from '@mui/icons-material';
 
 interface ProfileDialogProps {
@@ -33,7 +29,6 @@ interface ProfileDialogProps {
 
 export const ProfileDialog = ({ open, onClose, user, onEdit }: ProfileDialogProps) => {
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     if (!user) return null;
 
@@ -41,122 +36,135 @@ export const ProfileDialog = ({ open, onClose, user, onEdit }: ProfileDialogProp
         <Dialog
             open={open}
             onClose={onClose}
-            maxWidth="sm"
+            maxWidth="xs"
             fullWidth
             PaperProps={{
                 sx: {
-                    borderRadius: isMobile ? 3 : 5,
+                    borderRadius: 5,
                     overflow: 'hidden',
-                    mx: isMobile ? 2 : 'auto',
-                    width: isMobile ? 'calc(100% - 32px)' : 'auto'
+                    bgcolor: '#FBFBFB',
                 }
             }}
         >
             <Box sx={{
-                height: 120,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                position: 'relative'
+                p: 3,
+                pb: 1,
+                display: 'flex',
+                justifyContent: 'flex-end',
+                bgcolor: 'transparent'
             }}>
                 <IconButton
                     onClick={onClose}
-                    sx={{ position: 'absolute', top: 12, right: 12, color: 'white', bgcolor: alpha('#000', 0.2), '&:hover': { bgcolor: alpha('#000', 0.4) } }}
+                    sx={{ bgcolor: alpha(theme.palette.divider, 0.1) }}
                 >
-                    <Close />
+                    <Close fontSize="small" />
                 </IconButton>
             </Box>
 
-            <DialogContent sx={{ pt: 0, position: 'relative' }}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: -6, mb: 3 }}>
+            <DialogContent sx={{ pt: 0, px: 3, pb: 4 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
                     <Avatar
                         src={user.profile_picture}
                         sx={{
-                            width: 120,
-                            height: 120,
-                            border: '6px solid',
-                            borderColor: 'background.paper',
-                            boxShadow: theme.shadows[4]
+                            width: 100,
+                            height: 100,
+                            border: '4px solid white',
+                            boxShadow: theme.shadows[3],
+                            mb: 2
                         }}
                     >
                         {user.firstName?.[0]}
                     </Avatar>
-                    <Typography variant="h5" fontWeight="900" sx={{ mt: 2 }}>
+                    <Typography variant="h5" fontWeight="900" sx={{ letterSpacing: -0.5 }}>
                         {user.firstName} {user.lastName}
                     </Typography>
-                    <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, opacity: 0.8 }}>
+                        {user.email}
+                    </Typography>
+
+                    <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
                         <Chip
-                            icon={<AdminPanelSettings sx={{ fontSize: '1rem !important' }} />}
                             label={user.role || 'User'}
                             size="small"
-                            color="primary"
-                            variant="outlined"
-                            sx={{ fontWeight: 600, borderRadius: 1.5 }}
+                            sx={{
+                                fontWeight: 700,
+                                borderRadius: 1.5,
+                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                color: 'primary.main',
+                                border: 'none'
+                            }}
                         />
                         {user.is_verified && (
                             <Chip
-                                icon={<VerifiedUser sx={{ fontSize: '1rem !important' }} />}
                                 label="Verified"
                                 size="small"
                                 color="success"
-                                sx={{ fontWeight: 600, borderRadius: 1.5 }}
+                                sx={{ fontWeight: 700, borderRadius: 1.5 }}
                             />
                         )}
-                    </Stack>
+                    </Box>
                 </Box>
 
-                <Divider sx={{ mb: 3 }} />
-
-                <Stack spacing={2.5}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main' }}>
-                            <Email />
-                        </Avatar>
-                        <Box>
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 600 }}>Email Address</Typography>
-                            <Typography variant="body1" fontWeight="500">{user.email}</Typography>
+                <Paper elevation={0} sx={{
+                    borderRadius: 4,
+                    p: 2,
+                    bgcolor: 'white',
+                    border: '1px solid',
+                    borderColor: alpha(theme.palette.divider, 0.08)
+                }}>
+                    <Stack spacing={2.5}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: alpha(theme.palette.primary.main, 0.05), display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'primary.main' }}>
+                                <Email fontSize="small" />
+                            </Box>
+                            <Box>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 700, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Email Address</Typography>
+                                <Typography variant="body2" fontWeight="600">{user.email}</Typography>
+                            </Box>
                         </Box>
-                    </Box>
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar sx={{ bgcolor: alpha(theme.palette.secondary.main, 0.1), color: 'secondary.main' }}>
-                            <Phone />
-                        </Avatar>
-                        <Box>
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 600 }}>Phone Number</Typography>
-                            <Typography variant="body1" fontWeight="500">{user.phoneNumber || 'Not provided'}</Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: alpha(theme.palette.secondary.main, 0.05), display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'secondary.main' }}>
+                                <Phone fontSize="small" />
+                            </Box>
+                            <Box>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 700, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Phone Number</Typography>
+                                <Typography variant="body2" fontWeight="600">{user.phone_number || 'Not provided'}</Typography>
+                            </Box>
                         </Box>
-                    </Box>
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar sx={{ bgcolor: alpha(theme.palette.info.main, 0.1), color: 'info.main' }}>
-                            <CalendarMonth />
-                        </Avatar>
-                        <Box>
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 600 }}>Member Since</Typography>
-                            <Typography variant="body1" fontWeight="500">
-                                {user.dateJoined ? new Date(user.dateJoined).toLocaleDateString(undefined, { month: 'long', year: 'numeric', day: 'numeric' }) : 'N/A'}
-                            </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: alpha(theme.palette.info.main, 0.05), display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'info.main' }}>
+                                <CalendarMonth fontSize="small" />
+                            </Box>
+                            <Box>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 700, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Member Since</Typography>
+                                <Typography variant="body2" fontWeight="600">
+                                    {user.date_joined ? new Date(user.date_joined).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) : 'N/A'}
+                                </Typography>
+                            </Box>
                         </Box>
-                    </Box>
-                </Stack>
+                    </Stack>
+                </Paper>
             </DialogContent>
 
-            <DialogActions sx={{ p: 3, bgcolor: alpha(theme.palette.background.default, 0.5) }}>
+            <Box sx={{ p: 3, pt: 0 }}>
                 <Button
-                    variant="outlined"
+                    fullWidth
+                    variant="contained"
                     startIcon={<Edit />}
                     onClick={onEdit}
-                    sx={{ borderRadius: 3, px: 3, textTransform: 'none', fontWeight: 'bold' }}
+                    sx={{
+                        borderRadius: 3,
+                        py: 1.5,
+                        textTransform: 'none',
+                        fontWeight: 'bold',
+                        boxShadow: '0 4px 12px ' + alpha(theme.palette.primary.main, 0.2)
+                    }}
                 >
-                    Edit Profile
+                    Edit Profile Details
                 </Button>
-                <Button
-                    variant="contained"
-                    onClick={onClose}
-                    sx={{ borderRadius: 3, px: 4, textTransform: 'none', fontWeight: 'bold' }}
-                >
-                    Close
-                </Button>
-            </DialogActions>
+            </Box>
         </Dialog>
     );
 };
