@@ -1,4 +1,4 @@
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Collapse, Typography, alpha, useTheme } from '@mui/material';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Collapse, Typography, alpha, useTheme, useMediaQuery } from '@mui/material';
 import {
     Dashboard as DashboardIcon,
     VolunteerActivism,
@@ -118,6 +118,7 @@ interface NavigationItem {
 
 export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionToggle, canViewModule }: SidebarProps) => {
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -228,7 +229,7 @@ export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionTo
                                                     pl: 3,
                                                     borderRadius: '0 10px 10px 0',
                                                     mb: 0.2,
-                                                    minHeight: 34,
+                                                    minHeight: isMobile ? 44 : 36, // Larger touch target on mobile
                                                     color: activeTab === child.id ? theme.palette.primary.main : theme.palette.text.secondary,
                                                     bgcolor: activeTab === child.id ? alpha('#8DA88D', 0.1) : 'transparent',
                                                     '&:hover': {

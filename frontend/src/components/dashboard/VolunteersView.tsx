@@ -38,7 +38,8 @@ import {
     ListItemIcon,
     ListItemText,
     Stack,
-    TablePagination
+    TablePagination,
+    useMediaQuery
 } from '@mui/material';
 import { Person, Assignment, Event as EventIcon, Schedule, School, Verified, Add, AccessTime, Email, Phone, AdminPanelSettings, OpenInNew, Delete } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
@@ -55,6 +56,7 @@ interface VolunteersViewProps {
 
 export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps) {
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const dispatch = useDispatch<AppDispatch>();
     const { volunteers, tasks, events, timeLogs, shelters, isLoading, error } = useSelector((state: RootState) => state.volunteers);
     const user = useSelector((state: RootState) => state.auth.user);
@@ -391,7 +393,6 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
         const currentVolunteerId = volunteers.find((v: any) => v.email === user?.email)?.id;
 
         // Filter tasks
-        // Filter tasks
         const myTasks = tasks.filter((t: any) => t.assignees_details?.some((a: any) => a.id === currentVolunteerId));
         const openTasks = tasks.filter((t: any) => t.status === 'OPEN' && (!t.assignees_details || t.assignees_details.length === 0));
 
@@ -412,6 +413,101 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                     .catch(() => setSnackbar({ open: true, message: 'Failed to delete task', severity: 'error' }));
             }
         };
+
+        if (isMobile) {
+            const displayedTasks = (isVolunteer ? myTasks : tasks).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+            return (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                        <Typography variant="h6" fontWeight="bold">
+                            {isVolunteer ? 'My Assignments' : 'All Tasks'}
+                        </Typography>
+                        {(isManagement || isShelter) && (
+                            <Button variant="outlined" size="small" onClick={() => setTaskDialogOpen(true)} startIcon={<Add />}>New Task</Button>
+                        )}
+                    </Box>
+                    {displayedTasks.map((task: any) => (
+                        <Card key={task.id} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                    <Typography variant="subtitle1" fontWeight="bold">{task.title}</Typography>
+                                    <StatusChip status={task.status} />
+                                </Box>
+                                <Typography variant="body2" color="text.secondary" gutterBottom>
+                                    {task.location || task.shelter_name || 'No location'}
+                                </Typography>
+                                <Stack direction="row" spacing={1} sx={{ mt: 1, mb: 1 }}>
+                                    <Chip
+                                        label={task.priority}
+                                        size="small"
+                                        sx={{
+                                            bgcolor: task.priority === 'HIGH' || task.priority === 'URGENT' ? alpha(theme.palette.error.main, 0.1) : alpha(theme.palette.info.main, 0.1),
+                                            color: task.priority === 'HIGH' || task.priority === 'URGENT' ? 'error.dark' : 'info.dark',
+                                            fontWeight: 600,
+                                            height: 24
+                                        }}
+                                    />
+                                    <Chip label={`Due: ${task.due_date || 'N/A'}`} size="small" variant="outlined" sx={{ height: 24 }} />
+                                </Stack>
+                                <Typography variant="caption" display="block" color="text.secondary">
+                                    Assignee: {task.assignees_details?.map((a: any) => a.name).join(', ') || 'Unassigned'}
+                                </Typography>
+                                {isManagement && (
+                                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                        <Button
+                                            size="small"
+                                            color="error"
+                                            onClick={() => handleDeleteTask(task.id)}
+                                            startIcon={<Delete fontSize="small" />}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </Box>
+                                )}
+                            </CardContent>
+                        </Card>
+                    ))}
+                    {displayedTasks.length === 0 && (
+                        <Typography color="text.secondary" align="center" sx={{ py: 4 }}>No tasks found.</Typography>
+                    )}
+
+                    {/* Available Opportunities for Volunteers on Mobile */}
+                    {isVolunteer && openTasks.length > 0 && (
+                        <Box sx={{ mt: 3 }}>
+                            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Opportunities</Typography>
+                            {openTasks.map((task: any) => (
+                                <Card key={task.id} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', mb: 2 }}>
+                                    <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                                        <Typography variant="subtitle2" fontWeight="bold">{task.title}</Typography>
+                                        <Typography variant="caption" color="text.secondary" gutterBottom>{task.location || 'General'}</Typography>
+                                        <Box sx={{ mt: 1 }}>
+                                            <Button
+                                                size="small"
+                                                variant="outlined"
+                                                fullWidth
+                                                onClick={() => handleApply(task.id)}
+                                                disabled={task.has_applied}
+                                            >
+                                                {task.has_applied ? "Applied" : "Get Involved"}
+                                            </Button>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </Box>
+                    )}
+
+                    <TablePagination
+                        component="div"
+                        count={(isVolunteer ? myTasks : tasks).length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                </Box>
+            );
+        }
 
         return (
             <Paper sx={{ p: 0, borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], overflow: 'hidden' }}>
@@ -537,6 +633,14 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             </TableBody>
                         </Table>
                     </TableContainer>
+                    <TablePagination
+                        component="div"
+                        count={(isVolunteer ? myTasks : tasks).length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
                 </Box>
             </Paper>
         );

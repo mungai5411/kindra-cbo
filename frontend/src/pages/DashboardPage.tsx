@@ -402,6 +402,7 @@ export default function DashboardPage() {
                     activeTab={activeTab}
                     setActiveTab={handleTabChange}
                     canViewModule={canViewModule}
+                    onMenuClick={handleDrawerToggle}
                 />
             )}
 
