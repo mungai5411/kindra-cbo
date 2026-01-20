@@ -19,8 +19,6 @@ import {
     Autocomplete,
     useTheme,
     Button,
-    List,
-    ListItem,
     useMediaQuery,
     Backdrop,
     alpha,
@@ -191,25 +189,22 @@ export const CommunityHub = () => {
 
     return (
         <>
-            <Backdrop
-                open={isOpen}
-                onClick={() => setIsOpen(false)}
-                sx={{ zIndex: 1398, bgcolor: 'rgba(0,0,0,0.1)', backdropFilter: 'blur(4px)' }}
-            />
 
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 50, scale: 0.95 }}
+                        initial={{ x: '100%', opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: '100%', opacity: 0 }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                         style={{
                             position: 'fixed',
+                            top: isMobile ? 0 : 20,
                             bottom: isMobile ? 0 : 20,
                             right: isMobile ? 0 : 20,
-                            zIndex: 1399,
-                            width: isMobile ? '100%' : 400,
-                            height: isMobile ? '100%' : 600,
+                            zIndex: 1400,
+                            width: isMobile ? '100%' : 350,
+                            display: 'flex',
                         }}
                     >
                         <Paper
@@ -228,58 +223,58 @@ export const CommunityHub = () => {
 
                             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', bgcolor: 'white' }}>
                                 <Box sx={{
-                                    p: 2,
-                                    borderBottom: '1px solid rgba(0,0,0,0.05)',
+                                    p: 1.5,
+                                    borderBottom: '1px solid rgba(0,0,0,0.03)',
                                     display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: 1.5
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    background: 'rgba(255,255,255,0.5)',
+                                    backdropFilter: 'blur(10px)'
                                 }}>
-                                    <Box sx={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center'
-                                    }}>
-                                        <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                            {sections.map(section => (
-                                                <Button
-                                                    key={section}
-                                                    onClick={() => setActiveSection(section)}
-                                                    startIcon={getIcon(section)}
-                                                    size="small"
-                                                    sx={{
-                                                        textTransform: 'none',
-                                                        fontWeight: activeSection === section ? 800 : 500,
-                                                        color: activeSection === section ? theme.palette.primary.main : 'text.secondary',
-                                                        borderBottom: activeSection === section ? `2px solid ${theme.palette.primary.main}` : 'none',
-                                                        borderRadius: 0,
-                                                        px: 1,
-                                                        pb: 0.5,
-                                                        minWidth: 'auto',
-                                                        '&:hover': { bgcolor: 'transparent', opacity: 0.8 }
-                                                    }}
-                                                >
-                                                    {section}
-                                                </Button>
-                                            ))}
-                                        </Box>
-                                        <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                            <Tooltip title="View Preferences">
-                                                <IconButton size="small"><Tune sx={{ fontSize: 16 }} /></IconButton>
-                                            </Tooltip>
-                                            <IconButton size="small" onClick={() => setIsOpen(false)}><Close sx={{ fontSize: 16 }} /></IconButton>
-                                        </Box>
+                                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                        {sections.map(section => (
+                                            <IconButton
+                                                key={section}
+                                                onClick={() => setActiveSection(section)}
+                                                size="small"
+                                                sx={{
+                                                    color: activeSection === section ? theme.palette.primary.main : 'text.secondary',
+                                                    bgcolor: activeSection === section ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
+                                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05) }
+                                                }}
+                                            >
+                                                <Tooltip title={section}>
+                                                    {getIcon(section)}
+                                                </Tooltip>
+                                            </IconButton>
+                                        ))}
                                     </Box>
+
                                     <TextField
-                                        fullWidth
                                         size="small"
-                                        placeholder={`Search ${activeSection.toLowerCase()}...`}
+                                        placeholder="Search..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         InputProps={{
-                                            startAdornment: <Search sx={{ fontSize: 16, mr: 1, color: 'text.secondary', opacity: 0.5 }} />,
-                                            sx: { borderRadius: 2, bgcolor: '#f8faf9', '& fieldset': { border: 'none' }, height: 36 }
+                                            startAdornment: <Search sx={{ fontSize: 14, mr: 0.5, color: 'text.secondary', opacity: 0.5 }} />,
+                                            sx: {
+                                                borderRadius: 2,
+                                                bgcolor: 'rgba(0,0,0,0.03)',
+                                                '& fieldset': { border: 'none' },
+                                                height: 32,
+                                                fontSize: '0.75rem',
+                                                width: 120,
+                                                transition: 'width 0.3s ease',
+                                                '&:focus-within': { width: 160 }
+                                            }
                                         }}
                                     />
+
+                                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                        <IconButton size="small" onClick={() => setIsOpen(false)}>
+                                            <Close sx={{ fontSize: 18, opacity: 0.6 }} />
+                                        </IconButton>
+                                    </Box>
                                 </Box>
 
                                 <Box sx={{ flex: 1, overflowY: 'auto', p: 2, position: 'relative' }}>
@@ -293,20 +288,26 @@ export const CommunityHub = () => {
                                                     alignSelf: msg.is_sender ? 'flex-end' : 'flex-start',
                                                     maxWidth: '80%'
                                                 }}>
-                                                    <Avatar src={msg.user?.profile_picture || undefined} sx={{ width: 32, height: 32 }}>
+                                                    <Avatar src={msg.user?.profile_picture || undefined} sx={{ width: 24, height: 24, mt: 0.5 }}>
                                                         {msg.user?.username?.[0] || '?'}
                                                     </Avatar>
                                                     <Box>
-                                                        <Box sx={{ display: 'flex', gap: 1, mb: 0.5, flexDirection: msg.is_sender ? 'row-reverse' : 'row' }}>
-                                                            <Typography variant="caption" fontWeight="bold">
+                                                        <Box sx={{ display: 'flex', gap: 0.8, mb: 0.2, alignItems: 'center', flexDirection: msg.is_sender ? 'row-reverse' : 'row' }}>
+                                                            <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 600, opacity: 0.7 }}>
                                                                 {msg.user?.first_name || msg.user?.username || 'Unknown'}
                                                             </Typography>
-                                                            <Typography variant="caption" color="text.secondary">
+                                                            <Typography variant="caption" sx={{ fontSize: '0.6rem', opacity: 0.4 }}>
                                                                 {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                             </Typography>
                                                         </Box>
-                                                        <Box sx={glassChatBubble(msg.is_sender, msg.is_private)}>
-                                                            <Typography variant="body2">{msg.content}</Typography>
+                                                        <Box sx={{
+                                                            ...glassChatBubble(msg.is_sender, msg.is_private),
+                                                            px: 1.5,
+                                                            py: 0.8,
+                                                            borderRadius: msg.is_sender ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                                                            boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+                                                        }}>
+                                                            <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>{msg.content}</Typography>
                                                         </Box>
                                                     </Box>
                                                 </Box>
@@ -398,13 +399,24 @@ export const CommunityHub = () => {
                                 </Box>
 
                                 {activeSection === 'Community' && (
-                                    <Box component="form" onSubmit={handleSend} sx={{ p: 2, borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-                                            <FormControlLabel
-                                                control={<Switch size="small" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} color="success" />}
-                                                label={<Typography sx={{ fontSize: '0.6rem', fontWeight: 800 }}>PRIVATE</Typography>}
-                                                sx={{ m: 0, '& .MuiFormControlLabel-label': { ml: 0.5 } }}
-                                            />
+                                    <Box component="form" onSubmit={handleSend} sx={{
+                                        p: 1.5,
+                                        borderTop: '1px solid rgba(0,0,0,0.03)',
+                                        background: 'rgba(255,255,255,0.8)',
+                                        backdropFilter: 'blur(10px)'
+                                    }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => setIsPrivate(!isPrivate)}
+                                                sx={{
+                                                    color: isPrivate ? theme.palette.success.main : 'text.disabled',
+                                                    transform: 'scale(0.8)'
+                                                }}
+                                            >
+                                                <Tune sx={{ fontSize: 16 }} />
+                                            </IconButton>
+
                                             {isPrivate && (
                                                 <Autocomplete
                                                     size="small"
@@ -412,29 +424,43 @@ export const CommunityHub = () => {
                                                     getOptionLabel={(o: User) => (o?.first_name || o?.username || 'Unknown')}
                                                     value={recipient}
                                                     onChange={(_: any, v: User | null) => setRecipient(v)}
-                                                    renderInput={(p: any) => <TextField {...p} placeholder="Select user..." variant="standard" sx={{ width: 120, '& .MuiInput-input': { fontSize: '0.75rem' } }} />}
+                                                    renderInput={(p: any) => <TextField {...p} placeholder="Private to..." variant="standard" sx={{ width: 100, '& .MuiInput-input': { fontSize: '0.65rem' } }} />}
                                                 />
                                             )}
                                         </Box>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <TextField
                                                 fullWidth
-                                                placeholder="Ask community..."
+                                                placeholder="Say something..."
                                                 value={newMessage}
                                                 onChange={(e) => setNewMessage(e.target.value)}
                                                 variant="outlined"
                                                 size="small"
                                                 InputProps={{
-                                                    sx: { borderRadius: 2, bgcolor: '#f8faf9', height: 36, fontSize: '0.875rem' }
+                                                    sx: {
+                                                        borderRadius: 4,
+                                                        bgcolor: 'rgba(0,0,0,0.03)',
+                                                        height: 32,
+                                                        fontSize: '0.8rem',
+                                                        '& fieldset': { border: 'none' }
+                                                    }
                                                 }}
                                             />
                                             <IconButton
                                                 type="submit"
                                                 color="primary"
                                                 disabled={!newMessage.trim() || loading || (isPrivate && !recipient)}
-                                                sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), borderRadius: 2, p: 1 }}
+                                                sx={{
+                                                    background: theme.palette.primary.main,
+                                                    color: 'white',
+                                                    '&:hover': { background: theme.palette.primary.dark },
+                                                    width: 32,
+                                                    height: 32,
+                                                    p: 0,
+                                                    opacity: newMessage.trim() ? 1 : 0.5
+                                                }}
                                             >
-                                                <ChatBubbleOutline sx={{ fontSize: 20 }} />
+                                                <ChatBubbleOutline sx={{ fontSize: 16 }} />
                                             </IconButton>
                                         </Box>
                                     </Box>
