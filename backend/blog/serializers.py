@@ -99,9 +99,8 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
         source='tags',
         required=False
     )
-    comment_count = serializers.SerializerMethodField()
-    likes_count = serializers.SerializerMethodField()
     has_liked = serializers.SerializerMethodField()
+    excerpt = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     
     class Meta:
         model = BlogPost

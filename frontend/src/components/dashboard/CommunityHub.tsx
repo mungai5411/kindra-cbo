@@ -84,7 +84,7 @@ export const CommunityHub = () => {
     const [availableUsers, setAvailableUsers] = useState<User[]>([]);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [selectedNotif, setSelectedNotif] = useState<Notification | null>(null);
+    const [selectedNotifId, setSelectedNotifId] = useState<string | null>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -216,7 +216,8 @@ export const CommunityHub = () => {
                                 overflow: 'hidden',
                                 borderRadius: isMobile ? 0 : 4,
                                 border: '1px solid rgba(0,0,0,0.05)',
-                                bgcolor: 'rgba(255,255,255,0.95)'
+                                bgcolor: 'rgba(255,255,255,0.95)',
+                                overflow: 'visible' // Changed from hidden to allow Autocomplete dropdown
                             }}
                         >
 
@@ -355,37 +356,81 @@ export const CommunityHub = () => {
                                                         flex: 1,
                                                         p: 2,
                                                         borderRadius: 3,
-                                                        border: '1px solid rgba(0,0,0,0.06)',
-                                                        boxShadow: '0 2px 12px rgba(0,0,0,0.02)',
+                                                        border: selectedNotifId === notif.id ? `1px solid ${theme.palette.primary.main}` : '1px solid rgba(0,0,0,0.06)',
+                                                        boxShadow: selectedNotifId === notif.id ? '0 4px 20px rgba(0,0,0,0.08)' : '0 2px 12px rgba(0,0,0,0.02)',
                                                         display: 'flex',
-                                                        gap: 2,
+                                                        flexDirection: 'column',
+                                                        gap: 1,
                                                         cursor: 'pointer',
+                                                        transition: 'all 0.3s ease',
                                                         '&:hover': { bgcolor: '#fafafa', borderColor: theme.palette.primary.main }
-                                                    }} onClick={() => setSelectedNotif(notif)}>
-                                                        <Avatar sx={{ width: 32, height: 32, bgcolor: alpha(theme.palette.primary.main, 0.1), color: theme.palette.primary.main }}>
-                                                            {(notif.type?.[0] || 'N').toUpperCase()}
-                                                        </Avatar>
-                                                        <Box sx={{ flex: 1 }}>
-                                                            <Typography variant="body2" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 0.5 }}>
-                                                                <span style={{ color: theme.palette.primary.main }}>{(notif.title || '').split(' ')[0]}</span> {(notif.title || '').split(' ').slice(1).join(' ')}
-                                                            </Typography>
-                                                            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8rem', mb: 1.5 }}>
-                                                                {notif.message}
-                                                            </Typography>
-                                                            <Chip
-                                                                size="small"
-                                                                label={notif.category || 'System'}
-                                                                sx={{
-                                                                    height: 20,
-                                                                    fontSize: '0.65rem',
-                                                                    fontWeight: 800,
-                                                                    bgcolor: alpha(theme.palette.primary.main, 0.05),
-                                                                    color: theme.palette.primary.main,
-                                                                    borderRadius: 1
-                                                                }}
-                                                            />
+                                                    }} onClick={() => setSelectedNotifId(selectedNotifId === notif.id ? null : notif.id)}>
+                                                        <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
+                                                            <Avatar sx={{ width: 32, height: 32, bgcolor: alpha(theme.palette.primary.main, 0.1), color: theme.palette.primary.main }}>
+                                                                {(notif.type?.[0] || 'N').toUpperCase()}
+                                                            </Avatar>
+                                                            <Box sx={{ flex: 1 }}>
+                                                                <Typography variant="body2" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 0.5 }}>
+                                                                    <span style={{ color: theme.palette.primary.main }}>{(notif.title || '').split(' ')[0]}</span> {(notif.title || '').split(' ').slice(1).join(' ')}
+                                                                </Typography>
+                                                                <AnimatePresence>
+                                                                    {selectedNotifId !== notif.id && (
+                                                                        <motion.div
+                                                                            initial={{ opacity: 0 }}
+                                                                            animate={{ opacity: 1 }}
+                                                                            exit={{ opacity: 0 }}
+                                                                        >
+                                                                            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8rem', mb: 1, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                                                {notif.message}
+                                                                            </Typography>
+                                                                        </motion.div>
+                                                                    )}
+                                                                </AnimatePresence>
+                                                                <Chip
+                                                                    size="small"
+                                                                    label={notif.category || 'System'}
+                                                                    sx={{
+                                                                        height: 20,
+                                                                        fontSize: '0.65rem',
+                                                                        fontWeight: 800,
+                                                                        bgcolor: alpha(theme.palette.primary.main, 0.05),
+                                                                        color: theme.palette.primary.main,
+                                                                        borderRadius: 1
+                                                                    }}
+                                                                />
+                                                            </Box>
+                                                            <IconButton size="small"><MoreVert sx={{ fontSize: 16 }} /></IconButton>
                                                         </Box>
-                                                        <IconButton size="small"><MoreVert sx={{ fontSize: 16 }} /></IconButton>
+
+                                                        <AnimatePresence>
+                                                            {selectedNotifId === notif.id && (
+                                                                <motion.div
+                                                                    initial={{ height: 0, opacity: 0 }}
+                                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                                    exit={{ height: 0, opacity: 0 }}
+                                                                    style={{ overflow: 'hidden' }}
+                                                                >
+                                                                    <Box sx={{ pt: 1, borderTop: '1px solid rgba(0,0,0,0.03)', mt: 1 }}>
+                                                                        <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+                                                                            {notif.message}
+                                                                        </Typography>
+                                                                        {notif.link && (
+                                                                            <Button
+                                                                                size="small"
+                                                                                variant="outlined"
+                                                                                sx={{ mt: 2, borderRadius: 2, textTransform: 'none', fontSize: '0.75rem' }}
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    window.location.href = notif.link;
+                                                                                }}
+                                                                            >
+                                                                                View Details
+                                                                            </Button>
+                                                                        )}
+                                                                    </Box>
+                                                                </motion.div>
+                                                            )}
+                                                        </AnimatePresence>
                                                     </Paper>
                                                 </Box>
                                             ))}
@@ -473,22 +518,6 @@ export const CommunityHub = () => {
 
 
 
-            <Dialog open={!!selectedNotif} onClose={() => setSelectedNotif(null)} maxWidth="xs" fullWidth>
-                {selectedNotif && (
-                    <>
-                        <Box sx={{ p: 3, pb: 0, display: 'flex', justifyContent: 'space-between' }}>
-                            <Typography variant="h6" fontWeight="bold">{selectedNotif.title}</Typography>
-                            <IconButton size="small" onClick={() => setSelectedNotif(null)}><Close /></IconButton>
-                        </Box>
-                        <DialogContent>
-                            <Typography variant="body1">{selectedNotif.message}</Typography>
-                        </DialogContent>
-                        <DialogActions sx={{ p: 2 }}>
-                            <Button fullWidth variant="contained" onClick={() => setSelectedNotif(null)}>Close</Button>
-                        </DialogActions>
-                    </>
-                )}
-            </Dialog>
         </>
     );
 };
