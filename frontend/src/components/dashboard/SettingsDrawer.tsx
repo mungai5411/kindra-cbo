@@ -12,9 +12,6 @@ import {
     alpha,
     Snackbar,
     Alert,
-    Tabs,
-    Tab,
-    Divider,
     Stack,
     Paper
 } from '@mui/material';
@@ -23,7 +20,13 @@ import {
     Person,
     Lock,
     Notifications,
-    Check
+    Check,
+    ChevronRight,
+    ArrowBack,
+    Settings,
+    HelpOutline,
+    InfoOutlined,
+    BugReportOutlined
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateProfile } from '../../features/auth/authSlice';
@@ -45,7 +48,7 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
     const { donors } = useSelector((state: RootState) => state.donations);
     const donorProfile = donors.find(d => d.user === user?.id || d.email === user?.email);
 
-    const [activeTab, setActiveTab] = useState(0);
+    const [activeTab, setActiveTab] = useState<number | string>(0); // 0 is main list, strings are sub-view IDs
     const [editMode, setEditMode] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [formData, setFormData] = useState({
@@ -113,147 +116,235 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
 
             setEditMode(false);
             setSaveSuccess(true);
+            setTimeout(() => setActiveTab(0), 1000); // Return to main list after success
         } catch (error) {
             console.error('Failed to save settings:', error);
         }
     };
 
-    const renderProfileSection = () => (
-        <Box>
-            {/* Profile Header */}
+    const SettingGroup = ({ title, children }: { title: string, children: React.ReactNode }) => (
+        <Box sx={{ mb: 3 }}>
+            <Typography variant="overline" sx={{ fontWeight: 800, color: 'text.secondary', ml: 1, mb: 1, display: 'block', letterSpacing: '0.1em' }}>
+                {title}
+            </Typography>
             <Paper elevation={0} sx={{
-                p: 3,
-                mb: 4,
                 borderRadius: 4,
-                bgcolor: alpha(theme.palette.primary.main, 0.04),
+                overflow: 'hidden',
+                border: '1px solid',
+                borderColor: alpha(theme.palette.divider, 0.08),
+                bgcolor: 'background.paper'
+            }}>
+                {children}
+            </Paper>
+        </Box>
+    );
+
+    const SettingItem = ({ icon, label, subtitle, onClick, rightElement, color }: any) => (
+        <Button
+            fullWidth
+            onClick={onClick}
+            sx={{
+                justifyContent: 'flex-start',
+                textAlign: 'left',
+                py: 2,
+                px: 2.5,
+                borderRadius: 0,
+                color: color || 'text.primary',
+                borderBottom: '1px solid',
+                borderColor: alpha(theme.palette.divider, 0.05),
+                '&:last-child': { borderBottom: 'none' },
+                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2
+            }}
+        >
+            <Box sx={{
+                width: 38,
+                height: 38,
+                borderRadius: 2.5,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: alpha(color || theme.palette.primary.main, 0.1),
+                color: color || theme.palette.primary.main,
+                flexShrink: 0
+            }}>
+                {icon}
+            </Box>
+            <Box sx={{ flexGrow: 1 }}>
+                <Typography variant="body1" fontWeight="600" sx={{ lineHeight: 1.2 }}>{label}</Typography>
+                {subtitle && <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.2 }}>{subtitle}</Typography>}
+            </Box>
+            {rightElement || <ChevronRight sx={{ opacity: 0.3 }} />}
+        </Button>
+    );
+
+    const renderMainList = () => (
+        <Box sx={{ p: 2 }}>
+            {/* Profile Summary Card */}
+            <Paper elevation={0} sx={{
+                p: 2.5,
+                mb: 4,
+                borderRadius: 5,
+                bgcolor: alpha(theme.palette.primary.main, 0.03),
                 border: '1px solid',
                 borderColor: alpha(theme.palette.primary.main, 0.1),
                 display: 'flex',
-                flexDirection: { xs: 'column', sm: 'row' },
-                alignItems: { xs: 'flex-start', sm: 'center' },
-                justifyContent: 'space-between',
-                gap: 3
+                alignItems: 'center',
+                gap: 2.5,
+                position: 'relative',
+                overflow: 'hidden'
             }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, width: editMode ? '100%' : 'auto' }}>
-                    {editMode ? (
-                        <Box sx={{ width: '100%' }}>
-                            <ImageUploader
-                                value={formData.profile_picture}
-                                onChange={(file) => setFormData({ ...formData, profile_picture: file || '' })}
-                                onDelete={async () => {
-                                    try {
-                                        await axios.delete('/api/v1/accounts/profile/picture/');
-                                        setFormData({ ...formData, profile_picture: '' });
-                                    } catch (error) {
-                                        console.error('Failed to delete profile picture:', error);
-                                        throw error;
-                                    }
-                                }}
-                                maxSizeMB={5}
-                                label="Profile Picture"
-                                helperText="Max 5MB (JPG/PNG)"
-                                showPreview={true}
-                            />
-                        </Box>
-                    ) : (
-                        <>
-                            <Avatar
-                                src={typeof formData.profile_picture === 'string' ? formData.profile_picture : undefined}
-                                sx={{
-                                    width: 72,
-                                    height: 72,
-                                    border: '3px solid',
-                                    borderColor: 'background.paper',
-                                    boxShadow: theme.shadows[2],
-                                    fontSize: '1.75rem',
-                                    fontWeight: 700,
-                                    bgcolor: 'primary.main',
-                                    color: 'primary.contrastText'
-                                }}
-                            >
-                                {user?.firstName?.[0]}{user?.lastName?.[0]}
-                            </Avatar>
-                            <Box>
-                                <Typography variant="h6" fontWeight="800" sx={{ mb: 0.5 }}>
-                                    {user?.firstName} {user?.lastName}
-                                </Typography>
-                                <Stack direction="row" alignItems="center" spacing={1}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {user?.email}
-                                    </Typography>
-                                    <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'text.disabled' }} />
-                                    <Typography variant="caption" fontWeight="600" color="primary.main" sx={{
-                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                        px: 1,
-                                        py: 0.25,
-                                        borderRadius: 1
-                                    }}>
-                                        {user?.role || 'User'}
-                                    </Typography>
-                                </Stack>
-                            </Box>
-                        </>
-                    )}
+                <Avatar
+                    src={user?.profile_picture}
+                    sx={{
+                        width: 64,
+                        height: 64,
+                        border: '3px solid white',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                    }}
+                />
+                <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" fontWeight="800" sx={{ lineHeight: 1.2 }}>{user?.firstName} {user?.lastName}</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.8 }}>{user?.email}</Typography>
                 </Box>
+                <IconButton
+                    onClick={() => setActiveTab('profile')}
+                    sx={{ bgcolor: 'white', '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05) } }}
+                >
+                    <Settings fontSize="small" />
+                </IconButton>
+            </Paper>
 
-                {!editMode ? (
-                    <Button
-                        variant="contained"
-                        onClick={() => setEditMode(true)}
-                        sx={{
-                            borderRadius: 2.5,
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            px: 3,
-                            boxShadow: theme.shadows[2]
+            <SettingGroup title="Account settings">
+                <SettingItem
+                    icon={<Person fontSize="small" />}
+                    label="Personal Information"
+                    subtitle="Name, Email, Phone number"
+                    onClick={() => { setEditMode(true); setActiveTab('profile'); }}
+                />
+                <SettingItem
+                    icon={<Lock fontSize="small" />}
+                    label="Security"
+                    subtitle="Password & Two-factor"
+                    onClick={() => setActiveTab('security')}
+                />
+                <SettingItem
+                    icon={<Notifications fontSize="small" />}
+                    label="Notifications"
+                    subtitle="Email & Push preferences"
+                    onClick={() => setActiveTab('notifications')}
+                />
+            </SettingGroup>
+
+            <SettingGroup title="Support & About">
+                <SettingItem icon={<HelpOutline fontSize="small" />} label="Help Center" onClick={() => { }} />
+                <SettingItem icon={<InfoOutlined fontSize="small" />} label="Legal Information" onClick={() => { }} />
+                <SettingItem icon={<BugReportOutlined fontSize="small" />} label="Report a Bug" onClick={() => { }} />
+            </SettingGroup>
+
+            <Box sx={{ mt: 2 }}>
+                <Button
+                    fullWidth
+                    variant="outlined"
+                    color="error"
+                    onClick={() => window.dispatchEvent(new CustomEvent('confirm-logout'))}
+                    sx={{
+                        py: 1.5,
+                        borderRadius: 4,
+                        bgcolor: alpha(theme.palette.error.main, 0.05),
+                        color: 'error.main',
+                        fontWeight: 'bold',
+                        border: '1px solid',
+                        borderColor: alpha(theme.palette.error.main, 0.2),
+                        '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.1), borderColor: 'error.main' }
+                    }}
+                >
+                    Log out
+                </Button>
+            </Box>
+
+            <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 4, opacity: 0.3, letterSpacing: 1, fontWeight: 'bold' }}>
+                KINDRA CBO v2.5.0
+            </Typography>
+        </Box>
+    );
+
+    const renderProfileSection = () => (
+        <Box>
+            {/* Header / Image Uploader Contextual to Edit Mode */}
+            {editMode ? (
+                <Box sx={{ mb: 4 }}>
+                    <ImageUploader
+                        value={formData.profile_picture}
+                        onChange={(file) => setFormData({ ...formData, profile_picture: file || '' })}
+                        onDelete={async () => {
+                            try {
+                                await axios.delete('/api/v1/accounts/profile/picture/');
+                                setFormData({ ...formData, profile_picture: '' });
+                            } catch (error) {
+                                console.error('Failed to delete profile picture:', error);
+                                throw error;
+                            }
                         }}
-                    >
-                        Edit Profile
-                    </Button>
-                ) : (
-                    <Stack direction="row" spacing={1} sx={{ alignSelf: 'flex-start' }}>
+                        maxSizeMB={5}
+                        label="Profile Picture"
+                        helperText="Max 5MB (JPG/PNG)"
+                        showPreview={true}
+                    />
+                    <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
                         <Button
                             variant="outlined"
+                            fullWidth
                             onClick={() => setEditMode(false)}
-                            sx={{
-                                borderRadius: 2.5,
-                                textTransform: 'none',
-                                fontWeight: 600
-                            }}
+                            sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
                         >
                             Cancel
                         </Button>
                         <Button
                             variant="contained"
+                            fullWidth
                             startIcon={<Check />}
                             onClick={handleSave}
-                            sx={{
-                                borderRadius: 2.5,
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                boxShadow: theme.shadows[2]
-                            }}
+                            sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
                         >
-                            Save Changes
+                            Save
                         </Button>
                     </Stack>
-                )}
-            </Paper>
+                </Box>
+            ) : (
+                <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar
+                        src={typeof formData.profile_picture === 'string' ? formData.profile_picture : undefined}
+                        sx={{ width: 80, height: 80, border: '4px solid white', boxShadow: theme.shadows[2] }}
+                    />
+                    <Box>
+                        <Typography variant="h6" fontWeight="800">{user?.firstName} {user?.lastName}</Typography>
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() => setEditMode(true)}
+                            sx={{ mt: 0.5, borderRadius: 2, textTransform: 'none', py: 0 }}
+                        >
+                            Change Photo
+                        </Button>
+                    </Box>
+                </Box>
+            )}
 
-            {/* Personal Information */}
-            <Typography variant="subtitle2" fontWeight="700" sx={{ mb: 2.5, color: 'text.primary', fontSize: '0.95rem' }}>
+            <Typography variant="subtitle2" fontWeight="700" sx={{ mb: 2, color: 'text.primary', fontSize: '0.9rem' }}>
                 Personal Information
             </Typography>
-            <Stack spacing={2.5} sx={{ mb: 4 }}>
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2.5 }}>
+            <Stack spacing={2} sx={{ mb: 4 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
                     <TextField
                         label="First Name"
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                         disabled={!editMode}
                         fullWidth
-                        size="medium"
-                        InputProps={{ sx: { borderRadius: 2 } }}
+                        size="small"
                     />
                     <TextField
                         label="Last Name"
@@ -261,128 +352,76 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                         disabled={!editMode}
                         fullWidth
-                        size="medium"
-                        InputProps={{ sx: { borderRadius: 2 } }}
+                        size="small"
                     />
                 </Box>
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1.5fr 1fr' }, gap: 2.5 }}>
-                    <TextField
-                        label="Email Address"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        disabled={!editMode}
-                        fullWidth
-                        InputProps={{ sx: { borderRadius: 2 } }}
-                    />
-                    <TextField
-                        label="Phone Number"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        disabled={!editMode}
-                        fullWidth
-                        InputProps={{ sx: { borderRadius: 2 } }}
-                    />
-                </Box>
+                <TextField
+                    label="Email Address"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    disabled={!editMode}
+                    fullWidth
+                    size="small"
+                />
+                <TextField
+                    label="Phone Number"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    disabled={!editMode}
+                    fullWidth
+                    size="small"
+                />
             </Stack>
 
-            {/* Donor Details */}
             {user?.role === 'DONOR' && (
                 <>
-                    <Divider sx={{ my: 4, borderStyle: 'dashed' }} />
-                    <Typography variant="subtitle2" fontWeight="700" sx={{ mb: 2.5, color: 'text.primary', fontSize: '0.95rem' }}>
+                    <Typography variant="subtitle2" fontWeight="700" sx={{ mb: 2, color: 'text.primary', fontSize: '0.9rem' }}>
                         Organization Details
                     </Typography>
-                    <Stack spacing={2.5}>
+                    <Stack spacing={2}>
                         <TextField
                             label="Organization Name"
                             value={formData.organization_name}
                             onChange={(e) => setFormData({ ...formData, organization_name: e.target.value })}
                             disabled={!editMode}
                             fullWidth
-                            InputProps={{ sx: { borderRadius: 2 } }}
+                            size="small"
                         />
-                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2.5 }}>
-                            <TextField
-                                label="Country"
-                                value={formData.country}
-                                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                                disabled={!editMode}
-                                fullWidth
-                                InputProps={{ sx: { borderRadius: 2 } }}
-                            />
-                            <TextField
-                                label="City"
-                                value={formData.city}
-                                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                disabled={!editMode}
-                                fullWidth
-                                InputProps={{ sx: { borderRadius: 2 } }}
-                            />
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                            <TextField label="Country" value={formData.country} size="small" disabled={!editMode} fullWidth />
+                            <TextField label="City" value={formData.city} size="small" disabled={!editMode} fullWidth />
                         </Box>
-                        <TextField
-                            label="Address"
-                            value={formData.address}
-                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                            disabled={!editMode}
-                            fullWidth
-                            multiline
-                            rows={3}
-                            InputProps={{ sx: { borderRadius: 2 } }}
-                        />
                     </Stack>
                 </>
+            )}
+
+            {editMode && !formData.profile_picture && (
+                <Box sx={{ mt: 4 }}>
+                    <Button
+                        variant="contained"
+                        fullWidth
+                        onClick={handleSave}
+                        sx={{ borderRadius: 3, py: 1.5, fontWeight: 'bold' }}
+                    >
+                        Save All Changes
+                    </Button>
+                </Box>
             )}
         </Box>
     );
 
     const renderSecuritySection = () => (
-        <Box>
+        <Box sx={{ p: 1 }}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 3, color: 'text.secondary' }}>
                 Change Password
             </Typography>
             <Stack spacing={2.5}>
-                <TextField
-                    label="Current Password"
-                    type="password"
-                    fullWidth
-                    variant="outlined"
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            borderRadius: 2
-                        }
-                    }}
-                />
-                <TextField
-                    label="New Password"
-                    type="password"
-                    fullWidth
-                    variant="outlined"
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            borderRadius: 2
-                        }
-                    }}
-                />
-                <TextField
-                    label="Confirm New Password"
-                    type="password"
-                    fullWidth
-                    variant="outlined"
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            borderRadius: 2
-                        }
-                    }}
-                />
+                <TextField label="Current Password" type="password" fullWidth size="small" />
+                <TextField label="New Password" type="password" fullWidth size="small" />
+                <TextField label="Confirm New Password" type="password" fullWidth size="small" />
                 <Button
                     variant="contained"
-                    sx={{
-                        mt: 2,
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        py: 1.25
-                    }}
+                    sx={{ mt: 2, borderRadius: 3, fontWeight: 600, py: 1.25 }}
                 >
                     Update Password
                 </Button>
@@ -437,12 +476,25 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
     );
 
     const renderContent = () => {
-        switch (activeTab) {
-            case 0: return renderProfileSection();
-            case 1: return renderSecuritySection();
-            case 2: return renderNotificationsSection();
-            default: return renderProfileSection();
-        }
+        if (activeTab === 0) return renderMainList();
+
+        return (
+            <Box>
+                <Box sx={{ px: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <IconButton size="small" onClick={() => setActiveTab(0)} sx={{ bgcolor: alpha(theme.palette.primary.main, 0.05) }}>
+                        <ArrowBack fontSize="small" />
+                    </IconButton>
+                    <Typography variant="subtitle1" fontWeight="bold" sx={{ textTransform: 'capitalize' }}>
+                        {String(activeTab).replace('_', ' ')}
+                    </Typography>
+                </Box>
+                <Box sx={{ px: 2 }}>
+                    {activeTab === 'profile' && renderProfileSection()}
+                    {activeTab === 'security' && renderSecuritySection()}
+                    {activeTab === 'notifications' && renderNotificationsSection()}
+                </Box>
+            </Box>
+        );
     };
 
     return (
@@ -452,60 +504,38 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
             onClose={onClose}
             PaperProps={{
                 sx: {
-                    width: { xs: '100%', sm: 520 },
-                    bgcolor: 'background.default',
+                    width: { xs: '100%', sm: 480 },
+                    bgcolor: '#FBFBFB', // Slightly off-white background for modern feel
                 }
             }}
         >
             {/* Header */}
             <Box sx={{
-                p: 3,
-                borderBottom: '1px solid',
-                borderColor: 'divider',
+                p: 2.5,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                bgcolor: 'background.paper'
+                bgcolor: 'transparent'
             }}>
-                <Typography variant="h5" fontWeight="bold">
-                    Settings
+                <Typography variant="h6" fontWeight="900" sx={{ letterSpacing: -0.5 }}>
+                    {activeTab === 0 ? 'Settings' : ''}
                 </Typography>
                 <IconButton
                     onClick={onClose}
                     sx={{
+                        bgcolor: alpha(theme.palette.divider, 0.1),
                         '&:hover': {
                             bgcolor: alpha(theme.palette.error.main, 0.1),
                             color: 'error.main'
                         }
                     }}
                 >
-                    <Close />
+                    <Close fontSize="small" />
                 </IconButton>
             </Box>
 
-            {/* Tabs */}
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
-                <Tabs
-                    value={activeTab}
-                    onChange={(_, newValue) => setActiveTab(newValue)}
-                    sx={{
-                        px: 3,
-                        '& .MuiTab-root': {
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            fontSize: '0.9rem',
-                            minHeight: 56
-                        }
-                    }}
-                >
-                    <Tab icon={<Person sx={{ fontSize: 20 }} />} iconPosition="start" label="Profile" />
-                    <Tab icon={<Lock sx={{ fontSize: 20 }} />} iconPosition="start" label="Security" />
-                    <Tab icon={<Notifications sx={{ fontSize: 20 }} />} iconPosition="start" label="Notifications" />
-                </Tabs>
-            </Box>
-
             {/* Content */}
-            <Box sx={{ p: 3, overflowY: 'auto', height: 'calc(100vh - 140px)' }}>
+            <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
                 {renderContent()}
             </Box>
 
