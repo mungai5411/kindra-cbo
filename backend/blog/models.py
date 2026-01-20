@@ -82,7 +82,7 @@ class BlogPost(models.Model):
     # Content
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=250, unique=True, blank=True)
-    excerpt = models.TextField(max_length=500, help_text=_('Brief summary for listings'))
+    excerpt = models.TextField(max_length=500, blank=True, null=True, help_text=_('Brief summary for listings'))
     content = models.TextField(help_text=_('Full blog post content (supports Markdown)'))
     
     # Media

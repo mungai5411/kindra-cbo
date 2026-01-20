@@ -107,6 +107,11 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
         model = BlogPost
         fields = '__all__'
         read_only_fields = ('id', 'slug', 'view_count', 'author', 'created_at', 'updated_at')
+        extra_kwargs = {
+            'featured_image': {'required': False, 'allow_null': True},
+            'excerpt': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'tag_ids': {'required': False},
+        }
 
     def get_comment_count(self, obj):
         return obj.comments.filter(status='APPROVED').count()
