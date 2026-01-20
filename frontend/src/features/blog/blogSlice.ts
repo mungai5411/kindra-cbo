@@ -109,7 +109,7 @@ export const submitComment = createAsyncThunk(
             const response = await apiClient.post(`${endpoints.blog.comments}create/`, commentData);
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.detail || error.response?.data?.error || 'Failed to submit comment');
+            return rejectWithValue(error.response?.data || error.message || 'Failed to submit comment');
         }
     }
 );
@@ -145,7 +145,7 @@ export const createCategory = createAsyncThunk(
             const response = await apiClient.post(endpoints.blog.adminCategories, data);
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to create category');
+            return rejectWithValue(error.response?.data || error.message || 'Failed to create category');
         }
     }
 );
@@ -157,7 +157,7 @@ export const updateCategory = createAsyncThunk(
             const response = await apiClient.patch(`${endpoints.blog.adminCategories}${id}/`, data);
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to update category');
+            return rejectWithValue(error.response?.data || error.message || 'Failed to update category');
         }
     }
 );
@@ -193,7 +193,7 @@ export const createTag = createAsyncThunk(
             const response = await apiClient.post(endpoints.blog.adminTags, data);
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to create tag');
+            return rejectWithValue(error.response?.data || error.message || 'Failed to create tag');
         }
     }
 );
@@ -229,7 +229,7 @@ export const createPost = createAsyncThunk(
             const response = await apiClient.post(endpoints.blog.adminPosts, postData);
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to create post');
+            return rejectWithValue(error.response?.data || error.message || 'Failed to create post');
         }
     }
 );
@@ -241,7 +241,7 @@ export const updatePost = createAsyncThunk(
             const response = await apiClient.patch(`${endpoints.blog.adminPosts}${id}/`, data);
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to update post');
+            return rejectWithValue(error.response?.data || error.message || 'Failed to update post');
         }
     }
 );

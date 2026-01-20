@@ -84,6 +84,11 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
     """
     Serializer for full blog post detail view
     """
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        required=False,
+        allow_null=True
+    )
     category_name = serializers.CharField(source='category.name', read_only=True)
     author_name = serializers.CharField(source='author.get_full_name', read_only=True)
     tags = TagSerializer(many=True, read_only=True)

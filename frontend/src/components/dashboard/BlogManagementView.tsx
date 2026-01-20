@@ -151,12 +151,16 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
     };
 
     const handleTagSubmit = async () => {
-        if (selectedTag) {
-            await dispatch(updateTag({ id: selectedTag.id, data: metaFormData }));
-        } else {
-            await dispatch(createTag(metaFormData));
+        try {
+            if (selectedTag) {
+                await dispatch(updateTag({ id: selectedTag.id, data: metaFormData })).unwrap();
+            } else {
+                await dispatch(createTag(metaFormData)).unwrap();
+            }
+            setTagDialogOpen(false);
+        } catch (error) {
+            console.error('Failed to save tag:', error);
         }
-        setTagDialogOpen(false);
     };
 
     // Category Handlers
@@ -173,12 +177,16 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
     };
 
     const handleCategorySubmit = async () => {
-        if (selectedCategory) {
-            await dispatch(updateCategory({ id: selectedCategory.id, data: metaFormData }));
-        } else {
-            await dispatch(createCategory(metaFormData));
+        try {
+            if (selectedCategory) {
+                await dispatch(updateCategory({ id: selectedCategory.id, data: metaFormData })).unwrap();
+            } else {
+                await dispatch(createCategory(metaFormData)).unwrap();
+            }
+            setCategoryDialogOpen(false);
+        } catch (error) {
+            console.error('Failed to save category:', error);
         }
-        setCategoryDialogOpen(false);
     };
 
     const handleMetaDeleteClick = (type: 'tag' | 'category', item: any) => {
@@ -219,14 +227,14 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
             }
 
             if (selectedPost) {
-                await dispatch(updatePost({ id: selectedPost.id, data: formDataToSubmit }));
+                await dispatch(updatePost({ id: selectedPost.id, data: formDataToSubmit })).unwrap();
             } else {
-                await dispatch(createPost(formDataToSubmit));
+                await dispatch(createPost(formDataToSubmit)).unwrap();
             }
             setOpenDialog(false);
             dispatch(fetchAdminPosts()); // Refresh list
         } catch (error) {
-            console.error('Failed to save story:', error);
+            console.error('Failed to save story details:', error);
         }
     };
 
