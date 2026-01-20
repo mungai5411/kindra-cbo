@@ -156,6 +156,31 @@ export const terminateDuty = createAsyncThunk(
     }
 );
 
+export const updateShelter = createAsyncThunk(
+    'shelters/updateShelter',
+    async ({ id, data }: { id: string; data: any }, { rejectWithValue, dispatch }) => {
+        try {
+            // Handle FormData if needed (photos)
+            let payload = data;
+            const headers: any = {};
+
+            if (data instanceof FormData) {
+                payload = data;
+                headers['Content-Type'] = 'multipart/form-data';
+            }
+
+            const response = await apiClient.patch(`${endpoints.shelters.shelters}${id}/`, payload, {
+                headers
+            });
+
+            dispatch(fetchShelters());
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update shelter');
+        }
+    }
+);
+
 // New: Create shelter with photos
 export const createShelter = createAsyncThunk(
     'shelters/createShelter',

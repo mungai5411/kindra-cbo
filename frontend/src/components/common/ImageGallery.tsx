@@ -8,11 +8,8 @@ import {
     Box,
     Grid,
     IconButton,
-    Typography,
-    Button,
-    Dialog,
-    DialogContent,
     CircularProgress,
+    Typography,
     alpha,
     useTheme,
     Chip,
@@ -23,7 +20,6 @@ import {
     Star,
     StarBorder,
     Add,
-    Close,
     ZoomIn
 } from '@mui/icons-material';
 import { useDropzone } from 'react-dropzone';

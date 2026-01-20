@@ -40,7 +40,7 @@ import {
     Stack,
     TablePagination
 } from '@mui/material';
-import { Person, Assignment, Event as EventIcon, Schedule, School, Verified, Add, AccessTime, CloudUpload, Email, Phone, AdminPanelSettings, OpenInNew, Delete } from '@mui/icons-material';
+import { Person, Assignment, Event as EventIcon, Schedule, School, Verified, Add, AccessTime, Email, Phone, AdminPanelSettings, OpenInNew, Delete } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
 import { fetchVolunteers, fetchTasks, fetchEvents, logTimeEntry, addTask, addEvent, fetchTimeLogs, fetchShelters, createTaskApplication, deleteTask } from '../../features/volunteers/volunteersSlice';
 import { SubTabView } from './SubTabView';
@@ -105,7 +105,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
     const [eventPhotos, setEventPhotos] = useState<File[]>([]);
     const [eventPhotoPreviews, setEventPhotoPreviews] = useState<ImageItem[]>([]);
 
-    const handleEventGalleryAdd = (files: File[]) => {
+    const handleEventGalleryAdd = async (files: File[]) => {
         const updatedPhotos = [...eventPhotos, ...files];
         setEventPhotos(updatedPhotos);
 
@@ -117,7 +117,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
         setEventPhotoPreviews([...eventPhotoPreviews, ...newPreviews]);
     };
 
-    const handleEventGalleryDelete = (id: string) => {
+    const handleEventGalleryDelete = async (id: string) => {
         const idx = eventPhotoPreviews.findIndex(p => p.id === id);
         if (idx !== -1) {
             const updatedFiles = [...eventPhotos];
@@ -135,8 +135,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
     // Pagination state
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [taskPage, setTaskPage] = useState(0);
-    const [taskRowsPerPage, setTaskRowsPerPage] = useState(10);
+
     const [eventPage, setEventPage] = useState(0);
     const [eventRowsPerPage, setEventRowsPerPage] = useState(10);
     const [logPage, setLogPage] = useState(0);
@@ -151,14 +150,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
         setPage(0);
     };
 
-    const handleChangeTaskPage = (_event: unknown, newPage: number) => {
-        setTaskPage(newPage);
-    };
 
-    const handleChangeTaskRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTaskRowsPerPage(parseInt(event.target.value, 10));
-        setTaskPage(0);
-    };
 
     const handleChangeEventPage = (_event: unknown, newPage: number) => {
         setEventPage(newPage);
@@ -501,7 +493,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {(isVolunteer ? myTasks : tasks).slice(taskPage * taskRowsPerPage, taskPage * taskRowsPerPage + taskRowsPerPage).map((task: any) => (
+                                {(isVolunteer ? myTasks : tasks).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((task: any) => (
                                     <TableRow key={task.id} hover>
                                         <TableCell sx={{ fontWeight: 600 }}>{task.title}</TableCell>
                                         <TableCell>{task.assignees_details?.map((a: any) => a.name).join(', ') || 'Unassigned'}</TableCell>

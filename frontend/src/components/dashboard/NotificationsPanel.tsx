@@ -30,8 +30,7 @@ import {
     Warning
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+
 
 interface Notification {
     id: string;
@@ -49,6 +48,8 @@ interface NotificationsPanelProps {
     onClose: () => void;
 }
 
+// MOCK_NOTIFICATIONS removed or commented out to satisfy linter
+/* 
 const MOCK_NOTIFICATIONS: Notification[] = [
     {
         id: '1',
@@ -58,68 +59,15 @@ const MOCK_NOTIFICATIONS: Notification[] = [
         time: '2 hours ago',
         read: false
     },
-    {
-        id: '2',
-        type: 'event',
-        title: 'New Volunteer Event',
-        message: 'A new community outreach event has been scheduled for this Saturday.',
-        time: '5 hours ago',
-        read: false
-    },
-    {
-        id: '3',
-        type: 'task',
-        title: 'Task Assigned',
-        message: 'You have been assigned a new task: "Follow up with Family #F-2023-04".',
-        time: '1 day ago',
-        read: true
-    },
-    {
-        id: '4',
-        type: 'campaign',
-        title: 'Campaign Milestone',
-        message: '"Clean Water Initiative" has reached 75% of its goal!',
-        time: '2 days ago',
-        read: true
-    },
-    {
-        id: '5',
-        type: 'info',
-        title: 'System Update',
-        message: 'New reporting features are now available in your dashboard.',
-        time: '3 days ago',
-        read: true
-    }
-];
+    // ...
+]; 
+*/
 
 export const NotificationsPanel = ({ open, onClose }: NotificationsPanelProps) => {
     const theme = useTheme();
-    const { user } = useSelector((state: RootState) => state.auth);
+    // const { user } = useSelector((state: RootState) => state.auth);
 
-    const loadNotifications = () => {
-        const stored = sessionStorage.getItem('notifications');
-        if (stored) {
-            try {
-                const allNotifications = JSON.parse(stored);
-                // Filter notifications based on user role
-                return allNotifications.filter((notif: Notification) => {
-                    // If no targetRoles specified, show to everyone
-                    if (!notif.targetRoles || notif.targetRoles.length === 0) {
-                        return true;
-                    }
-                    // Admin and Management see everything
-                    if (user?.is_superuser || user?.role === 'ADMIN' || user?.role === 'MANAGEMENT') {
-                        return true;
-                    }
-                    // Otherwise, check if user's role is in targetRoles
-                    return notif.targetRoles.includes(user?.role || '');
-                });
-            } catch {
-                return MOCK_NOTIFICATIONS;
-            }
-        }
-        return MOCK_NOTIFICATIONS;
-    };
+
 
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);

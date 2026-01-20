@@ -255,6 +255,10 @@ export function NotificationCenter() {
                                     You'll be notified when donations are received
                                 </Typography>
                             </Box>
+                        ) : loading ? (
+                            <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}>
+                                <CircularProgress size={30} />
+                            </Box>
                         ) : (
                             <List sx={{ p: 0 }}>
                                 {notifications.map((notification, index) => (

@@ -71,9 +71,6 @@ import {
     fetchStaffCredentials,
     createStaffCredential,
     verifyStaffCredential,
-    fetchStaffCredentials,
-    createStaffCredential,
-    verifyStaffCredential,
     deleteStaffCredential,
     updateShelter
 } from '../../features/shelters/shelterSlice';
