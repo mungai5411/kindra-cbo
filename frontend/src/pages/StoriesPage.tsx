@@ -330,6 +330,10 @@ export default function StoriesPage() {
                                                     </Typography>
                                                     <Button
                                                         endIcon={<ArrowForward />}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(`/stories/${story.slug}`);
+                                                        }}
                                                         sx={{
                                                             mt: 'auto',
                                                             textTransform: 'none',

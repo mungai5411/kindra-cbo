@@ -41,6 +41,7 @@ import {
     Forum,
     Email
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { SubTabView } from './SubTabView';
 import { ImageUploader } from '../common/ImageUploader';
@@ -79,6 +80,7 @@ const StatusChip = ({ status }: { status: string }) => {
 export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?: string }) {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
     const { posts, categories, tags, isLoading } = useSelector((state: RootState) => state.blog);
 
     // Dialog States
@@ -312,7 +314,13 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                                 </TableCell>
                                 <TableCell align="right">
                                     <Tooltip title="View Public Page">
-                                        <IconButton size="small" sx={{ color: 'info.main' }}><Visibility fontSize="small" /></IconButton>
+                                        <IconButton
+                                            size="small"
+                                            sx={{ color: 'info.main' }}
+                                            onClick={() => navigate(`/stories/${post.slug}`)}
+                                        >
+                                            <Visibility fontSize="small" />
+                                        </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Edit Story">
                                         <IconButton size="small" sx={{ color: 'primary.main' }} onClick={() => handleOpenEdit(post)}>

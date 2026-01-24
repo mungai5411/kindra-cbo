@@ -498,7 +498,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
 
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid container spacing={{ xs: 1.5, sm: 3 }} sx={{ mb: 4 }}>
                 {[
                     { label: 'Active Case Load', value: cases.length, icon: <Assignment />, color: theme.palette.info.main, delay: 0 },
                     { label: 'Children Protected', value: children.length, icon: <ChildCare />, color: theme.palette.secondary.main, delay: 0.1 },
@@ -777,6 +777,6 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                     {snackbar.message}
                 </Alert>
             </Snackbar>
-        </Box>
+        </Box >
     );
 }

@@ -39,13 +39,14 @@ export const StatsCard = ({ title, value, color, icon, subtitle, delay = 0 }: St
             }}>
                 <Box sx={{
                     position: 'absolute',
-                    right: -10,
-                    top: -10,
-                    opacity: 0.15,
-                    fontSize: 80,
+                    right: { xs: 10, sm: -10 },
+                    top: { xs: '50%', sm: -10 },
+                    transform: { xs: 'translateY(-50%) rotate(15deg)', sm: 'rotate(15deg)' },
+                    opacity: { xs: 0.2, sm: 0.15 },
+                    fontSize: { xs: 60, sm: 80 },
                     color: 'white',
-                    transform: 'rotate(15deg)',
-                    pointerEvents: 'none'
+                    pointerEvents: 'none',
+                    transition: 'all 0.3s'
                 }}>
                     {icon}
                 </Box>
@@ -53,37 +54,41 @@ export const StatsCard = ({ title, value, color, icon, subtitle, delay = 0 }: St
                 <CardContent sx={{
                     position: 'relative',
                     zIndex: 1,
-                    p: 2.5,
+                    p: { xs: 2.5, sm: 2.5 },
                     height: '100%',
                     display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
+                    flexDirection: { xs: 'row', sm: 'column' },
+                    alignItems: { xs: 'center', sm: 'flex-start' },
+                    gap: 2,
                     '&:last-child': { pb: 2.5 }
                 }}>
-                    <Typography variant="caption" sx={{
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: 1.5,
-                        opacity: 0.8,
-                        fontSize: '0.65rem',
-                        mb: 1
-                    }}>
-                        {title}
-                    </Typography>
+                    <Box sx={{ flex: { xs: 1, sm: 'none' } }}>
+                        <Typography variant="caption" sx={{
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: 1.5,
+                            opacity: 0.8,
+                            fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                            mb: { xs: 0.5, sm: 1 },
+                            display: 'block'
+                        }}>
+                            {title}
+                        </Typography>
 
-                    <Typography variant="h4" fontWeight="900" sx={{
-                        lineHeight: 1,
-                        fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.85rem' },
-                        letterSpacing: -0.5
-                    }}>
-                        {value}
-                    </Typography>
+                        <Typography variant="h4" fontWeight="900" sx={{
+                            lineHeight: 1,
+                            fontSize: { xs: '1.5rem', sm: '1.5rem', md: '1.85rem' },
+                            letterSpacing: -0.5
+                        }}>
+                            {value}
+                        </Typography>
+                    </Box>
 
                     {subtitle && (
                         <Box sx={{
-                            mt: 2,
-                            pt: 1.5,
-                            borderTop: '1px solid',
+                            mt: { xs: 0, sm: 2 },
+                            pt: { xs: 0, sm: 1.5 },
+                            borderTop: { xs: 'none', sm: '1px solid' },
                             borderColor: alpha('#fff', 0.2),
                             display: 'flex',
                             alignItems: 'center',

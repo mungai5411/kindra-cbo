@@ -101,12 +101,13 @@ class PlacementDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class ResourceListCreateView(generics.ListCreateAPIView):
-    queryset = Resource.objects.all()
-    serializer_class = ResourceSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['shelter_home', 'resource_type', 'is_available']
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser or user.role in ['ADMIN', 'MANAGEMENT']:
+            return Resource.objects.all()
+        elif user.role == 'SHELTER_PARTNER':
+            return Resource.objects.filter(shelter_home__partner_user=user)
+        return Resource.objects.none()
 
 
 class ResourceDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -115,12 +116,13 @@ class ResourceDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class StaffCredentialListCreateView(generics.ListCreateAPIView):
-    queryset = StaffCredential.objects.all()
-    serializer_class = StaffCredentialSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['shelter_home', 'is_verified', 'is_active']
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser or user.role in ['ADMIN', 'MANAGEMENT']:
+            return StaffCredential.objects.all()
+        elif user.role == 'SHELTER_PARTNER':
+            return StaffCredential.objects.filter(shelter_home__partner_user=user)
+        return StaffCredential.objects.none()
 
 
 class StaffCredentialDetailView(generics.RetrieveUpdateDestroyAPIView):

@@ -130,6 +130,8 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
     const { volunteers, events: volunteerEvents } = useSelector((state: RootState) => state.volunteers);
     const { user } = useSelector((state: RootState) => state.auth);
     const isAdmin = user?.is_superuser || user?.role === 'ADMIN' || user?.role === 'MANAGEMENT';
+    const isPartner = user?.role === 'SHELTER_PARTNER';
+    const canManageStaff = isAdmin || isPartner;
 
     // UI States
     const [openDialog, setOpenDialog] = useState(false);
@@ -447,15 +449,17 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                     <Typography variant="h6" fontWeight="bold">Staffing & Operations</Typography>
                     <Typography variant="caption" color="text.secondary">Personnel and volunteers assigned to shelter management</Typography>
                 </Box>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<SupervisorAccount />}
-                    onClick={() => handleOpenDialog('ASSIGN')}
-                    sx={{ borderRadius: 3, boxShadow: theme.shadows[2], textTransform: 'none', fontWeight: 600 }}
-                >
-                    Assign Personnel
-                </Button>
+                {isAdmin && (
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        startIcon={<SupervisorAccount />}
+                        onClick={() => handleOpenDialog('ASSIGN')}
+                        sx={{ borderRadius: 3, boxShadow: theme.shadows[2], textTransform: 'none', fontWeight: 600 }}
+                    >
+                        Assign Personnel
+                    </Button>
+                )}
             </Box>
             <TableContainer>
                 <Table>
@@ -484,8 +488,14 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                                 </TableCell>
                                 <TableCell>{p.shelter_name || 'Central Support'}</TableCell>
                                 <TableCell align="right">
-                                    <Tooltip title="Transfer System"><IconButton onClick={() => handleAction('TRANSFER', p.id)} size="small" color="primary"><SwapHoriz /></IconButton></Tooltip>
-                                    <Tooltip title="Terminate Duty"><IconButton onClick={() => handleAction('TERMINATE', p.id)} size="small" color="error"><NoAccounts /></IconButton></Tooltip>
+                                    {isAdmin ? (
+                                        <>
+                                            <Tooltip title="Transfer System"><IconButton onClick={() => handleAction('TRANSFER', p.id)} size="small" color="primary"><SwapHoriz /></IconButton></Tooltip>
+                                            <Tooltip title="Terminate Duty"><IconButton onClick={() => handleAction('TERMINATE', p.id)} size="small" color="error"><NoAccounts /></IconButton></Tooltip>
+                                        </>
+                                    ) : (
+                                        <Typography variant="caption" color="text.secondary">Contact Admin for transfers</Typography>
+                                    )}
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -595,7 +605,7 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                                 <TableCell>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <StatusChip status={cred.is_verified ? "Verified" : "Pending"} />
-                                        {!cred.is_verified && (
+                                        {(!cred.is_verified && isAdmin) && (
                                             <Button
                                                 size="small"
                                                 onClick={() => dispatch(verifyStaffCredential({ id: cred.id, is_verified: true }))}
@@ -824,19 +834,15 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
             id: 'staff',
             label: 'Staffing & Roles',
             icon: <SupervisorAccount />,
-            component: isAdmin ? renderStaffing() : (
-                <Box sx={{ p: 4, textAlign: 'center' }}>
-                    <Typography color="text.secondary">Access to personnel records is restricted to system administrators.</Typography>
-                </Box>
-            ),
-            hidden: !isAdmin
+            component: renderStaffing(),
+            hidden: !canManageStaff
         },
         {
             id: 'staff_creds',
             label: 'Credentials',
             icon: <VerifiedUser />,
             component: renderStaffCredentials(),
-            hidden: !isAdmin
+            hidden: !canManageStaff
         },
         { id: 'resources', label: 'Inventory', icon: <Inventory />, component: renderResources() },
         { id: 'events', label: 'Partner Events', icon: <EventIcon />, component: renderPartnerEvents() },
@@ -856,7 +862,7 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                 </Box>
             </Box>
 
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid container spacing={{ xs: 1.5, sm: 3 }} sx={{ mb: 4 }}>
                 <Grid item xs={12} md={4}>
                     <StatsCard
                         title="Verified Homes"

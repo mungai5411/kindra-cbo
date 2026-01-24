@@ -86,6 +86,7 @@ function App() {
                         <Route path="/blog" element={<StoriesPage />} />
                         <Route path="/blog/:slug" element={<BlogPostPage />} />
                         <Route path="/stories" element={<StoriesPage />} />
+                        <Route path="/stories/:slug" element={<BlogPostPage />} />
 
                         <Route path="/donate" element={<DonationsPage />} />
                         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
