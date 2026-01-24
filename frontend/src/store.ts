@@ -7,10 +7,8 @@ import authReducer from './features/auth/authSlice';
 import blogReducer from './features/blog/blogSlice';
 import donationsReducer from './features/donations/donationsSlice';
 import volunteersReducer from './features/volunteers/volunteersSlice';
-import casesReducer from './features/cases/casesSlice';
 import reportingReducer from './features/reporting/reportingSlice';
 import shelterReducer from './features/shelters/shelterSlice';
-import campaignsReducer from './features/campaigns/campaignsSlice';
 import resourcesReducer from './features/resources/resourcesSlice';
 import caseManagementReducer from './features/caseManagement/caseManagementSlice';
 import adminReducer from './features/admin/adminSlice';
@@ -23,10 +21,8 @@ export const store = configureStore({
         donations: donationsReducer,
         volunteers: volunteersReducer,
         groups: groupsReducer,
-        cases: casesReducer,
         reporting: reportingReducer,
         shelters: shelterReducer,
-        campaigns: campaignsReducer,
         resources: resourcesReducer,
         caseManagement: caseManagementReducer,
         admin: adminReducer,

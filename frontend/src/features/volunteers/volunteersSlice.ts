@@ -105,6 +105,68 @@ export const addEvent = createAsyncThunk(
     }
 );
 
+export const updateEvent = createAsyncThunk(
+    'volunteers/updateEvent',
+    async ({ id, data }: { id: string; data: FormData }, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.patch(`${endpoints.volunteers.events}${id}/`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update event');
+        }
+    }
+);
+
+export const deleteEvent = createAsyncThunk(
+    'volunteers/deleteEvent',
+    async (id: string, { rejectWithValue }) => {
+        try {
+            await apiClient.delete(`${endpoints.volunteers.events}${id}/`);
+            return id;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete event');
+        }
+    }
+);
+
+export const registerForEvent = createAsyncThunk(
+    'volunteers/registerForEvent',
+    async (eventId: string, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post(`${endpoints.volunteers.events}${eventId}/register/`, { action: 'register' });
+            return { eventId, data: response.data };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to register for event');
+        }
+    }
+);
+
+export const unregisterFromEvent = createAsyncThunk(
+    'volunteers/unregisterFromEvent',
+    async (eventId: string, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post(`${endpoints.volunteers.events}${eventId}/register/`, { action: 'unregister' });
+            return { eventId, data: response.data };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to unregister from event');
+        }
+    }
+);
+
+export const fetchEventParticipants = createAsyncThunk(
+    'volunteers/fetchEventParticipants',
+    async (eventId: string, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get(`${endpoints.volunteers.events}${eventId}/participants/`);
+            return response.data.results || response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch event participants');
+        }
+    }
+);
+
 export const addVolunteer = createAsyncThunk(
     'volunteers/addVolunteer',
     async (volunteerData: any, { rejectWithValue }) => {
@@ -191,7 +253,7 @@ export const updateTaskApplication = createAsyncThunk(
 
 export const fetchShelters = createAsyncThunk(
     'volunteers/fetchShelters',
-    async (_) => {
+    async () => {
         try {
             const response = await apiClient.get(endpoints.shelters.shelters);
             return response.data.results || response.data;
@@ -290,6 +352,42 @@ const volunteersSlice = createSlice({
         // Add Event
         builder.addCase(addEvent.fulfilled, (state, action) => {
             state.events = Array.isArray(state.events) ? [action.payload, ...state.events] : [action.payload];
+        });
+
+        // Update Event
+        builder.addCase(updateEvent.fulfilled, (state, action) => {
+            const index = state.events.findIndex(e => e.id === action.payload.id);
+            if (index !== -1) {
+                state.events[index] = action.payload;
+            }
+        });
+
+        // Delete Event
+        builder.addCase(deleteEvent.fulfilled, (state, action) => {
+            state.events = state.events.filter(e => e.id !== action.payload);
+        });
+
+        // Event Registration
+        builder.addCase(registerForEvent.fulfilled, (state, action) => {
+            const index = state.events.findIndex(e => e.id === action.payload.eventId);
+            if (index !== -1) {
+                state.events[index] = {
+                    ...state.events[index],
+                    is_registered: true,
+                    registered_count: (state.events[index].registered_count || 0) + 1
+                };
+            }
+        });
+
+        builder.addCase(unregisterFromEvent.fulfilled, (state, action) => {
+            const index = state.events.findIndex(e => e.id === action.payload.eventId);
+            if (index !== -1) {
+                state.events[index] = {
+                    ...state.events[index],
+                    is_registered: false,
+                    registered_count: Math.max(0, (state.events[index].registered_count || 1) - 1)
+                };
+            }
         });
 
         // Fetch Task Applications

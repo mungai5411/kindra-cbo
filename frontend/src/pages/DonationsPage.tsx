@@ -8,14 +8,14 @@ import { Container, Grid, Card, CardContent, Typography, Box, Button, LinearProg
 import { Favorite, Security, Public, VolunteerActivism } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { AppDispatch, RootState } from '../store';
-import { fetchCampaigns } from '../features/campaigns/campaignsSlice';
+import { fetchCampaigns } from '../features/donations/donationsSlice';
 import DonationDialog from '../components/campaigns/DonationDialog';
 import MaterialDonationDialog from '../components/campaigns/MaterialDonationDialog';
 
 export default function DonationsPage() {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
-    const { campaigns, isLoading } = useSelector((state: RootState) => state.campaigns);
+    const { campaigns, isLoading } = useSelector((state: RootState) => state.donations);
 
     const [donationDialogOpen, setDonationDialogOpen] = useState(false);
     const [selectedCampaign, setSelectedCampaign] = useState<any>(null);

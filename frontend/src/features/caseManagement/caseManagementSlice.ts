@@ -14,6 +14,14 @@ interface Family {
     registration_date: string;
 }
 
+interface Child {
+    id: string;
+    family: string;
+    full_name: string;
+    date_of_birth: string;
+    gender: string;
+}
+
 interface Case {
     id: string;
     case_number: string;
@@ -45,6 +53,7 @@ interface CaseNote {
 
 interface CaseManagementState {
     families: Family[];
+    children: Child[];
     cases: Case[];
     assessments: Assessment[];
     caseNotes: CaseNote[];
@@ -54,6 +63,7 @@ interface CaseManagementState {
 
 const initialState: CaseManagementState = {
     families: [],
+    children: [],
     cases: [],
     assessments: [],
     caseNotes: [],
@@ -159,6 +169,79 @@ export const fetchCaseNotes = createAsyncThunk(
     }
 );
 
+export const fetchChildren = createAsyncThunk(
+    'caseManagement/fetchChildren',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get('/cases/children/');
+            return response.data.results || response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch children');
+        }
+    }
+);
+
+// Create Actions
+export const addFamily = createAsyncThunk(
+    'caseManagement/addFamily',
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post('/cases/families/', data);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to add family');
+        }
+    }
+);
+
+export const addChild = createAsyncThunk(
+    'caseManagement/addChild',
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post('/cases/children/', data);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to register child');
+        }
+    }
+);
+
+export const addCase = createAsyncThunk(
+    'caseManagement/addCase',
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post('/cases/cases/', data);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to create case');
+        }
+    }
+);
+
+export const addAssessment = createAsyncThunk(
+    'caseManagement/addAssessment',
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post('/cases/assessments/', data);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to save assessment');
+        }
+    }
+);
+
+export const addCaseNote = createAsyncThunk(
+    'caseManagement/addCaseNote',
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post('/cases/notes/', data);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to add case note');
+        }
+    }
+);
+
 // Slice
 const caseManagementSlice = createSlice({
     name: 'caseManagement',
@@ -183,6 +266,11 @@ const caseManagementSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload as string;
             });
+
+        // Fetch Children
+        builder.addCase(fetchChildren.fulfilled, (state, action: PayloadAction<Child[]>) => {
+            state.children = action.payload;
+        });
 
         // Fetch Cases
         builder
@@ -288,6 +376,23 @@ const caseManagementSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload as string;
             });
+
+        // Add Actions
+        builder.addCase(addFamily.fulfilled, (state, action) => {
+            state.families.unshift(action.payload);
+        });
+        builder.addCase(addChild.fulfilled, (state, action) => {
+            state.children.unshift(action.payload);
+        });
+        builder.addCase(addCase.fulfilled, (state, action) => {
+            state.cases.unshift(action.payload);
+        });
+        builder.addCase(addAssessment.fulfilled, (state, action) => {
+            state.assessments.unshift(action.payload);
+        });
+        builder.addCase(addCaseNote.fulfilled, (state, action) => {
+            state.caseNotes.unshift(action.payload);
+        });
     },
 });
 

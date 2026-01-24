@@ -17,6 +17,18 @@ export const fetchCampaigns = createAsyncThunk(
     }
 );
 
+export const fetchCampaignBySlug = createAsyncThunk(
+    'donations/fetchCampaignBySlug',
+    async (slug: string, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get(`${endpoints.donations.campaigns}${slug}/`);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch campaign');
+        }
+    }
+);
+
 export const fetchDonations = createAsyncThunk(
     'donations/fetchDonations',
     async (_, { rejectWithValue }) => {

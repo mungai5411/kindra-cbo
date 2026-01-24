@@ -41,9 +41,9 @@ import {
     TablePagination,
     useMediaQuery
 } from '@mui/material';
-import { Person, Assignment, Event as EventIcon, Schedule, School, Verified, Add, AccessTime, Email, Phone, AdminPanelSettings, OpenInNew, Delete } from '@mui/icons-material';
+import { Person, Assignment, Event as EventIcon, Schedule, School, Verified, Add, AccessTime, Email, Phone, AdminPanelSettings, OpenInNew, Delete, People, Edit } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
-import { fetchVolunteers, fetchTasks, fetchEvents, logTimeEntry, addTask, addEvent, fetchTimeLogs, fetchShelters, createTaskApplication, deleteTask } from '../../features/volunteers/volunteersSlice';
+import { fetchVolunteers, fetchTasks, fetchEvents, logTimeEntry, addTask, addEvent, updateEvent, deleteEvent, registerForEvent, unregisterFromEvent, fetchTimeLogs, fetchShelters, createTaskApplication, deleteTask, fetchEventParticipants } from '../../features/volunteers/volunteersSlice';
 import { SubTabView } from './SubTabView';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
@@ -103,9 +103,18 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
         post_to_volunteers: true,
         post_to_donors: false,
         post_to_shelters: false,
+        event_gallery: [] as any[]
     });
     const [eventPhotos, setEventPhotos] = useState<File[]>([]);
     const [eventPhotoPreviews, setEventPhotoPreviews] = useState<ImageItem[]>([]);
+    const [isEditingEvent, setIsEditingEvent] = useState(false);
+    const [editingEventId, setEditingEventId] = useState<string | null>(null);
+
+    // Participants Dialog
+    const [participantsDialogOpen, setParticipantsDialogOpen] = useState(false);
+    const [participants, setParticipants] = useState<any[]>([]);
+    const [participantsLoading, setParticipantsLoading] = useState(false);
+    const [activeEventForParticipants, setActiveEventForParticipants] = useState<any>(null);
 
     const handleEventGalleryAdd = async (files: File[]) => {
         const updatedPhotos = [...eventPhotos, ...files];
@@ -250,42 +259,95 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
         });
     };
 
-    const handleAddEvent = () => {
-        if (!eventForm.title || !eventForm.description || !eventForm.location) {
-            setSnackbar({ open: true, message: 'Please fill in Title, Description and Location', severity: 'warning' });
+    const handleAddEvent = async () => {
+        if (!eventForm.title || !eventForm.start_datetime) {
+            setSnackbar({ open: true, message: 'Required fields missing', severity: 'error' });
             return;
         }
 
         const formData = new FormData();
-        Object.keys(eventForm).forEach(key => {
-            formData.append(key, String((eventForm as any)[key]));
+        Object.entries(eventForm).forEach(([key, value]) => {
+            if (key === 'event_gallery') {
+                (value as any[]).forEach(img => formData.append('event_gallery', img));
+            } else {
+                formData.append(key, String(value));
+            }
         });
 
-        if (eventPhotos.length > 0) {
-            eventPhotos.forEach(photo => {
-                formData.append('photos', photo);
+        if (isEditingEvent && editingEventId) {
+            dispatch(updateEvent({ id: editingEventId, data: formData })).unwrap().then(() => {
+                setEventDialogOpen(false);
+                setIsEditingEvent(false);
+                setEditingEventId(null);
+                setEventForm({ title: '', description: '', event_type: 'COMMUNITY', location: '', start_datetime: '', end_datetime: '', post_to_volunteers: true, post_to_donors: false, post_to_shelters: false, event_gallery: [] });
+                setEventPhotoPreviews([]);
+                setSnackbar({ open: true, message: 'Event updated successfully', severity: 'success' });
+            }).catch(() => {
+                setSnackbar({ open: true, message: 'Failed to update event.', severity: 'error' });
+            });
+        } else {
+            dispatch(addEvent(formData)).unwrap().then(() => {
+                setEventDialogOpen(false);
+                setEventForm({ title: '', description: '', event_type: 'COMMUNITY', location: '', start_datetime: '', end_datetime: '', post_to_volunteers: true, post_to_donors: false, post_to_shelters: false, event_gallery: [] });
+                setEventPhotoPreviews([]);
+                setSnackbar({ open: true, message: 'Event created and posted successfully', severity: 'success' });
+            }).catch(() => {
+                setSnackbar({ open: true, message: 'Failed to create event.', severity: 'error' });
             });
         }
+    };
 
-        dispatch(addEvent(formData)).unwrap().then(() => {
-            setEventDialogOpen(false);
-            setEventForm({
-                title: '',
-                description: '',
-                event_type: 'COMMUNITY',
-                location: '',
-                start_datetime: new Date().toISOString().slice(0, 16),
-                end_datetime: new Date(Date.now() + 3600000).toISOString().slice(0, 16),
-                post_to_volunteers: true,
-                post_to_donors: false,
-                post_to_shelters: false,
+    const handleViewParticipants = (event: any) => {
+        setActiveEventForParticipants(event);
+        setParticipantsLoading(true);
+        setParticipantsDialogOpen(true);
+        dispatch(fetchEventParticipants(event.id)).unwrap()
+            .then((data) => {
+                setParticipants(data);
+                setParticipantsLoading(false);
+            })
+            .catch(() => {
+                setParticipantsLoading(false);
+                setSnackbar({ open: true, message: 'Failed to fetch participants', severity: 'error' });
             });
-            setEventPhotos([]);
-            setEventPhotoPreviews([]);
-            setSnackbar({ open: true, message: 'Event created and posted successfully', severity: 'success' });
-        }).catch(() => {
-            setSnackbar({ open: true, message: 'Failed to create event. Check inputs.', severity: 'error' });
+    };
+
+    const handleRegister = (eventId: string) => {
+        dispatch(registerForEvent(eventId)).unwrap()
+            .then(() => setSnackbar({ open: true, message: 'Successfully registered!', severity: 'success' }))
+            .catch(() => setSnackbar({ open: true, message: 'Registration failed', severity: 'error' }));
+    };
+
+    const handleUnregister = (eventId: string) => {
+        dispatch(unregisterFromEvent(eventId)).unwrap()
+            .then(() => setSnackbar({ open: true, message: 'Successfully unregistered', severity: 'success' }))
+            .catch(() => setSnackbar({ open: true, message: 'Failed to unregister', severity: 'error' }));
+    };
+
+    const handleEditEvent = (event: any) => {
+        setIsEditingEvent(true);
+        setEditingEventId(event.id);
+        setEventForm({
+            title: event.title,
+            description: event.description,
+            event_type: event.event_type,
+            location: event.location,
+            start_datetime: event.start_datetime.slice(0, 16),
+            end_datetime: (event.end_datetime || '').slice(0, 16),
+            post_to_volunteers: event.post_to_volunteers,
+            post_to_donors: event.post_to_donors,
+            post_to_shelters: event.post_to_shelters,
+            event_gallery: []
         });
+        setEventDialogOpen(true);
+    };
+
+    const handleDeleteEvent = (eventId: string) => {
+        if (window.confirm('Are you sure you want to delete this event?')) {
+            dispatch(deleteEvent(eventId)).unwrap()
+                .then(() => setSnackbar({ open: true, message: 'Event deleted', severity: 'success' }))
+                .catch(() => setSnackbar({ open: true, message: 'Failed to delete event', severity: 'error' }));
+        }
     };
 
     const handleViewProfile = (volunteer: any) => {
@@ -670,6 +732,8 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             <TableCell sx={{ fontWeight: 600 }}>Type</TableCell>
                             <TableCell sx={{ fontWeight: 600 }}>Venue</TableCell>
                             <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Participants</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }} align="right">Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -681,6 +745,30 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 </TableCell>
                                 <TableCell>{event.location}</TableCell>
                                 <TableCell>{new Date(event.start_datetime).toLocaleDateString()}</TableCell>
+                                <TableCell>
+                                    <Chip
+                                        label={`${event.registered_count || 0} Joined`}
+                                        size="small"
+                                        onClick={isManagement ? () => handleViewParticipants(event) : undefined}
+                                        sx={{ cursor: isManagement ? 'pointer' : 'default', bgcolor: alpha(theme.palette.success.main, 0.1), color: 'success.dark', fontWeight: 'bold' }}
+                                    />
+                                </TableCell>
+                                <TableCell align="right">
+                                    {isVolunteer && (
+                                        event.is_registered ? (
+                                            <Button size="small" variant="outlined" color="error" onClick={() => handleUnregister(event.id)}>Leave</Button>
+                                        ) : (
+                                            <Button size="small" variant="contained" color="primary" onClick={() => handleRegister(event.id)} disabled={event.is_full}>Join</Button>
+                                        )
+                                    )}
+                                    {isManagement && (
+                                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                                            <Tooltip title="Participants"><IconButton size="small" onClick={() => handleViewParticipants(event)}><People fontSize="small" /></IconButton></Tooltip>
+                                            <Tooltip title="Edit"><IconButton size="small" onClick={() => handleEditEvent(event)} color="primary"><Edit fontSize="small" /></IconButton></Tooltip>
+                                            <Tooltip title="Delete"><IconButton size="small" onClick={() => handleDeleteEvent(event.id)} color="error"><Delete fontSize="small" /></IconButton></Tooltip>
+                                        </Box>
+                                    )}
+                                </TableCell>
                             </TableRow>
                         ))}
                         {events.filter((e: any) => isManagement || e.is_active).length === 0 && (
@@ -1150,8 +1238,43 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>
-                    <Button onClick={() => setEventDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleAddEvent} sx={{ borderRadius: 2, px: 3 }}>Create Event</Button>
+                    <Button onClick={() => {
+                        setEventDialogOpen(false);
+                        setIsEditingEvent(false);
+                        setEditingEventId(null);
+                    }}>Cancel</Button>
+                    <Button variant="contained" onClick={handleAddEvent} sx={{ borderRadius: 2, px: 3 }}>
+                        {isEditingEvent ? 'Update Event' : 'Create Event'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Participants Dialog */}
+            <Dialog open={participantsDialogOpen} onClose={() => setParticipantsDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>
+                    Event Participants: {activeEventForParticipants?.title}
+                </DialogTitle>
+                <DialogContent>
+                    {participantsLoading ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>
+                    ) : (
+                        <List>
+                            {participants.map((p: any) => (
+                                <ListItem key={p.id}>
+                                    <ListItemIcon>
+                                        <Avatar src={p.account_details?.profile_picture}>{p.full_name[0]}</Avatar>
+                                    </ListItemIcon>
+                                    <ListItemText primary={p.full_name} secondary={p.email} />
+                                </ListItem>
+                            ))}
+                            {participants.length === 0 && (
+                                <Typography align="center" color="text.secondary" sx={{ py: 2 }}>No participants yet.</Typography>
+                            )}
+                        </List>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ p: 3, pt: 0 }}>
+                    <Button onClick={() => setParticipantsDialogOpen(false)}>Close</Button>
                 </DialogActions>
             </Dialog>
 

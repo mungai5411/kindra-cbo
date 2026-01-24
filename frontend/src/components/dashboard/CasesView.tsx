@@ -46,7 +46,7 @@ import {
     HealthAndSafety
 } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
-import { fetchFamilies, fetchChildren, fetchCases, addFamily, addChild, addCase } from '../../features/cases/casesSlice';
+import { fetchFamilies, fetchChildren, fetchCases, addFamily, addChild, addCase } from '../../features/caseManagement/caseManagementSlice';
 import { SubTabView } from './SubTabView';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
@@ -114,7 +114,7 @@ const StatusChip = ({ status, type = 'status' }: { status: string, type?: 'statu
 export function CasesView({ activeTab }: { activeTab?: string }) {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
-    const { families, children, cases, assessments, notes, isLoading } = useSelector((state: RootState) => state.cases);
+    const { families, children, cases, assessments, caseNotes: notes, isLoading } = useSelector((state: RootState) => state.caseManagement);
     const userRole = useSelector((state: RootState) => state.auth.user?.role);
     const isManagement = ['ADMIN', 'MANAGEMENT'].includes(userRole || '');
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' as 'info' | 'success' | 'error' });

@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
 import { fetchPosts } from '../features/blog/blogSlice';
-import { fetchCampaigns } from '../features/campaigns/campaignsSlice';
+import { fetchCampaigns } from '../features/donations/donationsSlice';
 import {
     Box,
     Grid,
@@ -54,7 +54,7 @@ export default function StoriesPage() {
     const navigate = useNavigate();
 
     const { posts, isLoading: blogLoading } = useSelector((state: RootState) => state.blog);
-    const { campaigns, isLoading: campaignsLoading } = useSelector((state: RootState) => state.campaigns);
+    const { campaigns, isLoading: campaignsLoading } = useSelector((state: RootState) => state.donations);
 
     const [currentTab, setCurrentTab] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');

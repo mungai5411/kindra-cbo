@@ -74,7 +74,7 @@ import {
     deleteStaffCredential,
     updateShelter
 } from '../../features/shelters/shelterSlice';
-import { fetchChildren } from '../../features/cases/casesSlice';
+import { fetchChildren } from '../../features/caseManagement/caseManagementSlice';
 import { fetchEvents } from '../../features/volunteers/volunteersSlice';
 import { SubTabView } from './SubTabView';
 import { ConfirmationDialog } from './ConfirmationDialog';
@@ -126,7 +126,7 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
     const { shelters, pendingShelters, resources, staff, placements, staffCredentials } = useSelector((state: RootState) => state.shelters);
-    const { children } = useSelector((state: RootState) => state.cases);
+    const { children } = useSelector((state: RootState) => state.caseManagement);
     const { volunteers, events: volunteerEvents } = useSelector((state: RootState) => state.volunteers);
     const { user } = useSelector((state: RootState) => state.auth);
     const isAdmin = user?.is_superuser || user?.role === 'ADMIN' || user?.role === 'MANAGEMENT';
