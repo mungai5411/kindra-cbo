@@ -43,7 +43,7 @@ const apiClient = axios.create({
 // Request interceptor - add auth token
 apiClient.interceptors.request.use(
     (config) => {
-        const token = sessionStorage.getItem('accessToken');
+        const token = localStorage.getItem('accessToken');
         if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -96,7 +96,7 @@ apiClient.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                const refreshToken = sessionStorage.getItem('refreshToken');
+                const refreshToken = localStorage.getItem('refreshToken');
                 if (!refreshToken) {
                     throw new Error('No refresh token');
                 }
@@ -107,7 +107,7 @@ apiClient.interceptors.response.use(
                 });
 
                 const { access } = response.data;
-                sessionStorage.setItem('accessToken', access);
+                localStorage.setItem('accessToken', access);
 
                 if (originalRequest.headers) {
                     originalRequest.headers.Authorization = `Bearer ${access}`;
@@ -118,8 +118,8 @@ apiClient.interceptors.response.use(
             } catch (refreshError) {
                 processQueue(refreshError, null);
                 // Refresh failed - logout user
-                sessionStorage.removeItem('accessToken');
-                sessionStorage.removeItem('refreshToken');
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
                 window.location.href = '/login';
                 return Promise.reject(refreshError);
             } finally {

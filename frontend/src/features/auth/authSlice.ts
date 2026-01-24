@@ -28,10 +28,10 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-    user: sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')!) : null,
-    accessToken: sessionStorage.getItem('accessToken'),
-    refreshToken: sessionStorage.getItem('refreshToken'),
-    isAuthenticated: !!sessionStorage.getItem('accessToken'),
+    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
+    accessToken: localStorage.getItem('accessToken'),
+    refreshToken: localStorage.getItem('refreshToken'),
+    isAuthenticated: !!localStorage.getItem('accessToken'),
     isLoading: false,
     error: null,
 };
@@ -45,8 +45,8 @@ export const login = createAsyncThunk(
             const { tokens, user } = response.data;
             const { access, refresh } = tokens;
 
-            sessionStorage.setItem('accessToken', access);
-            sessionStorage.setItem('refreshToken', refresh);
+            localStorage.setItem('accessToken', access);
+            localStorage.setItem('refreshToken', refresh);
 
             // Normalize user data
             const normalizedUser = {
@@ -84,8 +84,8 @@ export const register = createAsyncThunk(
             const { tokens, user } = response.data;
             const { access, refresh } = tokens;
 
-            sessionStorage.setItem('accessToken', access);
-            sessionStorage.setItem('refreshToken', refresh);
+            localStorage.setItem('accessToken', access);
+            localStorage.setItem('refreshToken', refresh);
 
             // Normalize user data
             const normalizedUser = {
@@ -115,8 +115,9 @@ export const register = createAsyncThunk(
 );
 
 export const logout = createAsyncThunk('auth/logout', async () => {
-    sessionStorage.removeItem('accessToken');
-    sessionStorage.removeItem('refreshToken');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
 });
 
 export const fetchProfile = createAsyncThunk(
@@ -199,8 +200,8 @@ export const updateProfile = createAsyncThunk(
                 phone_number: user.phone_number,
             };
 
-            // Sync sessionStorage
-            sessionStorage.setItem('user', JSON.stringify(normalizedUser));
+            // Sync localStorage
+            localStorage.setItem('user', JSON.stringify(normalizedUser));
 
             // Force refresh to get latest data from server
             setTimeout(() => {
@@ -245,8 +246,8 @@ const authSlice = createSlice({
                     ...state.user,
                     ...action.payload
                 };
-                // Persist to sessionStorage
-                sessionStorage.setItem('user', JSON.stringify(state.user));
+                // Persist to localStorage
+                localStorage.setItem('user', JSON.stringify(state.user));
             }
         },
     },
@@ -262,8 +263,8 @@ const authSlice = createSlice({
             state.accessToken = action.payload.access;
             state.refreshToken = action.payload.refresh;
             state.user = normalizeUser(action.payload.user);
-            // Persist user to sessionStorage
-            sessionStorage.setItem('user', JSON.stringify(state.user));
+            // Persist user to localStorage
+            localStorage.setItem('user', JSON.stringify(state.user));
         });
         builder.addCase(login.rejected, (state, action) => {
             state.isLoading = false;
@@ -281,7 +282,7 @@ const authSlice = createSlice({
             state.accessToken = action.payload.access;
             state.refreshToken = action.payload.refresh;
             state.user = normalizeUser(action.payload.user);
-            sessionStorage.setItem('user', JSON.stringify(state.user));
+            localStorage.setItem('user', JSON.stringify(state.user));
         });
         builder.addCase(register.rejected, (state, action) => {
             state.isLoading = false;
@@ -303,7 +304,7 @@ const authSlice = createSlice({
         builder.addCase(fetchProfile.fulfilled, (state, action: PayloadAction<any>) => {
             state.isLoading = false;
             state.user = normalizeUser(action.payload);
-            sessionStorage.setItem('user', JSON.stringify(state.user));
+            localStorage.setItem('user', JSON.stringify(state.user));
         });
         builder.addCase(fetchProfile.rejected, (state, action) => {
             state.isLoading = false;

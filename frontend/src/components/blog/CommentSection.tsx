@@ -41,6 +41,17 @@ export const CommentSection = ({ postSlug, postId }: CommentSectionProps) => {
         if (postSlug) {
             dispatch(fetchComments(postSlug));
         }
+
+        // Load persist visitor details
+        const savedVisitor = localStorage.getItem('visitorDetails');
+        if (savedVisitor) {
+            try {
+                const { name, email } = JSON.parse(savedVisitor);
+                setFormData(prev => ({ ...prev, name, email }));
+            } catch (e) {
+                // Ignore parse error
+            }
+        }
     }, [dispatch, postSlug]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -57,8 +68,15 @@ export const CommentSection = ({ postSlug, postId }: CommentSectionProps) => {
                 ...formData
             })).unwrap();
 
+            // Save visitor details for next time (easier functionality)
+            localStorage.setItem('visitorDetails', JSON.stringify({
+                name: formData.name,
+                email: formData.email
+            }));
+
             setSuccessMsg('Thank you! Your comment is awaiting moderation.');
-            setFormData({ name: '', email: '', content: '' });
+            // Clear content but keep name/email
+            setFormData(prev => ({ ...prev, content: '' }));
 
             // Clear success message after 5 seconds
             setTimeout(() => setSuccessMsg(null), 5000);
