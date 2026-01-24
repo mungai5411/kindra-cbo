@@ -22,6 +22,7 @@ interface SidebarProps {
     openSections: { [key: string]: boolean };
     handleSectionToggle: (id: string) => void;
     canViewModule: (id: string) => boolean;
+    onClose?: () => void;
 }
 
 const NAVIGATION = [
@@ -126,12 +127,20 @@ interface NavigationItem {
     children?: { id: string; label: string; adminOnly?: boolean }[];
 }
 
-export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionToggle, canViewModule }: SidebarProps) => {
+export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionToggle, canViewModule, onClose }: SidebarProps) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+    const handleNavigation = (id: string) => {
+        setActiveTab(id);
+        if (isMobile && onClose) {
+            onClose();
+        }
+    };
+
     return (
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {/* ... header ... */}
             <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Box
                     sx={{
@@ -174,7 +183,6 @@ export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionTo
                     const hasChildren = item.children && item.children.length > 0;
                     const visibleChildren = item.children?.filter(child => {
                         if (child.adminOnly && !canViewModule('admin_sys')) return false;
-                        // Some children might need explicit per-id permission checking if logic exists
                         return canViewModule(child.id);
                     });
 
@@ -187,7 +195,7 @@ export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionTo
                         <Box key={item.id} sx={{ mb: 0.5 }}>
                             <ListItem disablePadding>
                                 <ListItemButton
-                                    onClick={() => hasChildren ? handleSectionToggle(item.id) : setActiveTab(item.id)}
+                                    onClick={() => hasChildren ? handleSectionToggle(item.id) : handleNavigation(item.id)}
                                     selected={activeTab === item.id}
                                     sx={{
                                         borderRadius: 2,
@@ -259,7 +267,7 @@ export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionTo
                                                     } : {}
                                                 }}
                                                 selected={activeTab === child.id}
-                                                onClick={() => setActiveTab(child.id)}
+                                                onClick={() => handleNavigation(child.id)}
                                             >
                                                 <ListItemText
                                                     primary={child.label}

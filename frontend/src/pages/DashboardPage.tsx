@@ -357,6 +357,7 @@ export default function DashboardPage() {
                                     openSections={openSections}
                                     handleSectionToggle={handleSectionToggle}
                                     canViewModule={canViewModule}
+                                    onClose={handleDrawerToggle}
                                 />
                             </Box>
                             <Divider />

@@ -119,7 +119,12 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
                 return (
                     <DonorOverview
                         stats={{
-                            myTotalDonations: myDonations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0),
+                            myTotalDonations: myDonations.reduce((sum, d) => {
+                                if (['COMPLETED', 'VERIFIED', 'SUCCESS'].includes(d.status)) {
+                                    return sum + (Number(d.amount) || 0);
+                                }
+                                return sum;
+                            }, 0),
                             impactRank: 'Silver Partner', // Will be dynamic inside DonorOverview
                             supportedCampaigns: new Set(myDonations.map(d => d.campaign)).size
                         }}

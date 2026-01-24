@@ -990,7 +990,12 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
 
 
     const renderImpactAnalytics = () => {
-        const totalImpact = (displayDonations || []).reduce((acc: number, curr: any) => acc + Number(curr?.amount || 0), 0);
+        const totalImpact = (displayDonations || []).reduce((acc: number, curr: any) => {
+            if (['COMPLETED', 'VERIFIED', 'SUCCESS'].includes(curr?.status)) {
+                return acc + Number(curr?.amount || 0);
+            }
+            return acc;
+        }, 0);
 
         // Mock allocation based on proportions
         const allocationData = [
@@ -1115,7 +1120,12 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                 <Grid item xs={12} md={4}>
                     <StatsCard
                         title={isDonor ? "My Lifetime Impact" : "Total Raised"}
-                        value={`KES ${((displayDonations || []).reduce((acc: number, curr: any) => acc + Number(curr?.amount || 0), 0)).toLocaleString()}`}
+                        value={`KES ${((displayDonations || []).reduce((acc: number, curr: any) => {
+                            if (['COMPLETED', 'VERIFIED', 'SUCCESS'].includes(curr?.status)) {
+                                return acc + Number(curr?.amount || 0);
+                            }
+                            return acc;
+                        }, 0)).toLocaleString()}`}
                         icon={<MonetizationOn />}
                         color={theme.palette.success.main}
                     />
@@ -1131,7 +1141,12 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                 <Grid item xs={12} md={4}>
                     <StatsCard
                         title={isDonor ? "Personal Impact Rank" : "Total Donors"}
-                        value={isDonor ? getImpactRank((displayDonations || []).reduce((acc: number, curr: any) => acc + Number(curr?.amount || 0), 0)) : (donors?.length || 0)}
+                        value={isDonor ? getImpactRank((displayDonations || []).reduce((acc: number, curr: any) => {
+                            if (['COMPLETED', 'VERIFIED', 'SUCCESS'].includes(curr?.status)) {
+                                return acc + Number(curr?.amount || 0);
+                            }
+                            return acc;
+                        }, 0)) : (donors?.length || 0)}
                         icon={isDonor ? <Box component="span" sx={{ fontSize: 'inherit' }}>⭐</Box> : <Box component="span" sx={{ fontSize: 'inherit' }}>🤝</Box>}
                         color={theme.palette.secondary.main}
                     />

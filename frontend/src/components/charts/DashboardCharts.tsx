@@ -1,32 +1,64 @@
 /**
  * Dashboard Chart Components
- * Reusable visualization components using Recharts
+ * Reusable visualization components using Recharts with a modern, minimal aesthetic
  */
 
 import type { ReactNode } from 'react';
-import { Card, CardContent, Typography, useTheme, alpha } from '@mui/material';
+import { Card, CardContent, Typography, useTheme, alpha, Box } from '@mui/material';
 import {
     BarChart, Bar, PieChart, Pie, AreaChart, Area,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell
 } from 'recharts';
 import { useDeviceType } from '../../hooks/useDeviceType';
 
-// Pie chart coloring logic moved inside components to use theme palette
-const GET_CHART_COLORS = (theme: any) => [
-    theme.palette.primary.main,
-    theme.palette.secondary.main,
-    theme.palette.success.main,
-    theme.palette.warning.main,
-    theme.palette.info.main,
+// Modern clean palette
+const CHART_COLORS = [
+    '#6366f1', // Indigo (Primary)
+    '#ec4899', // Pink (Secondary)
+    '#10b981', // Emerald (Success)
+    '#f59e0b', // Amber (Warning)
+    '#3b82f6', // Blue (Info)
     '#8b5cf6', // Violet
-    '#ec4899', // Pink
-    '#f97316', // Orange
+    '#f43f5e', // Rose
     '#06b6d4', // Cyan
-    '#10b981', // Emerald
-    '#fbbf24', // Amber
-    '#6366f1', // Indigo
 ];
 
+interface CustomTooltipProps {
+    active?: boolean;
+    payload?: any[];
+    label?: string;
+    formatter?: (value: any) => string;
+}
+
+const CustomTooltip = ({ active, payload, label, formatter }: CustomTooltipProps) => {
+    const theme = useTheme();
+    if (active && payload && payload.length) {
+        return (
+            <Box sx={{
+                bgcolor: alpha(theme.palette.background.paper, 0.9),
+                backdropFilter: 'blur(8px)',
+                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                borderRadius: 3,
+                boxShadow: theme.shadows[4],
+                p: 1.5,
+                minWidth: 120
+            }}>
+                <Typography variant="caption" color="text.secondary" fontWeight="bold" sx={{ mb: 0.5, display: 'block' }}>
+                    {label}
+                </Typography>
+                {payload.map((entry: any, index: number) => (
+                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: entry.fill || entry.stroke }} />
+                        <Typography variant="body2" fontWeight="bold">
+                            {formatter ? formatter(entry.value) : entry.value}
+                        </Typography>
+                    </Box>
+                ))}
+            </Box>
+        );
+    }
+    return null;
+};
 
 interface ChartCardProps {
     title?: string;
@@ -37,38 +69,39 @@ interface ChartCardProps {
 const ChartCard = ({ title, children, hideCard = false }: ChartCardProps) => {
     const theme = useTheme();
     return (
-        <Card sx={{
+        <Card elevation={0} sx={{
             height: '100%',
-            borderRadius: 1,
-            boxShadow: theme.shadows[1],
-            border: '1px solid',
-            borderColor: alpha(theme.palette.divider, 0.1),
-            ...(hideCard && { boxShadow: 'none', border: 'none', bgcolor: 'transparent' })
+            borderRadius: 3,
+            border: hideCard ? 'none' : `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+            bgcolor: hideCard ? 'transparent' : 'background.paper',
+            ...(hideCard && { p: 0 })
         }}>
             <CardContent sx={{
-                p: { xs: 1.5, sm: 2 },
+                p: { xs: 2, sm: 3 },
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
                 ...(hideCard && { p: 0, '&:last-child': { pb: 0 } })
             }}>
                 {title && (
                     <Typography
-                        variant="overline"
+                        variant="caption"
                         sx={{
-                            mb: 2,
+                            mb: 3,
                             display: 'block',
-                            fontSize: { xs: '0.65rem', sm: '0.75rem' },
-                            fontWeight: 800,
-                            letterSpacing: 1,
-                            color: 'text.secondary',
-                            lineHeight: 1.2,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
+                            fontWeight: 700,
+                            letterSpacing: 1.2,
+                            color: 'text.disabled',
+                            textTransform: 'uppercase',
+                            fontSize: '0.7rem'
                         }}
                     >
                         {title}
                     </Typography>
                 )}
-                {children}
+                <Box sx={{ flexGrow: 1, minHeight: 0 }}>
+                    {children}
+                </Box>
             </CardContent>
         </Card>
     );
@@ -81,43 +114,32 @@ export const DonationTrendsChart = ({ data }: { data: any[] }) => {
     const isMobile = deviceType === 'MOBILE';
 
     return (
-        <ChartCard title="DONATION TRENDS">
-            <ResponsiveContainer width="100%" aspect={isMobile ? 1.5 : 2}>
-                <BarChart data={data} margin={{ left: -20, right: 10, top: 10, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} vertical={false} />
+        <ChartCard title="Donation Trends">
+            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+                <BarChart data={data} margin={{ left: -20, right: 0, top: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} vertical={false} />
                     <XAxis
                         dataKey="date"
-                        style={{ fontSize: '10px' }}
-                        stroke={theme.palette.text.secondary}
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: theme.palette.text.secondary, fontSize: 10 }}
+                        dy={10}
                         tickFormatter={(value) => {
                             const date = new Date(value);
                             return isNaN(date.getTime()) ? value : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                         }}
                     />
                     <YAxis
-                        style={{ fontSize: '10px' }}
-                        stroke={theme.palette.text.secondary}
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: theme.palette.text.secondary, fontSize: 10 }}
                         tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
                     />
-                    <Tooltip
-                        cursor={{ fill: alpha(theme.palette.primary.main, 0.05) }}
-                        contentStyle={{
-                            borderRadius: '4px',
-                            backgroundColor: theme.palette.background.paper,
-                            border: `1px solid ${theme.palette.divider}`,
-                            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                            fontSize: '12px'
-                        }}
-                        itemStyle={{ color: theme.palette.primary.main, fontWeight: 'bold' }}
-                    />
-                    <Bar
-                        dataKey="amount"
-                        radius={[2, 2, 0, 0]}
-                    >
-                        {data.map((_entry, index) => {
-                            const colors = GET_CHART_COLORS(theme);
-                            return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} fillOpacity={0.9} />;
-                        })}
+                    <Tooltip content={<CustomTooltip formatter={(v) => `KES ${v.toLocaleString()}`} />} cursor={{ fill: alpha(theme.palette.primary.main, 0.05), radius: 4 }} />
+                    <Bar dataKey="amount" radius={[4, 4, 0, 0]} maxBarSize={40}>
+                        {data.map((_entry, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
                     </Bar>
                 </BarChart>
             </ResponsiveContainer>
@@ -132,72 +154,70 @@ export const CampaignProgressChart = ({ campaigns }: { campaigns: any[] }) => {
     const isMobile = deviceType === 'MOBILE';
 
     return (
-        <ChartCard title="CAMPAIGN GOALS">
-            <ResponsiveContainer width="100%" aspect={isMobile ? 1.5 : 2}>
-                <BarChart data={campaigns} margin={{ left: -20, right: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} vertical={false} />
-                    <XAxis
+        <ChartCard title="Campaign Goals">
+            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+                <BarChart data={campaigns} layout="vertical" margin={{ left: 0, right: 20, top: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} horizontal={false} />
+                    <XAxis type="number" hide />
+                    <YAxis
                         dataKey="name"
-                        style={{ fontSize: '10px' }}
-                        stroke={theme.palette.text.secondary}
+                        type="category"
+                        axisLine={false}
+                        tickLine={false}
+                        width={80}
+                        tick={{ fill: theme.palette.text.secondary, fontSize: 11, fontWeight: 500 }}
                         tickFormatter={(value) => value.length > 10 ? `${value.substring(0, 8)}...` : value}
                     />
-                    <YAxis
-                        style={{ fontSize: '10px' }}
-                        stroke={theme.palette.text.secondary}
-                    />
-                    <Tooltip
-                        contentStyle={{
-                            borderRadius: '12px',
-                            backgroundColor: theme.palette.background.paper,
-                            border: `1px solid ${theme.palette.divider}`,
-                            fontSize: '12px'
-                        }}
-                        itemStyle={{ color: theme.palette.secondary.main }}
-                    />
-                    <Bar dataKey="percentage" radius={[2, 2, 0, 0]} name="Progress %">
-                        {campaigns.map((_entry, index) => {
-                            const colors = GET_CHART_COLORS(theme);
-                            return <Cell key={`cell-${index}`} fill={colors[(index + 2) % colors.length]} />;
-                        })}
+                    <Tooltip content={<CustomTooltip formatter={(v) => `${v}%`} />} cursor={{ fill: 'transparent' }} />
+                    <Bar dataKey="percentage" radius={[0, 4, 4, 0]} barSize={12}>
+                        {campaigns.map((_entry, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[(index + 1) % CHART_COLORS.length]} />
+                        ))}
                     </Bar>
                 </BarChart>
             </ResponsiveContainer>
         </ChartCard>
     );
 };
-// Volunteer Hours Bar Chart
+
+// Volunteer Hours Area Chart
 export const VolunteerHoursChart = ({ data }: { data: any[] }) => {
     const theme = useTheme();
     const deviceType = useDeviceType();
     const isMobile = deviceType === 'MOBILE';
 
     return (
-        <ChartCard title="VOLUNTEER CONTRIBUTIONS">
-            <ResponsiveContainer width="100%" aspect={isMobile ? 1.5 : 2}>
-                <AreaChart data={data} margin={{ left: -20, right: 10, top: 10, bottom: 0 }}>
+        <ChartCard title="Volunteer Contributions">
+            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+                <AreaChart data={data} margin={{ left: -20, right: 0, top: 10, bottom: 0 }}>
                     <defs>
                         <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={theme.palette.info.main} stopOpacity={0.3} />
-                            <stop offset="95%" stopColor={theme.palette.info.main} stopOpacity={0} />
+                            <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.2} />
+                            <stop offset="95%" stopColor={theme.palette.primary.main} stopOpacity={0} />
                         </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} vertical={false} />
                     <XAxis
                         dataKey="date"
-                        style={{ fontSize: '10px' }}
-                        stroke={theme.palette.text.secondary}
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: theme.palette.text.secondary, fontSize: 10 }}
+                        dy={10}
                     />
-                    <YAxis style={{ fontSize: '10px' }} stroke={theme.palette.text.secondary} />
-                    <Tooltip
-                        contentStyle={{
-                            borderRadius: '12px',
-                            backgroundColor: theme.palette.background.paper,
-                            border: `1px solid ${theme.palette.divider}`,
-                            fontSize: '12px'
-                        }}
+                    <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: theme.palette.text.secondary, fontSize: 10 }}
                     />
-                    <Area type="monotone" dataKey="hours" stroke={theme.palette.info.main} fillOpacity={1} fill="url(#colorHours)" />
+                    <Tooltip content={<CustomTooltip formatter={(v) => `${v} hrs`} />} />
+                    <Area
+                        type="monotone"
+                        dataKey="hours"
+                        stroke={theme.palette.primary.main}
+                        strokeWidth={3}
+                        fillOpacity={1}
+                        fill="url(#colorHours)"
+                    />
                 </AreaChart>
             </ResponsiveContainer>
         </ChartCard>
@@ -206,30 +226,31 @@ export const VolunteerHoursChart = ({ data }: { data: any[] }) => {
 
 // Children Distribution Pie Chart
 export const ChildrenDistributionChart = ({ data }: { data: any[] }) => {
-    const theme = useTheme();
-    const deviceType = useDeviceType();
-    const isMobile = deviceType === 'MOBILE';
-    const COLORS = GET_CHART_COLORS(theme);
-
     return (
-        <ChartCard title="CHILDREN STATUS">
-            <ResponsiveContainer width="100%" aspect={isMobile ? 1.2 : 2}>
+        <ChartCard title="Child Demographics">
+            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
                 <PieChart>
                     <Pie
                         data={data}
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
+                        innerRadius="60%"
+                        outerRadius="85%"
+                        paddingAngle={4}
                         dataKey="value"
+                        cornerRadius={4}
                     >
                         {data.map((_entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="none" />
                         ))}
                     </Pie>
-                    <Tooltip />
-                    <Legend verticalAlign="bottom" align="center" iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend
+                        verticalAlign="bottom"
+                        iconType="circle"
+                        iconSize={8}
+                        wrapperStyle={{ fontSize: '11px', paddingTop: '16px', opacity: 0.8 }}
+                    />
                 </PieChart>
             </ResponsiveContainer>
         </ChartCard>
@@ -238,107 +259,109 @@ export const ChildrenDistributionChart = ({ data }: { data: any[] }) => {
 
 // Donation Methods Pie Chart
 export const DonationMethodsChart = ({ data }: { data: any[] }) => {
-    const theme = useTheme();
-    const deviceType = useDeviceType();
-    const isMobile = deviceType === 'MOBILE';
-    const COLORS = GET_CHART_COLORS(theme);
-
     return (
-        <ChartCard title="DONATION SOURCES">
-            <ResponsiveContainer width="100%" aspect={isMobile ? 1.2 : 2}>
+        <ChartCard title="Donation Sources">
+            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
                 <PieChart>
                     <Pie
                         data={data}
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
+                        innerRadius="60%"
+                        outerRadius="85%"
+                        paddingAngle={4}
                         dataKey="value"
+                        cornerRadius={4}
                     >
                         {data.map((_entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="none" />
                         ))}
                     </Pie>
-                    <Tooltip />
-                    <Legend verticalAlign="bottom" align="center" iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-                </PieChart>
-            </ResponsiveContainer>
-        </ChartCard>
-    );
-};
-
-// Fund Allocation breakdown (Impact Analytics)
-export const FundAllocationChart = ({ data, title, hideCard = false }: { data: any[], title?: string, hideCard?: boolean }) => {
-    const theme = useTheme();
-    const deviceType = useDeviceType();
-    const isMobile = deviceType === 'MOBILE';
-    const COLORS = GET_CHART_COLORS(theme);
-
-    return (
-        <ChartCard title={title || "IMPACT ALLOCATION"} hideCard={hideCard}>
-            <ResponsiveContainer width="100%" aspect={isMobile ? 1.5 : 2.5}>
-                <PieChart>
-                    <Pie
-                        data={data}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={45}
-                        outerRadius={65}
-                        paddingAngle={5}
-                        dataKey="value"
-                    >
-                        {data.map((_entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                    </Pie>
-                    <Tooltip
-                        contentStyle={{ borderRadius: '4px', border: 'none', boxShadow: theme.shadows[4] }}
-                        formatter={(value: any) => [`KES ${Number(value).toLocaleString()}`, 'Allocated']}
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend
+                        verticalAlign="bottom"
+                        iconType="circle"
+                        iconSize={8}
+                        wrapperStyle={{ fontSize: '11px', paddingTop: '16px', opacity: 0.8 }}
                     />
-                    <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '5px' }} />
                 </PieChart>
             </ResponsiveContainer>
         </ChartCard>
     );
 };
 
-// Shelter Capacity vs Occupancy Chart
+// Fund Allocation breakdown
+export const FundAllocationChart = ({ data, title, hideCard = false }: { data: any[], title?: string, hideCard?: boolean }) => {
+    return (
+        <ChartCard title={title || "Impact Allocation"} hideCard={hideCard}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+                <PieChart>
+                    <Pie
+                        data={data}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius="60%"
+                        outerRadius="85%"
+                        paddingAngle={4}
+                        dataKey="value"
+                        cornerRadius={4}
+                    >
+                        {data.map((_entry, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="none" />
+                        ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip formatter={(v) => `KES ${v.toLocaleString()}`} />} />
+                    <Legend
+                        verticalAlign="bottom"
+                        iconType="circle"
+                        iconSize={8}
+                        wrapperStyle={{ fontSize: '11px', paddingTop: '16px', opacity: 0.8 }}
+                    />
+                </PieChart>
+            </ResponsiveContainer>
+        </ChartCard>
+    );
+};
+
+// Shelter Capacity Chart
 export const ShelterCapacityChart = ({ shelters }: { shelters: any[] }) => {
     const theme = useTheme();
-    const deviceType = useDeviceType();
-    const isMobile = deviceType === 'MOBILE';
 
     return (
-        <ChartCard title="SHELTER CAPACITY">
-            <ResponsiveContainer width="100%" aspect={isMobile ? 1.5 : 2}>
-                <BarChart data={shelters} margin={{ left: -20, right: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} vertical={false} />
+        <ChartCard title="Shelter Occupancy">
+            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+                <BarChart data={shelters} margin={{ left: -20, right: 0, top: 0, bottom: 0 }} barGap={2}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} vertical={false} />
                     <XAxis
                         dataKey="name"
-                        style={{ fontSize: '10px' }}
-                        stroke={theme.palette.text.secondary}
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: theme.palette.text.secondary, fontSize: 10 }}
+                        dy={10}
                         tickFormatter={(v) => v.length > 8 ? `${v.substring(0, 6)}...` : v}
                     />
-                    <YAxis style={{ fontSize: '10px' }} stroke={theme.palette.text.secondary} />
-                    <Tooltip
-                        contentStyle={{
-                            borderRadius: '12px',
-                            backgroundColor: theme.palette.background.paper,
-                            border: `1px solid ${theme.palette.divider}`,
-                            fontSize: '12px'
-                        }}
+                    <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: theme.palette.text.secondary, fontSize: 10 }}
                     />
-                    <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px', paddingBottom: '10px' }} />
-                    <Bar dataKey="occupancy" name="Occupants" fill={theme.palette.primary.main} radius={[2, 2, 0, 0]} />
-                    <Bar dataKey="capacity" name="Total Capacity" fill={theme.palette.action.disabledBackground} radius={[2, 2, 0, 0]} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar dataKey="occupancy" name="Occupants" fill={theme.palette.primary.main} radius={[4, 4, 4, 4]} barSize={12} />
+                    <Bar dataKey="capacity" name="Capacity" fill={alpha(theme.palette.primary.main, 0.2)} radius={[4, 4, 4, 4]} barSize={12} />
+                    <Legend
+                        verticalAlign="top"
+                        align="right"
+                        iconType="circle"
+                        iconSize={8}
+                        wrapperStyle={{ fontSize: '11px', paddingBottom: '10px', opacity: 0.8 }}
+                    />
                 </BarChart>
             </ResponsiveContainer>
         </ChartCard>
     );
 };
 
-// Stat Card for quick metrics
+// Enhanced Stat Card
 interface StatCardProps {
     title: string;
     value: string | number;
@@ -351,11 +374,33 @@ export const StatCard = ({ title, value, subtitle, color }: StatCardProps) => {
     const displayColor = color || theme.palette.primary.main;
 
     return (
-        <Card>
-            <CardContent>
-                <Typography variant="body2" color="text.secondary" gutterBottom>{title}</Typography>
-                <Typography variant="h3" fontWeight="bold" sx={{ color: displayColor, my: 1 }}>{value}</Typography>
-                {subtitle && <Typography variant="caption" color="text.secondary">{subtitle}</Typography>}
+        <Card elevation={0} sx={{
+            height: '100%',
+            borderRadius: 3,
+            border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+            position: 'relative',
+            overflow: 'hidden'
+        }}>
+            <Box sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: 4,
+                height: '100%',
+                bgcolor: displayColor
+            }} />
+            <CardContent sx={{ p: 3 }}>
+                <Typography variant="caption" fontWeight="bold" sx={{ color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>
+                    {title}
+                </Typography>
+                <Typography variant="h3" fontWeight="800" sx={{ color: 'text.primary', my: 1, letterSpacing: -1 }}>
+                    {value}
+                </Typography>
+                {subtitle && (
+                    <Typography variant="body2" sx={{ color: alpha(theme.palette.text.secondary, 0.8), fontWeight: 500 }}>
+                        {subtitle}
+                    </Typography>
+                )}
             </CardContent>
         </Card>
     );

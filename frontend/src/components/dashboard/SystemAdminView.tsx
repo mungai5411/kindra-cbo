@@ -343,94 +343,176 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
 
     const renderUsers = () => (
         <Box>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ mb: 5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                 <Box>
-                    <Typography variant="h5" fontWeight="bold">Staff & Member Credentials</Typography>
-                    <Typography variant="body2" color="text.secondary">Manage system access, roles, and identity verification</Typography>
+                    <Typography variant="h5" fontWeight="800" sx={{ letterSpacing: -0.5 }}>User Infrastructure</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Kindra Intelligence & Management Protocol</Typography>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                     <TextField
                         size="small"
                         placeholder="Search by identity..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         InputProps={{
-                            startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment>,
-                            sx: { borderRadius: 1, width: 300, bgcolor: 'background.paper' }
+                            startAdornment: <InputAdornment position="start"><Search fontSize="small" sx={{ color: 'text.disabled' }} /></InputAdornment>,
+                            sx: {
+                                borderRadius: 10,
+                                width: { xs: '100%', sm: 300 },
+                                bgcolor: 'background.paper',
+                                border: 'none',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                                '& fieldset': { border: 'none' },
+                                pl: 1
+                            }
                         }}
                     />
-                    <Button variant="contained" startIcon={<Refresh />} onClick={() => dispatch(fetchUsers())} sx={{ borderRadius: 1 }}>Sync Directory</Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<Refresh />}
+                        onClick={() => dispatch(fetchUsers())}
+                        sx={{
+                            borderRadius: 10,
+                            boxShadow: 'none',
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            px: 3,
+                            bgcolor: 'primary.main',
+                            '&:hover': { bgcolor: 'primary.dark', boxShadow: 'none' }
+                        }}
+                    >
+                        Sync Directory
+                    </Button>
                 </Box>
             </Box>
 
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
                 {filteredUsers.map((u: any) => (
                     <Grid item xs={12} md={6} lg={4} key={u.id}>
                         <Paper
                             elevation={0}
                             sx={{
-                                p: 3, borderRadius: 2, border: '1px solid',
-                                borderColor: 'divider', bgcolor: alpha('#fff', 0.8),
-                                backdropFilter: 'blur(10px)',
-                                transition: 'transform 0.2s, box-shadow 0.2s',
+                                p: 0,
+                                borderRadius: 4,
+                                border: '1px solid',
+                                borderColor: alpha(theme.palette.divider, 0.1),
+                                overflow: 'hidden',
+                                transition: 'all 0.2s ease-in-out',
                                 '&:hover': {
-                                    transform: 'translateY(-4px)',
-                                    boxShadow: '0 12px 24px rgba(0,0,0,0.05)',
-                                    borderColor: 'primary.main'
+                                    borderColor: alpha(theme.palette.primary.main, 0.3),
+                                    boxShadow: '0 12px 32px rgba(0,0,0,0.05)',
+                                    transform: 'translateY(-2px)'
                                 }
                             }}
                         >
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <Box sx={{ display: 'flex', gap: 2 }}>
-                                    <Box sx={{
-                                        width: 50, height: 50, borderRadius: 1.5,
-                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                        color: 'primary.main', display: 'flex',
-                                        alignItems: 'center', justifyContent: 'center',
-                                        fontWeight: '900', fontSize: '1.4rem'
-                                    }}>
-                                        {(u.full_name || u.email)?.[0].toUpperCase()}
-                                    </Box>
-                                    <Box>
-                                        <Typography variant="subtitle1" fontWeight="800" sx={{ lineHeight: 1.2 }}>{u.full_name || 'Anonymous User'}</Typography>
-                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>{u.email}</Typography>
-                                        <Chip
-                                            label={u.role || 'GUEST'}
-                                            size="small"
-                                            sx={{
-                                                borderRadius: 0.5, fontWeight: '900',
-                                                fontSize: '0.6rem', height: 20,
-                                                bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                                color: 'primary.main'
-                                            }}
-                                        />
-                                    </Box>
+                            <Box sx={{ p: 3, display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                                <Box sx={{
+                                    width: 56, height: 56, borderRadius: 3,
+                                    bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                    color: 'primary.main', display: 'flex',
+                                    alignItems: 'center', justifyContent: 'center',
+                                    fontWeight: '800', fontSize: '1.5rem',
+                                    flexShrink: 0
+                                }}>
+                                    {(u.full_name || u.email)?.[0]?.toUpperCase()}
                                 </Box>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                    <IconButton size="small" onClick={() => handleEditUser(u)} sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}><Edit fontSize="small" /></IconButton>
-                                    <IconButton size="small" onClick={() => handleDeleteUser(u)} sx={{ color: 'text.secondary', '&:hover': { color: 'error.main' } }}><Delete fontSize="small" /></IconButton>
+                                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <Box sx={{ pr: 1 }}>
+                                            <Typography variant="subtitle1" fontWeight="800" sx={{ lineHeight: 1.2, mb: 0.5 }}>
+                                                {u.full_name || 'Anonymous User'}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" noWrap sx={{ fontSize: '0.8rem', mb: 1 }}>
+                                                {u.email}
+                                            </Typography>
+                                            <Chip
+                                                label={u.role || 'GUEST'}
+                                                size="small"
+                                                sx={{
+                                                    borderRadius: 1,
+                                                    fontWeight: '700',
+                                                    fontSize: '0.65rem',
+                                                    height: 22,
+                                                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                                                    color: 'primary.main',
+                                                    border: 'none'
+                                                }}
+                                            />
+                                        </Box>
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                            <IconButton size="small" onClick={() => handleEditUser(u)} sx={{ opacity: 0.6, '&:hover': { opacity: 1, color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.1) } }}>
+                                                <Edit fontSize="small" />
+                                            </IconButton>
+                                            <IconButton size="small" onClick={() => handleDeleteUser(u)} sx={{ opacity: 0.6, '&:hover': { opacity: 1, color: 'error.main', bgcolor: alpha(theme.palette.error.main, 0.1) } }}>
+                                                <Delete fontSize="small" />
+                                            </IconButton>
+                                        </Box>
+                                    </Box>
                                 </Box>
                             </Box>
 
-                            <Box sx={{ p: 1.5, bgcolor: alpha(theme.palette.background.default, 0.4), borderRadius: 1, mb: 2 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                    <Typography variant="caption" fontWeight="bold" sx={{ opacity: 0.6 }}>STATUS</Typography>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: u.is_active ? 'success.main' : 'error.main' }} />
-                                        <Typography variant="caption" fontWeight="bold">{u.is_active ? 'VERIFIED' : 'SUSPENDED'}</Typography>
+                            <Box sx={{
+                                px: 3, pb: 3, pt: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                borderTop: '1px dashed',
+                                borderColor: alpha(theme.palette.divider, 0.1),
+                                mt: 1,
+                                paddingTop: 2
+                            }}>
+                                <Box>
+                                    <Typography variant="caption" color="text.disabled" fontWeight="bold" sx={{ display: 'block', letterSpacing: 0.5, mb: 0.5 }}>STATUS</Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: u.is_active ? 'success.main' : 'error.main', boxShadow: u.is_active ? '0 0 0 2px rgba(16, 185, 129, 0.2)' : 'none' }} />
+                                        <Typography variant="caption" fontWeight="bold" color="text.primary">{u.is_active ? 'VERIFIED' : 'SUSPENDED'}</Typography>
                                     </Box>
                                 </Box>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <Typography variant="caption" fontWeight="bold" sx={{ opacity: 0.6 }}>JOINED</Typography>
-                                    <Typography variant="caption" fontWeight="bold">
-                                        {u.date_joined ? new Date(u.date_joined).toLocaleDateString() : 'N/A'}
+                                <Box sx={{ textAlign: 'right' }}>
+                                    <Typography variant="caption" color="text.disabled" fontWeight="bold" sx={{ display: 'block', letterSpacing: 0.5, mb: 0.5 }}>JOINED</Typography>
+                                    <Typography variant="caption" fontWeight="bold" color="text.primary">
+                                        {u.date_joined ? new Date(u.date_joined).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : 'N/A'}
                                     </Typography>
                                 </Box>
                             </Box>
 
-                            <Box sx={{ display: 'flex', gap: 1 }}>
-                                <Button fullWidth size="small" variant="outlined" sx={{ borderRadius: 1, fontSize: '0.7rem', fontWeight: 'bold' }}>Activity logs</Button>
-                                <Button fullWidth size="small" variant="outlined" sx={{ borderRadius: 1, fontSize: '0.7rem', fontWeight: 'bold' }}>Security info</Button>
+                            <Box sx={{ p: 1.5, bgcolor: alpha(theme.palette.background.default, 0.5), display: 'flex', gap: 1 }}>
+                                <Button
+                                    fullWidth
+                                    size="small"
+                                    onClick={() => { setSnackbar({ open: true, message: 'Fetching activity logs...', severity: 'info' }) }}
+                                    sx={{
+                                        borderRadius: 2,
+                                        color: 'text.secondary',
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        fontSize: '0.75rem',
+                                        bgcolor: 'background.paper',
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                        '&:hover': { borderColor: 'primary.main', color: 'primary.main', bgcolor: 'background.paper' }
+                                    }}
+                                >
+                                    Activity logs
+                                </Button>
+                                <Button
+                                    fullWidth
+                                    size="small"
+                                    onClick={() => { setSnackbar({ open: true, message: 'Checking security protocols...', severity: 'info' }) }}
+                                    sx={{
+                                        borderRadius: 2,
+                                        color: 'text.secondary',
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        fontSize: '0.75rem',
+                                        bgcolor: 'background.paper',
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                        '&:hover': { borderColor: 'primary.main', color: 'primary.main', bgcolor: 'background.paper' }
+                                    }}
+                                >
+                                    Security info
+                                </Button>
                             </Box>
                         </Paper>
                     </Grid>
