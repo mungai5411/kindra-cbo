@@ -28,19 +28,22 @@ class ReportService:
     def generate_report_file(report):
         """
         Main entry point to generate the physical file for a report object
+        Returns the generated content to avoid re-reading from storage
         """
         try:
+            content = None
             if report.format == 'PDF':
-                ReportService._generate_pdf(report)
+                content = ReportService._generate_pdf(report)
             elif report.format == 'EXCEL':
-                ReportService._generate_excel(report)
+                content = ReportService._generate_excel(report)
             else:
                 # Default to CSV if not PDF/Excel
-                ReportService._generate_csv(report)
+                content = ReportService._generate_csv(report)
             
             report.status = 'COMPLETED'
             report.save()
             logger.info(f"Successfully generated {report.format} for report {report.id}")
+            return content
         except Exception as e:
             logger.error(f"Error generating report {report.id}: {str(e)}")
             report.status = 'FAILED'
@@ -81,9 +84,10 @@ class ReportService:
                     v.status, v.total_hours, v.created_at.strftime('%Y-%m-%d')
                 ])
         
-        content = output.getvalue()
+        content = output.getvalue().encode('utf-8')
         filename = f"report_{report.report_type.lower()}_{report.id.hex[:8]}.csv"
-        report.file.save(filename, ContentFile(content.encode('utf-8')))
+        report.file.save(filename, ContentFile(content))
+        return content
 
     @staticmethod
     def _generate_excel(report):
@@ -136,8 +140,10 @@ class ReportService:
         buffer = io.BytesIO()
         wb.save(buffer)
         buffer.seek(0)
+        content = buffer.read()
         filename = f"report_{report.report_type.lower()}_{report.id.hex[:8]}.xlsx"
-        report.file.save(filename, ContentFile(buffer.read()))
+        report.file.save(filename, ContentFile(content))
+        return content
 
     @staticmethod
     def _generate_pdf(report):
@@ -201,5 +207,7 @@ class ReportService:
 
         doc.build(elements)
         buffer.seek(0)
+        content = buffer.read()
         filename = f"report_{report.report_type.lower()}_{report.id.hex[:8]}.pdf"
-        report.file.save(filename, ContentFile(buffer.read()))
+        report.file.save(filename, ContentFile(content))
+        return content

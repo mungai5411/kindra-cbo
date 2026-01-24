@@ -243,9 +243,10 @@ class ReceiptService:
                 
             buffer.seek(0)
             filename = f"receipt_{receipt.receipt_number}.pdf"
-            receipt.receipt_file.save(filename, ContentFile(buffer.read()), save=True)
+            content = buffer.read()
+            receipt.receipt_file.save(filename, ContentFile(content), save=True)
             logger.info(f"Generated PDF file for receipt {receipt.receipt_number} using template")
-            return receipt
+            return content
             
         except Exception as e:
             logger.error(f"Error generating PDF receipt with template: {str(e)}. Falling back to ReportLab.")
@@ -311,9 +312,10 @@ class ReceiptService:
                 
                 buffer.seek(0)
                 filename = f"receipt_{receipt.receipt_number}.pdf"
-                receipt.receipt_file.save(filename, ContentFile(buffer.read()), save=True)
+                content = buffer.read()
+                receipt.receipt_file.save(filename, ContentFile(content), save=True)
                 logger.info(f"Generated PDF file for receipt {receipt.receipt_number} using fallback")
-                return receipt
+                return content
             except Exception as e2:
                 logger.error(f"Critical error generating receipt (fallback failed): {str(e2)}")
                 return None

@@ -144,14 +144,16 @@ class ReportListCreateView(generics.ListCreateAPIView):
             )
             
             try:
-                # Generate the file
-                ReportService.generate_report_file(report)
+                # Generate the file and get content directly
+                file_content = ReportService.generate_report_file(report)
                 
-                # Re-fetch to get the file path
-                report.refresh_from_db()
+                # Fallback: if service didn't return content (legacy), try reading from storage
+                if not file_content:
+                    report.refresh_from_db()
+                    if report.file:
+                        file_content = report.file.read()
                 
-                if report.file:
-                    file_content = report.file.read()
+                if file_content:
                     content_type = {
                         'PDF': 'application/pdf',
                         'EXCEL': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -159,11 +161,11 @@ class ReportListCreateView(generics.ListCreateAPIView):
                     }.get(report_format, 'text/csv')
                     
                     response = HttpResponse(file_content, content_type=content_type)
-                    filename = report.file.name.split('/')[-1]
+                    filename = f"report_{report_type.lower()}.{report_format.lower()}"
+                    if report.file:
+                        filename = report.file.name.split('/')[-1]
+                        
                     response['Content-Disposition'] = f'attachment; filename="{filename}"'
-                    
-                    # Clean up the report record after sending if desired, 
-                    # but keeping it provides an audit trail.
                     return response
                 else:
                     return Response({'error': 'Failed to generate report file'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
