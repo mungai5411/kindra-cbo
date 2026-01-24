@@ -86,7 +86,7 @@ export default function DashboardPage() {
     };
 
     const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({
-        blog_campaigns: true,
+        blog_campaigns: false,
         case_management: false,
         donations: false,
         volunteers: false,
