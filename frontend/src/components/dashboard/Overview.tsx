@@ -1,4 +1,4 @@
-import { Box, Typography, CircularProgress, useTheme, alpha } from '@mui/material';
+import { Box, Typography, CircularProgress, useTheme } from '@mui/material';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -22,14 +22,13 @@ interface OverviewProps {
 }
 
 export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps) => {
-    const theme = useTheme();
     const { user } = useSelector((state: RootState) => state.auth);
     const { dashboardData, isLoading: dashboardLoading } = useSelector((state: RootState) => state.reporting);
 
     // Keep individual slices for specific lists if needed, but rely on dashboardData for stats
     const { volunteers, tasks, events } = useSelector((state: RootState) => state.volunteers);
     const { campaigns, donations: donationRecords } = useSelector((state: RootState) => state.donations);
-    const { cases, children } = useSelector((state: RootState) => state.cases);
+    const { cases, children } = useSelector((state: RootState) => state.caseManagement);
     const { shelters, incidents } = useSelector((state: RootState) => state.shelters);
 
     const isLoading = dashboardLoading;
