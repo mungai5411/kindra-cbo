@@ -160,7 +160,7 @@ export const CommentSection = ({ postSlug, postId }: CommentSectionProps) => {
                                             {comment.name}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                            {new Date(comment.createdAt).toLocaleDateString()}
+                                            {new Date(comment.created_at).toLocaleDateString()}
                                         </Typography>
                                     </Box>
                                     <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary' }}>

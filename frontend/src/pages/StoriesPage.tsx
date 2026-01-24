@@ -78,7 +78,7 @@ export default function StoriesPage() {
     const allActiveCampaigns = campaigns.filter((campaign: any) => campaign.status === 'ACTIVE');
 
     // Extract categories
-    const storyCategories = ['All', ...Array.from(new Set(allPublishedStories.map((p: any) => p.category?.name || 'Uncategorized')))];
+    const storyCategories = ['All', ...Array.from(new Set(allPublishedStories.map((p: any) => p.category_name || p.category?.name || 'Uncategorized')))];
     const campaignCategories = ['All', ...Array.from(new Set(allActiveCampaigns.map((c: any) => c.category?.replace('_', ' ') || 'Uncategorized')))];
 
     // Apply category filter

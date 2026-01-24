@@ -103,7 +103,7 @@ export default function BlogPostPage() {
             }}>
                 <Box
                     component="img"
-                    src={currentPost.featuredImage || "https://source.unsplash.com/random/1600x900?charity"}
+                    src={currentPost.featured_image || "https://source.unsplash.com/random/1600x900?charity"}
                     alt={currentPost.title}
                     sx={{
                         width: '100%',
@@ -132,7 +132,7 @@ export default function BlogPostPage() {
                         </Button>
                         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
                             <Chip
-                                label={currentPost.categoryName || 'Update'}
+                                label={currentPost.category_name || 'Update'}
                                 sx={{ bgcolor: theme.palette.primary.main, color: 'white', fontWeight: 'bold', mb: 2 }}
                             />
                             <Typography variant="h2" fontWeight="900" sx={{
@@ -148,16 +148,16 @@ export default function BlogPostPage() {
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '1rem' }}>
-                                        {currentPost.authorName?.[0] || <Person />}
+                                        {currentPost.author_name?.[0] || <Person />}
                                     </Avatar>
                                     <Typography variant="subtitle1" fontWeight="medium">
-                                        {currentPost.authorName || 'Anonymous'}
+                                        {currentPost.author_name || 'Anonymous'}
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, opacity: 0.8 }}>
                                     <CalendarToday sx={{ fontSize: 18 }} />
                                     <Typography variant="body2">
-                                        {new Date(currentPost.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                                        {new Date(currentPost.published_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, opacity: 0.8 }}>
@@ -213,9 +213,9 @@ export default function BlogPostPage() {
                     {/* Likes & Share Interactions */}
                     <PostInteractions
                         slug={currentPost.slug}
-                        likesCount={currentPost.likesCount || 0}
-                        hasLiked={!!currentPost.hasLiked}
-                        commentCount={currentPost.commentCount || 0}
+                        likesCount={currentPost.likes_count || 0}
+                        hasLiked={!!currentPost.has_liked}
+                        commentCount={currentPost.comment_count || 0}
                         onCommentClick={scrollToComments}
                     />
 

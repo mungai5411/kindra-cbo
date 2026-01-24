@@ -11,25 +11,26 @@ interface BlogPost {
     slug: string;
     excerpt: string;
     content: string;
-    featuredImage: string;
+    featured_image: string;
     category: any;
-    categoryName?: string;
+    category_name?: string;
     tags: any[];
     author: any;
-    authorName?: string;
-    publishedAt: string;
-    viewCount: number;
+    author_name?: string;
+    published_at: string;
+    view_count: number;
     status: string;
-    likesCount?: number;
-    hasLiked?: boolean;
-    commentCount?: number;
+    likes_count?: number;
+    has_liked?: boolean;
+    comment_count?: number;
+    is_featured: boolean;
 }
 
 interface BlogComment {
     id: string;
     name: string;
     content: string;
-    createdAt: string;
+    created_at: string;
     status: string;
 }
 
