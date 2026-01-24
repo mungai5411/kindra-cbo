@@ -137,6 +137,17 @@ class EventSerializer(serializers.ModelSerializer):
         return obj.registered_volunteers.count()
 
 
+class EventRegistrationSerializer(serializers.Serializer):
+    """Serializer for registering/unregistering for an event"""
+    action = serializers.ChoiceField(choices=['register', 'unregister'])
+
+    def validate(self, data):
+        user = self.context['request'].user
+        if not hasattr(user, 'volunteer_profile'):
+            raise serializers.ValidationError("Only volunteers can register for events.")
+        return data
+
+
 class TimeLogSerializer(serializers.ModelSerializer):
     volunteer_name = serializers.CharField(source='volunteer.full_name', read_only=True)
     task_title = serializers.CharField(source='task.title', read_only=True)

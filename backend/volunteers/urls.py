@@ -6,7 +6,7 @@ from django.urls import path
 from .views import (
     VolunteerListCreateView, VolunteerDetailView,
     TaskListCreateView, TaskDetailView,
-    EventListCreateView, EventDetailView,
+    EventListCreateView, EventDetailView, EventRegisterView, EventParticipantsView,
     TimeLogListCreateView, TimeLogDetailView, TimeLogApprovalView,
     TrainingListCreateView, TrainingDetailView,
     TrainingCompletionListCreateView, TrainingCompletionDetailView,
@@ -28,8 +28,9 @@ urlpatterns = [
     path('tasks/applications/<uuid:pk>/', TaskApplicationDetailView.as_view(), name='task-application-detail'),
     
     # Events
-    path('events/', EventListCreateView.as_view(), name='event-list'),
     path('events/<uuid:pk>/', EventDetailView.as_view(), name='event-detail'),
+    path('events/<uuid:pk>/register/', EventRegisterView.as_view(), name='event-register'),
+    path('events/<uuid:pk>/participants/', EventParticipantsView.as_view(), name='event-participants'),
     
     # Time Logs
     path('timelogs/', TimeLogListCreateView.as_view(), name='timelog-list'),

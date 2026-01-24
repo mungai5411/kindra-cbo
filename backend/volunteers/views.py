@@ -14,7 +14,7 @@ from .serializers import (
     VolunteerSerializer, TaskSerializer, EventSerializer,
     TimeLogSerializer, TimeLogApprovalSerializer,
     TrainingSerializer, TrainingCompletionSerializer, TaskApplicationSerializer,
-    VolunteerGroupSerializer, GroupMessageSerializer
+    VolunteerGroupSerializer, GroupMessageSerializer, EventRegistrationSerializer
 )
 
 
@@ -160,6 +160,48 @@ class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class EventRegisterView(generics.GenericAPIView):
+    """
+    Register or unregister from an event
+    """
+    queryset = Event.objects.all()
+    serializer_class = EventRegistrationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        event = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        volunteer = request.user.volunteer_profile
+        action = serializer.validated_data['action']
+        
+        if action == 'register':
+            if event.is_full:
+                return Response({"detail": "Event is full."}, status=status.HTTP_400_BAD_REQUEST)
+            event.registered_volunteers.add(volunteer)
+            return Response({"detail": "Successfully registered for event."}, status=status.HTTP_200_OK)
+        else:
+            event.registered_volunteers.remove(volunteer)
+            return Response({"detail": "Successfully unregistered from event."}, status=status.HTTP_200_OK)
+
+
+class EventParticipantsView(generics.ListAPIView):
+    """
+    List participants for an event (Admin/Management only)
+    """
+    serializer_class = VolunteerSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
+
+    def get_queryset(self):
+        event_id = self.kwargs.get('pk')
+        try:
+            event = Event.objects.get(id=event_id)
+            return event.registered_volunteers.all()
+        except Event.DoesNotExist:
+            return Volunteer.objects.none()
 
 
 class TimeLogListCreateView(generics.ListCreateAPIView):
