@@ -26,7 +26,9 @@ import {
     alpha,
     Tooltip,
     Avatar,
-    Stack
+    Stack,
+    FormControlLabel,
+    Switch
 } from '@mui/material';
 import {
     PermMedia,
@@ -42,7 +44,8 @@ import {
     PersonAdd,
     LinkedIn,
     Twitter,
-    Save
+    Save,
+    VisibilityOff
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { SubTabView } from './SubTabView';
@@ -364,10 +367,16 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                             alignItems: 'center'
                         }}>
                             <Avatar
-                                src={member.image}
-                                sx={{ width: 100, height: 100, mb: 2, border: `4px solid ${alpha(theme.palette.secondary.main, 0.2)}` }}
+                                sx={{ width: 100, height: 100, mb: 2, border: `4px solid ${alpha(theme.palette.secondary.main, 0.2)}`, opacity: member.is_active ? 1 : 0.5 }}
                             />
-                            <Typography variant="h6" fontWeight="bold">{member.name}</Typography>
+                            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                                <Typography variant="h6" fontWeight="bold">{member.name}</Typography>
+                                {!member.is_active && (
+                                    <Tooltip title="Hidden from public side">
+                                        <Chip label="Hidden" size="small" color="warning" variant="outlined" sx={{ height: 20, fontSize: '0.65rem' }} />
+                                    </Tooltip>
+                                )}
+                            </Stack>
                             <Typography variant="body2" color="secondary" fontWeight="700" sx={{ mb: 2 }}>{member.role}</Typography>
                             <Typography variant="caption" color="text.secondary" sx={{
                                 mb: 3,
@@ -477,7 +486,12 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                                     <Chip label={content.section} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }} />
                                     <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>key: {content.key}</Typography>
                                 </Stack>
-                                <Typography variant="h6" fontWeight="bold">{content.title || 'Untitled Block'}</Typography>
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    <Typography variant="h6" fontWeight="bold">{content.title || 'Untitled Block'}</Typography>
+                                    {!content.is_active && (
+                                        <Chip label="Hidden" size="small" color="warning" variant="outlined" sx={{ height: 20, fontSize: '0.65rem' }} />
+                                    )}
+                                </Stack>
                                 {content.value && (
                                     <Typography variant="h4" color="primary" fontWeight="900">{content.value}</Typography>
                                 )}
@@ -611,6 +625,16 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                                 onChange={(e) => setContentForm({ ...contentForm, value: e.target.value })}
                                 placeholder="e.g. 50+ or 10,000"
                                 size="small"
+                                sx={{ mb: 2 }}
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={contentForm.is_active}
+                                        onChange={(e) => setContentForm({ ...contentForm, is_active: e.target.checked })}
+                                    />
+                                }
+                                label="Published (Publicly Visible)"
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -693,6 +717,15 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                                     onChange={(e) => setTeamForm({ ...teamForm, twitter: e.target.value })}
                                     size="small"
                                     InputProps={{ startAdornment: <Twitter sx={{ mr: 1, color: 'text.disabled' }} /> }}
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={teamForm.is_active}
+                                            onChange={(e) => setTeamForm({ ...teamForm, is_active: e.target.checked })}
+                                        />
+                                    }
+                                    label="Active Visionary (Show on About Page)"
                                 />
                             </Stack>
                         </Grid>

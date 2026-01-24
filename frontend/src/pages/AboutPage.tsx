@@ -43,7 +43,7 @@ export default function AboutPage() {
         const loadAll = async () => {
             try {
                 const [teamRes, contentRes] = await Promise.all([
-                    apiClient.get('/blog/team/'),
+                    apiClient.get('/blog/team/?is_active=true'),
                     apiClient.get('/blog/content/?is_active=true')
                 ]);
 

@@ -416,7 +416,8 @@ class TeamMemberViewSet(viewsets.ModelViewSet):
     queryset = TeamMember.objects.all()
     serializer_class = TeamMemberSerializer
     permission_classes = [IsStaffOrReadOnly]
-    filter_backends = [OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['is_active']
     ordering_fields = ['order', 'name']
     ordering = ['order']
 
