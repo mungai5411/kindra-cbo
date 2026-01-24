@@ -56,10 +56,10 @@ export default function AboutPage() {
         <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', overflow: 'hidden' }}>
             <Navbar />
 
-            {/* Premium Hero Section */}
+            {/* Premium Hero Section - Squeezed */}
             <Box sx={{
                 position: 'relative',
-                height: { xs: '70vh', md: '85vh' },
+                height: { xs: '45vh', md: '55vh' },
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -93,18 +93,18 @@ export default function AboutPage() {
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
                     <AnimatePresence>
                         <MotionBox
-                            initial={{ opacity: 0, y: 40 }}
+                            initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 1, ease: "easeOut" }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
                         >
                             <Typography
                                 variant="overline"
                                 sx={{
                                     fontWeight: 900,
-                                    letterSpacing: 6,
+                                    letterSpacing: 4,
                                     color: 'primary.main',
                                     display: 'block',
-                                    mb: 2,
+                                    mb: 1,
                                     textShadow: '0 2px 4px rgba(0,0,0,0.1)'
                                 }}
                             >
@@ -114,21 +114,21 @@ export default function AboutPage() {
                                 variant="h1"
                                 sx={{
                                     ...gradientText(glassColors.primaryGradient),
-                                    fontSize: { xs: '3.5rem', md: '6rem' },
-                                    mb: 3,
-                                    lineHeight: 1
+                                    fontSize: { xs: '2.5rem', md: '4rem' },
+                                    mb: 2,
+                                    lineHeight: 1.1
                                 }}
                             >
                                 Driven by <br /> Compassion.
                             </MotionTypography>
                             <Typography
-                                variant="h5"
+                                variant="h6"
                                 sx={{
-                                    maxWidth: 800,
+                                    maxWidth: 700,
                                     mx: 'auto',
                                     color: 'text.secondary',
                                     fontWeight: 500,
-                                    lineHeight: 1.6,
+                                    lineHeight: 1.5,
                                     px: 2
                                 }}
                             >
@@ -137,12 +137,10 @@ export default function AboutPage() {
                         </MotionBox>
                     </AnimatePresence>
                 </Container>
-
-                {/* Decorative Scroll indicator icon could go here */}
             </Box>
 
-            {/* Core Pillars Section */}
-            <Container maxWidth="lg" sx={{ py: { xs: 8, md: 15 }, mt: { xs: -8, md: -15 }, position: 'relative', zIndex: 2 }}>
+            {/* Core Pillars Section - Squeezed */}
+            <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 }, mt: { xs: -4, md: -6 }, position: 'relative', zIndex: 2 }}>
                 <Grid container spacing={3}>
                     {[
                         { title: "Our Mission", icon: <VolunteerActivism />, text: "To empower vulnerable communities through sustainable social, health, and economic support systems.", color: theme.palette.primary.main, delay: 0 },
@@ -151,16 +149,16 @@ export default function AboutPage() {
                     ].map((item, index) => (
                         <Grid item xs={12} md={4} key={index}>
                             <MotionBox
-                                initial={{ opacity: 0, y: 30 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: item.delay, duration: 0.6 }}
+                                transition={{ delay: item.delay, duration: 0.5 }}
                             >
                                 <Paper sx={{
                                     ...glassCard(theme, 'elevated'),
                                     height: '100%',
-                                    p: { xs: 4, md: 5 },
-                                    borderRadius: 8,
+                                    p: { xs: 3, md: 4 },
+                                    borderRadius: 6,
                                     textAlign: 'center',
                                     display: 'flex',
                                     flexDirection: 'column',
@@ -168,23 +166,23 @@ export default function AboutPage() {
                                     borderColor: alpha(item.color, 0.2),
                                     '&:hover': {
                                         borderColor: item.color,
-                                        transform: 'translateY(-12px)',
+                                        transform: 'translateY(-8px)',
                                     }
                                 }}>
                                     <Avatar sx={{
                                         bgcolor: alpha(item.color, 0.1),
                                         color: item.color,
-                                        width: 80,
-                                        height: 80,
-                                        mb: 4,
-                                        boxShadow: `0 8px 16px ${alpha(item.color, 0.2)}`
+                                        width: 60,
+                                        height: 60,
+                                        mb: 2,
+                                        boxShadow: `0 6px 12px ${alpha(item.color, 0.15)}`
                                     }}>
                                         {item.icon}
                                     </Avatar>
-                                    <Typography variant="h3" fontWeight="900" gutterBottom sx={{ fontSize: '1.75rem', letterSpacing: -1 }}>
+                                    <Typography variant="h5" fontWeight="900" gutterBottom sx={{ letterSpacing: -0.5 }}>
                                         {item.title}
                                     </Typography>
-                                    <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8, fontSize: '1rem' }}>
+                                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
                                         {item.text}
                                     </Typography>
                                 </Paper>
@@ -194,33 +192,33 @@ export default function AboutPage() {
                 </Grid>
             </Container>
 
-            {/* Split Story Section */}
-            <Box sx={{ py: { xs: 10, md: 20 }, position: 'relative', overflow: 'hidden' }}>
+            {/* Split Story Section - Squeezed */}
+            <Box sx={{ py: { xs: 4, md: 8 }, position: 'relative', overflow: 'hidden' }}>
                 <Container maxWidth="lg">
-                    <Grid container spacing={8} alignItems="center">
+                    <Grid container spacing={6} alignItems="center">
                         <Grid item xs={12} md={6}>
                             <MotionBox
-                                initial={{ opacity: 0, x: -50 }}
+                                initial={{ opacity: 0, x: -30 }}
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.8 }}
+                                transition={{ duration: 0.6 }}
                             >
-                                <Typography variant="overline" color="primary" sx={{ fontWeight: 900, letterSpacing: 4 }}>THE GENESIS</Typography>
-                                <Typography variant="h2" fontWeight="900" sx={{ mb: 4, letterSpacing: -2 }}>The Kindra Story</Typography>
-                                <Typography variant="body1" paragraph color="text.secondary" sx={{ fontSize: '1.2rem', lineHeight: 2 }}>
+                                <Typography variant="overline" color="primary" sx={{ fontWeight: 900, letterSpacing: 2 }}>THE GENESIS</Typography>
+                                <Typography variant="h3" fontWeight="900" sx={{ mb: 2, letterSpacing: -1 }}>The Kindra Story</Typography>
+                                <Typography variant="body2" paragraph color="text.secondary" sx={{ fontSize: '1rem', lineHeight: 1.8 }}>
                                     Founded in 2025, Kindra CBO began as a small group of neighbors in Nairobi concerned about the increasing number of vulnerable children in their community.
                                 </Typography>
-                                <Typography variant="body1" paragraph color="text.secondary" sx={{ fontSize: '1.2rem', lineHeight: 2 }}>
+                                <Typography variant="body2" paragraph color="text.secondary" sx={{ fontSize: '1rem', lineHeight: 1.8 }}>
                                     What started as a simple weekly food drive quickly evolved into a comprehensive digital support network, bridging the gap between resources and those who need them most. Today, we stand as a beacon of transparency and a catalyst for change.
                                 </Typography>
-                                <Stack direction="row" spacing={3} sx={{ mt: 5 }}>
+                                <Stack direction="row" spacing={3} sx={{ mt: 3 }}>
                                     <Box>
-                                        <Typography variant="h3" color="primary" fontWeight="900">50+</Typography>
+                                        <Typography variant="h4" color="primary" fontWeight="900">50+</Typography>
                                         <Typography variant="caption" color="text.secondary" fontWeight="700">PARTNER SCHOOLS</Typography>
                                     </Box>
                                     <Divider orientation="vertical" flexItem />
                                     <Box>
-                                        <Typography variant="h3" color="secondary" fontWeight="900">10k+</Typography>
+                                        <Typography variant="h4" color="secondary" fontWeight="900">10k+</Typography>
                                         <Typography variant="caption" color="text.secondary" fontWeight="700">LIVES IMPACTED</Typography>
                                     </Box>
                                 </Stack>
@@ -228,50 +226,49 @@ export default function AboutPage() {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <MotionBox
-                                initial={{ opacity: 0, scale: 0.8 }}
+                                initial={{ opacity: 0, scale: 0.9 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.8 }}
+                                transition={{ duration: 0.6 }}
                                 sx={{ position: 'relative' }}
                             >
                                 <Box sx={{
                                     position: 'absolute',
-                                    top: -20,
-                                    right: -20,
-                                    bottom: -20,
-                                    left: -20,
+                                    top: -10,
+                                    right: -10,
+                                    bottom: -10,
+                                    left: -10,
                                     background: glassColors.secondaryGradient,
-                                    borderRadius: 10,
-                                    filter: 'blur(60px)',
+                                    borderRadius: 8,
+                                    filter: 'blur(40px)',
                                     opacity: 0.1,
                                     zIndex: 0
                                 }} />
                                 <Card sx={{
-                                    borderRadius: 10,
+                                    borderRadius: 6,
                                     overflow: 'hidden',
-                                    boxShadow: '0 40px 80px rgba(0,0,0,0.12)',
+                                    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
                                     zIndex: 1,
                                     position: 'relative'
                                 }}>
                                     <Box
                                         component="img"
                                         src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&q=80&w=2070"
-                                        sx={{ width: '100%', height: 500, objectFit: 'cover' }}
+                                        sx={{ width: '100%', height: 350, objectFit: 'cover' }}
                                     />
                                     <Box sx={{
                                         position: 'absolute',
-                                        bottom: 30,
-                                        left: 30,
-                                        right: 30,
-                                        p: 3,
+                                        bottom: 20,
+                                        left: 20,
+                                        right: 20,
+                                        p: 2,
                                         ...glassCard(theme),
-                                        borderRadius: 4,
+                                        borderRadius: 3,
                                         color: 'text.primary'
                                     }}>
-                                        <Typography variant="subtitle1" fontWeight="900" display="flex" alignItems="center" gap={1}>
-                                            <Favorite color="error" fontSize="small" /> Community-Driven Impact
+                                        <Typography variant="subtitle2" fontWeight="900" display="flex" alignItems="center" gap={1}>
+                                            <Favorite color="error" fontSize="small" /> Community Impact
                                         </Typography>
-                                        <Typography variant="body2" color="text.secondary">Building lasting change together.</Typography>
                                     </Box>
                                 </Card>
                             </MotionBox>
@@ -280,19 +277,19 @@ export default function AboutPage() {
                 </Container>
             </Box>
 
-            {/* Minimal Values Grid */}
-            <Box sx={{ py: 15, bgcolor: alpha(theme.palette.divider, 0.03) }}>
+            {/* Minimal Values Grid - Squeezed */}
+            <Box sx={{ py: 6, bgcolor: alpha(theme.palette.divider, 0.02) }}>
                 <Container maxWidth="lg">
-                    <Box sx={{ textAlign: 'center', mb: 10 }}>
-                        <Typography variant="overline" color="primary" sx={{ fontWeight: 900, letterSpacing: 4 }}>CORE VALUES</Typography>
-                        <Typography variant="h3" fontWeight="900">What Drives Us</Typography>
+                    <Box sx={{ textAlign: 'center', mb: 6 }}>
+                        <Typography variant="overline" color="primary" sx={{ fontWeight: 900, letterSpacing: 2 }}>CORE VALUES</Typography>
+                        <Typography variant="h4" fontWeight="900">What Drives Us</Typography>
                     </Box>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                         {VALUES.map((val, i) => (
                             <Grid item xs={12} sm={6} md={3} key={i}>
                                 <Paper sx={{
-                                    p: 4,
-                                    borderRadius: 6,
+                                    p: 3,
+                                    borderRadius: 4,
                                     height: '100%',
                                     bgcolor: 'background.paper',
                                     border: '1px solid',
@@ -300,13 +297,13 @@ export default function AboutPage() {
                                     transition: 'all 0.3s ease',
                                     '&:hover': {
                                         borderColor: 'primary.main',
-                                        boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
-                                        transform: 'translateY(-5px)'
+                                        boxShadow: '0 10px 20px rgba(0,0,0,0.03)',
+                                        transform: 'translateY(-3px)'
                                     }
                                 }}>
-                                    <Box sx={{ color: 'primary.main', mb: 2 }}>{val.icon}</Box>
-                                    <Typography variant="h5" fontWeight="900" gutterBottom>{val.title}</Typography>
-                                    <Typography variant="body2" color="text.secondary" lineHeight={1.8}>{val.desc}</Typography>
+                                    <Box sx={{ color: 'primary.main', mb: 1.5, '& svg': { fontSize: 24 } }}>{val.icon}</Box>
+                                    <Typography variant="h6" fontWeight="900" gutterBottom sx={{ fontSize: '1.1rem' }}>{val.title}</Typography>
+                                    <Typography variant="caption" color="text.secondary" lineHeight={1.6} display="block">{val.desc}</Typography>
                                 </Paper>
                             </Grid>
                         ))}
@@ -314,42 +311,39 @@ export default function AboutPage() {
                 </Container>
             </Box>
 
-            {/* Leadership Section */}
-            <Container maxWidth="lg" id="team" sx={{ py: 15 }}>
-                <Box sx={{ textAlign: 'center', mb: 12 }}>
-                    <Typography variant="overline" color="secondary" sx={{ fontWeight: 900, letterSpacing: 4 }}>LEADERSHIP</Typography>
-                    <Typography variant="h2" fontWeight="900" sx={{ letterSpacing: -2 }}>Meet Our Visionaries</Typography>
-                    <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 700, mx: 'auto', mt: 3, fontWeight: 500 }}>
-                        A collective of passionate experts dedicated to building sustainable community solutions.
-                    </Typography>
+            {/* Leadership Section - Squeezed */}
+            <Container maxWidth="lg" id="team" sx={{ py: 8 }}>
+                <Box sx={{ textAlign: 'center', mb: 6 }}>
+                    <Typography variant="overline" color="secondary" sx={{ fontWeight: 900, letterSpacing: 2 }}>LEADERSHIP</Typography>
+                    <Typography variant="h3" fontWeight="900" sx={{ letterSpacing: -1 }}>Meet Our Visionaries</Typography>
                 </Box>
 
-                <Grid container spacing={4}>
+                <Grid container spacing={3}>
                     {TEAM.map((member, index) => (
                         <Grid item xs={12} sm={6} md={3} key={index}>
                             <MotionBox
-                                initial={{ opacity: 0, y: 20 }}
+                                initial={{ opacity: 0, y: 15 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
                             >
                                 <Card sx={{
                                     textAlign: 'center',
-                                    borderRadius: 8,
-                                    p: 4,
+                                    borderRadius: 6,
+                                    p: 3,
                                     background: 'transparent',
                                     boxShadow: 'none',
                                     border: 'none',
                                     '&:hover img': {
-                                        transform: 'scale(1.05)',
+                                        transform: 'scale(1.03)',
                                         borderColor: 'primary.main'
                                     }
                                 }}>
                                     <Box sx={{
-                                        mb: 4,
+                                        mb: 2,
                                         position: 'relative',
-                                        width: 180,
-                                        height: 180,
+                                        width: 140,
+                                        height: 140,
                                         mx: 'auto'
                                     }}>
                                         <Box
@@ -361,16 +355,16 @@ export default function AboutPage() {
                                                 height: '100%',
                                                 borderRadius: '50%',
                                                 objectFit: 'cover',
-                                                border: '6px solid',
-                                                borderColor: alpha(theme.palette.secondary.light, 0.2),
-                                                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                boxShadow: theme.shadows[10]
+                                                border: '4px solid',
+                                                borderColor: alpha(theme.palette.secondary.light, 0.15),
+                                                transition: 'all 0.4s ease-out',
+                                                boxShadow: theme.shadows[4]
                                             }}
                                         />
                                     </Box>
-                                    <Typography variant="h5" fontWeight="900" sx={{ mb: 0.5 }}>{member.name}</Typography>
-                                    <Typography variant="subtitle2" color="secondary" fontWeight="800" sx={{ mb: 2, textTransform: 'uppercase', letterSpacing: 1 }}>{member.role}</Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ px: 1, lineHeight: 1.7 }}>
+                                    <Typography variant="h6" fontWeight="900" sx={{ mb: 0.25, fontSize: '1.1rem' }}>{member.name}</Typography>
+                                    <Typography variant="caption" color="secondary" fontWeight="800" sx={{ mb: 1, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{member.role}</Typography>
+                                    <Typography variant="caption" color="text.secondary" sx={{ px: 1, lineHeight: 1.5, display: 'block' }}>
                                         {member.bio}
                                     </Typography>
                                 </Card>
@@ -385,11 +379,11 @@ export default function AboutPage() {
                 position: 'fixed',
                 top: '10%',
                 right: '-5%',
-                width: 400,
-                height: 400,
+                width: 300,
+                height: 300,
                 borderRadius: '50%',
-                bgcolor: alpha(theme.palette.primary.main, 0.05),
-                filter: 'blur(100px)',
+                bgcolor: alpha(theme.palette.primary.main, 0.04),
+                filter: 'blur(80px)',
                 zIndex: -1,
                 pointerEvents: 'none'
             }} />
@@ -397,14 +391,15 @@ export default function AboutPage() {
                 position: 'fixed',
                 bottom: '10%',
                 left: '-5%',
-                width: 500,
-                height: 500,
+                width: 400,
+                height: 400,
                 borderRadius: '50%',
-                bgcolor: alpha(theme.palette.secondary.main, 0.03),
-                filter: 'blur(120px)',
+                bgcolor: alpha(theme.palette.secondary.main, 0.02),
+                filter: 'blur(100px)',
                 zIndex: -1,
                 pointerEvents: 'none'
             }} />
         </Box>
+
     );
 }
