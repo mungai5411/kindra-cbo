@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '../../store';
-import apiClient, { endpoints } from '../../api/client';
+import apiClient from '../../api/client';
 import {
     Box,
     Typography,
@@ -28,7 +26,8 @@ import {
     Avatar,
     Stack,
     FormControlLabel,
-    Switch
+    Switch,
+    Divider
 } from '@mui/material';
 import {
     PermMedia,
@@ -39,18 +38,16 @@ import {
     CloudUpload,
     Link as LinkIcon,
     Visibility,
-    Image as ImageIcon,
     FolderOpen,
     PersonAdd,
     LinkedIn,
     Twitter,
-    Save,
-    VisibilityOff
+    Save
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { SubTabView } from './SubTabView';
 import { ImageUploader } from '../common/ImageUploader';
-import { glassCard, gradientText } from '../../theme/glassmorphism';
+import { glassCard } from '../../theme/glassmorphism';
 
 // Status Label Mapping
 const SOURCE_LABELS: { [key: string]: string } = {
@@ -64,8 +61,6 @@ const SOURCE_LABELS: { [key: string]: string } = {
 
 export function ContentManagementView({ initialTab = 'media' }: { initialTab?: string }) {
     const theme = useTheme();
-    const dispatch = useDispatch<AppDispatch>();
-    const { user } = useSelector((state: RootState) => state.auth);
 
     const [media, setMedia] = useState<any[]>([]);
     const [team, setTeam] = useState<any[]>([]);
@@ -137,19 +132,27 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
     const handleMediaUpload = async () => {
         if (!mediaForm.file) return;
         setLoading(true);
+        setError(null);
         try {
             const formData = new FormData();
             formData.append('file', mediaForm.file);
             formData.append('title', mediaForm.title || mediaForm.file.name);
-            formData.append('alt_text', mediaForm.alt_text);
+            formData.append('alt_text', mediaForm.alt_text || '');
             formData.append('source_type', mediaForm.source_type);
 
             await apiClient.post('/blog/admin/media/', formData);
             setMediaDialogOpen(false);
             setMediaForm({ title: '', alt_text: '', source_type: 'GENERAL', file: null });
             fetchData();
-        } catch (err) {
+        } catch (err: any) {
             console.error('Upload failed:', err);
+            let errorMsg = 'Upload failed';
+            if (err.response?.data) {
+                errorMsg = typeof err.response.data === 'object'
+                    ? JSON.stringify(err.response.data)
+                    : err.response.data;
+            }
+            setError(`Asset upload failed: ${errorMsg}`);
         } finally {
             setLoading(false);
         }
@@ -158,12 +161,22 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
     // Team Handlers
     const handleTeamSubmit = async () => {
         setLoading(true);
+        setError(null);
         try {
             const formData = new FormData();
-            Object.entries(teamForm).forEach(([key, value]) => {
-                if (key === 'image' && value === null) return;
-                formData.append(key, value as any);
-            });
+
+            // Explicitly append fields to ensure proper type handling in FormData
+            formData.append('name', teamForm.name);
+            formData.append('role', teamForm.role);
+            formData.append('bio', teamForm.bio || '');
+            formData.append('order', String(teamForm.order));
+            formData.append('linkedin', teamForm.linkedin || '');
+            formData.append('twitter', teamForm.twitter || '');
+            formData.append('is_active', String(teamForm.is_active));
+
+            if (teamForm.image instanceof File) {
+                formData.append('image', teamForm.image);
+            }
 
             if (selectedTeam) {
                 await apiClient.patch(`/blog/admin/team/${selectedTeam.id}/`, formData);
@@ -174,7 +187,20 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
             fetchData();
         } catch (err: any) {
             console.error('Team save failed:', err);
-            const errorMsg = err.response?.data ? JSON.stringify(err.response.data) : (err.message || 'Unknown error');
+            let errorMsg = 'Unknown error';
+
+            if (err.response?.data) {
+                if (typeof err.response.data === 'object') {
+                    errorMsg = Object.entries(err.response.data)
+                        .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+                        .join(' | ');
+                } else {
+                    errorMsg = JSON.stringify(err.response.data);
+                }
+            } else {
+                errorMsg = err.message || 'Network error';
+            }
+
             setError(`Team save failed: ${errorMsg}`);
         } finally {
             setLoading(false);

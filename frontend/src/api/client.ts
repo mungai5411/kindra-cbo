@@ -33,7 +33,9 @@ const apiClient = axios.create({
     baseURL: API_BASE_URL,
     withCredentials: true, // Required for cookies/CORS
     headers: {
-        'Content-Type': 'application/json',
+        // Axios defaults to 'application/json' for objects.
+        // Removing this allows Axios to automatically set the correct 
+        // Content-Type (with boundary) when sending FormData.
     },
     timeout: 30000, // 30 seconds
 });
