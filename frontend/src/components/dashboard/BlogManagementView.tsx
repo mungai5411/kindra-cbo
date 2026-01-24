@@ -40,8 +40,10 @@ import {
     Warning,
     Forum,
     Email,
-    CheckCircleOutline
+    CheckCircleOutline,
+    Block
 } from '@mui/icons-material';
+import { Avatar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { SubTabView } from './SubTabView';
@@ -463,123 +465,156 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
     );
 
     const renderComments = () => {
-        // We fetch comments when this tab renders if not already loaded or explicit refresh
-        // This is handled by a useEffect in the main component if activeTab triggers it, 
-        // or we can add a refresh button here.
-
         return (
-            <Paper sx={{ p: 0, borderRadius: 4, border: '1px solid', borderColor: 'divider', background: alpha(theme.palette.background.paper, 0.6), overflow: 'hidden' }}>
-                <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
-                    <Typography variant="h6" fontWeight="bold">Comment Moderation</Typography>
+            <Paper sx={{
+                p: 0,
+                borderRadius: 4,
+                border: '1px solid',
+                borderColor: 'divider',
+                background: alpha(theme.palette.background.paper, 0.6),
+                overflow: 'hidden'
+            }}>
+                <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.1) }}>
+                    <Box>
+                        <Typography variant="h6" fontWeight="800" sx={{ letterSpacing: -0.5 }}>Community Voices</Typography>
+                        <Typography variant="body2" color="text.secondary">Review and moderate reader engagement</Typography>
+                    </Box>
                     <Button
                         variant="outlined"
                         size="small"
                         onClick={() => dispatch(fetchAllComments())}
                         startIcon={<Forum />}
-                        sx={{ borderRadius: 2, textTransform: 'none' }}
+                        sx={{ borderRadius: 3, textTransform: 'none', px: 2, border: 'none', bgcolor: alpha(theme.palette.primary.main, 0.08), color: 'primary.main', fontWeight: 600, '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15), border: 'none' } }}
                     >
                         Refresh
                     </Button>
                 </Box>
-                <TableContainer>
-                    <Table>
-                        <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 600 }}>Author</TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>Comment</TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>Post</TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                                <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {(comments || []).map((comment: any) => (
-                                <TableRow key={comment.id} hover>
-                                    <TableCell>
-                                        <Typography variant="subtitle2" fontWeight="bold">{comment.name}</Typography>
-                                        <Typography variant="caption" color="text.secondary">{comment.email}</Typography>
-                                    </TableCell>
-                                    <TableCell sx={{ maxWidth: 300 }}>
-                                        <Typography variant="body2" noWrap>{comment.content}</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2">{comment.post_title || 'Unknown Post'}</Typography>
-                                    </TableCell>
-                                    <TableCell>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    {(comments || []).map((comment: any, index: number) => {
+                        const isLast = index === (comments || []).length - 1;
+                        const statusColor = comment.status === 'APPROVED' ? 'success' : comment.status === 'REJECTED' ? 'error' : 'warning';
+
+                        return (
+                            <Box
+                                key={comment.id}
+                                sx={{
+                                    p: 3,
+                                    display: 'flex',
+                                    gap: 2.5,
+                                    borderBottom: isLast ? 'none' : `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+                                    transition: 'all 0.2s',
+                                    '&:hover': { bgcolor: alpha(theme.palette.action.hover, 0.04) }
+                                }}
+                            >
+                                <Avatar
+                                    sx={{
+                                        width: 48,
+                                        height: 48,
+                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                        color: theme.palette.primary.main,
+                                        fontWeight: 700,
+                                        fontSize: '1rem'
+                                    }}
+                                >
+                                    {comment.name.charAt(0).toUpperCase()}
+                                </Avatar>
+
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
+                                        <Box>
+                                            <Typography variant="subtitle2" fontWeight="700" sx={{ lineHeight: 1.2 }}>
+                                                {comment.name}
+                                                <Box component="span" sx={{ fontWeight: 400, color: 'text.secondary', ml: 1, fontSize: '0.8rem' }}>
+                                                    • {new Date(comment.created_at).toLocaleDateString()}
+                                                </Box>
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                                                on <strong>{comment.post_title || 'Unknown Post'}</strong>
+                                            </Typography>
+                                        </Box>
+
                                         <Chip
                                             label={comment.status}
                                             size="small"
-                                            color={
-                                                comment.status === 'APPROVED' ? 'success' :
-                                                    comment.status === 'REJECTED' ? 'error' :
-                                                        comment.status === 'SPAM' ? 'warning' : 'default'
-                                            }
-                                            variant="outlined"
-                                            sx={{ fontWeight: 600, borderRadius: 1 }}
+                                            color={statusColor}
+                                            sx={{
+                                                height: 24,
+                                                fontSize: '0.7rem',
+                                                fontWeight: 700,
+                                                bgcolor: alpha(theme.palette[statusColor].main, 0.1),
+                                                color: theme.palette[statusColor].main,
+                                                borderRadius: 1.5,
+                                                border: 'none'
+                                            }}
                                         />
-                                    </TableCell>
-                                    <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                                        {new Date(comment.created_at).toLocaleDateString()}
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                                            {comment.status === 'PENDING' && (
-                                                <>
-                                                    <Tooltip title="Approve">
-                                                        <IconButton
-                                                            size="small"
-                                                            color="success"
-                                                            onClick={async () => {
-                                                                await dispatch(updateCommentStatus({ id: comment.id, status: 'APPROVED' }));
-                                                            }}
-                                                        >
-                                                            <CheckCircleOutline sx={{ fontSize: 20 }} />
-                                                            {/* Note: Icon used below is standard Check/Close */}
-                                                            <Box component="span" sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>✓</Box>
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                    <Tooltip title="Reject">
-                                                        <IconButton
-                                                            size="small"
-                                                            color="warning"
-                                                            onClick={async () => {
-                                                                await dispatch(updateCommentStatus({ id: comment.id, status: 'REJECTED' }));
-                                                            }}
-                                                        >
-                                                            <Box component="span" sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>✕</Box>
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                </>
-                                            )}
-                                            <Tooltip title="Delete">
-                                                <IconButton
+                                    </Box>
+
+                                    <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.action.hover, 0.03), borderRadius: 3 }}>
+                                        <Typography variant="body2" sx={{ color: 'text.primary', lineHeight: 1.6 }}>
+                                            {comment.content}
+                                        </Typography>
+                                    </Paper>
+
+                                    <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                                        {comment.status === 'PENDING' && (
+                                            <>
+                                                <Button
                                                     size="small"
-                                                    color="error"
-                                                    onClick={async () => {
-                                                        if (window.confirm('Are you sure you want to delete this comment?')) {
-                                                            await dispatch(deleteComment(comment.id));
-                                                        }
+                                                    startIcon={<CheckCircleOutline />}
+                                                    onClick={() => dispatch(updateCommentStatus({ id: comment.id, status: 'APPROVED' }))}
+                                                    sx={{
+                                                        color: 'success.main',
+                                                        bgcolor: alpha(theme.palette.success.main, 0.08),
+                                                        borderRadius: 2,
+                                                        textTransform: 'none',
+                                                        fontWeight: 600,
+                                                        '&:hover': { bgcolor: alpha(theme.palette.success.main, 0.15) }
                                                     }}
                                                 >
-                                                    <Delete fontSize="small" />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </Box>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {(comments || []).length === 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>
-                                        <Forum sx={{ fontSize: 40, opacity: 0.3, mb: 1 }} />
-                                        <Typography>No comments found.</Typography>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                                                    Approve
+                                                </Button>
+                                                <Button
+                                                    size="small"
+                                                    startIcon={<Block />}
+                                                    onClick={() => dispatch(updateCommentStatus({ id: comment.id, status: 'REJECTED' }))}
+                                                    sx={{
+                                                        color: 'warning.main',
+                                                        bgcolor: alpha(theme.palette.warning.main, 0.08),
+                                                        borderRadius: 2,
+                                                        textTransform: 'none',
+                                                        fontWeight: 600,
+                                                        '&:hover': { bgcolor: alpha(theme.palette.warning.main, 0.15) }
+                                                    }}
+                                                >
+                                                    Reject
+                                                </Button>
+                                            </>
+                                        )}
+                                        <IconButton
+                                            size="small"
+                                            sx={{ ml: 'auto', color: 'text.disabled', '&:hover': { color: 'error.main', bgcolor: alpha(theme.palette.error.main, 0.08) } }}
+                                            onClick={() => {
+                                                if (window.confirm('Delete this comment permanently?')) {
+                                                    dispatch(deleteComment(comment.id));
+                                                }
+                                            }}
+                                        >
+                                            <Delete fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                </Box>
+                            </Box>
+                        );
+                    })}
+
+                    {(comments || []).length === 0 && (
+                        <Box sx={{ py: 10, textAlign: 'center', opacity: 0.6 }}>
+                            <Forum sx={{ fontSize: 48, color: 'text.disabled', mb: 2, display: 'block', mx: 'auto' }} />
+                            <Typography variant="body1" fontWeight="500" color="text.secondary">No comments to moderate yet.</Typography>
+                        </Box>
+                    )}
+                </Box>
             </Paper>
         );
     };
