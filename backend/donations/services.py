@@ -244,8 +244,14 @@ class ReceiptService:
             buffer.seek(0)
             filename = f"receipt_{receipt.receipt_number}.pdf"
             content = buffer.read()
-            receipt.receipt_file.save(filename, ContentFile(content), save=True)
-            logger.info(f"Generated PDF file for receipt {receipt.receipt_number} using template")
+            
+            # Try to save to storage, but don't fail if storage is misconfigured
+            try:
+                receipt.receipt_file.save(filename, ContentFile(content), save=True)
+                logger.info(f"Generated PDF file for receipt {receipt.receipt_number} using template")
+            except Exception as storage_error:
+                logger.warning(f"Failed to save receipt to storage (will still return content): {str(storage_error)}")
+            
             return content
             
         except Exception as e:
@@ -313,8 +319,14 @@ class ReceiptService:
                 buffer.seek(0)
                 filename = f"receipt_{receipt.receipt_number}.pdf"
                 content = buffer.read()
-                receipt.receipt_file.save(filename, ContentFile(content), save=True)
-                logger.info(f"Generated PDF file for receipt {receipt.receipt_number} using fallback")
+                
+                # Try to save to storage, but don't fail if storage is misconfigured
+                try:
+                    receipt.receipt_file.save(filename, ContentFile(content), save=True)
+                    logger.info(f"Generated PDF file for receipt {receipt.receipt_number} using fallback")
+                except Exception as storage_error:
+                    logger.warning(f"Failed to save receipt to storage (will still return content): {str(storage_error)}")
+                
                 return content
             except Exception as e2:
                 logger.error(f"Critical error generating receipt (fallback failed): {str(e2)}")
