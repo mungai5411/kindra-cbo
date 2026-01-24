@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Donation Receipt</title>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
+        .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
+        .logo { font-size: 24px; font-weight: bold; color: #2c3e50; }
+        .sub-header { color: #7f8c8d; font-size: 14px; }
+        .receipt-info { margin-bottom: 30px; }
+        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .table { width: 100%; margin-bottom: 30px; border-collapse: collapse; }
+        .table th { background: #f8f9fa; text-align: left; padding: 12px; border-bottom: 2px solid #dee2e6; }
+        .table td { padding: 12px; border-bottom: 1px solid #dee2e6; }
+        .total-row { font-weight: bold; font-size: 18px; }
+        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 20px; }
+        .signature-box { margin-top: 40px; }
+        .signature-line { width: 200px; border-top: 1px solid #000; margin-top: 50px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">KINDRA CBO</div>
+        <div class="sub-header">Official Donation Receipt<br>Nairobi, Kenya | info@kindra.org</div>
+    </div>
+
+    <div class="receipt-info">
+        <p><strong>Receipt Number:</strong> {{ receipt.receipt_number }}</p>
+        <p><strong>Date:</strong> {{ date }}</p>
+        <p><strong>Donor:</strong> {{ receipt.donation.donor_name|default:receipt.donation.donor.full_name }}</p>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th style="text-align: right">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Donation to {{ receipt.donation.campaign.title|default:"General Fund" }}</td>
+                <td style="text-align: right">{{ receipt.donation.currency }} {{ receipt.donation.amount }}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="total-row">Total</td>
+                <td class="total-row" style="text-align: right">{{ receipt.donation.currency }} {{ receipt.donation.amount }}</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="signature-box">
+        <p>Authorized Signature:</p>
+        <div class="signature-line"></div>
+    </div>
+
+    <div class="footer">
+        <p>Thank you for your generous support. Your donation is tax deductible for the year {{ receipt.tax_year }}.</p>
+        <p>KINDRA CBO is a registered community-based organization.</p>
+    </div>
+</body>
+</html>

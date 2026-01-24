@@ -220,71 +220,37 @@ class ReceiptService:
     @staticmethod
     def generate_pdf_receipt(receipt):
         """
-        Generate a professional PDF receipt for a donation
+        Generate a professional PDF receipt using HTML templates
         """
-        donation = receipt.donation
-        buffer = io.BytesIO()
-        p = canvas.Canvas(buffer, pagesize=letter)
-        width, height = letter
-        
-        # Header
-        p.setFont("Helvetica-Bold", 24)
-        p.drawCentredString(width/2, height - inch, "KINDRA CBO")
-        
-        p.setFont("Helvetica", 12)
-        p.drawCentredString(width/2, height - 1.3*inch, "Official Donation Receipt")
-        p.drawCentredString(width/2, height - 1.5*inch, "Nairobi, Kenya | info@kindra.org")
-        
-        p.line(inch, height - 1.8*inch, width - inch, height - 1.8*inch)
-        
-        # Receipt Info
-        p.setFont("Helvetica-Bold", 12)
-        p.drawString(inch, height - 2.2*inch, f"Receipt Number: {receipt.receipt_number}")
-        p.drawRightString(width-inch, height - 2.2*inch, f"Date: {timezone.now().strftime('%d %b %Y')}")
-        
-        # Donor Info
-        p.setFont("Helvetica", 12)
-        p.drawString(inch, height - 2.7*inch, "Donor Information:")
-        p.setFont("Helvetica-Bold", 12)
-        p.drawString(inch, height - 2.9*inch, donation.donor_name or str(donation.donor or "Valued Supporter"))
-        
-        # Table Header
-        p.setFillColor(colors.grey)
-        p.rect(inch, height - 3.5*inch, width - 2*inch, 0.3*inch, fill=1)
-        p.setFillColor(colors.whitesmoke)
-        p.setFont("Helvetica-Bold", 10)
-        p.drawString(inch + 0.1*inch, height - 3.4*inch, "DESCRIPTION")
-        p.drawRightString(width - inch - 0.1*inch, height - 3.4*inch, "AMOUNT")
-        
-        # Table Content
-        p.setFillColor(colors.black)
-        p.setFont("Helvetica", 11)
-        description = f"Donation to {donation.campaign.title if donation.campaign else 'General Fund'}"
-        p.drawString(inch + 0.1*inch, height - 3.8*inch, description)
-        p.drawRightString(width - inch - 0.1*inch, height - 3.8*inch, f"{donation.currency} {donation.amount:,.2f}")
-        
-        p.line(inch, height - 4*inch, width - inch, height - 4*inch)
-        
-        # Total
-        p.setFont("Helvetica-Bold", 12)
-        p.drawRightString(width - inch - 0.1*inch, height - 4.3*inch, f"Total: {donation.currency} {donation.amount:,.2f}")
-        
-        # Footer / Signature
-        p.setFont("Helvetica", 10)
-        p.drawString(inch, height - 5.5*inch, "Authorized Signature:")
-        p.line(inch + 1.5*inch, height - 5.5*inch, inch + 4*inch, height - 5.5*inch)
-        
-        p.setFont("Helvetica-Oblique", 10)
-        p.drawCentredString(width/2, inch, "Thank you for your generous support. Your donation is tax deductible for the year " + str(receipt.tax_year))
-        
-        p.showPage()
-        p.save()
-        
-        buffer.seek(0)
-        filename = f"receipt_{receipt.receipt_number}.pdf"
-        receipt.receipt_file.save(filename, ContentFile(buffer.read()), save=True)
-        logger.info(f"Generated PDF file for receipt {receipt.receipt_number}")
-        return receipt
+        try:
+            from django.template.loader import render_to_string
+            from xhtml2pdf import pisa
+            
+            donation = receipt.donation
+            context = {
+                'receipt': receipt,
+                'date': timezone.now().strftime('%d %b %Y'),
+                'server_url': 'http://localhost:8000', # Should be from settings
+            }
+            
+            html_string = render_to_string('donations/receipt.html', context)
+            buffer = io.BytesIO()
+            pisa_status = pisa.CreatePDF(html_string, dest=buffer)
+            
+            if pisa_status.err:
+                logger.error(f"PDF generation error for receipt {receipt.receipt_number}")
+                return None
+                
+            buffer.seek(0)
+            filename = f"receipt_{receipt.receipt_number}.pdf"
+            receipt.receipt_file.save(filename, ContentFile(buffer.read()), save=True)
+            logger.info(f"Generated PDF file for receipt {receipt.receipt_number} using template")
+            return receipt
+            
+        except Exception as e:
+            logger.error(f"Error generating PDF receipt: {str(e)}")
+            # Fallback to ReportLab if template fails (legacy support) or raise
+            return None
 
 
 class MaterialAcknowledgmentService:

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Gift In Kind Acknowledgment</title>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
+        .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
+        .logo { font-size: 24px; font-weight: bold; color: #2c3e50; }
+        .content { margin-bottom: 40px; }
+        .items-box { background: #f8f9fa; padding: 20px; border-radius: 4px; border: 1px solid #dee2e6; margin: 20px 0; }
+        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">KINDRA CBO</div>
+        <div class="sub-header">Official Gift-in-Kind Acknowledgment</div>
+    </div>
+
+    <div class="content">
+        <p>Date: {{ date }}</p>
+        
+        <p>Dear {{ donor_name }},</p>
+        
+        <p>On behalf of Kindra CBO, we would like to express our deepest gratitude for your generous donation of the following items received on {{ donation_date }}:</p>
+        
+        <div class="items-box">
+            <p><strong>Category:</strong> {{ category }}</p>
+            <p><strong>Description:</strong> {{ description }}</p>
+            <p><strong>Quantity:</strong> {{ quantity }}</p>
+        </div>
+        
+        <p>Your contribution is vital to our mission of empowering lives and building futures for our community members. Your kindness makes a real difference.</p>
+        
+        <p><em>Please note that as per standard regulations, we do not provide a dollar value for gift-in-kind donations. This acknowledgment serves as your official record for tax purposes.</em></p>
+        
+        <br>
+        <p>With sincere gratitude,</p>
+        <p><strong>The Kindra CBO Team</strong></p>
+    </div>
+
+    <div class="footer">
+        <p>KINDRA CBO | Nairobi, Kenya | info@kindra.org</p>
+    </div>
+</body>
+</html>
