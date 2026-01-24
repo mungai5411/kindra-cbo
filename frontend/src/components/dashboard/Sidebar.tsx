@@ -9,7 +9,8 @@ import {
     Analytics,
     Security,
     ExpandLess,
-    ExpandMore
+    ExpandMore,
+    PermMedia
 } from '@mui/icons-material';
 import logo from '../../assets/logo.jpg';
 
@@ -33,6 +34,15 @@ const NAVIGATION = [
         id: 'blog_campaigns',
         label: 'Blog & Storytelling',
         icon: <Article />,
+    },
+    {
+        id: 'content_management',
+        label: 'Content & Media',
+        icon: <PermMedia />,
+        children: [
+            { id: 'media', label: 'Media Library' },
+            { id: 'team', label: 'Visionaries' },
+        ]
     },
     {
         id: 'case_management',

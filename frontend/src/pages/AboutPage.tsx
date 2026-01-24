@@ -1,41 +1,20 @@
-/**
- * About Us Page
- * Showcasing the organization's mission, story, and team with premium styling.
- */
-
-import { Box, Container, Typography, Grid, Card, Avatar, useTheme, alpha, Stack, Paper, Divider } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Container, Typography, Grid, Card, Avatar, useTheme, alpha, Stack, Paper, Divider, CircularProgress } from '@mui/material';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Navbar } from '../components/public/Navbar';
 import { VolunteerActivism, Handshake, Lightbulb, Groups, AssignmentTurnedIn, Public, TrendingUp, Favorite } from '@mui/icons-material';
 import { glassCard, gradientText, glassColors } from '../theme/glassmorphism';
+import apiClient from '../api/client';
 
 const MotionBox = motion(Box);
 const MotionTypography = motion(Typography);
 
-const TEAM = [
+const FALLBACK_TEAM = [
     {
         name: "Sarah Johnson",
         role: "Executive Director",
         bio: "Former UN relief coordinator with 15 years of experience in community development.",
         image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400"
-    },
-    {
-        name: "David Kimani",
-        role: "Head of Operations",
-        bio: "Dedicated to building sustainable logistical networks in rural Kenya.",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400"
-    },
-    {
-        name: "Dr. Amani Okafor",
-        role: "Health Program Lead",
-        bio: "Pediatrician focused on preventative care and child nutrition initiatives.",
-        image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=400"
-    },
-    {
-        name: "James Ochieng",
-        role: "Community Liaison",
-        bio: "Connecting local leadership with resources to drive grassroots change.",
-        image: "https://images.unsplash.com/photo-1533227268428-f9ed0900fb3b?auto=format&fit=crop&q=80&w=400"
     }
 ];
 
@@ -51,6 +30,41 @@ export default function AboutPage() {
     const { scrollY } = useScroll();
     const yHero = useTransform(scrollY, [0, 400], [0, 150]);
     const opacityHero = useTransform(scrollY, [0, 300], [1, 0]);
+
+    const [team, setTeam] = useState<any[]>([]);
+    const [content, setContent] = useState<{ [key: string]: any }>({});
+    const [loading, setLoading] = useState(true);
+
+    const getContent = (key: string, fallback: string) => content[key]?.content || fallback;
+    const getValue = (key: string, fallback: string) => content[key]?.value || fallback;
+    const getTitle = (key: string, fallback: string) => content[key]?.title || fallback;
+
+    useEffect(() => {
+        const loadAll = async () => {
+            try {
+                const [teamRes, contentRes] = await Promise.all([
+                    apiClient.get('/blog/team/'),
+                    apiClient.get('/blog/content/?is_active=true')
+                ]);
+
+                const teamData = teamRes.data.results || teamRes.data;
+                setTeam(teamData.length > 0 ? teamData : FALLBACK_TEAM);
+
+                const contentData = contentRes.data.results || contentRes.data;
+                const contentMap = contentData.reduce((acc: any, item: any) => {
+                    acc[item.key] = item;
+                    return acc;
+                }, {});
+                setContent(contentMap);
+            } catch (err) {
+                console.error('Failed to sync page content:', err);
+                setTeam(FALLBACK_TEAM);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadAll();
+    }, []);
 
     return (
         <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', overflow: 'hidden' }}>
@@ -108,7 +122,7 @@ export default function AboutPage() {
                                     textShadow: '0 2px 4px rgba(0,0,0,0.1)'
                                 }}
                             >
-                                OUR JOURNEY OF HOPE
+                                {getContent('about-hero-overline', 'OUR JOURNEY OF HOPE')}
                             </Typography>
                             <MotionTypography
                                 variant="h1"
@@ -119,7 +133,7 @@ export default function AboutPage() {
                                     lineHeight: 1.1
                                 }}
                             >
-                                Driven by <br /> Compassion.
+                                {getContent('about-hero-title', 'Driven by Compassion.')}
                             </MotionTypography>
                             <Typography
                                 variant="h6"
@@ -132,7 +146,7 @@ export default function AboutPage() {
                                     px: 2
                                 }}
                             >
-                                Kindra CBO is a grassroots movement dedicated to restoring dignity and building a sustainable future where every child in Kenya can thrive.
+                                {getContent('about-hero-desc', 'Kindra CBO is a grassroots movement dedicated to restoring dignity and building a sustainable future where every child in Kenya can thrive.')}
                             </Typography>
                         </MotionBox>
                     </AnimatePresence>
@@ -143,9 +157,9 @@ export default function AboutPage() {
             <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 }, mt: { xs: -4, md: -6 }, position: 'relative', zIndex: 2 }}>
                 <Grid container spacing={3}>
                     {[
-                        { title: "Our Mission", icon: <VolunteerActivism />, text: "To empower vulnerable communities through sustainable social, health, and economic support systems.", color: theme.palette.primary.main, delay: 0 },
-                        { title: "Our Vision", icon: <Lightbulb />, text: "A world where every family has the resources, dignity, and opportunity to build their own prosperous future.", color: '#BE91BE', delay: 0.1 },
-                        { title: "Our Values", icon: <TrendingUp />, text: "Integrity, Radical Transparency, Community-First Action, and Unwavering Commitment to measurable Impact.", color: '#DBAAA7', delay: 0.2 }
+                        { title: getTitle('about-mission', 'Our Mission'), icon: <VolunteerActivism />, text: getContent('about-mission', "To empower vulnerable communities through sustainable social, health, and economic support systems."), color: theme.palette.primary.main, delay: 0 },
+                        { title: getTitle('about-vision', 'Our Vision'), icon: <Lightbulb />, text: getContent('about-vision', "A world where every family has the resources, dignity, and opportunity to build their own prosperous future."), color: '#BE91BE', delay: 0.1 },
+                        { title: getTitle('about-values', 'Our Values'), icon: <TrendingUp />, text: getContent('about-values', "Integrity, Radical Transparency, Community-First Action, and Unwavering Commitment to measurable Impact."), color: '#DBAAA7', delay: 0.2 }
                     ].map((item, index) => (
                         <Grid item xs={12} md={4} key={index}>
                             <MotionBox
@@ -203,22 +217,19 @@ export default function AboutPage() {
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.6 }}
                             >
-                                <Typography variant="overline" color="primary" sx={{ fontWeight: 900, letterSpacing: 2 }}>THE GENESIS</Typography>
-                                <Typography variant="h3" fontWeight="900" sx={{ mb: 2, letterSpacing: -1 }}>The Kindra Story</Typography>
+                                <Typography variant="overline" color="primary" sx={{ fontWeight: 900, letterSpacing: 2 }}>{getContent('about-genesis-overline', 'THE GENESIS')}</Typography>
+                                <Typography variant="h3" fontWeight="900" sx={{ mb: 2, letterSpacing: -1 }}>{getTitle('about-genesis-story', 'The Kindra Story')}</Typography>
                                 <Typography variant="body2" paragraph color="text.secondary" sx={{ fontSize: '1rem', lineHeight: 1.8 }}>
-                                    Founded in 2025, Kindra CBO began as a small group of neighbors in Nairobi concerned about the increasing number of vulnerable children in their community.
-                                </Typography>
-                                <Typography variant="body2" paragraph color="text.secondary" sx={{ fontSize: '1rem', lineHeight: 1.8 }}>
-                                    What started as a simple weekly food drive quickly evolved into a comprehensive digital support network, bridging the gap between resources and those who need them most. Today, we stand as a beacon of transparency and a catalyst for change.
+                                    {getContent('about-genesis-story', 'Founded in 2025, Kindra CBO began as a small group of neighbors in Nairobi concerned about the increasing number of vulnerable children in their community.')}
                                 </Typography>
                                 <Stack direction="row" spacing={3} sx={{ mt: 3 }}>
                                     <Box>
-                                        <Typography variant="h4" color="primary" fontWeight="900">50+</Typography>
+                                        <Typography variant="h4" color="primary" fontWeight="900">{getValue('about-stat-schools', '50+')}</Typography>
                                         <Typography variant="caption" color="text.secondary" fontWeight="700">PARTNER SCHOOLS</Typography>
                                     </Box>
                                     <Divider orientation="vertical" flexItem />
                                     <Box>
-                                        <Typography variant="h4" color="secondary" fontWeight="900">10k+</Typography>
+                                        <Typography variant="h4" color="secondary" fontWeight="900">{getValue('about-stat-impact', '10k+')}</Typography>
                                         <Typography variant="caption" color="text.secondary" fontWeight="700">LIVES IMPACTED</Typography>
                                     </Box>
                                 </Stack>
@@ -318,60 +329,64 @@ export default function AboutPage() {
                     <Typography variant="h3" fontWeight="900" sx={{ letterSpacing: -1 }}>Meet Our Visionaries</Typography>
                 </Box>
 
-                <Grid container spacing={3}>
-                    {TEAM.map((member, index) => (
-                        <Grid item xs={12} sm={6} md={3} key={index}>
-                            <MotionBox
-                                initial={{ opacity: 0, y: 15 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
-                            >
-                                <Card sx={{
-                                    textAlign: 'center',
-                                    borderRadius: 6,
-                                    p: 3,
-                                    background: 'transparent',
-                                    boxShadow: 'none',
-                                    border: 'none',
-                                    '&:hover img': {
-                                        transform: 'scale(1.03)',
-                                        borderColor: 'primary.main'
-                                    }
-                                }}>
-                                    <Box sx={{
-                                        mb: 2,
-                                        position: 'relative',
-                                        width: 140,
-                                        height: 140,
-                                        mx: 'auto'
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 8 }}><CircularProgress /></Box>
+                ) : (
+                    <Grid container spacing={3}>
+                        {team.map((member, index) => (
+                            <Grid item xs={12} sm={6} md={3} key={index}>
+                                <MotionBox
+                                    initial={{ opacity: 0, y: 15 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.1 }}
+                                >
+                                    <Card sx={{
+                                        textAlign: 'center',
+                                        borderRadius: 6,
+                                        p: 3,
+                                        background: 'transparent',
+                                        boxShadow: 'none',
+                                        border: 'none',
+                                        '&:hover img': {
+                                            transform: 'scale(1.03)',
+                                            borderColor: 'primary.main'
+                                        }
                                     }}>
-                                        <Box
-                                            component="img"
-                                            src={member.image}
-                                            alt={member.name}
-                                            sx={{
-                                                width: '100%',
-                                                height: '100%',
-                                                borderRadius: '50%',
-                                                objectFit: 'cover',
-                                                border: '4px solid',
-                                                borderColor: alpha(theme.palette.secondary.light, 0.15),
-                                                transition: 'all 0.4s ease-out',
-                                                boxShadow: theme.shadows[4]
-                                            }}
-                                        />
-                                    </Box>
-                                    <Typography variant="h6" fontWeight="900" sx={{ mb: 0.25, fontSize: '1.1rem' }}>{member.name}</Typography>
-                                    <Typography variant="caption" color="secondary" fontWeight="800" sx={{ mb: 1, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{member.role}</Typography>
-                                    <Typography variant="caption" color="text.secondary" sx={{ px: 1, lineHeight: 1.5, display: 'block' }}>
-                                        {member.bio}
-                                    </Typography>
-                                </Card>
-                            </MotionBox>
-                        </Grid>
-                    ))}
-                </Grid>
+                                        <Box sx={{
+                                            mb: 2,
+                                            position: 'relative',
+                                            width: 140,
+                                            height: 140,
+                                            mx: 'auto'
+                                        }}>
+                                            <Box
+                                                component="img"
+                                                src={member.image}
+                                                alt={member.name}
+                                                sx={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    borderRadius: '50%',
+                                                    objectFit: 'cover',
+                                                    border: '4px solid',
+                                                    borderColor: alpha(theme.palette.secondary.light, 0.15),
+                                                    transition: 'all 0.4s ease-out',
+                                                    boxShadow: theme.shadows[4]
+                                                }}
+                                            />
+                                        </Box>
+                                        <Typography variant="h6" fontWeight="900" sx={{ mb: 0.25, fontSize: '1.1rem' }}>{member.name}</Typography>
+                                        <Typography variant="caption" color="secondary" fontWeight="800" sx={{ mb: 1, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{member.role}</Typography>
+                                        <Typography variant="caption" color="text.secondary" sx={{ px: 1, lineHeight: 1.5, display: 'block' }}>
+                                            {member.bio}
+                                        </Typography>
+                                    </Card>
+                                </MotionBox>
+                            </Grid>
+                        ))}
+                    </Grid>
+                )}
             </Container>
 
             {/* Minimal Background Blobs */}

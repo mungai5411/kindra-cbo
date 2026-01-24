@@ -8,12 +8,12 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.utils import timezone
-from .models import Category, Tag, BlogPost, Comment, Newsletter, Like
+from .models import Category, Tag, BlogPost, Comment, Newsletter, Like, TeamMember, MediaAsset, SiteContent
 from .serializers import (
     CategorySerializer, TagSerializer, BlogPostListSerializer,
     BlogPostDetailSerializer, CommentSerializer, CommentCreateSerializer,
     CommentModerationSerializer, NewsletterSerializer, NewsletterSubscribeSerializer,
-    LikeSerializer
+    LikeSerializer, TeamMemberSerializer, MediaAssetSerializer, SiteContentSerializer
 )
 from accounts.permissions import IsAdminManagementOrSocialMedia
 
@@ -406,3 +406,58 @@ def delete_blog_post_og_image(request, pk):
             {'error': f'Failed to delete OG image: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+from rest_framework import viewsets
+
+
+class TeamMemberViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing team members
+    """
+    queryset = TeamMember.objects.all()
+    serializer_class = TeamMemberSerializer
+    permission_classes = [IsStaffOrReadOnly]
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['order', 'name']
+    ordering = ['order']
+
+
+class MediaAssetViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for centralized media library management
+    """
+    queryset = MediaAsset.objects.all().select_related('uploaded_by')
+    serializer_class = MediaAssetSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminManagementOrSocialMedia]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['source_type', 'uploaded_by']
+    search_fields = ['title', 'alt_text']
+    ordering = ['-created_at']
+
+    def perform_create(self, serializer):
+        serializer.save(uploaded_by=self.request.user)
+
+    @action(detail=False, methods=['get'])
+    def gallery(self, request):
+        """Public gallery view (SAFE_METHODS)"""
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class SiteContentViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing site-wide dynamic content (No-Code Hub)
+    """
+    queryset = SiteContent.objects.all()
+    serializer_class = SiteContentSerializer
+    permission_classes = [IsStaffOrReadOnly]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['section', 'is_active']
+    search_fields = ['key', 'title', 'content']
+    ordering_fields = ['section', 'key']
+    ordering = ['section', 'key']
+    lookup_field = 'key'

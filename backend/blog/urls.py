@@ -12,11 +12,23 @@ from .views import (
     CommentAdminListView, CommentModerationView,
     NewsletterSubscribeView, NewsletterAdminListView,
     delete_blog_post_featured_image, delete_blog_post_og_image,
+    TeamMemberViewSet, MediaAssetViewSet, SiteContentViewSet
 )
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'admin/team', TeamMemberViewSet, basename='admin-team')
+router.register(r'admin/media', MediaAssetViewSet, basename='admin-media')
+router.register(r'admin/content', SiteContentViewSet, basename='admin-content')
+router.register(r'team', TeamMemberViewSet, basename='public-team')
+router.register(r'media', MediaAssetViewSet, basename='public-media')
+router.register(r'content', SiteContentViewSet, basename='public-content')
 
 app_name = 'blog'
 
 urlpatterns = [
+    # Router-based viewsets
+] + router.urls + [
     # Public endpoints
     path('categories/', CategoryListView.as_view(), name='category-list'),
     path('tags/', TagListView.as_view(), name='tag-list'),

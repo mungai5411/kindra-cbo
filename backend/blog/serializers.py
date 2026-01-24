@@ -4,7 +4,56 @@ Blog & Public Campaigns Serializers
 
 from rest_framework import serializers
 from django.utils.html import strip_tags
-from .models import Category, Tag, BlogPost, Comment, Newsletter, Like
+from .models import Category, Tag, BlogPost, Comment, Newsletter, Like, TeamMember, MediaAsset, SiteContent
+
+
+class TeamMemberSerializer(serializers.ModelSerializer):
+    """
+    Serializer for team members
+    """
+    class Meta:
+        model = TeamMember
+        fields = '__all__'
+        read_only_fields = ('id', 'created_at', 'updated_at')
+
+
+class MediaAssetSerializer(serializers.ModelSerializer):
+    """
+    Serializer for centralized media library
+    """
+    uploaded_by_name = serializers.CharField(source='uploaded_by.get_full_name', read_only=True)
+    file_name = serializers.SerializerMethodField()
+    file_size = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MediaAsset
+        fields = [
+            'id', 'title', 'file', 'alt_text', 'source_type', 
+            'source_id', 'uploaded_by', 'uploaded_by_name', 
+            'file_name', 'file_size', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ('id', 'uploaded_by', 'created_at', 'updated_at')
+
+    def get_file_name(self, obj):
+        return obj.file.name.split('/')[-1] if obj.file else 'unknown'
+
+    def get_file_size(self, obj):
+        try:
+            return obj.file.size
+        except:
+            return 0
+
+
+class SiteContentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for site-wide dynamic content
+    """
+    category_display = serializers.CharField(source='get_section_display', read_only=True)
+    
+    class Meta:
+        model = SiteContent
+        fields = '__all__'
+        read_only_fields = ('id', 'updated_at')
 
 
 class CategorySerializer(serializers.ModelSerializer):

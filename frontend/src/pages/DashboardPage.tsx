@@ -45,6 +45,7 @@ import { ResourcesView } from '../components/dashboard/ResourcesView';
 import { ReportingView } from '../components/dashboard/ReportingView';
 import { SystemAdminView } from '../components/dashboard/SystemAdminView';
 import { BlogManagementView } from '../components/dashboard/BlogManagementView';
+import { ContentManagementView } from '../components/dashboard/ContentManagementView';
 import { LogoutDialog } from '../components/common/LogoutDialog';
 import { MobileBottomNav } from '../components/dashboard/MobileBottomNav';
 import { CommunityHub } from '../components/dashboard/CommunityHub';
@@ -296,6 +297,10 @@ export default function DashboardPage() {
             'comments': <BlogManagementView initialTab={activeTab} />,
             'newsletter': <BlogManagementView initialTab={activeTab} />,
             'tags': <BlogManagementView initialTab={activeTab} />,
+
+            'content_management': <ContentManagementView initialTab={activeTab} />,
+            'media': <ContentManagementView initialTab={activeTab} />,
+            'team': <ContentManagementView initialTab={activeTab} />,
 
             'system_admin': <SystemAdminView />,
             'settings': <SystemAdminView />,
