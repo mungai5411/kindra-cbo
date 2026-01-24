@@ -270,7 +270,7 @@ class TeamMember(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200)
     role = models.CharField(max_length=150)
-    bio = models.TextField()
+    bio = models.TextField(blank=True)
     image = models.ImageField(upload_to='team/', blank=True, null=True)
     order = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)

@@ -172,8 +172,10 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
             }
             setTeamDialogOpen(false);
             fetchData();
-        } catch (err) {
+        } catch (err: any) {
             console.error('Team save failed:', err);
+            const errorMsg = err.response?.data ? JSON.stringify(err.response.data) : (err.message || 'Unknown error');
+            setError(`Team save failed: ${errorMsg}`);
         } finally {
             setLoading(false);
         }

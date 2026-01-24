@@ -15,6 +15,12 @@ class TeamMemberSerializer(serializers.ModelSerializer):
         model = TeamMember
         fields = '__all__'
         read_only_fields = ('id', 'created_at', 'updated_at')
+        extra_kwargs = {
+            'image': {'required': False, 'allow_null': True},
+            'bio': {'required': False, 'allow_blank': True},
+            'linkedin': {'required': False, 'allow_blank': True},
+            'twitter': {'required': False, 'allow_blank': True},
+        }
 
 
 class MediaAssetSerializer(serializers.ModelSerializer):
