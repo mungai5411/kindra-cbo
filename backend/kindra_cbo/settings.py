@@ -356,7 +356,7 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
 SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='')
-DEFAULT_FROM_EMAIL = config('SENDGRID_FROM_EMAIL', default='info@kindra.org')
+DEFAULT_FROM_EMAIL = config('SENDGRID_FROM_EMAIL', default='kindra-cbo@zohomail.com')
 SENDGRID_SANDBOX_MODE_IN_DEBUG = DEBUG
 
 # Email templates
