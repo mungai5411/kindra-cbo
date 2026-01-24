@@ -35,6 +35,12 @@ const NAVIGATION = [
         id: 'blog_campaigns',
         label: 'Blog & Storytelling',
         icon: <Article />,
+        children: [
+            { id: 'blog_posts', label: 'All Stories' },
+            { id: 'comments', label: 'Comments' },
+            { id: 'categories', label: 'Categories' },
+            { id: 'tags', label: 'Tags' },
+        ]
     },
     {
         id: 'content_management',

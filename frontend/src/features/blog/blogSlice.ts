@@ -259,6 +259,44 @@ export const deletePost = createAsyncThunk(
     }
 );
 
+// Admin Comment Actions
+export const fetchAllComments = createAsyncThunk(
+    'blog/fetchAllComments',
+    async (_, { rejectWithValue }) => {
+        try {
+            // Using the general comments endpoint which should support listing for admins
+            const response = await apiClient.get(endpoints.blog.comments);
+            return response.data.results || response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch comments');
+        }
+    }
+);
+
+export const updateCommentStatus = createAsyncThunk(
+    'blog/updateCommentStatus',
+    async ({ id, status }: { id: string; status: string }, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.patch(`${endpoints.blog.comments}${id}/`, { status });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update comment status');
+        }
+    }
+);
+
+export const deleteComment = createAsyncThunk(
+    'blog/deleteComment',
+    async (id: string, { rejectWithValue }) => {
+        try {
+            await apiClient.delete(`${endpoints.blog.comments}${id}/`);
+            return id;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete comment');
+        }
+    }
+);
+
 // Slice
 const blogSlice = createSlice({
     name: 'blog',
@@ -393,6 +431,22 @@ const blogSlice = createSlice({
         // Delete Post
         builder.addCase(deletePost.fulfilled, (state, action) => {
             state.posts = state.posts.filter(p => p.id !== action.payload);
+        });
+
+        // Admin Comments
+        builder.addCase(fetchAllComments.fulfilled, (state, action) => {
+            state.comments = action.payload; // Reuse comments state
+        });
+
+        builder.addCase(updateCommentStatus.fulfilled, (state, action) => {
+            const index = state.comments.findIndex(c => c.id === action.payload.id);
+            if (index !== -1) {
+                state.comments[index].status = action.payload.status;
+            }
+        });
+
+        builder.addCase(deleteComment.fulfilled, (state, action) => {
+            state.comments = state.comments.filter(c => c.id !== action.payload);
         });
     },
 });

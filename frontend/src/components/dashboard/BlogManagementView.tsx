@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
-import { fetchAdminPosts, fetchCategories, createPost, updatePost, deletePost, fetchTags, createTag, updateTag, deleteTag, createCategory, updateCategory, deleteCategory } from '../../features/blog/blogSlice';
+import { fetchAdminPosts, fetchCategories, createPost, updatePost, deletePost, fetchTags, createTag, updateTag, deleteTag, createCategory, updateCategory, deleteCategory, fetchAllComments, updateCommentStatus, deleteComment } from '../../features/blog/blogSlice';
 import apiClient from '../../api/client';
 import {
     Box,
@@ -39,7 +39,8 @@ import {
     Label,
     Warning,
     Forum,
-    Email
+    Email,
+    CheckCircleOutline
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -81,7 +82,7 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const { posts, categories, tags, isLoading } = useSelector((state: RootState) => state.blog);
+    const { posts, categories, tags, comments, isLoading } = useSelector((state: RootState) => state.blog);
 
     // Dialog States
     const [openDialog, setOpenDialog] = useState(false);
@@ -116,6 +117,7 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
         dispatch(fetchAdminPosts());
         dispatch(fetchCategories());
         dispatch(fetchTags());
+        dispatch(fetchAllComments());
     }, [dispatch]);
 
     // Handlers
@@ -460,13 +462,127 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
         </Box>
     );
 
-    const renderComments = () => (
-        <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 4, border: '1px solid', borderColor: 'divider', background: alpha(theme.palette.background.paper, 0.6) }}>
-            <Forum sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
-            <Typography variant="h6" color="text.secondary">Community Conversations</Typography>
-            <Typography variant="body2" color="text.secondary">Comment moderation and engagement tools are coming soon to help you connect with your readers.</Typography>
-        </Paper>
-    );
+    const renderComments = () => {
+        // We fetch comments when this tab renders if not already loaded or explicit refresh
+        // This is handled by a useEffect in the main component if activeTab triggers it, 
+        // or we can add a refresh button here.
+
+        return (
+            <Paper sx={{ p: 0, borderRadius: 4, border: '1px solid', borderColor: 'divider', background: alpha(theme.palette.background.paper, 0.6), overflow: 'hidden' }}>
+                <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
+                    <Typography variant="h6" fontWeight="bold">Comment Moderation</Typography>
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => dispatch(fetchAllComments())}
+                        startIcon={<Forum />}
+                        sx={{ borderRadius: 2, textTransform: 'none' }}
+                    >
+                        Refresh
+                    </Button>
+                </Box>
+                <TableContainer>
+                    <Table>
+                        <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+                            <TableRow>
+                                <TableCell sx={{ fontWeight: 600 }}>Author</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Comment</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Post</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {(comments || []).map((comment: any) => (
+                                <TableRow key={comment.id} hover>
+                                    <TableCell>
+                                        <Typography variant="subtitle2" fontWeight="bold">{comment.name}</Typography>
+                                        <Typography variant="caption" color="text.secondary">{comment.email}</Typography>
+                                    </TableCell>
+                                    <TableCell sx={{ maxWidth: 300 }}>
+                                        <Typography variant="body2" noWrap>{comment.content}</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2">{comment.post_title || 'Unknown Post'}</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            label={comment.status}
+                                            size="small"
+                                            color={
+                                                comment.status === 'APPROVED' ? 'success' :
+                                                    comment.status === 'REJECTED' ? 'error' :
+                                                        comment.status === 'SPAM' ? 'warning' : 'default'
+                                            }
+                                            variant="outlined"
+                                            sx={{ fontWeight: 600, borderRadius: 1 }}
+                                        />
+                                    </TableCell>
+                                    <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+                                        {new Date(comment.created_at).toLocaleDateString()}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                                            {comment.status === 'PENDING' && (
+                                                <>
+                                                    <Tooltip title="Approve">
+                                                        <IconButton
+                                                            size="small"
+                                                            color="success"
+                                                            onClick={async () => {
+                                                                await dispatch(updateCommentStatus({ id: comment.id, status: 'APPROVED' }));
+                                                            }}
+                                                        >
+                                                            <CheckCircleOutline sx={{ fontSize: 20 }} />
+                                                            {/* Note: Icon used below is standard Check/Close */}
+                                                            <Box component="span" sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>✓</Box>
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                    <Tooltip title="Reject">
+                                                        <IconButton
+                                                            size="small"
+                                                            color="warning"
+                                                            onClick={async () => {
+                                                                await dispatch(updateCommentStatus({ id: comment.id, status: 'REJECTED' }));
+                                                            }}
+                                                        >
+                                                            <Box component="span" sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>✕</Box>
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </>
+                                            )}
+                                            <Tooltip title="Delete">
+                                                <IconButton
+                                                    size="small"
+                                                    color="error"
+                                                    onClick={async () => {
+                                                        if (window.confirm('Are you sure you want to delete this comment?')) {
+                                                            await dispatch(deleteComment(comment.id));
+                                                        }
+                                                    }}
+                                                >
+                                                    <Delete fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Box>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            {(comments || []).length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                                        <Forum sx={{ fontSize: 40, opacity: 0.3, mb: 1 }} />
+                                        <Typography>No comments found.</Typography>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
+        );
+    };
 
     const renderNewsletter = () => (
         <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 4, border: '1px solid', borderColor: 'divider', background: alpha(theme.palette.background.paper, 0.6) }}>
