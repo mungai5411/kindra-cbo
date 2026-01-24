@@ -701,7 +701,7 @@ export default function HomePage() {
                                     { label: 'Donate', path: '/donate' },
                                     { label: 'Volunteer', path: '/register?role=VOLUNTEER' },
                                     { label: 'Partner', path: '/register?role=SHELTER_PARTNER' },
-                                    { label: 'Contact', path: 'mailto:hello@kindracbo.org', isExternal: true }
+                                    { label: 'Contact', path: 'mailto:kindra-cbo@zohomail.com', isExternal: true }
                                 ].map(item => (
                                     <Typography
                                         key={item.label}
