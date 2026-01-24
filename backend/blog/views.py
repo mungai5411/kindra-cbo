@@ -248,9 +248,9 @@ class CommentAdminListView(generics.ListAPIView):
     ordering = ['-created_at']
 
 
-class CommentModerationView(generics.UpdateAPIView):
+class CommentAdminDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
-    Admin endpoint for moderating comments
+    Admin endpoint for moderating (update/delete) comments
     """
     queryset = Comment.objects.all()
     serializer_class = CommentModerationSerializer

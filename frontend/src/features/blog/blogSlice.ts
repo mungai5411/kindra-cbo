@@ -265,7 +265,7 @@ export const fetchAllComments = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             // Using the general comments endpoint which should support listing for admins
-            const response = await apiClient.get(endpoints.blog.comments);
+            const response = await apiClient.get(endpoints.blog.adminComments);
             return response.data.results || response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch comments');
@@ -277,7 +277,7 @@ export const updateCommentStatus = createAsyncThunk(
     'blog/updateCommentStatus',
     async ({ id, status }: { id: string; status: string }, { rejectWithValue }) => {
         try {
-            const response = await apiClient.patch(`${endpoints.blog.comments}${id}/`, { status });
+            const response = await apiClient.patch(`${endpoints.blog.adminComments}${id}/`, { status });
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to update comment status');
@@ -289,7 +289,7 @@ export const deleteComment = createAsyncThunk(
     'blog/deleteComment',
     async (id: string, { rejectWithValue }) => {
         try {
-            await apiClient.delete(`${endpoints.blog.comments}${id}/`);
+            await apiClient.delete(`${endpoints.blog.adminComments}${id}/`);
             return id;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to delete comment');
@@ -360,15 +360,15 @@ const blogSlice = createSlice({
 
             // Update current post if it's the one liked
             if (state.currentPost && state.currentPost.slug === slug) {
-                state.currentPost.hasLiked = liked;
-                state.currentPost.likesCount = likes_count;
+                state.currentPost.has_liked = liked;
+                state.currentPost.likes_count = likes_count;
             }
 
             // Update post in list if it's there
             const postIndex = state.posts.findIndex(p => p.slug === slug);
             if (postIndex !== -1) {
-                state.posts[postIndex].hasLiked = liked;
-                state.posts[postIndex].likesCount = likes_count;
+                state.posts[postIndex].has_liked = liked;
+                state.posts[postIndex].likes_count = likes_count;
             }
         });
 

@@ -158,6 +158,7 @@ export const endpoints = {
         adminPosts: '/blog/admin/posts/',
         adminCategories: '/blog/admin/categories/',
         adminTags: '/blog/admin/tags/',
+        adminComments: '/blog/admin/comments/',
     },
 
     // Donations

@@ -9,7 +9,7 @@ from .views import (
     TagAdminListCreateView, TagAdminDetailView,
     BlogPostAdminListCreateView, BlogPostAdminDetailView,
     CommentListView, CommentCreateView, PostLikeView,
-    CommentAdminListView, CommentModerationView,
+    CommentAdminListView, CommentAdminDetailView,
     NewsletterSubscribeView, NewsletterAdminListView,
     delete_blog_post_featured_image, delete_blog_post_og_image,
     TeamMemberViewSet, MediaAssetViewSet, SiteContentViewSet
@@ -47,7 +47,7 @@ urlpatterns = [
     path('admin/posts/', BlogPostAdminListCreateView.as_view(), name='admin-post-list'),
     path('admin/posts/<uuid:pk>/', BlogPostAdminDetailView.as_view(), name='admin-post-detail'),
     path('admin/comments/', CommentAdminListView.as_view(), name='admin-comment-list'),
-    path('admin/comments/<uuid:pk>/moderate/', CommentModerationView.as_view(), name='comment-moderate'),
+    path('admin/comments/<uuid:pk>/', CommentAdminDetailView.as_view(), name='admin-comment-detail'),
     path('admin/newsletter/', NewsletterAdminListView.as_view(), name='admin-newsletter-list'),
     
     # Image Management
