@@ -88,7 +88,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
 
         try {
             let endpoint = '';
-            let payload: any = {
+            const payload: any = {
                 amount: parseFloat(amount),
                 campaign: campaign.id,
                 donor_name: isAnonymous ? 'Anonymous' : donorName,

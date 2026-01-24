@@ -170,7 +170,7 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
         if (user && isDonor) {
             setDonorName(`${user.firstName} ${user.lastName}`);
             // Find donor phone if available in donors list
-            const currentDonor = donors.find(d => d.email === user.email || d.user === user.id);
+            const currentDonor = donors.find((d: any) => d.email === user.email || d.user === user.id);
             if (currentDonor?.phone_number) setDonorPhone(currentDonor.phone_number);
         }
 
@@ -182,7 +182,7 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
 
         window.addEventListener('open-donation-dialog', handleOpenExternalDonation);
         return () => window.removeEventListener('open-donation-dialog', handleOpenExternalDonation);
-    }, [dispatch]);
+    }, [dispatch, donors, isDonor, user]);
 
     const handleOpenStatusDialog = (campaign: any) => {
         setSelectedCampaign(campaign);

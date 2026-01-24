@@ -4,7 +4,7 @@
  * Styled with HomePage gradient aesthetic
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
     Box,
     Container,
@@ -66,11 +66,7 @@ export default function PendingDonationsView() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    useEffect(() => {
-        fetchDonations();
-    }, [filter]);
-
-    const fetchDonations = async () => {
+    const fetchDonations = useCallback(async () => {
         setLoading(true);
         try {
             const response = await apiClient.get(endpoints.donations.donations, {
@@ -82,7 +78,11 @@ export default function PendingDonationsView() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filter]);
+
+    useEffect(() => {
+        fetchDonations();
+    }, [fetchDonations]);
 
     const handleApprove = async (donationId: string) => {
         setProcessing(true);

@@ -56,7 +56,7 @@ export const colors = {
     },
 };
 
-let baseTheme = createTheme({
+const baseTheme = createTheme({
     palette: colors,
     typography: {
         fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',

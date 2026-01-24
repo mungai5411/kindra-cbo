@@ -3,7 +3,7 @@
  * Refactored modular version
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -136,7 +136,7 @@ export default function DashboardPage() {
         navigate('/');
     };
 
-    const canViewModule = (itemId: string) => {
+    const canViewModule = useCallback((itemId: string) => {
         if (!user) return false;
 
         // Admins and Management see everything EXCEPT specific views they manage elsewhere
@@ -172,7 +172,7 @@ export default function DashboardPage() {
 
         // Default: deny access
         return false;
-    };
+    }, [user]);
 
     // Force fetch profile on mount to ensure fresh data (fixes cross-device sync)
     useEffect(() => {
@@ -188,7 +188,7 @@ export default function DashboardPage() {
             // Redirect to overview if user tries to access restricted tab
             navigate('/dashboard/overview');
         }
-    }, [isAuthenticated, user, navigate, authLoading, activeTab]);
+    }, [isAuthenticated, user, navigate, authLoading, activeTab, canViewModule]);
 
     // Handle form submissions
     const handleAddVolunteer = async () => {
