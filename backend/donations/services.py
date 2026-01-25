@@ -321,7 +321,7 @@ class MaterialAcknowledgmentService:
 
             context = {
                 'material_donation': material_donation,
-                'donor_name': material_donation.donor.user.get_full_name() if material_donation.donor and material_donation.donor.user else "Valued Donor",
+                'donor_name': material_donation.donor.full_name if material_donation.donor else "Anonymous",
                 'donation_date': material_donation.updated_at.strftime('%d %b %Y'),
                 'category': material_donation.category,
                 'description': material_donation.description,

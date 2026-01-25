@@ -28,8 +28,8 @@
 
     <div class="field-row">
         <span class="field-label">Received From:</span>
-        <span class="field-value readable-bold">{{ donation.donor_name|default:donation.donor.full_name|default:"Valued
-            Supporter" }}</span>
+        <strong class="field-value readable-bold">{% if donation.is_anonymous %}Anonymous{% else %}{{
+            donation.donor_name|default:donation.donor.full_name|default:"Valued Supporter" }}{% endif %}</strong>
     </div>
 
     <div class="field-row">
