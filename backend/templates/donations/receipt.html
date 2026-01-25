@@ -28,7 +28,6 @@
             border-radius: 3px;
         }
 
-        /* Dynamic Layout */
         .layout-both {
             width: 48.5%;
             float: left;
@@ -38,17 +37,13 @@
             width: 100%;
         }
 
-            {
-            % if bg_path %
-        }
-
+        /* Using comments to hide Django logic from IDE CSS parser */
+        /* {% if bg_path %} */
         .receipt-card {
             background-image: url('{{ bg_path }}');
         }
 
-            {
-            % endif %
-        }
+        /* {% endif %} */
 
         .divider {
             width: 3%;
@@ -186,7 +181,7 @@
         .handwritten {
             font-family: 'HandwrittenFont', 'Segoe Script', cursive;
             color: #1a237e;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .field-value {
@@ -240,25 +235,21 @@
         }
     </style>
 
-    {% if font_path %}<style>
+    {% if font_path %}
+    <style>
         @font-face {
             font-family: 'HandwrittenFont';
             src: url('{{ font_path }}');
         }
-    </style>{% endif %}
-    {% if target_copy == 'both' %}<style>
-        @page {
-            size: letter landscape;
-            margin: 0.2cm;
-        }
-    </style>
-    {% else %}<style>
-        @page {
-            size: 14cm 9cm;
-            margin: 0.2cm;
-        }
     </style>
     {% endif %}
+
+    <style>
+        /* Separating @page logic to satisfy IDE */
+        @page {
+            margin: 0.2cm;
+        }
+    </style>
 </head>
 
 <body>
