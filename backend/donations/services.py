@@ -235,18 +235,18 @@ class ReceiptService:
                 logger.error(f"Receipt {receipt.receipt_number} has no associated donation")
                 return None
                 
-            # Physical paths for images to work with xhtml2pdf
+            # Physical paths for assets
             logo_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'images', 'logo.jpg')
-            bg_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'images', 'background.png')
             font_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'Handwritten.ttf')
             
-            # Fallback if files don't exist
+            # Use empty string instead of None to avoid url('None') in CSS
             if not os.path.exists(logo_path):
-                logo_path = None
-            if not os.path.exists(bg_path):
-                bg_path = None
+                logo_path = ""
             if not os.path.exists(font_path):
-                font_path = None
+                font_path = ""
+            
+            # background.png currently not present
+            bg_path = ""
 
             context = {
                 'receipt': receipt,
