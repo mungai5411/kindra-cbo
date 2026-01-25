@@ -11,7 +11,6 @@ import {
     MenuItem,
     CircularProgress,
     useTheme,
-    alpha,
     Dialog,
     DialogContent,
     Typography,
@@ -23,7 +22,6 @@ import { Close, Visibility, VisibilityOff } from '@mui/icons-material';
 import { register } from '../../features/auth/authSlice';
 import type { AppDispatch } from '../../store';
 import { useAuthModal } from '../../contexts/AuthModalContext';
-import logo from '../../assets/logo.jpg';
 
 const ROLES = [
     { value: 'VOLUNTEER', label: 'Volunteer' },
@@ -109,11 +107,14 @@ export const RegisterModal = () => {
         fontSize: '0.9rem',
     };
 
-    const labelSx = {
-        variant: "body2",
-        fontWeight: "600",
-        sx: { mb: 0.75, color: '#333', fontSize: '0.85rem' }
-    };
+    const LabelComponent = ({ children }: { children: React.ReactNode }) => (
+        <Typography
+            variant="body2"
+            sx={{ mb: 0.75, color: '#333', fontSize: '0.85rem', fontWeight: "600" }}
+        >
+            {children}
+        </Typography>
+    );
 
     return (
         <Dialog
@@ -161,7 +162,7 @@ export const RegisterModal = () => {
                 <Box component="form" onSubmit={handleSubmit}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
-                            <Typography {...labelSx}>First Name *</Typography>
+                            <LabelComponent>First Name *</LabelComponent>
                             <TextField
                                 fullWidth
                                 name="first_name"
@@ -173,7 +174,7 @@ export const RegisterModal = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Typography {...labelSx}>Last Name *</Typography>
+                            <LabelComponent>Last Name *</LabelComponent>
                             <TextField
                                 fullWidth
                                 name="last_name"
@@ -185,7 +186,7 @@ export const RegisterModal = () => {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography {...labelSx}>Email Address *</Typography>
+                            <LabelComponent>Email Address *</LabelComponent>
                             <TextField
                                 fullWidth
                                 name="email"
@@ -198,7 +199,7 @@ export const RegisterModal = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Typography {...labelSx}>Phone Number</Typography>
+                            <LabelComponent>Phone Number</LabelComponent>
                             <TextField
                                 fullWidth
                                 name="phone_number"
@@ -209,7 +210,7 @@ export const RegisterModal = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Typography {...labelSx}>I am a... *</Typography>
+                            <LabelComponent>I am a... *</LabelComponent>
                             <TextField
                                 fullWidth
                                 select
@@ -227,7 +228,7 @@ export const RegisterModal = () => {
                             </TextField>
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography {...labelSx}>Organization (Optional)</Typography>
+                            <LabelComponent>Organization (Optional)</LabelComponent>
                             <TextField
                                 fullWidth
                                 name="organization"
@@ -238,7 +239,7 @@ export const RegisterModal = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Typography {...labelSx}>Password *</Typography>
+                            <LabelComponent>Password *</LabelComponent>
                             <TextField
                                 fullWidth
                                 name="password"
@@ -264,7 +265,7 @@ export const RegisterModal = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Typography {...labelSx}>Confirm Password *</Typography>
+                            <LabelComponent>Confirm Password *</LabelComponent>
                             <TextField
                                 fullWidth
                                 name="password_confirm"

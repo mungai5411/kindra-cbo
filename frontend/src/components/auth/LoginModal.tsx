@@ -21,7 +21,11 @@ import {
     Grid,
     Paper
 } from '@mui/material';
-import { Visibility, VisibilityOff, Close, Security, Groups, Favorite, Business } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Close, Groups, Favorite, Business } from '@mui/icons-material';
+import DOMPurify from 'isomorphic-dompurify';
+import { useAuthModal } from '../../contexts/AuthModalContext';
+import { GoogleLogin } from '@react-oauth/google';
+import apiClient, { endpoints } from '../../api/client';
 
 const ROLES = [
     { value: 'DONOR', label: 'Donor', icon: <Favorite />, description: 'I want to donate and support causes' },
@@ -31,12 +35,11 @@ const ROLES = [
 
 // Google Sign-In Component
 const GoogleSignInButton = ({ onSuccess, onNewUser }: { onSuccess: (data: any) => void, onNewUser: (credential: string) => void }) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const handleGoogleSuccess = async (credentialResponse: any) => {
-        setIsLoading(true);
+        setIsProcessing(true);
         setError('');
 
         try {
@@ -56,17 +59,11 @@ const GoogleSignInButton = ({ onSuccess, onNewUser }: { onSuccess: (data: any) =
             localStorage.setItem('refreshToken', refresh);
             localStorage.setItem('user', JSON.stringify(user));
 
-            // Update Redux state
-            dispatch({
-                type: 'auth/login/fulfilled',
-                payload: { access, refresh, user }
-            });
-
             onSuccess(response.data);
         } catch (err: any) {
             setError(err.response?.data?.error || 'Google sign-in failed');
         } finally {
-            setIsLoading(false);
+            setIsProcessing(false);
         }
     };
 
@@ -82,7 +79,9 @@ const GoogleSignInButton = ({ onSuccess, onNewUser }: { onSuccess: (data: any) =
                 display: 'flex',
                 justifyContent: 'center',
                 '& > div': { width: '100% !important' },
-                '& iframe': { width: '100% !important', borderRadius: '8px !important' }
+                '& iframe': { width: '100% !important', borderRadius: '8px !important' },
+                opacity: isProcessing ? 0.7 : 1,
+                pointerEvents: isProcessing ? 'none' : 'auto'
             }}>
                 <GoogleLogin
                     onSuccess={handleGoogleSuccess}
@@ -97,7 +96,10 @@ const GoogleSignInButton = ({ onSuccess, onNewUser }: { onSuccess: (data: any) =
     );
 };
 
-// ... (sanitizeInput function remains)
+// Input sanitization function
+const sanitizeInput = (input: string): string => {
+    return DOMPurify.sanitize(input, { ALLOWED_TAGS: [] });
+};
 
 export const LoginModal = () => {
     const theme = useTheme();
@@ -106,7 +108,7 @@ export const LoginModal = () => {
     const location = useLocation();
     const dispatch = useDispatch<AppDispatch>();
     const { isLoginOpen, closeLoginModal, switchToRegister } = useAuthModal();
-    const { isLoading, error } = useSelector((state: RootState) => state.auth);
+    const { isLoading: reduxLoading, error: reduxError } = useSelector((state: RootState) => state.auth);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -177,7 +179,54 @@ export const LoginModal = () => {
         }
     };
 
-    // ... (validateEmail and handleSubmit remaining)
+    const validateEmail = (email: string): boolean => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLocalError('');
+        setRateLimitError('');
+        setLocalLoading(true);
+
+        const sanitizedEmail = sanitizeInput(email.trim().toLowerCase());
+        const sanitizedPassword = password;
+
+        if (!validateEmail(sanitizedEmail)) {
+            setLocalError('Please enter a valid email address');
+            setLocalLoading(false);
+            return;
+        }
+
+        if (sanitizedPassword.length < 8) {
+            setLocalError('Password must be at least 8 characters');
+            setLocalLoading(false);
+            return;
+        }
+
+        try {
+            await Promise.all([
+                dispatch(login({
+                    email: sanitizedEmail,
+                    password: sanitizedPassword
+                })).unwrap(),
+                new Promise(resolve => setTimeout(resolve, 800))
+            ]);
+
+            closeLoginModal();
+            const from = (location.state as any)?.from?.pathname || '/dashboard';
+            navigate(from, { replace: true });
+        } catch (err: any) {
+            if (typeof err === 'string' && err.includes('Rate limit exceeded')) {
+                setRateLimitError('Too many login attempts. Please try again later.');
+            } else {
+                setLocalError(err || 'Login failed. Please check your credentials.');
+            }
+        } finally {
+            setLocalLoading(false);
+        }
+    };
 
     return (
         <Dialog
@@ -224,7 +273,11 @@ export const LoginModal = () => {
                     </Box>
 
                     <GoogleSignInButton
-                        onSuccess={() => {
+                        onSuccess={(data) => {
+                            dispatch({
+                                type: 'auth/login/fulfilled',
+                                payload: { access: data.access, refresh: data.refresh, user: data.user }
+                            });
                             closeLoginModal();
                             const from = (location.state as any)?.from?.pathname || '/dashboard';
                             navigate(from, { replace: true });
@@ -240,9 +293,9 @@ export const LoginModal = () => {
                         <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
                     </Box>
 
-                    {(error || localError) && !rateLimitError && (
+                    {(reduxError || localError) && !rateLimitError && (
                         <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
-                            {localError || error}
+                            {localError || reduxError}
                         </Alert>
                     )}
 
@@ -263,7 +316,7 @@ export const LoginModal = () => {
                                 placeholder="Enter your email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                disabled={isLoading}
+                                disabled={localLoading || reduxLoading}
                                 required
                                 InputProps={{
                                     sx: {
@@ -271,7 +324,7 @@ export const LoginModal = () => {
                                         borderRadius: '8px',
                                         '& fieldset': { borderColor: '#ddd' },
                                         '&:hover fieldset': { borderColor: '#bbb !important' },
-                                        &.Mui - focused fieldset': { borderColor: '#000 !important', borderWidth: '1px' },
+                                        '&.Mui-focused fieldset': { borderColor: '#000 !important', borderWidth: '1px' },
                                     }
                                 }}
                             />
@@ -288,7 +341,7 @@ export const LoginModal = () => {
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                disabled={isLoading}
+                                disabled={localLoading || reduxLoading}
                                 required
                                 InputProps={{
                                     sx: {
@@ -356,7 +409,7 @@ export const LoginModal = () => {
                             fullWidth
                             type="submit"
                             variant="contained"
-                            disabled={localLoading || isLoading || !!rateLimitError}
+                            disabled={localLoading || reduxLoading || !!rateLimitError}
                             sx={{
                                 bgcolor: '#000',
                                 color: '#fff',
@@ -376,7 +429,7 @@ export const LoginModal = () => {
                                 }
                             }}
                         >
-                            {(localLoading || isLoading) ? <CircularProgress size={24} color="inherit" /> : 'Sign in'}
+                            {(localLoading || reduxLoading) ? <CircularProgress size={24} color="inherit" /> : 'Sign in'}
                         </Button>
 
                         <Box sx={{ mt: 4, textAlign: 'center' }}>
