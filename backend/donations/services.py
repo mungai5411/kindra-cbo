@@ -223,12 +223,13 @@ class ReceiptService:
     @staticmethod
     def generate_pdf_receipt(receipt, target_copy='both'):
         """
-        Generate a professional PDF receipt using HTML templates
+        Generate a professional PDF receipt using HTML templates and WeasyPrint
         target_copy: 'office', 'client', or 'both'
         """
         try:
             from django.template.loader import render_to_string
-            from xhtml2pdf import pisa
+            from weasyprint import HTML
+            from django.conf import settings
             
             donation = receipt.donation
             if not donation:
@@ -238,6 +239,7 @@ class ReceiptService:
             # Physical paths for assets
             logo_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'images', 'logo.jpg')
             font_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'Handwritten.ttf')
+            bg_path = "" # background.png currently not present
             
             # Use empty string instead of None to avoid url('None') in CSS
             if not os.path.exists(logo_path):
@@ -245,9 +247,6 @@ class ReceiptService:
             if not os.path.exists(font_path):
                 font_path = ""
             
-            # background.png currently not present
-            bg_path = ""
-
             context = {
                 'receipt': receipt,
                 'donation': donation,
@@ -261,14 +260,19 @@ class ReceiptService:
                 'server_url': settings.BACKEND_URL if hasattr(settings, 'BACKEND_URL') else 'http://localhost:8000',
             }
             
-            html_string = render_to_string('donations/receipt.html', context)
-            buffer = io.BytesIO()
-            pisa_status = pisa.CreatePDF(html_string.encode('utf-8'), dest=buffer, encoding='utf-8')
+            # Select template based on target_copy
+            template_name = 'donations/receipt.html' # Default is 'both'
+            if target_copy == 'office':
+                template_name = 'donations/receipt_office.html'
+            elif target_copy == 'client':
+                template_name = 'donations/receipt_client.html'
             
-            if pisa_status.err:
-                logger.error(f"PDF generation error for receipt {receipt.receipt_number}")
-                raise Exception("xhtml2pdf CreatePDF failed")
-                
+            html_string = render_to_string(template_name, context)
+            
+            # Generate PDF using WeasyPrint
+            buffer = io.BytesIO()
+            HTML(string=html_string, base_url=settings.BASE_DIR).write_pdf(buffer)
+            
             buffer.seek(0)
             filename = f"receipt_{receipt.receipt_number}.pdf"
             content = buffer.read()
@@ -276,14 +280,14 @@ class ReceiptService:
             # Try to save to storage, but don't fail if storage is misconfigured
             try:
                 receipt.receipt_file.save(filename, ContentFile(content), save=True)
-                logger.info(f"Generated PDF file for receipt {receipt.receipt_number} using template")
+                logger.info(f"Generated PDF file for receipt {receipt.receipt_number} using {template_name} (WeasyPrint)")
             except Exception as storage_error:
                 logger.warning(f"Failed to save receipt to storage (will still return content): {str(storage_error)}")
             
             return content
             
         except Exception as e:
-            logger.error(f"Error generating PDF receipt with template: {str(e)}", exc_info=True)
+            logger.error(f"Error generating PDF receipt with WeasyPrint: {str(e)}", exc_info=True)
             return None
 
 

@@ -1,0 +1,5 @@
+{% extends "donations/receipt_base.html" %}
+{% block title %}Client Receipt - {{ receipt.receipt_number }}{% endblock %}
+{% block content %}
+{% include "donations/receipt_slip.html" with copy_label="CLIENT COPY" is_single=True %}
+{% endblock %}
