@@ -159,6 +159,7 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
         return 'Bronze Partner';
     };
 
+    // Initial mounting fetch
     useEffect(() => {
         dispatch(fetchCampaigns());
         dispatch(fetchDonations());
@@ -166,13 +167,6 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
         dispatch(fetchReceipts());
         dispatch(fetchMaterialDonations());
         dispatch(fetchEvents());
-
-        if (user && isDonor) {
-            setDonorName(`${user.firstName} ${user.lastName}`);
-            // Find donor phone if available in donors list
-            const currentDonor = donors.find((d: any) => d.email === user.email || d.user === user.id);
-            if (currentDonor?.phone_number) setDonorPhone(currentDonor.phone_number);
-        }
 
         const handleOpenExternalDonation = (e: any) => {
             if (e.detail) {
@@ -182,7 +176,17 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
 
         window.addEventListener('open-donation-dialog', handleOpenExternalDonation);
         return () => window.removeEventListener('open-donation-dialog', handleOpenExternalDonation);
-    }, [dispatch, donors, isDonor, user]);
+    }, [dispatch]);
+
+    // Update local donor state when user or donors list changes
+    useEffect(() => {
+        if (user && isDonor) {
+            setDonorName(`${user.firstName} ${user.lastName}`);
+            // Find donor phone if available in donors list
+            const currentDonor = donors.find((d: any) => d.email === user.email || d.user === user.id);
+            if (currentDonor?.phone_number) setDonorPhone(currentDonor.phone_number);
+        }
+    }, [user, isDonor, donors]);
 
     const handleOpenStatusDialog = (campaign: any) => {
         setSelectedCampaign(campaign);
