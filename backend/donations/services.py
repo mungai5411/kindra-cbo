@@ -11,6 +11,9 @@ from .models import Donor, Campaign, Donation, Receipt, MaterialDonation
 from accounts.models import User, Notification, AuditLog
 from django.core.files.base import ContentFile
 import io
+import os
+from django.conf import settings
+from .utils import amount_to_words, get_date_digits
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
@@ -218,9 +221,10 @@ class ReceiptService:
     """
     
     @staticmethod
-    def generate_pdf_receipt(receipt):
+    def generate_pdf_receipt(receipt, target_copy='both'):
         """
         Generate a professional PDF receipt using HTML templates
+        target_copy: 'office', 'client', or 'both'
         """
         try:
             from django.template.loader import render_to_string
@@ -231,11 +235,30 @@ class ReceiptService:
                 logger.error(f"Receipt {receipt.receipt_number} has no associated donation")
                 return None
                 
+            # Physical paths for images to work with xhtml2pdf
+            logo_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'images', 'logo.jpg')
+            bg_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'images', 'background.png')
+            font_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'Handwritten.ttf')
+            
+            # Fallback if files don't exist
+            if not os.path.exists(logo_path):
+                logo_path = None
+            if not os.path.exists(bg_path):
+                bg_path = None
+            if not os.path.exists(font_path):
+                font_path = None
+
             context = {
                 'receipt': receipt,
                 'donation': donation,
-                'date': timezone.now().strftime('%d %b %Y'),
-                'server_url': 'http://localhost:8000', # Should be from settings
+                'date': donation.donation_date.strftime('%d %b %Y'),
+                'date_digits': get_date_digits(donation.donation_date),
+                'amount_in_words': amount_to_words(donation.amount, donation.currency),
+                'logo_path': logo_path,
+                'bg_path': bg_path,
+                'font_path': font_path,
+                'target_copy': target_copy, # 'office', 'client', or 'both'
+                'server_url': settings.BACKEND_URL if hasattr(settings, 'BACKEND_URL') else 'http://localhost:8000',
             }
             
             html_string = render_to_string('donations/receipt.html', context)

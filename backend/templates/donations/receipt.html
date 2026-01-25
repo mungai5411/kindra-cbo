@@ -1,65 +1,461 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Donation Receipt</title>
     <style>
-        body { font-family: Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
-        .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
-        .logo { font-size: 24px; font-weight: bold; color: #2c3e50; }
-        .sub-header { color: #7f8c8d; font-size: 14px; }
-        .receipt-info { margin-bottom: 30px; }
-        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .table { width: 100%; margin-bottom: 30px; border-collapse: collapse; }
-        .table th { background: #f8f9fa; text-align: left; padding: 12px; border-bottom: 2px solid #dee2e6; }
-        .table td { padding: 12px; border-bottom: 1px solid #dee2e6; }
-        .total-row { font-weight: bold; font-size: 18px; }
-        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 20px; }
-        .signature-box { margin-top: 40px; }
-        .signature-line { width: 200px; border-top: 1px solid #000; margin-top: 50px; }
+        {
+            % if font_path %
+        }
+
+        @font-face {
+            font-family: 'HandwrittenFont';
+            src: url('{{ font_path }}');
+        }
+
+            {
+            % endif %
+        }
+
+        @page {
+                {
+                % if target_copy=='both' %
+            }
+
+            size: letter landscape;
+
+                {
+                % else %
+            }
+
+            size: 14cm 9cm;
+
+            /* Even more compact slip size */
+                {
+                % endif %
+            }
+
+            margin: 0.2cm;
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #1a4d1a;
+            font-size: 11px;
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        .receipt-card {
+                {
+                % if target_copy=='both' %
+            }
+
+            width: 48.5%;
+            float: left;
+
+                {
+                % else %
+            }
+
+            width: 100%;
+
+                {
+                % endif %
+            }
+
+            height: 8.5cm;
+            /* Reduced from 11cm */
+            position: relative;
+            background-image: url('{{ bg_path }}');
+            background-size: cover;
+            background-position: center;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 3px;
+        }
+
+        .divider {
+            width: 3%;
+            height: 8.5cm;
+            float: left;
+            text-align: center;
+            position: relative;
+        }
+
+        .dotted-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            border-left: 1px dotted #999;
+        }
+
+        .scissors {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            background: white;
+            padding: 2px;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .logo-box {
+            float: left;
+            width: 60px;
+        }
+
+        .logo-img {
+            width: 50px;
+            height: auto;
+        }
+
+        .company-info {
+            float: left;
+            margin-left: 5px;
+        }
+
+        .company-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #4CAF50;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .company-details {
+            font-size: 10px;
+            color: #666;
+            margin: 0;
+        }
+
+        .copy-type {
+            float: right;
+            font-size: 9px;
+            text-transform: uppercase;
+            color: #999;
+            font-weight: bold;
+        }
+
+        /* Label */
+        .receipt-label {
+            background-color: #8BC34A;
+            color: white;
+            display: inline-block;
+            padding: 2px 10px;
+            font-weight: bold;
+            font-size: 11px;
+            border-radius: 3px;
+            margin: 5px 0;
+            text-transform: uppercase;
+        }
+
+        /* Top Row (No and Date) */
+        .top-row {
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .receipt-no {
+            float: left;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .date-box {
+            float: right;
+        }
+
+        .date-label {
+            font-size: 9px;
+            font-weight: bold;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 3px;
+        }
+
+        .date-grid {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .date-cell {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #1a4d1a;
+            text-align: center;
+            line-height: 14px;
+            margin-left: -1px;
+            font-size: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Form Fields */
+        .field-row {
+            margin-bottom: 8px;
+            border-bottom: 0.5px dotted #1a4d1a;
+            padding-bottom: 1px;
+            position: relative;
+        }
+
+        .field-label {
+            font-weight: bold;
+            font-size: 11px;
+            margin-right: 3px;
+        }
+
+        .handwritten {
+            font-family: 'HandwrittenFont', 'Segoe Script', cursive;
+            color: #1a237e;
+            font-size: 13px;
+        }
+
+        .field-value {
+            font-size: 11px;
+        }
+
+        /* Amount Section */
+        .footer-section {
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .amount-box {
+            float: left;
+            width: 180px;
+            border: 1.5px solid #8BC34A;
+            background-color: white;
+        }
+
+        .amount-label {
+            background-color: #8BC34A;
+            color: white;
+            padding: 2px 6px;
+            font-weight: bold;
+            display: inline-block;
+            width: 50px;
+        }
+
+        .amount-value {
+            padding: 2px 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #1a4d1a;
+            display: inline-block;
+        }
+
+        .signature-section {
+            float: right;
+            text-align: center;
+            width: 150px;
+        }
+
+        .signature-line {
+            border-top: 1px solid #1a4d1a;
+            margin-bottom: 3px;
+            padding-top: 3px;
+        }
+
+        .signature-text {
+            font-size: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
+
 <body>
-    <div class="header">
-        <div class="logo">KINDRA CBO</div>
-        <div class="sub-header">Official Donation Receipt<br>Nairobi, Kenya | info@kindra.org</div>
-    </div>
+    <div class="container">
+        <!-- OFFICE COPY -->
+        {% if target_copy == 'both' or target_copy == 'office' %}
+        <div class="receipt-card">
+            <div class="header">
+                <div class="copy-type">OFFICE COPY</div>
+                <div class="logo-box">
+                    {% if logo_path %}
+                    <img src="{{ logo_path }}" class="logo-img">
+                    {% else %}
+                    <div
+                        style="border:1px solid #ccc; width:40px; height:40px; line-height:40px; text-align:center; font-size:8px;">
+                        LOGO</div>
+                    {% endif %}
+                </div>
+                <div class="company-info">
+                    <p class="company-name">KINDRA CBO</p>
+                    <p class="company-details">Nairobi, Kenya | info@kindra.org</p>
+                </div>
+            </div>
 
-    <div class="receipt-info">
-        <p><strong>Receipt Number:</strong> {{ receipt.receipt_number }}</p>
-        <p><strong>Date:</strong> {{ date }}</p>
-        <p><strong>Donor:</strong> {{ receipt.donation.donor_name|default:receipt.donation.donor.full_name }}</p>
-    </div>
+            <div style="text-align: center;">
+                <div class="receipt-label">Money Receipt</div>
+            </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Description</th>
-                <th style="text-align: right">Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Donation to {{ receipt.donation.campaign.title|default:"General Fund" }}</td>
-                <td style="text-align: right">{{ receipt.donation.currency }} {{ receipt.donation.amount }}</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td class="total-row">Total</td>
-                <td class="total-row" style="text-align: right">{{ receipt.donation.currency }} {{ receipt.donation.amount }}</td>
-            </tr>
-        </tfoot>
-    </table>
+            <div class="top-row">
+                <div class="receipt-no">No. {{ receipt.receipt_number|slice:"4:" }}</div>
+                <div class="date-box">
+                    <div class="date-label">DATE</div>
+                    <div class="date-grid">
+                        {% for digit in date_digits %}
+                        <div class="date-cell">{{ digit }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
 
-    <div class="signature-box">
-        <p>Authorized Signature:</p>
-        <div class="signature-line"></div>
-    </div>
+            <div class="field-row">
+                <span class="field-label">Received From:</span>
+                <span class="field-value">{{ donation.donor_name|default:donation.donor.full_name|default:"Valued
+                    Supporter" }}</span>
+            </div>
 
-    <div class="footer">
-        <p>Thank you for your generous support. Your donation is tax deductible for the year {{ receipt.tax_year }}.</p>
-        <p>KINDRA CBO is a registered community-based organization.</p>
+            <div class="field-row">
+                <span class="field-label">In Words:</span>
+                <span class="field-value handwritten">{{ amount_in_words }}</span>
+            </div>
+
+            <div style="overflow: hidden;">
+                <div class="field-row" style="width: 55%; float: left; margin-bottom: 5px;">
+                    <span class="field-label">Payment:</span>
+                    <span class="field-value">{{ donation.payment_method }} - {{ donation.transaction_id|slice:":8"
+                        }}</span>
+                </div>
+                <div class="field-row" style="width: 40%; float: right; margin-bottom: 5px;">
+                    <span class="field-label">Date:</span>
+                    <span class="field-value">{{ date }}</span>
+                </div>
+            </div>
+
+            <div style="overflow: hidden;">
+                <div class="field-row" style="width: 40%; float: left;">
+                    <span class="field-label">Bank:</span>
+                    <span class="field-value">{% if donation.payment_method == 'MPESA' %}Safaricom{% else %}{{
+                        donation.payment_method }}{% endif %}</span>
+                </div>
+                <div class="field-row" style="width: 55%; float: right;">
+                    <span class="field-label">For:</span>
+                    <span class="field-value">{{ donation.campaign.title|default:"General Support" }}</span>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <div class="amount-box">
+                    <span class="amount-label">Amount</span>
+                    <span class="amount-value">{{ donation.currency }} {{ donation.amount|floatformat:2 }}</span>
+                </div>
+                <div class="signature-section">
+                    <div class="handwritten" style="height: 30px; margin-bottom: -8px;">Admin</div>
+                    <div class="signature-line"></div>
+                    <div class="signature-text">Authorized Signature</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if target_copy == 'both' %}
+        <div class="divider">
+            <div class="dotted-line"></div>
+            <div class="scissors">✂</div>
+        </div>
+        {% endif %}
+
+        <!-- CLIENT COPY -->
+        {% if target_copy == 'both' or target_copy == 'client' %}
+        <div class="receipt-card">
+            <div class="header">
+                <div class="copy-type">CLIENT COPY</div>
+                <div class="logo-box">
+                    {% if logo_path %}
+                    <img src="{{ logo_path }}" class="logo-img">
+                    {% else %}
+                    <div
+                        style="border:1px solid #ccc; width:40px; height:40px; line-height:40px; text-align:center; font-size:8px;">
+                        LOGO</div>
+                    {% endif %}
+                </div>
+                <div class="company-info">
+                    <p class="company-name">KINDRA CBO</p>
+                    <p class="company-details">Nairobi, Kenya | info@kindra.org</p>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <div class="receipt-label">Money Receipt</div>
+            </div>
+
+            <div class="top-row">
+                <div class="receipt-no">No. {{ receipt.receipt_number|slice:"4:" }}</div>
+                <div class="date-box">
+                    <div class="date-label">DATE</div>
+                    <div class="date-grid">
+                        {% for digit in date_digits %}
+                        <div class="date-cell">{{ digit }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <span class="field-label">Received From:</span>
+                <span class="field-value">{{ donation.donor_name|default:donation.donor.full_name|default:"Valued
+                    Supporter" }}</span>
+            </div>
+
+            <div class="field-row">
+                <span class="field-label">In Words:</span>
+                <span class="field-value handwritten">{{ amount_in_words }}</span>
+            </div>
+
+            <div style="overflow: hidden;">
+                <div class="field-row" style="width: 55%; float: left; margin-bottom: 5px;">
+                    <span class="field-label">Payment:</span>
+                    <span class="field-value">{{ donation.payment_method }} - {{ donation.transaction_id|slice:":8"
+                        }}</span>
+                </div>
+                <div class="field-row" style="width: 40%; float: right; margin-bottom: 5px;">
+                    <span class="field-label">Date:</span>
+                    <span class="field-value">{{ date }}</span>
+                </div>
+            </div>
+
+            <div style="overflow: hidden;">
+                <div class="field-row" style="width: 40%; float: left;">
+                    <span class="field-label">Bank:</span>
+                    <span class="field-value">{% if donation.payment_method == 'MPESA' %}Safaricom{% else %}{{
+                        donation.payment_method }}{% endif %}</span>
+                </div>
+                <div class="field-row" style="width: 55%; float: right;">
+                    <span class="field-label">For:</span>
+                    <span class="field-value">{{ donation.campaign.title|default:"General Support" }}</span>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <div class="amount-box">
+                    <span class="amount-label">Amount</span>
+                    <span class="amount-value">{{ donation.currency }} {{ donation.amount|floatformat:2 }}</span>
+                </div>
+                <div class="signature-section">
+                    <div class="handwritten" style="height: 30px; margin-bottom: -8px;">Admin</div>
+                    <div class="signature-line"></div>
+                    <div class="signature-text">Authorized Signature</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </body>
+
 </html>

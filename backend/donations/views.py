@@ -9,9 +9,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.response import Response
 from django.http import Http404
-from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
-
+from django.utils import timezone
 from .models import Donor, Campaign, Donation, Receipt, SocialMediaPost, MaterialDonation
 from .serializers import (
     DonorSerializer, CampaignSerializer, DonationSerializer, 
@@ -400,41 +398,32 @@ def download_receipt(request, pk):
         
         logger.info(f"Processing receipt download for receipt {receipt.receipt_number} (ID: {pk})")
         
-        # Generate if file is missing, get content directly
-        file_content = None
-        if not receipt.receipt_file:
-            logger.info(f"Receipt file not found in storage, generating PDF for {receipt.receipt_number}")
-            file_content = ReceiptService.generate_pdf_receipt(receipt)
+        # Determine which copy to serve
+        # For admins, allow choosing via query param ?type=client|office|both (default office)
+        # For donors, force client copy
+        target_copy = request.query_params.get('type', 'office')
         
-        # If we got content from generation, use it
+        if request.user.role == 'DONOR':
+            target_copy = 'client'
+        elif target_copy not in ['office', 'client', 'both']:
+            target_copy = 'office'
+            
+        logger.info(f"Generating {target_copy} copy for {request.user.email} (Role: {request.user.role})")
+        
+        file_content = ReceiptService.generate_pdf_receipt(receipt, target_copy=target_copy)
+        
         if file_content:
+            # Mark as sent if not already (or at least track the status)
+            if not receipt.donation.receipt_sent:
+                receipt.donation.receipt_sent = True
+                receipt.donation.receipt_sent_at = timezone.now()
+                receipt.donation.save(update_fields=['receipt_sent', 'receipt_sent_at'])
+                logger.info(f"Marked donation {receipt.donation.id} as receipt sent")
+
             response = HttpResponse(file_content, content_type='application/pdf')
-            filename = f"receipt_{receipt.receipt_number}.pdf"
+            filename = f"receipt_{receipt.receipt_number}_{target_copy}.pdf"
             response['Content-Disposition'] = f'attachment; filename="{filename}"'
-            logger.info(f"Successfully serving generated receipt {receipt.receipt_number}")
             return response
-        
-        # Otherwise try to read from storage (fallback for existing files)
-        if receipt.receipt_file:
-            try:
-                logger.info(f"Attempting to read receipt {receipt.receipt_number} from storage")
-                file_content = receipt.receipt_file.read()
-                response = HttpResponse(file_content, content_type='application/pdf')
-                filename = f"receipt_{receipt.receipt_number}.pdf"
-                response['Content-Disposition'] = f'attachment; filename="{filename}"'
-                logger.info(f"Successfully serving stored receipt {receipt.receipt_number}")
-                return response
-            except Exception as e:
-                logger.error(f"Error reading receipt file from storage: {str(e)}")
-                # Try regenerating as a last resort
-                logger.info(f"Attempting to regenerate receipt {receipt.receipt_number} as fallback")
-                file_content = ReceiptService.generate_pdf_receipt(receipt)
-                if file_content:
-                    response = HttpResponse(file_content, content_type='application/pdf')
-                    filename = f"receipt_{receipt.receipt_number}.pdf"
-                    response['Content-Disposition'] = f'attachment; filename="{filename}"'
-                    logger.info(f"Successfully serving regenerated receipt {receipt.receipt_number}")
-                    return response
 
         logger.error(f"Failed to generate or retrieve receipt {receipt.receipt_number}")
         return Response(
