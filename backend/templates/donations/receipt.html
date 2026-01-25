@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <title>Donation Receipt</title>
     <style>
-        /* Base Styles */
+        /* Static CSS only - No Django tags here to satisfy IDE linter */
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             margin: 0;
@@ -18,7 +18,6 @@
             width: 100%;
         }
 
-        /* Receipt Card base styles */
         .receipt-card {
             height: 8.4cm;
             position: relative;
@@ -28,16 +27,6 @@
             padding: 10px;
             box-sizing: border-box;
             border-radius: 3px;
-        }
-
-        /* Layout Variations */
-        .card-dual {
-            width: 48.5%;
-            float: left;
-        }
-
-        .card-single {
-            width: 100%;
         }
 
         .divider {
@@ -66,7 +55,6 @@
             padding: 2px;
         }
 
-        /* Components */
         .header {
             margin-bottom: 8px;
             overflow: hidden;
@@ -229,21 +217,18 @@
             font-size: 9px;
             font-weight: bold;
         }
+    </style>
 
-        /* Dynamic CSS (Placed at end to avoid linter confusion in main blocks) */
-            {
-            % if font_path %
-        }
-
+    {% if font_path %}
+    <style>
         @font-face {
             font-family: 'HandwrittenFont';
             src: url('{{ font_path }}');
         }
+    </style>
+    {% endif %}
 
-            {
-            % endif %
-        }
-
+    <style>
         @page {
             size: {
                 % if target_copy=='both' %
@@ -267,8 +252,8 @@
     <div class="container">
         <!-- OFFICE COPY -->
         {% if target_copy == 'both' or target_copy == 'office' %}
-        <div class="receipt-card {% if target_copy == 'both' %}card-dual{% else %}card-single{% endif %}"
-            style="background-image: url('{{ bg_path }}');">
+        <div class="receipt-card"
+            style="background-image: url('{{ bg_path }}'); width: {% if target_copy == 'both' %}48.5%{% else %}100%{% endif %}; {% if target_copy == 'both' %}float: left;{% endif %}">
             <div class="header">
                 <div class="copy-type">OFFICE COPY</div>
                 <div class="logo-box">
@@ -358,8 +343,8 @@
 
         <!-- CLIENT COPY -->
         {% if target_copy == 'both' or target_copy == 'client' %}
-        <div class="receipt-card {% if target_copy == 'both' %}card-dual{% else %}card-single{% endif %}"
-            style="background-image: url('{{ bg_path }}');">
+        <div class="receipt-card"
+            style="background-image: url('{{ bg_path }}'); width: {% if target_copy == 'both' %}48.5%{% else %}100%{% endif %}; {% if target_copy == 'both' %}float: left;{% endif %}">
             <div class="header">
                 <div class="copy-type">CLIENT COPY</div>
                 <div class="logo-box">
