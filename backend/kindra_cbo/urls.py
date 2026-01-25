@@ -29,6 +29,9 @@ urlpatterns = [
     path('api/v1/reporting/', include('reporting.urls')),  # Alternative path
     path('api/v1/blog/', include('blog.urls')),
     path('api/v1/chat/', include('social_chat.urls')),
+    
+    # Django Allauth (for social authentication)
+    path('accounts/', include('allauth.urls')),
 ]
 
 # Serve media files in development

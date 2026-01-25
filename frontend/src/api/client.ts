@@ -146,6 +146,7 @@ export const endpoints = {
         groups: '/accounts/groups/',
         passwordReset: '/accounts/password-reset/',
         passwordResetConfirm: '/accounts/password-reset-confirm/',
+        googleLogin: '/accounts/google-login/',
     },
 
     // Blog

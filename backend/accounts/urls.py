@@ -21,6 +21,8 @@ from .views import (
     approve_user_view,
     delete_profile_picture_view,
 )
+from .google_auth import google_login
+
 
 app_name = 'accounts'
 
@@ -30,6 +32,9 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', logout_view, name='logout'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    # Google OAuth
+    path('google-login/', google_login, name='google_login'),
     
     # User Profile
     path('profile/', UserProfileView.as_view(), name='profile'),

@@ -23,6 +23,64 @@ import { Visibility, VisibilityOff, Close, Security } from '@mui/icons-material'
 import DOMPurify from 'isomorphic-dompurify';
 import { useAuthModal } from '../../contexts/AuthModalContext';
 import logo from '../../assets/logo.jpg';
+import { GoogleLogin } from '@react-oauth/google';
+import apiClient, { endpoints } from '../../api/client';
+
+// Google Sign-In Component
+const GoogleSignInButton = ({ onSuccess }: { onSuccess: () => void }) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleGoogleSuccess = async (credentialResponse: any) => {
+        setIsLoading(true);
+        setError('');
+
+        try {
+            const response = await apiClient.post(endpoints.auth.googleLogin, {
+                credential: credentialResponse.credential
+            });
+
+            const { access, refresh, user } = response.data;
+
+            // Store tokens
+            localStorage.setItem('accessToken', access);
+            localStorage.setItem('refreshToken', refresh);
+            localStorage.setItem('user', JSON.stringify(user));
+
+            // Update Redux state
+            dispatch({
+                type: 'auth/login/fulfilled',
+                payload: { access, refresh, user }
+            });
+
+            onSuccess();
+        } catch (err: any) {
+            setError(err.response?.data?.error || 'Google sign-in failed');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <Box>
+            {error && (
+                <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+                    {error}
+                </Alert>
+            )}
+            <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError('Google sign-in failed. Please try again.')}
+                useOneTap
+                theme="filled_blue"
+                size="large"
+                width="100%"
+                disabled={isLoading}
+            />
+        </Box>
+    );
+};
 
 // Input sanitization function
 const sanitizeInput = (input: string): string => {
@@ -297,6 +355,23 @@ export const LoginModal = () => {
                         </Typography>
                     </Box>
                 </form>
+
+                {/* Divider */}
+                <Box sx={{ display: 'flex', alignItems: 'center', my: isMobile ? 2 : 2.5 }}>
+                    <Box sx={{ flex: 1, height: '1px', bgcolor: alpha(theme.palette.divider, 0.2) }} />
+                    <Typography variant="caption" color="text.secondary" sx={{ px: 1.5 }}>
+                        OR
+                    </Typography>
+                    <Box sx={{ flex: 1, height: '1px', bgcolor: alpha(theme.palette.divider, 0.2) }} />
+                </Box>
+
+                {/* Google Sign-In
+Button */}
+                <GoogleSignInButton onSuccess={() => {
+                    closeLoginModal();
+                    const from = (location.state as any)?.from?.pathname || '/dashboard';
+                    navigate(from, { replace: true });
+                }} />
 
                 <Box sx={{ mt: 2.5, textAlign: 'center' }}>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>

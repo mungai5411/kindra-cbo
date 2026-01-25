@@ -4,6 +4,7 @@
 
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 // Contexts
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthModalProvider, useAuthModal } from './contexts/AuthModalContext';
@@ -28,6 +29,8 @@ import { PendingApprovalView } from './components/auth/PendingApprovalView';
 // Modals
 import { LoginModal } from './components/auth/LoginModal';
 import { RegisterModal } from './components/auth/RegisterModal';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 // Component to handle /login redirect
 const LoginRedirect = () => {
@@ -70,46 +73,48 @@ function App() {
     }, []);
 
     return (
-        <ThemeProvider>
-            <AuthModalProvider>
-                <CssBaseline />
-                <Router>
-                    <Routes>
-                        {/* Public routes */}
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/about" element={<AboutPage />} />
-                        <Route path="/login" element={<LoginRedirect />} />
-                        <Route path="/register" element={<RegisterRedirect />} />
-                        <Route path="/pending-approval" element={<PendingApprovalView />} />
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+            <ThemeProvider>
+                <AuthModalProvider>
+                    <CssBaseline />
+                    <Router>
+                        <Routes>
+                            {/* Public routes */}
+                            <Route path="/" element={<HomePage />} />
+                            <Route path="/about" element={<AboutPage />} />
+                            <Route path="/login" element={<LoginRedirect />} />
+                            <Route path="/register" element={<RegisterRedirect />} />
+                            <Route path="/pending-approval" element={<PendingApprovalView />} />
 
-                        {/* Consolidated Blog & Stories */}
-                        <Route path="/blog" element={<StoriesPage />} />
-                        <Route path="/blog/:slug" element={<BlogPostPage />} />
-                        <Route path="/stories" element={<StoriesPage />} />
-                        <Route path="/stories/:slug" element={<BlogPostPage />} />
+                            {/* Consolidated Blog & Stories */}
+                            <Route path="/blog" element={<StoriesPage />} />
+                            <Route path="/blog/:slug" element={<BlogPostPage />} />
+                            <Route path="/stories" element={<StoriesPage />} />
+                            <Route path="/stories/:slug" element={<BlogPostPage />} />
 
-                        <Route path="/donate" element={<DonationsPage />} />
-                        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                        <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />
+                            <Route path="/donate" element={<DonationsPage />} />
+                            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                            <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />
 
-                        {/* Protected routes */}
-                        <Route
-                            path="/dashboard/:view?"
-                            element={
-                                <ProtectedRoute>
-                                    <DashboardPage />
-                                </ProtectedRoute>
-                            }
-                        />
+                            {/* Protected routes */}
+                            <Route
+                                path="/dashboard/:view?"
+                                element={
+                                    <ProtectedRoute>
+                                        <DashboardPage />
+                                    </ProtectedRoute>
+                                }
+                            />
 
-                        {/* Redirect unknown routes to home */}
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-                    <LoginModal />
-                    <RegisterModal />
-                </Router>
-            </AuthModalProvider>
-        </ThemeProvider>
+                            {/* Redirect unknown routes to home */}
+                            <Route path="*" element={<Navigate to="/" replace />} />
+                        </Routes>
+                        <LoginModal />
+                        <RegisterModal />
+                    </Router>
+                </AuthModalProvider>
+            </ThemeProvider>
+        </GoogleOAuthProvider>
     );
 }
 
