@@ -28,6 +28,28 @@
             border-radius: 3px;
         }
 
+        /* Dynamic Layout */
+        .layout-both {
+            width: 48.5%;
+            float: left;
+        }
+
+        .layout-single {
+            width: 100%;
+        }
+
+            {
+            % if bg_path %
+        }
+
+        .receipt-card {
+            background-image: url('{{ bg_path }}');
+        }
+
+            {
+            % endif %
+        }
+
         .divider {
             width: 3%;
             height: 8.4cm;
@@ -178,7 +200,7 @@
 
         .amount-box {
             float: left;
-            width: 151px;
+            width: 140px;
             border: 1px solid #8BC34A;
             background-color: white;
         }
@@ -194,7 +216,7 @@
 
         .amount-value {
             padding: 2px 5px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             color: #1a4d1a;
             display: inline-block;
@@ -203,7 +225,7 @@
         .signature-section {
             float: right;
             text-align: center;
-            width: 130px;
+            width: 120px;
         }
 
         .signature-line {
@@ -213,26 +235,17 @@
         }
 
         .signature-text {
-            font-size: 9px;
+            font-size: 8px;
             font-weight: bold;
         }
-
-        .card-both {
-            width: 48.5%;
-            float: left;
-        }
-
-        .card-single {
-            width: 100%;
-        }
     </style>
+
     {% if font_path %}<style>
         @font-face {
             font-family: 'HandwrittenFont';
             src: url('{{ font_path }}');
         }
     </style>{% endif %}
-
     {% if target_copy == 'both' %}<style>
         @page {
             size: letter landscape;
@@ -252,8 +265,7 @@
     <div class="container">
         <!-- OFFICE COPY -->
         {% if target_copy == 'both' or target_copy == 'office' %}
-        <div class="receipt-card {% if target_copy == 'both' %}card-both{% else %}card-single{% endif %}"
-            style="{% if bg_path %}background-image: url('{{ bg_path }}');{% endif %}">
+        <div class="receipt-card {% if target_copy == 'both' %}layout-both{% else %}layout-single{% endif %}">
             <div class="header">
                 <div class="copy-type">OFFICE COPY</div>
                 <div class="logo-box">
@@ -272,32 +284,48 @@
             </div>
             <div class="top-row">
                 <div class="receipt-no">No. {{ receipt.receipt_number|slice:"4:" }}</div>
-                <div class="date-box"><span class="date-label">DATE</span>
+                <div class="date-box">
+                    <span class="date-label">DATE</span>
                     <div class="date-grid">{% for digit in date_digits %}<div class="date-cell">{{ digit }}</div>{%
                         endfor %}</div>
                 </div>
             </div>
-            <div class="field-row"><span class="field-label">Received From:</span><span class="field-value">{{
-                    donation.donor_name|default:donation.donor.full_name|default:"Valued Supporter" }}</span></div>
-            <div class="field-row"><span class="field-label">In Words:</span><span class="field-value handwritten">{{
-                    amount_in_words }}</span></div>
-            <div style="overflow: hidden;">
-                <div class="field-row" style="width: 55%; float: left; margin-bottom: 5px;"><span
-                        class="field-label">Pymt:</span><span class="field-value">{{ donation.payment_method }} - {{
-                        donation.transaction_id|slice:":8" }}</span></div>
-                <div class="field-row" style="width: 40%; float: right; margin-bottom: 5px;"><span
-                        class="field-label">Date:</span><span class="field-value">{{ date }}</span></div>
+            <div class="field-row">
+                <span class="field-label">Received From:</span>
+                <span class="field-value">{{ donation.donor_name|default:donation.donor.full_name|default:"Valued
+                    Supporter" }}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">In Words:</span>
+                <span class="field-value handwritten">{{ amount_in_words }}</span>
             </div>
             <div style="overflow: hidden;">
-                <div class="field-row" style="width: 40%; float: left;"><span class="field-label">Bank:</span><span
-                        class="field-value">{% if donation.payment_method == 'MPESA' %}Safaricom{% else %}{{
-                        donation.payment_method }}{% endif %}</span></div>
-                <div class="field-row" style="width: 55%; float: right;"><span class="field-label">For:</span><span
-                        class="field-value">{{ donation.campaign.title|default:"General Support" }}</span></div>
+                <div class="field-row" style="width: 55%; float: left; margin-bottom: 5px;">
+                    <span class="field-label">Pymt:</span>
+                    <span class="field-value">{{ donation.payment_method }} - {{ donation.transaction_id|slice:":8"
+                        }}</span>
+                </div>
+                <div class="field-row" style="width: 40%; float: right; margin-bottom: 5px;">
+                    <span class="field-label">Date:</span>
+                    <span class="field-value">{{ date }}</span>
+                </div>
+            </div>
+            <div style="overflow: hidden;">
+                <div class="field-row" style="width: 40%; float: left;">
+                    <span class="field-label">Bank:</span>
+                    <span class="field-value">{% if donation.payment_method == 'MPESA' %}Safaricom{% else %}{{
+                        donation.payment_method }}{% endif %}</span>
+                </div>
+                <div class="field-row" style="width: 55%; float: right;">
+                    <span class="field-label">For:</span>
+                    <span class="field-value">{{ donation.campaign.title|default:"General Support" }}</span>
+                </div>
             </div>
             <div class="footer-section">
-                <div class="amount-box"><span class="amount-label">Amount</span><span class="amount-value">{{
-                        donation.currency }} {{ donation.amount|floatformat:2 }}</span></div>
+                <div class="amount-box">
+                    <span class="amount-label">Amount</span>
+                    <span class="amount-value">{{ donation.currency }} {{ donation.amount|floatformat:2 }}</span>
+                </div>
                 <div class="signature-section">
                     <div class="handwritten" style="height: 25px; margin-bottom: -5px;">Admin</div>
                     <div class="signature-line"></div>
@@ -316,8 +344,7 @@
 
         <!-- CLIENT COPY -->
         {% if target_copy == 'both' or target_copy == 'client' %}
-        <div class="receipt-card {% if target_copy == 'both' %}card-both{% else %}card-single{% endif %}"
-            style="{% if bg_path %}background-image: url('{{ bg_path }}');{% endif %}">
+        <div class="receipt-card {% if target_copy == 'both' %}layout-both{% else %}layout-single{% endif %}">
             <div class="header">
                 <div class="copy-type">CLIENT COPY</div>
                 <div class="logo-box">
@@ -336,32 +363,48 @@
             </div>
             <div class="top-row">
                 <div class="receipt-no">No. {{ receipt.receipt_number|slice:"4:" }}</div>
-                <div class="date-box"><span class="date-label">DATE</span>
+                <div class="date-box">
+                    <span class="date-label">DATE</span>
                     <div class="date-grid">{% for digit in date_digits %}<div class="date-cell">{{ digit }}</div>{%
                         endfor %}</div>
                 </div>
             </div>
-            <div class="field-row"><span class="field-label">Received From:</span><span class="field-value">{{
-                    donation.donor_name|default:donation.donor.full_name|default:"Valued Supporter" }}</span></div>
-            <div class="field-row"><span class="field-label">In Words:</span><span class="field-value handwritten">{{
-                    amount_in_words }}</span></div>
-            <div style="overflow: hidden;">
-                <div class="field-row" style="width: 55%; float: left; margin-bottom: 5px;"><span
-                        class="field-label">Pymt:</span><span class="field-value">{{ donation.payment_method }} - {{
-                        donation.transaction_id|slice:":8" }}</span></div>
-                <div class="field-row" style="width: 40%; float: right; margin-bottom: 5px;"><span
-                        class="field-label">Date:</span><span class="field-value">{{ date }}</span></div>
+            <div class="field-row">
+                <span class="field-label">Received From:</span>
+                <span class="field-value">{{ donation.donor_name|default:donation.donor.full_name|default:"Valued
+                    Supporter" }}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">In Words:</span>
+                <span class="field-value handwritten">{{ amount_in_words }}</span>
             </div>
             <div style="overflow: hidden;">
-                <div class="field-row" style="width: 40%; float: left;"><span class="field-label">Bank:</span><span
-                        class="field-value">{% if donation.payment_method == 'MPESA' %}Safaricom{% else %}{{
-                        donation.payment_method }}{% endif %}</span></div>
-                <div class="field-row" style="width: 55%; float: right;"><span class="field-label">For:</span><span
-                        class="field-value">{{ donation.campaign.title|default:"General Support" }}</span></div>
+                <div class="field-row" style="width: 55%; float: left; margin-bottom: 5px;">
+                    <span class="field-label">Pymt:</span>
+                    <span class="field-value">{{ donation.payment_method }} - {{ donation.transaction_id|slice:":8"
+                        }}</span>
+                </div>
+                <div class="field-row" style="width: 40%; float: right; margin-bottom: 5px;">
+                    <span class="field-label">Date:</span>
+                    <span class="field-value">{{ date }}</span>
+                </div>
+            </div>
+            <div style="overflow: hidden;">
+                <div class="field-row" style="width: 40%; float: left;">
+                    <span class="field-label">Bank:</span>
+                    <span class="field-value">{% if donation.payment_method == 'MPESA' %}Safaricom{% else %}{{
+                        donation.payment_method }}{% endif %}</span>
+                </div>
+                <div class="field-row" style="width: 55%; float: right;">
+                    <span class="field-label">For:</span>
+                    <span class="field-value">{{ donation.campaign.title|default:"General Support" }}</span>
+                </div>
             </div>
             <div class="footer-section">
-                <div class="amount-box"><span class="amount-label">Amount</span><span class="amount-value">{{
-                        donation.currency }} {{ donation.amount|floatformat:2 }}</span></div>
+                <div class="amount-box">
+                    <span class="amount-label">Amount</span>
+                    <span class="amount-value">{{ donation.currency }} {{ donation.amount|floatformat:2 }}</span>
+                </div>
                 <div class="signature-section">
                     <div class="handwritten" style="height: 25px; margin-bottom: -5px;">Admin</div>
                     <div class="signature-line"></div>
