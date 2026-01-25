@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <title>Donation Receipt</title>
     <style>
-        /* Static CSS only - No Django tags here to satisfy IDE linter */
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             margin: 0;
@@ -257,45 +256,36 @@
             <div class="header">
                 <div class="copy-type">OFFICE COPY</div>
                 <div class="logo-box">
-                    {% if logo_path %}
-                    <img src="{{ logo_path }}" class="logo-img">
-                    {% else %}
-                    <div
+                    {% if logo_path %}<img src="{{ logo_path }}" class="logo-img">
+                    {% else %}<div
                         style="border:0.5px solid #ccc; width:30px; height:30px; line-height:30px; text-align:center; font-size:6px;">
-                        LOGO</div>
-                    {% endif %}
+                        LOGO</div>{% endif %}
                 </div>
                 <div class="company-info">
                     <p class="company-name">KINDRA CBO</p>
                     <p class="company-details">Nairobi, Kenya | info@kindra.org</p>
                 </div>
             </div>
-
             <div style="text-align: center;">
                 <div class="receipt-label">Money Receipt</div>
             </div>
-
             <div class="top-row">
                 <div class="receipt-no">No. {{ receipt.receipt_number|slice:"4:" }}</div>
                 <div class="date-box">
-                    <div class="date-label">DATE</div>
-                    <div class="date-grid">
-                        {% for digit in date_digits %}<div class="date-cell">{{ digit }}</div>{% endfor %}
-                    </div>
+                    <span class="date-label">DATE</span>
+                    <div class="date-grid">{% for digit in date_digits %}<div class="date-cell">{{ digit }}</div>{%
+                        endfor %}</div>
                 </div>
             </div>
-
             <div class="field-row">
                 <span class="field-label">Received From:</span>
                 <span class="field-value">{{ donation.donor_name|default:donation.donor.full_name|default:"Valued
                     Supporter" }}</span>
             </div>
-
             <div class="field-row">
                 <span class="field-label">In Words:</span>
                 <span class="field-value handwritten">{{ amount_in_words }}</span>
             </div>
-
             <div style="overflow: hidden;">
                 <div class="field-row" style="width: 55%; float: left; margin-bottom: 5px;">
                     <span class="field-label">Pymt:</span>
@@ -307,7 +297,6 @@
                     <span class="field-value">{{ date }}</span>
                 </div>
             </div>
-
             <div style="overflow: hidden;">
                 <div class="field-row" style="width: 40%; float: left;">
                     <span class="field-label">Bank:</span>
@@ -319,7 +308,6 @@
                     <span class="field-value">{{ donation.campaign.title|default:"General Support" }}</span>
                 </div>
             </div>
-
             <div class="footer-section">
                 <div class="amount-box">
                     <span class="amount-label">Amount</span>
@@ -348,45 +336,36 @@
             <div class="header">
                 <div class="copy-type">CLIENT COPY</div>
                 <div class="logo-box">
-                    {% if logo_path %}
-                    <img src="{{ logo_path }}" class="logo-img">
-                    {% else %}
-                    <div
+                    {% if logo_path %}<img src="{{ logo_path }}" class="logo-img">
+                    {% else %}<div
                         style="border:0.5px solid #ccc; width:30px; height:30px; line-height:30px; text-align:center; font-size:6px;">
-                        LOGO</div>
-                    {% endif %}
+                        LOGO</div>{% endif %}
                 </div>
                 <div class="company-info">
                     <p class="company-name">KINDRA CBO</p>
                     <p class="company-details">Nairobi, Kenya | info@kindra.org</p>
                 </div>
             </div>
-
             <div style="text-align: center;">
                 <div class="receipt-label">Money Receipt</div>
             </div>
-
             <div class="top-row">
                 <div class="receipt-no">No. {{ receipt.receipt_number|slice:"4:" }}</div>
                 <div class="date-box">
-                    <div class="date-label">DATE</div>
-                    <div class="date-grid">
-                        {% for digit in date_digits %}<div class="date-cell">{{ digit }}</div>{% endfor %}
-                    </div>
+                    <span class="date-label">DATE</span>
+                    <div class="date-grid">{% for digit in date_digits %}<div class="date-cell">{{ digit }}</div>{%
+                        endfor %}</div>
                 </div>
             </div>
-
             <div class="field-row">
                 <span class="field-label">Received From:</span>
                 <span class="field-value">{{ donation.donor_name|default:donation.donor.full_name|default:"Valued
                     Supporter" }}</span>
             </div>
-
             <div class="field-row">
                 <span class="field-label">In Words:</span>
                 <span class="field-value handwritten">{{ amount_in_words }}</span>
             </div>
-
             <div style="overflow: hidden;">
                 <div class="field-row" style="width: 55%; float: left; margin-bottom: 5px;">
                     <span class="field-label">Pymt:</span>
@@ -398,7 +377,6 @@
                     <span class="field-value">{{ date }}</span>
                 </div>
             </div>
-
             <div style="overflow: hidden;">
                 <div class="field-row" style="width: 40%; float: left;">
                     <span class="field-label">Bank:</span>
@@ -410,7 +388,6 @@
                     <span class="field-value">{{ donation.campaign.title|default:"General Support" }}</span>
                 </div>
             </div>
-
             <div class="footer-section">
                 <div class="amount-box">
                     <span class="amount-label">Amount</span>
