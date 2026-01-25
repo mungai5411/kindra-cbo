@@ -229,15 +229,9 @@
         @page {
             margin: 0.2cm;
         }
-
-            {
-            % block extra_styles %
-        }
-
-            {
-            % endblock %
-        }
     </style>
+
+    {% block extra_styles %}{% endblock %}
 
     {% if bg_path %}
     <style>
