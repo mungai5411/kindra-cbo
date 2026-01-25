@@ -227,8 +227,13 @@ class ReceiptService:
             from xhtml2pdf import pisa
             
             donation = receipt.donation
+            if not donation:
+                logger.error(f"Receipt {receipt.receipt_number} has no associated donation")
+                return None
+                
             context = {
                 'receipt': receipt,
+                'donation': donation,
                 'date': timezone.now().strftime('%d %b %Y'),
                 'server_url': 'http://localhost:8000', # Should be from settings
             }
@@ -239,7 +244,7 @@ class ReceiptService:
             
             if pisa_status.err:
                 logger.error(f"PDF generation error for receipt {receipt.receipt_number}")
-                return None
+                raise Exception("xhtml2pdf CreatePDF failed")
                 
             buffer.seek(0)
             filename = f"receipt_{receipt.receipt_number}.pdf"
@@ -259,6 +264,11 @@ class ReceiptService:
             
             # Fallback to ReportLab (Legacy)
             try:
+                donation = receipt.donation
+                if not donation:
+                    logger.error(f"Receipt {receipt.receipt_number} has no associated donation - cannot generate fallback PDF")
+                    return None
+                    
                 buffer = io.BytesIO()
                 p = canvas.Canvas(buffer, pagesize=letter)
                 width, height = letter
@@ -282,7 +292,8 @@ class ReceiptService:
                 p.setFont("Helvetica", 12)
                 p.drawString(inch, height - 2.7*inch, "Donor Information:")
                 p.setFont("Helvetica-Bold", 12)
-                p.drawString(inch, height - 2.9*inch, donation.donor_name or str(donation.donor or "Valued Supporter"))
+                donor_name = donation.donor_name or str(donation.donor or "Valued Supporter")
+                p.drawString(inch, height - 2.9*inch, donor_name)
                 
                 # Table Header
                 p.setFillColor(colors.grey)
@@ -329,7 +340,7 @@ class ReceiptService:
                 
                 return content
             except Exception as e2:
-                logger.error(f"Critical error generating receipt (fallback failed): {str(e2)}")
+                logger.error(f"Critical error generating receipt (fallback failed): {str(e2)}", exc_info=True)
                 return None
 
 

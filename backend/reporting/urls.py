@@ -11,6 +11,7 @@ from .views import (
     ComplianceReportListCreateView, ComplianceReportDetailView,
     ComplianceReportSubmitView, ComplianceReportApproveView,
     PeriodicTaskListView, TaskResultListView,
+    download_report,
 )
 
 app_name = 'reporting'
@@ -25,6 +26,7 @@ urlpatterns = [
     # Reports
     path('reports/', ReportListCreateView.as_view(), name='report-list'),
     path('reports/<uuid:pk>/', ReportDetailView.as_view(), name='report-detail'),
+    path('reports/<uuid:pk>/download/', download_report, name='report-download'),
     
     # KPIs
     path('kpis/', KPIListCreateView.as_view(), name='kpi-list'),

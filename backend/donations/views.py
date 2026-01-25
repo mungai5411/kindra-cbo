@@ -17,7 +17,7 @@ from .serializers import (
     DonorSerializer, CampaignSerializer, DonationSerializer, 
     ReceiptSerializer, SocialMediaPostSerializer, MaterialDonationSerializer
 )
-from .services import DonationService, PaymentService, NotificationService, MaterialAcknowledgmentService
+from .services import DonationService, PaymentService, NotificationService, MaterialAcknowledgmentService, ReceiptService
 from accounts.models import User, Notification, AuditLog
 from django.http import HttpResponse
 from accounts.permissions import IsAdminOrManagement
@@ -395,11 +395,15 @@ def download_receipt(request, pk):
         # Check permissions - donor can only download their own receipt
         if request.user.role == 'DONOR':
             if not receipt.donation.donor or receipt.donation.donor.user != request.user:
+                logger.warning(f"User {request.user.id} attempted to access receipt {pk} without permission")
                 return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        
+        logger.info(f"Processing receipt download for receipt {receipt.receipt_number} (ID: {pk})")
         
         # Generate if file is missing, get content directly
         file_content = None
         if not receipt.receipt_file:
+            logger.info(f"Receipt file not found in storage, generating PDF for {receipt.receipt_number}")
             file_content = ReceiptService.generate_pdf_receipt(receipt)
         
         # If we got content from generation, use it
@@ -407,29 +411,46 @@ def download_receipt(request, pk):
             response = HttpResponse(file_content, content_type='application/pdf')
             filename = f"receipt_{receipt.receipt_number}.pdf"
             response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            logger.info(f"Successfully serving generated receipt {receipt.receipt_number}")
             return response
         
         # Otherwise try to read from storage (fallback for existing files)
         if receipt.receipt_file:
             try:
+                logger.info(f"Attempting to read receipt {receipt.receipt_number} from storage")
                 file_content = receipt.receipt_file.read()
                 response = HttpResponse(file_content, content_type='application/pdf')
                 filename = f"receipt_{receipt.receipt_number}.pdf"
                 response['Content-Disposition'] = f'attachment; filename="{filename}"'
+                logger.info(f"Successfully serving stored receipt {receipt.receipt_number}")
                 return response
             except Exception as e:
                 logger.error(f"Error reading receipt file from storage: {str(e)}")
                 # Try regenerating as a last resort
+                logger.info(f"Attempting to regenerate receipt {receipt.receipt_number} as fallback")
                 file_content = ReceiptService.generate_pdf_receipt(receipt)
                 if file_content:
                     response = HttpResponse(file_content, content_type='application/pdf')
                     filename = f"receipt_{receipt.receipt_number}.pdf"
                     response['Content-Disposition'] = f'attachment; filename="{filename}"'
+                    logger.info(f"Successfully serving regenerated receipt {receipt.receipt_number}")
                     return response
 
-        return Response({'error': 'Failed to generate receipt'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error(f"Failed to generate or retrieve receipt {receipt.receipt_number}")
+        return Response(
+            {'error': 'Failed to generate receipt. Please contact support.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     except Receipt.DoesNotExist:
+        logger.warning(f"Receipt not found: {pk}")
         return Response({'error': 'Receipt not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Unexpected error in download_receipt for {pk}: {str(e)}", exc_info=True)
+        return Response(
+            {'error': 'An unexpected error occurred. Please try again later.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
 
 
 @api_view(['GET'])

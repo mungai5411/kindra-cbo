@@ -3,6 +3,7 @@ Reporting & Analytics Views
 """
 
 from rest_framework import generics, permissions, status
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -193,6 +194,69 @@ class ReportDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Report.objects.all()
     serializer_class = ReportSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+import logging
+logger = logging.getLogger('kindra_cbo')
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def download_report(request, pk):
+    """Download generated report file"""
+    try:
+        report = Report.objects.get(pk=pk)
+        
+        # Permission check: only report owner or admins can download
+        if not (request.user.role in ['ADMIN', 'MANAGEMENT'] or report.generated_by == request.user):
+            logger.warning(f"User {request.user.id} attempted to access report {pk} without permission")
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        
+        logger.info(f"Processing download for report {report.id} ({report.title})")
+        
+        # Check if report has been generated
+        if not report.file:
+            logger.error(f"Report {report.id} has no file attached")
+            return Response(
+                {'error': 'Report file not found. Please regenerate the report.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Read file from storage
+        try:
+            logger.info(f"Reading report file from storage: {report.file.name}")
+            file_content = report.file.read()
+            
+            # Determine content type based on format
+            content_type = {
+                'PDF': 'application/pdf',
+                'EXCEL': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'CSV': 'text/csv'
+            }.get(report.format, 'application/octet-stream')
+            
+            response = HttpResponse(file_content, content_type=content_type)
+            filename = report.file.name.split('/')[-1]
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            logger.info(f"Successfully serving report {report.id}")
+            return response
+            
+        except Exception as e:
+            logger.error(f"Error reading report file from storage: {str(e)}", exc_info=True)
+            return Response(
+                {'error': 'Failed to retrieve report file. Please try again or regenerate the report.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+    except Report.DoesNotExist:
+        logger.warning(f"Report not found: {pk}")
+        return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Unexpected error in download_report for {pk}: {str(e)}", exc_info=True)
+        return Response(
+            {'error': 'An unexpected error occurred. Please try again later.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
 
 
 class DashboardListCreateView(generics.ListCreateAPIView):
