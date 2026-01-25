@@ -239,13 +239,15 @@ class ReceiptService:
             # Physical paths for assets
             logo_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'images', 'logo.jpg')
             font_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'Handwritten.ttf')
-            bg_path = "" # background.png currently not present
+            bg_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'images', 'watermark.png')
             
             # Use empty string instead of None to avoid url('None') in CSS
             if not os.path.exists(logo_path):
                 logo_path = ""
             if not os.path.exists(font_path):
                 font_path = ""
+            if not os.path.exists(bg_path):
+                bg_path = ""
             
             context = {
                 'receipt': receipt,
