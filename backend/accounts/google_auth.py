@@ -25,19 +25,22 @@ def google_login(request):
     
     Expected request body:
     {
-        "credential": "google_id_token"
+        "credential": "google_id_token",
+        "role": "optional_role"
     }
     
     Returns:
     {
         "access": "jwt_access_token",
         "refresh": "jwt_refresh_token",
-        "user": {...}
+        "user": {...},
+        "is_new_user": boolean
     }
     """
     try:
-        # Get the Google ID token from request
+        # Get the Google ID token and optional role from request
         google_token = request.data.get('credential')
+        requested_role = request.data.get('role')
         
         if not google_token:
             return Response(
@@ -73,24 +76,43 @@ def google_login(request):
             )
         
         # Get or create user
-        user, created = User.objects.get_or_create(
-            email=email,
-            defaults={
-                'first_name': first_name,
-                'last_name': last_name,
-                'is_verified': True,  # Google accounts are pre-verified
-                'is_active': True,
-            }
-        )
+        user = User.objects.filter(email=email).first()
+        is_new_user = False
         
-        # If user exists but was created via normal registration, update their info
-        if not created:
+        if not user:
+            is_new_user = True
+            # Validate requested role or default to DONOR
+            final_role = User.Role.DONOR
+            if requested_role and requested_role in [choice[0] for choice in User.Role.choices]:
+                final_role = requested_role
+                
+            user = User.objects.create(
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                role=final_role,
+                is_verified=True,
+                is_active=True,
+                is_approved=True # Auto-approve Google users for now
+            )
+        else:
+            # If user exists, update their info if needed
+            updated = False
             if not user.first_name and first_name:
                 user.first_name = first_name
+                updated = True
             if not user.last_name and last_name:
                 user.last_name = last_name
-            user.is_verified = True
-            user.save()
+                updated = True
+            if not user.is_verified:
+                user.is_verified = True
+                updated = True
+            # Allow role update if provided (useful for the second step of Google signup)
+            if requested_role and requested_role in [choice[0] for choice in User.Role.choices]:
+                user.role = requested_role
+                updated = True
+            if updated:
+                user.save()
         
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
@@ -103,7 +125,8 @@ def google_login(request):
             'access': str(refresh.access_token),
             'refresh': str(refresh),
             'user': user_data,
-            'message': 'Login successful' if not created else 'Account created and logged in'
+            'is_new_user': is_new_user,
+            'message': 'Login successful' if not is_new_user else 'Account created and logged in'
         }, status=status.HTTP_200_OK)
         
     except Exception as e:

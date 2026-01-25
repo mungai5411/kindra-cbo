@@ -99,38 +99,20 @@ export const RegisterModal = () => {
         }
     };
 
-    // Compact "pill" styles
-    const inputSx = {
-        '& .MuiOutlinedInput-root': {
-            borderRadius: '20px', // Smaller radius for compact look
-            backgroundColor: alpha(theme.palette.common.white, 0.8),
-            fontSize: '0.85rem', // Smaller text
-            '& fieldset': {
-                borderColor: alpha(theme.palette.grey[300], 0.5),
-            },
-            '&:hover fieldset': {
-                borderColor: theme.palette.primary.main,
-            },
-            '&.Mui-focused fieldset': {
-                borderColor: theme.palette.primary.main,
-                borderWidth: '2px',
-            },
-            '& input': {
-                py: 0.75, // Very compact padding
-                px: 1.5,
-            },
-            '& .MuiSelect-select': {
-                py: 0.75,
-                px: 1.5,
-            }
-        },
-        '& .MuiInputLabel-root': {
-            fontSize: '0.8rem',
-            transform: 'translate(14px, 8px) scale(1)',
-            '&.Mui-focused, &.MuiFormLabel-filled': {
-                transform: 'translate(14px, -14px) scale(0.75)', // Move label higher up
-            },
-        },
+    const inputInnerSx = {
+        height: '46px',
+        borderRadius: '8px',
+        bgcolor: '#fff',
+        '& fieldset': { borderColor: '#ddd' },
+        '&:hover fieldset': { borderColor: '#bbb !important' },
+        '&.Mui-focused fieldset': { borderColor: '#000 !important', borderWidth: '1px' },
+        fontSize: '0.9rem',
+    };
+
+    const labelSx = {
+        variant: "body2",
+        fontWeight: "600",
+        sx: { mb: 0.75, color: '#333', fontSize: '0.85rem' }
     };
 
     return (
@@ -141,156 +123,140 @@ export const RegisterModal = () => {
             fullWidth
             PaperProps={{
                 sx: {
-                    borderRadius: 3,
-                    bgcolor: '#fafafa',
+                    borderRadius: '16px',
+                    backgroundColor: '#fff',
                     backgroundImage: 'none',
-                    boxShadow: theme.shadows[24],
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
                     overflow: 'visible',
                     mx: isMobile ? 2 : 'auto',
-                    width: isMobile ? 'calc(100% - 32px)' : '400px',
-                    maxWidth: '400px',
-                    maxHeight: 'calc(100% - 32px)'
+                    width: isMobile ? 'calc(100% - 32px)' : '460px',
+                    maxWidth: '460px',
+                    border: 'none',
                 }
             }}
         >
             <IconButton
                 onClick={closeRegisterModal}
-                size="small"
                 sx={{
                     position: 'absolute',
-                    right: 8,
-                    top: 8,
-                    color: 'text.secondary',
-                    zIndex: 1
+                    right: 16,
+                    top: 16,
+                    color: '#999',
+                    '&:hover': { color: '#333' }
                 }}
             >
-                <Close fontSize="small" />
+                <Close />
             </IconButton>
 
-            <DialogContent sx={{ p: isMobile ? 2 : 3 }}>
-                <Box sx={{ textAlign: 'center', mb: 2 }}>
-                    <Box
-                        sx={{
-                            display: 'inline-flex',
-                            p: 1,
-                            borderRadius: '16px',
-                            bgcolor: 'white',
-                            mb: 1,
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                        }}
-                    >
-                        <Box
-                            component="img"
-                            src={logo}
-                            alt="Kindra Logo"
-                            sx={{
-                                height: 28, // Smaller logo
-                                width: 'auto',
-                                objectFit: 'contain'
-                            }}
-                        />
-                    </Box>
-                    <Typography variant="h6" fontWeight="700" gutterBottom sx={{ color: '#1a1a1a', fontSize: '1.1rem', mb: 0 }}>
-                        Join Kindra
+            <DialogContent sx={{ p: isMobile ? 3 : 5, pt: isMobile ? 5 : 6 }}>
+                <Box sx={{ mb: 4 }}>
+                    <Typography variant="h4" fontWeight="700" sx={{ color: '#000', mb: 1, letterSpacing: '-0.02em' }}>
+                        Create account
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: '#666', fontWeight: 400 }}>
+                        Join the Kindra community today
                     </Typography>
                 </Box>
 
-                {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2, py: 0, '& .MuiAlert-message': { py: 0.5 } }}>{error}</Alert>}
-
                 <Box component="form" onSubmit={handleSubmit}>
-                    <Grid container spacing={1.5}>
+                    <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
+                            <Typography {...labelSx}>First Name *</Typography>
                             <TextField
                                 fullWidth
-                                label="First Name *"
                                 name="first_name"
+                                placeholder="Jane"
                                 value={formData.first_name}
                                 onChange={handleChange}
                                 required
-                                sx={inputSx}
+                                InputProps={{ sx: inputInnerSx }}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
+                            <Typography {...labelSx}>Last Name *</Typography>
                             <TextField
                                 fullWidth
-                                label="Last Name *"
                                 name="last_name"
+                                placeholder="Doe"
                                 value={formData.last_name}
                                 onChange={handleChange}
                                 required
-                                sx={inputSx}
+                                InputProps={{ sx: inputInnerSx }}
                             />
                         </Grid>
                         <Grid item xs={12}>
+                            <Typography {...labelSx}>Email Address *</Typography>
                             <TextField
                                 fullWidth
-                                label="Email Address *"
                                 name="email"
                                 type="email"
+                                placeholder="jane@example.com"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                sx={inputSx}
+                                InputProps={{ sx: inputInnerSx }}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
+                            <Typography {...labelSx}>Phone Number</Typography>
                             <TextField
                                 fullWidth
-                                label="Phone Number"
                                 name="phone_number"
+                                placeholder="+254..."
                                 value={formData.phone_number}
                                 onChange={handleChange}
-                                sx={inputSx}
+                                InputProps={{ sx: inputInnerSx }}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
+                            <Typography {...labelSx}>I am a... *</Typography>
                             <TextField
                                 fullWidth
                                 select
-                                label="I am a... *"
                                 name="role"
                                 value={formData.role}
                                 onChange={handleChange}
                                 required
-                                sx={inputSx}
+                                InputProps={{ sx: inputInnerSx }}
                             >
                                 {ROLES.map((option) => (
-                                    <MenuItem key={option.value} value={option.value} sx={{ fontSize: '0.85rem' }}>
+                                    <MenuItem key={option.value} value={option.value} sx={{ fontSize: '0.9rem' }}>
                                         {option.label}
                                     </MenuItem>
                                 ))}
                             </TextField>
                         </Grid>
                         <Grid item xs={12}>
+                            <Typography {...labelSx}>Organization (Optional)</Typography>
                             <TextField
                                 fullWidth
-                                label="Organization (Optional)"
                                 name="organization"
+                                placeholder="Organization name"
                                 value={formData.organization}
                                 onChange={handleChange}
-                                sx={inputSx}
+                                InputProps={{ sx: inputInnerSx }}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
+                            <Typography {...labelSx}>Password *</Typography>
                             <TextField
                                 fullWidth
-                                label="Password *"
                                 name="password"
                                 type={showPassword ? 'text' : 'password'}
+                                placeholder="••••••••"
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
-                                sx={inputSx}
                                 InputProps={{
+                                    sx: inputInnerSx,
                                     endAdornment: (
                                         <InputAdornment position="end">
                                             <IconButton
                                                 onClick={() => setShowPassword(!showPassword)}
                                                 edge="end"
                                                 size="small"
-                                                sx={{ mr: 0.5, p: 0.5 }}
                                             >
-                                                {showPassword ? <VisibilityOff fontSize="small" sx={{ fontSize: 18 }} /> : <Visibility fontSize="small" sx={{ fontSize: 18 }} />}
+                                                {showPassword ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
                                             </IconButton>
                                         </InputAdornment>
                                     )
@@ -298,59 +264,61 @@ export const RegisterModal = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
+                            <Typography {...labelSx}>Confirm Password *</Typography>
                             <TextField
                                 fullWidth
-                                label="Confirm Password *"
                                 name="password_confirm"
                                 type={showPassword ? 'text' : 'password'}
+                                placeholder="••••••••"
                                 value={formData.password_confirm}
                                 onChange={handleChange}
                                 required
-                                sx={inputSx}
+                                InputProps={{ sx: inputInnerSx }}
                             />
                         </Grid>
                     </Grid>
+
+                    {error && <Alert severity="error" sx={{ mt: 3, mb: 0, borderRadius: '8px' }}>{error}</Alert>}
 
                     <Button
                         type="submit"
                         fullWidth
                         variant="contained"
-                        size="medium"
                         disabled={loading}
                         sx={{
-                            mt: 2.5,
-                            py: 1,
-                            borderRadius: '20px',
-                            fontSize: '0.95rem',
-                            fontWeight: 'bold',
+                            mt: 4,
+                            py: 1.5,
+                            borderRadius: '8px',
+                            fontWeight: '700',
                             textTransform: 'none',
-                            boxShadow: '0 4px 12px rgba(46, 125, 50, 0.2)',
-                            bgcolor: '#388e3c',
+                            fontSize: '16px',
+                            bgcolor: '#000',
+                            color: '#fff',
+                            boxShadow: 'none',
                             '&:hover': {
-                                bgcolor: '#2e7d32',
-                                boxShadow: '0 6px 16px rgba(46, 125, 50, 0.3)',
-                            }
+                                bgcolor: '#222',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                            },
                         }}
                     >
-                        {loading ? <CircularProgress size={20} color="inherit" /> : 'Register'}
+                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Create account'}
                     </Button>
 
-                    <Box sx={{ mt: 2, textAlign: 'center' }}>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                    <Box sx={{ mt: 3, textAlign: 'center' }}>
+                        <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
                             Already have an account?{' '}
                             <Link
                                 component="button"
                                 variant="body2"
                                 onClick={switchToLogin}
                                 sx={{
+                                    color: '#0066ff',
                                     fontWeight: 700,
-                                    color: '#388e3c',
                                     textDecoration: 'none',
-                                    fontSize: '0.8rem',
                                     '&:hover': { textDecoration: 'underline' }
                                 }}
                             >
-                                Sign In
+                                Sign in
                             </Link>
                         </Typography>
                     </Box>
