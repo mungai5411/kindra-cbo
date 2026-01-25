@@ -263,7 +263,7 @@ class ReceiptService:
             
             html_string = render_to_string('donations/receipt.html', context)
             buffer = io.BytesIO()
-            pisa_status = pisa.CreatePDF(html_string, dest=buffer)
+            pisa_status = pisa.CreatePDF(html_string.encode('utf-8'), dest=buffer, encoding='utf-8')
             
             if pisa_status.err:
                 logger.error(f"PDF generation error for receipt {receipt.receipt_number}")
@@ -283,7 +283,8 @@ class ReceiptService:
             return content
             
         except Exception as e:
-            logger.error(f"Error generating PDF receipt with template: {str(e)}. Falling back to ReportLab.")
+            logger.error(f"Error generating PDF receipt with template: {str(e)}", exc_info=True)
+            logger.info("Falling back to ReportLab for receipt generation.")
             
             # Fallback to ReportLab (Legacy)
             try:
@@ -375,59 +376,50 @@ class MaterialAcknowledgmentService:
     @staticmethod
     def generate_acknowledgment_pdf(material_donation):
         """
-        Generate a professional PDF acknowledgment for physical donations
+        Generate a professional PDF acknowledgment for physical donations using HTML templates
         """
-        buffer = io.BytesIO()
-        p = canvas.Canvas(buffer, pagesize=letter)
-        width, height = letter
+        try:
+            from django.template.loader import render_to_string
+            from xhtml2pdf import pisa
+            import os
+            from django.conf import settings
         
-        # Header
-        p.setFont("Helvetica-Bold", 20)
-        p.drawCentredString(width/2, height - inch, "KINDRA CBO")
-        p.setFont("Helvetica", 12)
-        p.drawCentredString(width/2, height - 1.3*inch, "Official Gift-in-Kind Acknowledgment")
-        
-        p.line(inch, height - 1.6*inch, width - inch, height - 1.6*inch)
-        
-        # Content
-        lines = [
-            f"Date: {timezone.now().strftime('%d %b %Y')}",
-            "",
-            "Dear " + (material_donation.donor.user.get_full_name() if material_donation.donor and material_donation.donor.user else "Valued Donor") + ",",
-            "",
-            "On behalf of Kindra CBO, we would like to express our deepest gratitude for your",
-            f"generous donation of the following items received on {material_donation.updated_at.strftime('%d %b %Y')}:",
-            "",
-            f"Category: {material_donation.category}",
-            f"Description: {material_donation.description}",
-            f"Quantity: {material_donation.quantity}",
-            "",
-            "Your contribution is vital to our mission of empowering lives and building futures",
-            "for our community members. Your kindness makes a real difference.",
-            "",
-            "Please note that as per standard regulations, we do not provide a dollar value for",
-            "gift-in-kind donations. This acknowledgment serves as your official record for tax",
-            "purposes.",
-            "",
-            "With sincere gratitude,",
-            "",
-            "The Kindra CBO Team"
-        ]
-        
-        y = height - 2.2*inch
-        p.setFont("Helvetica", 11)
-        for line in lines:
-            if line.startswith("Dear") or line.startswith("Category"):
-                p.setFont("Helvetica-Bold", 11)
-            else:
-                p.setFont("Helvetica", 11)
-            p.drawString(inch, y, line)
-            y -= 0.2*inch if line else 0.15*inch
+            # Physical paths for assets
+            logo_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'images', 'logo.jpg')
+            font_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'Handwritten.ttf')
+            
+            # Fallback if files don't exist
+            if not os.path.exists(logo_path):
+                logo_path = None
+            if not os.path.exists(font_path):
+                font_path = None
 
-        p.showPage()
-        p.save()
-        buffer.seek(0)
-        return buffer.read()
+            context = {
+                'material_donation': material_donation,
+                'donor_name': material_donation.donor.user.get_full_name() if material_donation.donor and material_donation.donor.user else "Valued Donor",
+                'donation_date': material_donation.updated_at.strftime('%d %b %Y'),
+                'category': material_donation.category,
+                'description': material_donation.description,
+                'quantity': material_donation.quantity,
+                'date': timezone.now().strftime('%d %b %Y'),
+                'logo_path': logo_path,
+                'font_path': font_path,
+                'server_url': settings.BACKEND_URL if hasattr(settings, 'BACKEND_URL') else 'http://localhost:8000',
+            }
+            
+            html_string = render_to_string('donations/acknowledgment.html', context)
+            buffer = io.BytesIO()
+            pisa_status = pisa.CreatePDF(html_string, dest=buffer)
+            
+            if pisa_status.err:
+                logger.error(f"PDF generation error for acknowledgment {material_donation.id}")
+                return None
+                
+            return buffer.getvalue()
+            
+        except Exception as e:
+            logger.error(f"Error generating acknowledgment PDF: {str(e)}")
+            return None
 
 
 class NotificationService:

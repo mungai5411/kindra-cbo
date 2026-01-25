@@ -1,47 +1,211 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Gift In Kind Acknowledgment</title>
     <style>
-        body { font-family: Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
-        .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
-        .logo { font-size: 24px; font-weight: bold; color: #2c3e50; }
-        .content { margin-bottom: 40px; }
-        .items-box { background: #f8f9fa; padding: 20px; border-radius: 4px; border: 1px solid #dee2e6; margin: 20px 0; }
-        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #7f8c8d; }
+        /* Base Styling */
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #FFFCF2;
+            color: #432818;
+            position: relative;
+        }
+
+        .container {
+            padding: 60px 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Decorative Arcs */
+        .arc-top-left {
+            position: absolute;
+            top: -150px;
+            left: -150px;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background-color: #F39C12;
+            z-index: -1;
+        }
+
+        .arc-bottom-right {
+            position: absolute;
+            bottom: -150px;
+            right: -150px;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background-color: #E67E22;
+            z-index: -1;
+        }
+
+        /* Header Components */
+        .slogan {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #D35400;
+            margin-bottom: 30px;
+        }
+
+        .partner-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .partner-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #5D4037;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .logo-placeholder {
+            width: 70px;
+            height: 70px;
+            margin: 0 10px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .logo-img {
+            width: 70px;
+            height: auto;
+        }
+
+        .main-message {
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+
+        /* Business Table Styling for Details */
+        .donation-details {
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 1.5px solid #F39C12;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .detail-row {
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #D35400;
+            width: 90px;
+            display: inline-block;
+        }
+
+        .inspirational-text {
+            border-top: 1px solid rgba(211, 84, 0, 0.2);
+            padding-top: 25px;
+            text-align: center;
+            font-style: italic;
+            font-size: 15px;
+            color: #5D4037;
+        }
+
+        .handwritten {
+            font-size: 22px;
+            color: #D35400;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 11px;
+            color: #8D6E63;
+        }
+    </style>
+
+    {% if font_path %}
+    <style>
+        @font-face {
+            font-family: 'HandwrittenFont';
+            src: url('{{ font_path }}');
+        }
+
+        .handwritten {
+            font-family: 'HandwrittenFont', cursive;
+        }
+    </style>
+    {% else %}
+    <style>
+        .handwritten {
+            font-family: 'Segoe Script', 'Lucida Handwriting', cursive;
+        }
+    </style>
+    {% endif %}
+
+    <style>
+        @page {
+            size: a4 portrait;
+            margin: 0.5cm;
+        }
     </style>
 </head>
+
 <body>
-    <div class="header">
-        <div class="logo">KINDRA CBO</div>
-        <div class="sub-header">Official Gift-in-Kind Acknowledgment</div>
-    </div>
+    <div class="arc-top-left"></div>
+    <div class="arc-bottom-right"></div>
 
-    <div class="content">
-        <p>Date: {{ date }}</p>
-        
-        <p>Dear {{ donor_name }},</p>
-        
-        <p>On behalf of Kindra CBO, we would like to express our deepest gratitude for your generous donation of the following items received on {{ donation_date }}:</p>
-        
-        <div class="items-box">
-            <p><strong>Category:</strong> {{ category }}</p>
-            <p><strong>Description:</strong> {{ description }}</p>
-            <p><strong>Quantity:</strong> {{ quantity }}</p>
+    <div class="container">
+        <div class="slogan">"Gratitude in Every Endeavor."</div>
+
+        <div class="partner-section">
+            <span class="partner-label">Proudly partnered with:</span>
+            <div class="logo-placeholder">
+                {% if logo_path %}<img src="{{ logo_path }}" class="logo-img">
+                {% else %}<div
+                    style="border:1px solid #D35400; width:50px; height:50px; line-height:50px; text-align:center; border-radius:8px; color:#D35400; font-size:10px;">
+                    KINDRA</div>{% endif %}
+            </div>
+            <div class="logo-placeholder">
+                <div
+                    style="background-color:#FDEBD0; width:50px; height:50px; line-height:50px; text-align:center; border-radius:8px; color:#D35400; font-weight:bold; font-size:8px;">
+                    PARTNER</div>
+            </div>
         </div>
-        
-        <p>Your contribution is vital to our mission of empowering lives and building futures for our community members. Your kindness makes a real difference.</p>
-        
-        <p><em>Please note that as per standard regulations, we do not provide a dollar value for gift-in-kind donations. This acknowledgment serves as your official record for tax purposes.</em></p>
-        
-        <br>
-        <p>With sincere gratitude,</p>
-        <p><strong>The Kindra CBO Team</strong></p>
-    </div>
 
-    <div class="footer">
-        <p>KINDRA CBO | Nairobi, Kenya | info@kindra.org</p>
+        <div class="main-message">
+            Together, we're sowing seeds of positive, lasting transformation.
+            To every partner and every collaborator:
+            Your belief fully expands our reach.
+        </div>
+
+        <div class="donation-details">
+            <div class="detail-row"><span class="detail-label">Donor:</span><span>{{ donor_name }}</span></div>
+            <div class="detail-row"><span class="detail-label">Date:</span><span>{{ donation_date }}</span></div>
+            <div class="detail-row"><span class="detail-label">Category:</span><span>{{ category }}</span></div>
+            <div class="detail-row"><span class="detail-label">Items:</span><span>{{ description }}</span></div>
+            <div class="detail-row"><span class="detail-label">Quantity:</span><span>{{ quantity }}</span></div>
+        </div>
+
+        <div class="inspirational-text">
+            "Thank you for amplifying our vision and ensuring that<br>
+            our shared mission touches countless lives."
+        </div>
+
+        <div class="footer">
+            <div class="handwritten">Kindra CBO Team</div>
+            <p style="margin-top: 15px;">KINDRA CBO | Nairobi, Kenya | info@kindra.org</p>
+            <p style="font-size: 9px; opacity: 0.7;">Official Gift-in-Kind Acknowledgment | {{ date }}</p>
+        </div>
     </div>
 </body>
+
 </html>
