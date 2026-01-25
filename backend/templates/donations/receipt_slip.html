@@ -28,13 +28,13 @@
 
     <div class="field-row">
         <span class="field-label">Received From:</span>
-        <span class="field-value handwritten">{{ donation.donor_name|default:donation.donor.full_name|default:"Valued
+        <span class="field-value readable-bold">{{ donation.donor_name|default:donation.donor.full_name|default:"Valued
             Supporter" }}</span>
     </div>
 
     <div class="field-row">
         <span class="field-label">In Words:</span>
-        <span class="field-value handwritten">{{ amount_in_words }}</span>
+        <span class="field-value readable-bold">{{ amount_in_words }}</span>
     </div>
 
     <div class="field-row">
