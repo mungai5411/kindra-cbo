@@ -217,16 +217,12 @@
             font-weight: bold;
         }
     </style>
-
-    {% if font_path %}
-    <style>
+    {% if font_path %}<style>
         @font-face {
             font-family: 'HandwrittenFont';
             src: url('{{ font_path }}');
         }
-    </style>
-    {% endif %}
-
+    </style>{% endif %}
     <style>
         @page {
             size: {
@@ -252,7 +248,7 @@
         <!-- OFFICE COPY -->
         {% if target_copy == 'both' or target_copy == 'office' %}
         <div class="receipt-card"
-            style="background-image: url('{{ bg_path }}'); width: {% if target_copy == 'both' %}48.5%{% else %}100%{% endif %}; {% if target_copy == 'both' %}float: left;{% endif %}">
+            style="{% if bg_path %}background-image: url('{{ bg_path }}');{% endif %} width: {% if target_copy == 'both' %}48.5%{% else %}100%{% endif %}; {% if target_copy == 'both' %}float: left;{% endif %}">
             <div class="header">
                 <div class="copy-type">OFFICE COPY</div>
                 <div class="logo-box">
@@ -332,7 +328,7 @@
         <!-- CLIENT COPY -->
         {% if target_copy == 'both' or target_copy == 'client' %}
         <div class="receipt-card"
-            style="background-image: url('{{ bg_path }}'); width: {% if target_copy == 'both' %}48.5%{% else %}100%{% endif %}; {% if target_copy == 'both' %}float: left;{% endif %}">
+            style="{% if bg_path %}background-image: url('{{ bg_path }}');{% endif %} width: {% if target_copy == 'both' %}48.5%{% else %}100%{% endif %}; {% if target_copy == 'both' %}float: left;{% endif %}">
             <div class="header">
                 <div class="copy-type">CLIENT COPY</div>
                 <div class="logo-box">
