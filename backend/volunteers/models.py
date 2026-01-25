@@ -6,6 +6,7 @@ Volunteer coordination, task management, and time tracking
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
+from decimal import Decimal
 from accounts.models import User
 from shelter_homes.models import ShelterHome
 import uuid
@@ -299,7 +300,7 @@ class TimeLog(models.Model):
     
     # Time details
     date = models.DateField()
-    hours = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0.25)])
+    hours = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(Decimal('0.25'))])
     description = models.TextField(help_text=_('What did you work on?'))
     
     # Optional associations
