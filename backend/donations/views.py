@@ -9,6 +9,8 @@ from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.response import Response
 from django.http import Http404
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
 from .models import Donor, Campaign, Donation, Receipt, SocialMediaPost, MaterialDonation
 from .serializers import (
