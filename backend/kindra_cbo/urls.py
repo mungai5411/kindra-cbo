@@ -25,7 +25,8 @@ urlpatterns = [
     path('api/v1/shelters/', include('shelter_homes.urls')),
     path('api/v1/donations/', include('donations.urls')),
     path('api/v1/volunteers/', include('volunteers.urls')),
-    path('api/v1/reporting/', include('reporting.urls')),
+    path('api/v1/reports/', include('reporting.urls')),  # Backwards compatibility
+    path('api/v1/reporting/', include('reporting.urls')),  # Alternative path
     path('api/v1/blog/', include('blog.urls')),
     path('api/v1/chat/', include('social_chat.urls')),
 ]
