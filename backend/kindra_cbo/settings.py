@@ -224,7 +224,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Whitenoise configuration for production static files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Whitenoise configuration is now in STORAGES
 
 # Media files (user uploads)
 MEDIA_URL = '/media/'
@@ -246,6 +248,7 @@ if config('CLOUDINARY_CLOUD_NAME', default=''):
     import cloudinary.uploader
     import cloudinary.api
     
+    # Cloudinary configuration
     cloudinary.config(
         cloud_name=config('CLOUDINARY_CLOUD_NAME'),
         api_key=config('CLOUDINARY_API_KEY'),
@@ -253,11 +256,25 @@ if config('CLOUDINARY_CLOUD_NAME', default=''):
         secure=True
     )
     
-    # Use Cloudinary for media files only
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Keep static files served by Whitenoise
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    # Storage Configuration (Django 4.2+)
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+else:
+    # Default to local storage if Cloudinary not configured
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
 # ==================================
 # CUSTOM USER MODEL
