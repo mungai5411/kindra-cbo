@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../features/auth/authSlice';
@@ -22,6 +22,7 @@ import {
     Paper
 } from '@mui/material';
 import { Visibility, VisibilityOff, Close, Groups, Favorite, Business } from '@mui/icons-material';
+import { Checkbox, FormControlLabel } from '@mui/material';
 import DOMPurify from 'isomorphic-dompurify';
 import { useAuthModal } from '../../contexts/AuthModalContext';
 import { GoogleLogin } from '@react-oauth/google';
@@ -166,7 +167,7 @@ export const LoginModal = () => {
         return emailRegex.test(email);
     };
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLocalError('');
         setRateLimitError('');
@@ -323,7 +324,7 @@ export const LoginModal = () => {
                             </Grid>
                             <GoogleSignInButton
                                 selectedRole={selectedRole}
-                                onSuccess={(data) => {
+                                onSuccess={(data: any) => {
                                     dispatch({
                                         type: 'auth/login/fulfilled',
                                         payload: { access: data.access, refresh: data.refresh, user: data.user }
@@ -392,7 +393,7 @@ export const LoginModal = () => {
                                 </Alert>
                             )}
 
-                            <form onSubmit={handleSubmit}>
+                            <Box component="form" onSubmit={handleSubmit}>
                                 <Box sx={{ mb: 3 }}>
                                     <Typography variant="body2" fontWeight="600" sx={{ mb: 1, color: '#333' }}>
                                         Email address
@@ -402,7 +403,7 @@ export const LoginModal = () => {
                                         variant="outlined"
                                         placeholder="Enter your email"
                                         value={email}
-                                        onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                                         disabled={localLoading || reduxLoading}
                                         required
                                         InputProps={{
@@ -427,7 +428,7 @@ export const LoginModal = () => {
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="••••••••"
                                         value={password}
-                                        onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                                         disabled={localLoading || reduxLoading}
                                         required
                                         InputProps={{
@@ -454,28 +455,23 @@ export const LoginModal = () => {
                                 </Box>
 
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <input
-                                            type="checkbox"
-                                            id="remember_me"
-                                            checked={rememberMe}
-                                            onChange={(e: ChangeEvent<HTMLInputElement>) => setRememberMe(e.target.checked)}
-                                            style={{
-                                                width: '18px',
-                                                height: '18px',
-                                                cursor: 'pointer',
-                                                accentColor: '#000'
-                                            }}
-                                        />
-                                        <Typography
-                                            component="label"
-                                            htmlFor="remember_me"
-                                            variant="body2"
-                                            sx={{ ml: 1, cursor: 'pointer', color: '#444', fontWeight: 500 }}
-                                        >
-                                            Remember for 30 days
-                                        </Typography>
-                                    </Box>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={rememberMe}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRememberMe(e.target.checked)}
+                                                sx={{
+                                                    color: '#ddd',
+                                                    '&.Mui-checked': { color: '#000' }
+                                                }}
+                                            />
+                                        }
+                                        label={
+                                            <Typography variant="body2" sx={{ color: '#444', fontWeight: 500 }}>
+                                                Remember for 30 days
+                                            </Typography>
+                                        }
+                                    />
                                     <Link
                                         component={RouterLink}
                                         to="/forgot-password"
@@ -537,7 +533,7 @@ export const LoginModal = () => {
                                         </Link>
                                     </Typography>
                                 </Box>
-                            </form>
+                            </Box>
                         </>
                     )}
                 </DialogContent>
