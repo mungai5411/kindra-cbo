@@ -1,4 +1,4 @@
-import { Box, Typography, CircularProgress } from '@mui/material';
+import { Box, Typography, CircularProgress, useTheme, alpha } from '@mui/material';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -22,6 +22,7 @@ interface OverviewProps {
 }
 
 export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps) => {
+    const theme = useTheme();
     const { user } = useSelector((state: RootState) => state.auth);
     const { dashboardData, isLoading: dashboardLoading } = useSelector((state: RootState) => state.reporting);
 
