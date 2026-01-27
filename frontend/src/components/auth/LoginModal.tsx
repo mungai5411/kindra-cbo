@@ -50,7 +50,6 @@ const GoogleSignInButton = ({ onSuccess, onNewUser, selectedRole }: { onSuccess:
             });
 
             if (response.data.is_new_user) {
-                // If it's a new user, they already selected the role, so we just finish
                 const { access, refresh, user } = response.data;
                 localStorage.setItem('accessToken', access);
                 localStorage.setItem('refreshToken', refresh);
@@ -60,8 +59,6 @@ const GoogleSignInButton = ({ onSuccess, onNewUser, selectedRole }: { onSuccess:
             }
 
             const { access, refresh, user } = response.data;
-
-            // Store tokens
             localStorage.setItem('accessToken', access);
             localStorage.setItem('refreshToken', refresh);
             localStorage.setItem('user', JSON.stringify(user));
@@ -75,7 +72,7 @@ const GoogleSignInButton = ({ onSuccess, onNewUser, selectedRole }: { onSuccess:
     };
 
     return (
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 2 }}>
             {error && (
                 <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
                     {error}
@@ -86,33 +83,33 @@ const GoogleSignInButton = ({ onSuccess, onNewUser, selectedRole }: { onSuccess:
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 2,
-                p: 3,
+                gap: 1.5,
+                p: 2.5,
                 borderRadius: '16px',
-                bgcolor: alpha(theme.palette.primary.main, 0.03),
-                border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                bgcolor: '#fcfcfc',
+                border: '1px solid #f0f0f0',
                 opacity: isProcessing ? 0.7 : 1,
                 pointerEvents: isProcessing ? 'none' : 'auto',
                 transition: 'all 0.3s ease'
             }}>
-                <Typography variant="body2" sx={{ color: '#666', fontWeight: 500, mb: 1 }}>
-                    Sign in with your Google account
+                <Typography variant="caption" sx={{ color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
+                    Secure Sign In
                 </Typography>
                 <Box sx={{
                     width: '100%',
                     display: 'flex',
                     justifyContent: 'center',
-                    '& > div': { width: '100% !important' },
-                    '& iframe': { width: '100% !important', borderRadius: '8px !important' }
+                    minHeight: '40px',
+                    '& > div': { width: '100% !important', display: 'flex', justifyContent: 'center' },
                 }}>
                     <GoogleLogin
                         onSuccess={handleGoogleSuccess}
                         onError={() => setError('Google sign-in failed. Please try again.')}
-                        theme="filled_blue"
+                        theme="outline"
                         size="large"
-                        shape="pill"
+                        shape="rectangular"
                         text="continue_with"
-                        width="400"
+                        width="320"
                     />
                 </Box>
             </Box>
@@ -300,52 +297,70 @@ export const LoginModal = () => {
 
                     {isGoogleFlow ? (
                         <>
-                            <Grid container spacing={2} sx={{ mb: 4 }}>
-                                {ROLES.map((role) => (
-                                    <Grid item xs={12} key={role.value}>
-                                        <Paper
-                                            elevation={0}
-                                            onClick={() => setSelectedRole(role.value)}
-                                            sx={{
-                                                p: 2,
-                                                cursor: 'pointer',
-                                                borderRadius: '12px',
-                                                border: '1px solid',
-                                                borderColor: selectedRole === role.value ? '#000' : '#eee',
-                                                bgcolor: selectedRole === role.value ? alpha('#000', 0.02) : '#fff',
-                                                transition: 'all 0.2s',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 2,
-                                                '&:hover': {
-                                                    borderColor: selectedRole === role.value ? '#000' : '#ccc',
-                                                    bgcolor: alpha('#000', 0.01)
-                                                }
-                                            }}
-                                        >
-                                            <Box sx={{
-                                                width: 40,
-                                                height: 40,
-                                                borderRadius: '50%',
-                                                bgcolor: selectedRole === role.value ? '#000' : '#f5f5f5',
-                                                color: selectedRole === role.value ? '#fff' : '#666',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                            }}>
-                                                {role.icon}
-                                            </Box>
-                                            <Box>
-                                                <Typography variant="body1" fontWeight="700" sx={{ color: '#000' }}>
-                                                    {role.label}
-                                                </Typography>
-                                                <Typography variant="caption" sx={{ color: '#666' }}>
-                                                    {role.description}
-                                                </Typography>
-                                            </Box>
-                                        </Paper>
-                                    </Grid>
-                                ))}
+                            <Grid container spacing={2} sx={{ mb: 3 }}>
+                                {ROLES.map((role) => {
+                                    const isSelected = selectedRole === role.value;
+                                    return (
+                                        <Grid item xs={12} key={role.value}>
+                                            <Paper
+                                                elevation={isSelected ? 4 : 0}
+                                                onClick={() => setSelectedRole(role.value)}
+                                                sx={{
+                                                    p: 2,
+                                                    cursor: 'pointer',
+                                                    borderRadius: '16px',
+                                                    border: '2px solid',
+                                                    borderColor: isSelected ? 'primary.main' : '#f0f0f0',
+                                                    bgcolor: isSelected ? alpha(theme.palette.primary.main, 0.02) : '#fff',
+                                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 2.5,
+                                                    position: 'relative',
+                                                    overflow: 'hidden',
+                                                    '&:hover': {
+                                                        borderColor: isSelected ? 'primary.main' : '#ddd',
+                                                        transform: 'translateY(-2px)',
+                                                        boxShadow: '0 8px 24px rgba(0,0,0,0.05)'
+                                                    },
+                                                    '&::after': isSelected ? {
+                                                        content: '""',
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        right: 0,
+                                                        width: '40px',
+                                                        height: '40px',
+                                                        background: `linear-gradient(135deg, transparent 50%, ${theme.palette.primary.main} 50%)`,
+                                                        opacity: 0.1
+                                                    } : {}
+                                                }}
+                                            >
+                                                <Box sx={{
+                                                    width: 48,
+                                                    height: 48,
+                                                    borderRadius: '12px',
+                                                    bgcolor: isSelected ? 'primary.main' : '#f8f9fa',
+                                                    color: isSelected ? '#fff' : 'text.secondary',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    transition: 'all 0.3s ease',
+                                                    boxShadow: isSelected ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}` : 'none'
+                                                }}>
+                                                    {role.icon}
+                                                </Box>
+                                                <Box sx={{ flex: 1 }}>
+                                                    <Typography variant="subtitle1" fontWeight="800" sx={{ color: '#1a1a1a', lineHeight: 1.2 }}>
+                                                        {role.label}
+                                                    </Typography>
+                                                    <Typography variant="caption" sx={{ color: '#666', fontWeight: 500, mt: 0.5, display: 'block' }}>
+                                                        {role.description}
+                                                    </Typography>
+                                                </Box>
+                                            </Paper>
+                                        </Grid>
+                                    );
+                                })}
                             </Grid>
                             <GoogleSignInButton
                                 selectedRole={selectedRole}
@@ -364,9 +379,15 @@ export const LoginModal = () => {
                                 fullWidth
                                 variant="text"
                                 onClick={() => setIsGoogleFlow(false)}
-                                sx={{ color: 'text.secondary', textTransform: 'none', fontWeight: 600 }}
+                                sx={{
+                                    color: 'text.secondary',
+                                    textTransform: 'none',
+                                    fontWeight: 700,
+                                    fontSize: '0.85rem',
+                                    '&:hover': { bgcolor: 'transparent', color: 'primary.main', textDecoration: 'underline' }
+                                }}
                             >
-                                Back to regular login
+                                Back to email login
                             </Button>
                         </>
                     ) : (
