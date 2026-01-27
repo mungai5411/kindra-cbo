@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../features/auth/authSlice';
@@ -34,10 +34,9 @@ const ROLES = [
 ];
 
 // Google Sign-In Component
-const GoogleSignInButton = ({ onSuccess, onNewUser, selectedRole }: { onSuccess: (data: any) => void, onNewUser: (credential: string) => void, selectedRole: string }) => {
+const GoogleSignInButton = ({ onSuccess, selectedRole }: { onSuccess: (data: any) => void, selectedRole: string }) => {
     const [error, setError] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
-    const theme = useTheme();
 
     const handleGoogleSuccess = async (credentialResponse: any) => {
         setIsProcessing(true);
@@ -139,9 +138,6 @@ export const LoginModal = () => {
     const [rateLimitError, setRateLimitError] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
 
-    // Google Signup Flow
-    const [step, setStep] = useState<'login' | 'role-selection'>('login');
-    const [googleCredential, setGoogleCredential] = useState<string | null>(null);
     const [selectedRole, setSelectedRole] = useState<string>('DONOR');
     const [isGoogleFlow, setIsGoogleFlow] = useState(false);
 
@@ -159,55 +155,18 @@ export const LoginModal = () => {
             setLocalError('');
             setRateLimitError('');
             setLocalLoading(false);
-            setStep('login');
-            setGoogleCredential(null);
             setIsGoogleFlow(false);
         }
     }, [isLoginOpen]);
 
-    const handleGoogleNewUser = (credential: string) => {
-        setGoogleCredential(credential);
-        setStep('role-selection');
-    };
 
-    const handleGoogleFinish = async () => {
-        if (!googleCredential) return;
-        setLocalLoading(true);
-        setLocalError('');
-
-        try {
-            const response = await apiClient.post(endpoints.auth.googleLogin, {
-                credential: googleCredential,
-                role: selectedRole
-            });
-
-            const { access, refresh, user } = response.data;
-
-            localStorage.setItem('accessToken', access);
-            localStorage.setItem('refreshToken', refresh);
-            localStorage.setItem('user', JSON.stringify(user));
-
-            dispatch({
-                type: 'auth/login/fulfilled',
-                payload: { access, refresh, user }
-            });
-
-            closeLoginModal();
-            const from = (location.state as any)?.from?.pathname || '/dashboard';
-            navigate(from, { replace: true });
-        } catch (err: any) {
-            setLocalError(err.response?.data?.error || 'Role selection failed');
-        } finally {
-            setLocalLoading(false);
-        }
-    };
 
     const validateEmail = (email: string): boolean => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return emailRegex.test(email);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLocalError('');
         setRateLimitError('');
@@ -284,7 +243,7 @@ export const LoginModal = () => {
                 <Close />
             </IconButton>
 
-            {step === 'login' ? (
+            {isLoginOpen && (
                 <DialogContent sx={{ p: isMobile ? 3 : 5, pt: isMobile ? 5 : 6 }}>
                     <Box sx={{ mb: 4 }}>
                         <Typography variant="h4" fontWeight="700" sx={{ color: '#000', mb: 1, letterSpacing: '-0.02em' }}>
@@ -373,7 +332,6 @@ export const LoginModal = () => {
                                     const from = (location.state as any)?.from?.pathname || '/dashboard';
                                     navigate(from, { replace: true });
                                 }}
-                                onNewUser={handleGoogleNewUser}
                             />
                             <Button
                                 fullWidth
@@ -444,7 +402,7 @@ export const LoginModal = () => {
                                         variant="outlined"
                                         placeholder="Enter your email"
                                         value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                                         disabled={localLoading || reduxLoading}
                                         required
                                         InputProps={{
@@ -469,7 +427,7 @@ export const LoginModal = () => {
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="••••••••"
                                         value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                                         disabled={localLoading || reduxLoading}
                                         required
                                         InputProps={{
@@ -501,7 +459,7 @@ export const LoginModal = () => {
                                             type="checkbox"
                                             id="remember_me"
                                             checked={rememberMe}
-                                            onChange={(e) => setRememberMe(e.target.checked)}
+                                            onChange={(e: ChangeEvent<HTMLInputElement>) => setRememberMe(e.target.checked)}
                                             style={{
                                                 width: '18px',
                                                 height: '18px',
@@ -582,94 +540,6 @@ export const LoginModal = () => {
                             </form>
                         </>
                     )}
-                </DialogContent>
-            ) : (
-                <DialogContent sx={{ p: isMobile ? 3 : 5, pt: isMobile ? 5 : 6 }}>
-                    <Box sx={{ mb: 4 }}>
-                        <Typography variant="h4" fontWeight="700" sx={{ color: '#000', mb: 1, letterSpacing: '-0.02em' }}>
-                            Welcome to Kindra
-                        </Typography>
-                        <Typography variant="body1" sx={{ color: '#666', fontWeight: 400 }}>
-                            Please select your role to continue
-                        </Typography>
-                    </Box>
-
-                    {localError && (
-                        <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
-                            {localError}
-                        </Alert>
-                    )}
-
-                    <Grid container spacing={2} sx={{ mb: 4 }}>
-                        {ROLES.map((role) => (
-                            <Grid item xs={12} key={role.value}>
-                                <Paper
-                                    elevation={0}
-                                    onClick={() => setSelectedRole(role.value)}
-                                    sx={{
-                                        p: 2,
-                                        cursor: 'pointer',
-                                        borderRadius: '12px',
-                                        border: '1px solid',
-                                        borderColor: selectedRole === role.value ? '#000' : '#eee',
-                                        bgcolor: selectedRole === role.value ? alpha('#000', 0.02) : '#fff',
-                                        transition: 'all 0.2s',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 2,
-                                        '&:hover': {
-                                            borderColor: selectedRole === role.value ? '#000' : '#ccc',
-                                            bgcolor: alpha('#000', 0.01)
-                                        }
-                                    }}
-                                >
-                                    <Box sx={{
-                                        width: 40,
-                                        height: 40,
-                                        borderRadius: '50%',
-                                        bgcolor: selectedRole === role.value ? '#000' : '#f5f5f5',
-                                        color: selectedRole === role.value ? '#fff' : '#666',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}>
-                                        {role.icon}
-                                    </Box>
-                                    <Box>
-                                        <Typography variant="body1" fontWeight="700" sx={{ color: '#000' }}>
-                                            {role.label}
-                                        </Typography>
-                                        <Typography variant="caption" sx={{ color: '#666' }}>
-                                            {role.description}
-                                        </Typography>
-                                    </Box>
-                                </Paper>
-                            </Grid>
-                        ))}
-                    </Grid>
-
-                    <Button
-                        fullWidth
-                        onClick={handleGoogleFinish}
-                        variant="contained"
-                        disabled={localLoading}
-                        sx={{
-                            bgcolor: '#000',
-                            color: '#fff',
-                            py: 1.5,
-                            borderRadius: '8px',
-                            fontWeight: '700',
-                            textTransform: 'none',
-                            fontSize: '16px',
-                            boxShadow: 'none',
-                            '&:hover': {
-                                bgcolor: '#222',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                            },
-                        }}
-                    >
-                        {localLoading ? <CircularProgress size={24} color="inherit" /> : 'Continue to Dashboard'}
-                    </Button>
                 </DialogContent>
             )}
         </Dialog>
