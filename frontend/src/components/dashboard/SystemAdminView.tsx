@@ -26,7 +26,8 @@ import {
     Snackbar,
     alpha,
     useTheme,
-    LinearProgress
+    LinearProgress,
+    Avatar
 } from '@mui/material';
 import {
     AdminPanelSettings,
@@ -293,31 +294,56 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
 
     const renderDashboard = () => (
         <>
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid container spacing={3} sx={{ mb: 6 }}>
                 {[
-                    { title: 'Total Registered Accounts', value: userList.length, color: theme.palette.primary.main, icon: <People /> },
-                    { title: 'System Uptime', value: '99.9%', color: theme.palette.success.main, sub: 'HEALTHY' },
-                    { title: 'Inactivity Risk (Pending)', value: userList.filter(u => !u.is_active).length, color: theme.palette.warning.main, icon: <ErrorOutline /> },
-                    { title: 'Active Volunteer Units', value: groups.length, color: theme.palette.info.main, icon: <GroupWork /> }
+                    { title: 'Registered Accounts', value: userList.length, color: theme.palette.primary.main, icon: <People /> },
+                    { title: 'System Uptime', value: '99.9%', color: '#519755', sub: 'HEALTHY', icon: <Security /> },
+                    { title: 'Inactivity Risk', value: userList.filter(u => !u.is_active).length, color: '#FF708B', icon: <ErrorOutline /> },
+                    { title: 'Volunteer Units', value: groups.length, color: '#5D5FEF', icon: <GroupWork /> }
                 ].map((stat, index) => (
                     <Grid item xs={12} sm={6} md={3} key={index}>
                         <Paper
                             elevation={0}
                             sx={{
-                                p: 2, borderRadius: 2, height: '100%',
-                                background: alpha('#fff', 0.6), backdropFilter: 'blur(10px)',
-                                border: '1px solid', borderColor: 'divider',
-                                display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
+                                p: 3,
+                                borderRadius: 4,
+                                height: '100%',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                background: alpha(stat.color, 0.03),
+                                border: '1px solid',
+                                borderColor: alpha(stat.color, 0.1),
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                backdropFilter: 'blur(10px)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between',
+                                '&:hover': {
+                                    borderColor: stat.color,
+                                    background: alpha(stat.color, 0.05),
+                                    transform: 'translateY(-4px)',
+                                    boxShadow: `0 12px 28px ${alpha(stat.color, 0.1)}`,
+                                }
                             }}
                         >
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <Typography variant="overline" fontWeight="bold" color="text.secondary">{stat.title}</Typography>
-                                {stat.icon && <Box sx={{ color: stat.color, opacity: 0.8 }}>{stat.icon}</Box>}
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, position: 'relative', zIndex: 1 }}>
+                                <Typography variant="overline" sx={{ fontWeight: 800, color: 'text.secondary', letterSpacing: 1 }}>{stat.title}</Typography>
+                                <Box sx={{
+                                    color: stat.color,
+                                    bgcolor: alpha(stat.color, 0.1),
+                                    p: 1,
+                                    borderRadius: 1.5,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    {stat.icon}
+                                </Box>
                             </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-                                <Typography variant="h4" fontWeight="900" sx={{ color: stat.color }}>{stat.value}</Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, position: 'relative', zIndex: 1 }}>
+                                <Typography variant="h3" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: -1 }}>{stat.value}</Typography>
                                 {stat.sub && (
-                                    <Typography variant="caption" sx={{ color: stat.color, fontWeight: 'bold', bgcolor: alpha(stat.color, 0.1), px: 1, borderRadius: 1 }}>
+                                    <Typography variant="caption" sx={{ color: stat.color, fontWeight: 900, bgcolor: alpha(stat.color, 0.15), px: 1, py: 0.5, borderRadius: 1, fontSize: '0.65rem' }}>
                                         {stat.sub}
                                     </Typography>
                                 )}
@@ -327,15 +353,15 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 ))}
             </Grid>
 
-            <Typography variant="h5" fontWeight="bold" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-                <FamilyRestroom color="primary" /> Central Registry Control
+            <Typography variant="h5" sx={{ mb: 4, fontWeight: 900, display: 'flex', alignItems: 'center', gap: 2, letterSpacing: -0.5 }}>
+                <FamilyRestroom sx={{ color: 'primary.main' }} /> Central Registry
             </Typography>
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid container spacing={4}>
                 <Grid item xs={12} lg={6}>
                     <RegistryCard title="Families Managed" count={families.length} items={families.slice(0, 5)} type="family" onDelete={handleDeleteFamily} />
                 </Grid>
                 <Grid item xs={12} lg={6}>
-                    <RegistryCard title="Recent Cases Audit" count={cases.length} items={cases.slice(0, 5)} type="case" onDelete={() => { }} />
+                    <RegistryCard title="Operations Audit" count={cases.length} items={cases.slice(0, 5)} type="case" onDelete={() => { }} />
                 </Grid>
             </Grid>
         </>
@@ -343,27 +369,26 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
 
     const renderUsers = () => (
         <Box>
-            <Box sx={{ mb: 5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+            <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3 }}>
                 <Box>
-                    <Typography variant="h5" fontWeight="800" sx={{ letterSpacing: -0.5 }}>User Infrastructure</Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Kindra Intelligence & Management Protocol</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Identity Management</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Administrative access and clearance control</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                     <TextField
                         size="small"
-                        placeholder="Search by identity..."
+                        placeholder="Search identities..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         InputProps={{
                             startAdornment: <InputAdornment position="start"><Search fontSize="small" sx={{ color: 'text.disabled' }} /></InputAdornment>,
                             sx: {
-                                borderRadius: 10,
+                                borderRadius: 3,
                                 width: { xs: '100%', sm: 300 },
-                                bgcolor: 'background.paper',
-                                border: 'none',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                                bgcolor: alpha(theme.palette.background.paper, 0.8),
+                                border: '1px solid',
+                                borderColor: alpha(theme.palette.divider, 0.1),
                                 '& fieldset': { border: 'none' },
-                                pl: 1
                             }
                         }}
                     />
@@ -372,21 +397,20 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         startIcon={<Refresh />}
                         onClick={() => dispatch(fetchUsers())}
                         sx={{
-                            borderRadius: 10,
+                            borderRadius: 3,
                             boxShadow: 'none',
                             textTransform: 'none',
-                            fontWeight: 700,
+                            fontWeight: 800,
                             px: 3,
-                            bgcolor: 'primary.main',
-                            '&:hover': { bgcolor: 'primary.dark', boxShadow: 'none' }
+                            '&:hover': { transform: 'translateY(-2px)' }
                         }}
                     >
-                        Sync Directory
+                        Directory Sync
                     </Button>
                 </Box>
             </Box>
 
-            <Grid container spacing={2}>
+            <Grid container spacing={4}>
                 {filteredUsers.map((u: any) => (
                     <Grid item xs={12} md={6} lg={4} key={u.id}>
                         <Paper
@@ -395,55 +419,58 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                 p: 0,
                                 borderRadius: 4,
                                 border: '1px solid',
-                                borderColor: alpha(theme.palette.divider, 0.1),
+                                borderColor: alpha(theme.palette.divider, 0.08),
                                 overflow: 'hidden',
-                                transition: 'all 0.2s ease-in-out',
+                                transition: 'all 0.3s ease',
+                                bgcolor: 'background.paper',
                                 '&:hover': {
                                     borderColor: alpha(theme.palette.primary.main, 0.3),
-                                    boxShadow: '0 12px 32px rgba(0,0,0,0.05)',
-                                    transform: 'translateY(-2px)'
+                                    boxShadow: '0 12px 32px rgba(0,0,0,0.06)',
+                                    transform: 'translateY(-4px)'
                                 }
                             }}
                         >
-                            <Box sx={{ p: 3, display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                                <Box sx={{
-                                    width: 56, height: 56, borderRadius: 3,
-                                    bgcolor: alpha(theme.palette.primary.main, 0.08),
-                                    color: 'primary.main', display: 'flex',
-                                    alignItems: 'center', justifyContent: 'center',
-                                    fontWeight: '800', fontSize: '1.5rem',
-                                    flexShrink: 0
-                                }}>
+                            <Box sx={{ p: 3, display: 'flex', alignItems: 'flex-start', gap: 2.5 }}>
+                                <Avatar
+                                    sx={{
+                                        width: 56,
+                                        height: 56,
+                                        borderRadius: 3,
+                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                        color: 'primary.main',
+                                        fontWeight: 900,
+                                        fontSize: '1.25rem'
+                                    }}
+                                >
                                     {(u.full_name || u.email)?.[0]?.toUpperCase()}
-                                </Box>
+                                </Avatar>
                                 <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                        <Box sx={{ pr: 1 }}>
-                                            <Typography variant="subtitle1" fontWeight="800" sx={{ lineHeight: 1.2, mb: 0.5 }}>
+                                        <Box sx={{ pr: 1, minWidth: 0 }}>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 900, lineHeight: 1.2, mb: 0.5, noWrap: true }}>
                                                 {u.full_name || 'Anonymous User'}
                                             </Typography>
-                                            <Typography variant="body2" color="text.secondary" noWrap sx={{ fontSize: '0.8rem', mb: 1 }}>
+                                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1, noWrap: true, fontWeight: 600 }}>
                                                 {u.email}
                                             </Typography>
                                             <Chip
                                                 label={u.role || 'GUEST'}
                                                 size="small"
                                                 sx={{
-                                                    borderRadius: 1,
-                                                    fontWeight: '700',
-                                                    fontSize: '0.65rem',
+                                                    borderRadius: 1.5,
+                                                    fontWeight: 800,
+                                                    fontSize: '0.6rem',
                                                     height: 22,
-                                                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                                                    bgcolor: alpha(theme.palette.primary.main, 0.08),
                                                     color: 'primary.main',
-                                                    border: 'none'
                                                 }}
                                             />
                                         </Box>
                                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                            <IconButton size="small" onClick={() => handleEditUser(u)} sx={{ opacity: 0.6, '&:hover': { opacity: 1, color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.1) } }}>
+                                            <IconButton size="small" onClick={() => handleEditUser(u)} sx={{ '&:hover': { color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.1) } }}>
                                                 <Edit fontSize="small" />
                                             </IconButton>
-                                            <IconButton size="small" onClick={() => handleDeleteUser(u)} sx={{ opacity: 0.6, '&:hover': { opacity: 1, color: 'error.main', bgcolor: alpha(theme.palette.error.main, 0.1) } }}>
+                                            <IconButton size="small" onClick={() => handleDeleteUser(u)} sx={{ '&:hover': { color: 'error.main', bgcolor: alpha(theme.palette.error.main, 0.1) } }}>
                                                 <Delete fontSize="small" />
                                             </IconButton>
                                         </Box>
@@ -452,66 +479,63 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             </Box>
 
                             <Box sx={{
-                                px: 3, pb: 3, pt: 0,
+                                px: 3, py: 2,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
-                                borderTop: '1px dashed',
-                                borderColor: alpha(theme.palette.divider, 0.1),
-                                mt: 1,
-                                paddingTop: 2
+                                borderTop: '1px solid',
+                                borderColor: alpha(theme.palette.divider, 0.04),
+                                bgcolor: alpha(theme.palette.background.default, 0.5)
                             }}>
                                 <Box>
-                                    <Typography variant="caption" color="text.disabled" fontWeight="bold" sx={{ display: 'block', letterSpacing: 0.5, mb: 0.5 }}>STATUS</Typography>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: u.is_active ? 'success.main' : 'error.main', boxShadow: u.is_active ? '0 0 0 2px rgba(16, 185, 129, 0.2)' : 'none' }} />
-                                        <Typography variant="caption" fontWeight="bold" color="text.primary">{u.is_active ? 'VERIFIED' : 'SUSPENDED'}</Typography>
+                                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, display: 'block', letterSpacing: 0.5, mb: 0.2 }}>STATUS</Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: u.is_active ? '#519755' : 'error.main', boxShadow: u.is_active ? '0 0 10px rgba(81, 151, 85, 0.3)' : 'none' }} />
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary' }}>{u.is_active ? 'ACTIVE' : 'SUSPENDED'}</Typography>
                                     </Box>
                                 </Box>
                                 <Box sx={{ textAlign: 'right' }}>
-                                    <Typography variant="caption" color="text.disabled" fontWeight="bold" sx={{ display: 'block', letterSpacing: 0.5, mb: 0.5 }}>JOINED</Typography>
-                                    <Typography variant="caption" fontWeight="bold" color="text.primary">
+                                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, display: 'block', letterSpacing: 0.5, mb: 0.2 }}>MEMBER SINCE</Typography>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                         {u.date_joined ? new Date(u.date_joined).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : 'N/A'}
                                     </Typography>
                                 </Box>
                             </Box>
 
-                            <Box sx={{ p: 1.5, bgcolor: alpha(theme.palette.background.default, 0.5), display: 'flex', gap: 1 }}>
+                            <Box sx={{ p: 2, display: 'flex', gap: 1 }}>
                                 <Button
                                     fullWidth
                                     size="small"
+                                    variant="text"
                                     onClick={() => { setSnackbar({ open: true, message: 'Fetching activity logs...', severity: 'info' }) }}
                                     sx={{
                                         borderRadius: 2,
                                         color: 'text.secondary',
                                         textTransform: 'none',
-                                        fontWeight: 600,
-                                        fontSize: '0.75rem',
-                                        bgcolor: 'background.paper',
-                                        border: '1px solid',
-                                        borderColor: 'divider',
-                                        '&:hover': { borderColor: 'primary.main', color: 'primary.main', bgcolor: 'background.paper' }
+                                        fontWeight: 800,
+                                        fontSize: '0.7rem',
+                                        py: 1,
+                                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), color: 'primary.main' }
                                     }}
                                 >
-                                    Activity logs
+                                    Activity Logs
                                 </Button>
                                 <Button
                                     fullWidth
                                     size="small"
+                                    variant="text"
                                     onClick={() => { setSnackbar({ open: true, message: 'Checking security protocols...', severity: 'info' }) }}
                                     sx={{
                                         borderRadius: 2,
                                         color: 'text.secondary',
                                         textTransform: 'none',
-                                        fontWeight: 600,
-                                        fontSize: '0.75rem',
-                                        bgcolor: 'background.paper',
-                                        border: '1px solid',
-                                        borderColor: 'divider',
-                                        '&:hover': { borderColor: 'primary.main', color: 'primary.main', bgcolor: 'background.paper' }
+                                        fontWeight: 800,
+                                        fontSize: '0.7rem',
+                                        py: 1,
+                                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), color: 'primary.main' }
                                     }}
                                 >
-                                    Security info
+                                    Security Vault
                                 </Button>
                             </Box>
                         </Paper>
@@ -523,61 +547,92 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
 
     const renderPendingApprovals = () => (
         <Box>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box>
-                    <Typography variant="h5" fontWeight="bold">Pending Identity Verifications</Typography>
-                    <Typography variant="body2" color="text.secondary">Shelter Partners waiting for system authorization</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Verification Queue</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Shelter Partner authorization requests</Typography>
                 </Box>
-                <Button variant="contained" startIcon={<Refresh />} onClick={() => dispatch(fetchPendingUsers())} sx={{ borderRadius: 1 }}>Refresh Queue</Button>
+                <Button
+                    variant="outlined"
+                    startIcon={<Refresh />}
+                    onClick={() => dispatch(fetchPendingUsers())}
+                    sx={{ borderRadius: 3, fontWeight: 800, textTransform: 'none' }}
+                >
+                    Update Queue
+                </Button>
             </Box>
 
             {!pendingUsers || pendingUsers.length === 0 ? (
-                <Paper sx={{ p: 8, textAlign: 'center', borderRadius: 2, border: '1px dashed', borderColor: 'divider', bgcolor: alpha(theme.palette.background.paper, 0.5) }}>
-                    <VerifiedUser sx={{ fontSize: 60, color: 'text.disabled', mb: 2, opacity: 0.3 }} />
-                    <Typography variant="h6" color="text.secondary" fontWeight="bold">Directory Clear</Typography>
-                    <Typography variant="body2" color="text.secondary">No accounts are currently awaiting approval.</Typography>
+                <Paper sx={{
+                    p: 10,
+                    textAlign: 'center',
+                    borderRadius: 4,
+                    border: '1px dashed',
+                    borderColor: alpha(theme.palette.divider, 0.1),
+                    bgcolor: alpha(theme.palette.background.paper, 0.3)
+                }}>
+                    <VerifiedUser sx={{ fontSize: 64, color: 'success.main', mb: 2, opacity: 0.2 }} />
+                    <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Queue Clear</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', opacity: 0.6 }}>No pending account authorizations.</Typography>
                 </Paper>
             ) : (
-                <Grid container spacing={3}>
+                <Grid container spacing={4}>
                     {pendingUsers.map((u: any) => (
                         <Grid item xs={12} md={6} lg={4} key={u.id}>
                             <Paper
                                 elevation={0}
                                 sx={{
-                                    p: 3, borderRadius: 2, border: '1px solid',
-                                    borderColor: 'warning.light', bgcolor: alpha('#fff', 0.8),
-                                    backdropFilter: 'blur(10px)',
-                                    display: 'flex', flexDirection: 'column', gap: 2
+                                    p: 3,
+                                    borderRadius: 4,
+                                    border: '1px solid',
+                                    borderColor: alpha(theme.palette.warning.main, 0.2),
+                                    bgcolor: alpha(theme.palette.background.paper, 0.8),
+                                    backdropFilter: 'blur(20px)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 3,
+                                    boxShadow: `0 8px 32px ${alpha(theme.palette.warning.main, 0.05)}`
                                 }}
                             >
-                                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                    <Box sx={{
-                                        width: 50, height: 50, borderRadius: 1.5,
+                                <Box sx={{ display: 'flex', gap: 2.5, alignItems: 'center' }}>
+                                    <Avatar sx={{
+                                        width: 52,
+                                        height: 52,
+                                        borderRadius: 2.5,
                                         bgcolor: alpha(theme.palette.warning.main, 0.1),
-                                        color: 'warning.main', display: 'flex',
-                                        alignItems: 'center', justifyContent: 'center'
+                                        color: 'warning.dark',
+                                        fontWeight: 900
                                     }}>
                                         <HourglassTop />
-                                    </Box>
-                                    <Box>
-                                        <Typography variant="subtitle1" fontWeight="bold">{u.full_name || u.email}</Typography>
-                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>{u.organization || 'No Organization'}</Typography>
-                                        <Typography variant="caption" sx={{ color: 'warning.dark', fontWeight: 'bold' }}>SHELTER PARTNER</Typography>
+                                    </Avatar>
+                                    <Box sx={{ minWidth: 0 }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 900, noWrap: true }}>{u.full_name || u.email}</Typography>
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', noWrap: true }}>
+                                            {u.organization || 'Independent Partner'}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ color: 'warning.dark', fontWeight: 900, textTransform: 'uppercase', fontSize: '0.6rem' }}>
+                                            SHELTER PARTNER
+                                        </Typography>
                                     </Box>
                                 </Box>
 
-                                <Box sx={{ p: 1.5, bgcolor: alpha(theme.palette.background.default, 0.4), borderRadius: 1 }}>
-                                    <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>CONTACT: {u.phone_number || 'N/A'}</Typography>
-                                    <Typography variant="caption">REGISTERED: {new Date(u.created_at).toLocaleString()}</Typography>
+                                <Box sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
+                                    <Typography variant="caption" sx={{ display: 'block', mb: 0.8, fontWeight: 700 }}>
+                                        CONTACT: <Box component="span" sx={{ color: 'text.primary' }}>{u.phone_number || 'N/A'}</Box>
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ fontWeight: 700, display: 'block' }}>
+                                        SUBMITTED: <Box component="span" sx={{ color: 'text.primary' }}>{new Date(u.created_at).toLocaleDateString()}</Box>
+                                    </Typography>
                                 </Box>
 
-                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                <Box sx={{ display: 'flex', gap: 2 }}>
                                     <Button
                                         fullWidth
                                         variant="contained"
                                         color="success"
+                                        disableElevation
                                         onClick={() => handleApproveUser(u)}
-                                        sx={{ borderRadius: 1, fontWeight: 'bold' }}
+                                        sx={{ borderRadius: 2.5, fontWeight: 900, textTransform: 'none', py: 1.2 }}
                                     >
                                         Approve
                                     </Button>
@@ -586,9 +641,9 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                         variant="outlined"
                                         color="error"
                                         onClick={() => handleDeleteUser(u)}
-                                        sx={{ borderRadius: 1, fontWeight: 'bold' }}
+                                        sx={{ borderRadius: 2.5, fontWeight: 900, textTransform: 'none', py: 1.2 }}
                                     >
-                                        Reject
+                                        Decline
                                     </Button>
                                 </Box>
                             </Paper>
@@ -600,65 +655,86 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     );
 
     const renderPeriodicTasks = () => (
-        <Grid container spacing={3}>
+        <Grid container spacing={4}>
             <Grid item xs={12} md={8}>
-                <Paper sx={{ p: 4, borderRadius: 3, border: '1px solid', borderColor: 'divider', background: 'linear-gradient(to bottom, #fff, #fafafa)' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-                        <Box sx={{ p: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.1), borderRadius: 1 }}>
+                <Paper sx={{
+                    p: 4,
+                    borderRadius: 4,
+                    border: '1px solid',
+                    borderColor: alpha(theme.palette.divider, 0.08),
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 4px 32px rgba(0,0,0,0.02)'
+                }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, mb: 4 }}>
+                        <Avatar sx={{ p: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.1), borderRadius: 2.5 }}>
                             <Schedule color="primary" sx={{ fontSize: 32 }} />
-                        </Box>
+                        </Avatar>
                         <Box>
-                            <Typography variant="h6" fontWeight="bold">Automated Lifecycle Engine</Typography>
-                            <Typography variant="body2" color="text.secondary">Real-time monitoring of system background processes</Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Lifecycle Automation</Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>Real-time coordination of background protocols</Typography>
                         </Box>
                     </Box>
 
-                    <Box sx={{ mb: 4, p: 3, bgcolor: '#fff', borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1), boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+                    <Box sx={{
+                        mb: 4,
+                        p: 3,
+                        bgcolor: alpha(theme.palette.background.default, 0.5),
+                        borderRadius: 3.5,
+                        border: '1px solid',
+                        borderColor: alpha(theme.palette.primary.main, 0.1),
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.04)'
+                    }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                             <Box>
-                                <Typography variant="subtitle1" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Autorenew sx={{ fontSize: 18 }} /> User Inactivity Cleanup
+                                <Typography variant="subtitle1" sx={{ fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                    <Autorenew sx={{ fontSize: 20, color: 'primary.main' }} /> Identity Hygiene Engine
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary">Protocol version 2.4 (Modern Logic Integrated)</Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Protocol v2.4 (Kindra Intelligence Integrated)</Typography>
                             </Box>
-                            <Chip label="RUNNING DAILY" size="small" color="success" sx={{ borderRadius: 1, fontWeight: 'bold' }} />
+                            <Chip label="RUNNING DAILY" size="small" color="success" sx={{ borderRadius: 1.5, fontWeight: 900, fontSize: '0.65rem' }} />
                         </Box>
 
-                        <Typography variant="body2" sx={{ mb: 3, lineHeight: 1.6 }}>
-                            Ensures data hygiene by tracking last login timestamps. High-risk accounts (inactive &gt; 6 months) are automatically decommissioned following a 5-stage notification workflow.
+                        <Typography variant="body2" sx={{ mb: 4, lineHeight: 1.6, color: 'text.secondary', fontWeight: 500 }}>
+                            Ensures data integrity by monitoring inactivity thresholds. Stale identities (&gt; 6 months) are automatically processed through a multi-stage decommissioning workflow.
                         </Typography>
 
                         <Grid container spacing={2} sx={{ mb: 4 }}>
                             {[
-                                { m: '1', a: 'Check-in Notification' },
-                                { m: '2', a: 'Community Highlights' },
-                                { m: '3', a: 'Re-engagement Offer' },
-                                { m: '4', a: 'Archival Warning' },
-                                { m: '5', a: 'FINAL DELETION ALERT' },
-                                { m: '6', a: 'DATA PURGE' },
+                                { m: '1', a: 'Discovery' },
+                                { m: '2', a: 'Insight' },
+                                { m: '3', a: 'Re-engage' },
+                                { m: '4', a: 'Warning' },
+                                { m: '5', a: 'DELETION' },
+                                { m: '6', a: 'PURGE' },
                             ].map((step, i) => (
                                 <Grid item xs={4} md={2} key={i}>
                                     <Box sx={{ textAlign: 'center' }}>
                                         <Box sx={{
                                             width: '100%', pt: '100%', position: 'relative',
-                                            bgcolor: i === 5 ? alpha(theme.palette.error.main, 0.1) : alpha(theme.palette.primary.main, 0.05),
-                                            borderRadius: 1, mb: 1, border: '1px solid',
-                                            borderColor: i === 5 ? alpha(theme.palette.error.main, 0.2) : alpha(theme.palette.primary.main, 0.1)
+                                            bgcolor: i >= 4 ? alpha(theme.palette.error.main, 0.08) : alpha(theme.palette.primary.main, 0.05),
+                                            borderRadius: 2, mb: 1, border: '1px solid',
+                                            borderColor: i >= 4 ? alpha(theme.palette.error.main, 0.15) : alpha(theme.palette.primary.main, 0.1)
                                         }}>
-                                            <Typography sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontWeight: 'bold', color: i === 5 ? 'error.main' : 'primary.main' }}>
+                                            <Typography sx={{
+                                                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                                                fontWeight: 900, fontSize: '0.85rem',
+                                                color: i >= 4 ? 'error.main' : 'primary.main'
+                                            }}>
                                                 {step.m}M
                                             </Typography>
                                         </Box>
-                                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 'bold', lineBreak: 'anywhere' }}>{step.a}</Typography>
+                                        <Typography variant="caption" sx={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', color: i >= 4 ? 'error.main' : 'text.secondary' }}>
+                                            {step.a}
+                                        </Typography>
                                     </Box>
                                 </Grid>
                             ))}
                         </Grid>
 
-                        <Box sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), borderRadius: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ p: 2.5, bgcolor: 'background.paper', borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.05), display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Box>
-                                <Typography variant="caption" display="block" fontWeight="bold" sx={{ opacity: 0.6 }}>LOG STATUS</Typography>
-                                <Typography variant="body2" fontWeight="bold">Next Automated Cycle: 02:00 AM</Typography>
+                                <Typography variant="caption" sx={{ display: 'block', fontWeight: 800, color: 'text.disabled', letterSpacing: 0.5, mb: 0.5 }}>STATUS MONITOR</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: 800 }}>Next Cycle: 02:00 AM UTC</Typography>
                             </Box>
                             <Button
                                 variant="contained"
@@ -669,44 +745,48 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                     });
                                 }}
                                 disabled={adminLoading}
-                                sx={{ borderRadius: 1, px: 3, fontWeight: 'bold' }}
+                                sx={{ borderRadius: 2.5, px: 3, fontWeight: 900, textTransform: 'none', boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}` }}
                             >
-                                Trigger Engine
+                                Force Scan
                             </Button>
                         </Box>
                     </Box>
 
                     <Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                            <Typography variant="subtitle2" fontWeight="bold">Active Background Threads</Typography>
-                            <Button size="small" variant="text" onClick={() => dispatch(fetchTaskResults())} startIcon={<Refresh />}>Refresh</Button>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 900, letterSpacing: -0.2 }}>Active Executions</Typography>
+                            <Button size="small" variant="text" onClick={() => dispatch(fetchTaskResults())} startIcon={<Refresh />} sx={{ fontWeight: 800, textTransform: 'none' }}>Refresh Logs</Button>
                         </Box>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                             {taskResults.length > 0 ? taskResults.slice(0, 5).map((result: any) => (
-                                <Box key={result.id} sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.4), borderRadius: 1.5, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1) }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                        <Typography variant="body2" fontWeight="bold" sx={{ fontFamily: 'monospace' }}>{result.task_name?.split('.').pop()}</Typography>
+                                <Box key={result.id} sx={{ p: 2.5, bgcolor: alpha(theme.palette.background.default, 0.3), borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.06) }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                                        <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main', fontFamily: 'monospace' }}>{result.task_name?.split('.').pop()}</Typography>
                                         <Chip
                                             label={result.status}
                                             size="small"
                                             color={result.status === 'SUCCESS' ? 'success' : result.status === 'FAILURE' ? 'error' : 'warning'}
-                                            sx={{ fontSize: '0.6rem', height: 20, fontWeight: 'bold' }}
+                                            sx={{ fontSize: '0.6rem', height: 18, fontWeight: 900, borderRadius: 1 }}
                                         />
                                     </Box>
                                     <LinearProgress
                                         variant="determinate"
                                         value={result.status === 'SUCCESS' ? 100 : result.status === 'FAILURE' ? 0 : 50}
-                                        color={result.status === 'SUCCESS' ? 'success' : result.status === 'FAILURE' ? 'error' : 'primary'}
-                                        sx={{ borderRadius: 5, height: 6, bgcolor: alpha(theme.palette.divider, 0.2) }}
+                                        sx={{
+                                            borderRadius: 5,
+                                            height: 6,
+                                            bgcolor: alpha(theme.palette.divider, 0.1),
+                                            '& .MuiLinearProgress-bar': { borderRadius: 5 }
+                                        }}
                                     />
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                                        <Typography variant="caption" color="text.secondary">Ref: {result.task_id.substring(0, 8)}...</Typography>
-                                        <Typography variant="caption" fontWeight="bold">{new Date(result.date_done).toLocaleTimeString()}</Typography>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1.5 }}>
+                                        <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 600 }}>Ref: {result.task_id.substring(0, 8)}</Typography>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>{new Date(result.date_done).toLocaleTimeString()}</Typography>
                                     </Box>
                                 </Box>
                             )) : (
-                                <Box sx={{ p: 3, textAlign: 'center', bgcolor: alpha(theme.palette.background.default, 0.3), borderRadius: 1 }}>
-                                    <Typography variant="caption" color="text.secondary">No thread history captured in current cycle.</Typography>
+                                <Box sx={{ p: 4, textAlign: 'center', bgcolor: alpha(theme.palette.background.default, 0.2), borderRadius: 3, border: '1px dashed', borderColor: alpha(theme.palette.divider, 0.1) }}>
+                                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>No execution history available.</Typography>
                                 </Box>
                             )}
                         </Box>
@@ -715,46 +795,67 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             </Grid>
 
             <Grid item xs={12} md={4}>
-                <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%', bgcolor: '#1a1f2c', color: '#fff', display: 'flex', flexDirection: 'column' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-                        <Box sx={{ p: 1, bgcolor: alpha('#fff', 0.1), borderRadius: 1 }}>
+                <Paper sx={{
+                    p: 4,
+                    borderRadius: 4,
+                    border: '1px solid',
+                    borderColor: alpha('#fff', 0.1),
+                    height: '100%',
+                    bgcolor: '#1a1f2c',
+                    color: '#fff',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    boxShadow: '0 12px 40px rgba(0,0,0,0.15)'
+                }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+                        <Avatar sx={{ bgcolor: alpha('#fff', 0.1), borderRadius: 2 }}>
                             <AccessTime sx={{ color: '#fff' }} fontSize="small" />
-                        </Box>
-                        <Typography variant="subtitle1" fontWeight="bold">Operational Schedule</Typography>
+                        </Avatar>
+                        <Typography variant="h6" sx={{ fontWeight: 900 }}>Operational Core</Typography>
                     </Box>
-                    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 2, overflow: 'auto' }}>
+                    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 2.5, overflow: 'auto', pr: 1 }}>
                         {periodicTasks.length > 0 ? periodicTasks.map((task: any) => (
-                            <Box key={task.id} sx={{ p: 2, borderRadius: 2, bgcolor: alpha('#fff', 0.05), border: '1px solid', borderColor: alpha('#fff', 0.1) }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                    <Typography variant="body2" fontWeight="bold" color="primary.main">{task.name}</Typography>
+                            <Box key={task.id} sx={{ p: 2.5, borderRadius: 3, bgcolor: alpha('#fff', 0.04), border: '1px solid', borderColor: alpha('#fff', 0.08), transition: 'all 0.2s ease', '&:hover': { bgcolor: alpha('#fff', 0.06), borderColor: alpha('#fff', 0.2) } }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.light' }}>{task.name}</Typography>
                                     <Chip
                                         label={task.enabled ? "ACTIVE" : "PAUSED"}
                                         size="small"
                                         sx={{
                                             height: 16, fontSize: '0.55rem',
-                                            bgcolor: task.enabled ? alpha(theme.palette.success.main, 0.2) : alpha(theme.palette.error.main, 0.2),
-                                            color: task.enabled ? 'success.light' : 'error.light', fontWeight: 'bold'
+                                            bgcolor: task.enabled ? alpha('#519755', 0.2) : alpha('#FF708B', 0.2),
+                                            color: task.enabled ? '#a6e3ae' : '#ffb3c1',
+                                            fontWeight: 900
                                         }}
                                     />
                                 </Box>
-                                <Typography variant="caption" sx={{ display: 'block', mb: 1, opacity: 0.7 }}>{task.schedule_description}</Typography>
+                                <Typography variant="caption" sx={{ display: 'block', mb: 2, opacity: 0.6, fontWeight: 500, lineHeight: 1.4 }}>{task.schedule_description}</Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Schedule sx={{ fontSize: 14, opacity: 0.5 }} />
-                                    <Typography variant="caption" sx={{ opacity: 0.5 }}>Last Run: {task.last_run_at ? new Date(task.last_run_at).toLocaleString() : 'Never'}</Typography>
+                                    <Schedule sx={{ fontSize: 14, opacity: 0.4 }} />
+                                    <Typography variant="caption" sx={{ opacity: 0.4, fontWeight: 600 }}>Sync: {task.last_run_at ? new Date(task.last_run_at).toLocaleTimeString() : 'Pending'}</Typography>
                                 </Box>
                             </Box>
                         )) : (
-                            <Box sx={{ p: 4, textAlign: 'center', opacity: 0.3 }}>
-                                <Autorenew sx={{ fontSize: 40, mb: 1 }} />
-                                <Typography variant="caption" display="block">Scanning System Schedule...</Typography>
+                            <Box sx={{ p: 6, textAlign: 'center', opacity: 0.2 }}>
+                                <Autorenew sx={{ fontSize: 48, mb: 1 }} />
+                                <Typography variant="caption" sx={{ display: 'block', fontWeight: 600 }}>Syncing Protocols...</Typography>
                             </Box>
                         )}
                     </Box>
                     <Button
                         fullWidth
-                        sx={{ mt: 3, color: '#94a3b8', borderColor: 'rgba(255,255,255,0.1)', '&:hover': { bgcolor: 'rgba(255,255,255,0.05)', borderColor: '#fff' } }}
                         variant="outlined"
                         onClick={() => dispatch(fetchPeriodicTasks())}
+                        sx={{
+                            mt: 4,
+                            color: '#94a3b8',
+                            borderRadius: 2.5,
+                            borderColor: alpha('#fff', 0.1),
+                            fontWeight: 900,
+                            textTransform: 'none',
+                            py: 1.2,
+                            '&:hover': { bgcolor: alpha('#fff', 0.05), borderColor: '#fff', color: '#fff' }
+                        }}
                     >
                         Sync Scheduler
                     </Button>
@@ -764,41 +865,84 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     );
 
     const renderGroups = () => (
-        <Paper elevation={0} sx={{ borderRadius: 1, overflow: 'hidden', background: alpha('#fff', 0.5), backdropFilter: 'blur(10px)' }}>
-            <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6" fontWeight="bold">Volunteer Units & Groups</Typography>
-                <Button variant="contained" startIcon={<GroupWork />} onClick={() => setOpenGroupDialog(true)} sx={{ borderRadius: 1 }}>Form New Group</Button>
+        <Paper elevation={0} sx={{ borderRadius: 4, overflow: 'hidden', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.08), bgcolor: alpha(theme.palette.background.paper, 0.6), backdropFilter: 'blur(20px)' }}>
+            <Box sx={{ p: 4, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05), display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Volunteer Infrastructure</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Operational units and field groups</Typography>
+                </Box>
+                <Button
+                    variant="contained"
+                    startIcon={<GroupWork />}
+                    onClick={() => setOpenGroupDialog(true)}
+                    sx={{ borderRadius: 3, fontWeight: 900, px: 3, py: 1.2, textTransform: 'none' }}
+                >
+                    Deploy Unit
+                </Button>
             </Box>
 
-            <Grid container spacing={3} sx={{ p: 3 }}>
+            <Grid container spacing={4} sx={{ p: 4 }}>
                 {groups.map((group: any) => (
                     <Grid item xs={12} md={6} lg={4} key={group.id}>
-                        <Paper sx={{ p: 3, borderRadius: 2, border: '1px solid', borderColor: 'divider', position: 'relative' }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <Box sx={{ p: 1, bgcolor: alpha(theme.palette.primary.main, 0.1), borderRadius: 1 }}>
-                                    <GroupWork color="primary" />
-                                </Box>
+                        <Paper sx={{
+                            p: 3.5,
+                            borderRadius: 4,
+                            border: '1px solid',
+                            borderColor: alpha(theme.palette.divider, 0.08),
+                            position: 'relative',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                borderColor: 'primary.main',
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 12px 32px rgba(0,0,0,0.04)'
+                            }
+                        }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                                <Avatar sx={{ p: 1, bgcolor: alpha(theme.palette.primary.main, 0.1), borderRadius: 2, color: 'primary.main' }}>
+                                    <GroupWork />
+                                </Avatar>
                                 <Box>
-                                    <IconButton size="small" color="primary" onClick={() => handleEditGroup(group)}><Edit fontSize="small" /></IconButton>
-                                    <IconButton size="small" color="error" onClick={() => handleDeleteGroup(group)}><Delete fontSize="small" /></IconButton>
+                                    <IconButton size="small" onClick={() => handleEditGroup(group)} sx={{ '&:hover': { color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.1) } }}><Edit fontSize="small" /></IconButton>
+                                    <IconButton size="small" onClick={() => handleDeleteGroup(group)} sx={{ '&:hover': { color: 'error.main', bgcolor: alpha(theme.palette.error.main, 0.1) } }}><Delete fontSize="small" /></IconButton>
                                 </Box>
                             </Box>
-                            <Typography variant="h6" fontWeight="bold" gutterBottom>{group.name}</Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>{group.description || 'No description provided.'}</Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 900, mb: 1.5, letterSpacing: -0.2 }}>{group.name}</Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3, minHeight: 48, lineHeight: 1.5, fontWeight: 500 }}>
+                                {group.description || 'No operational mandate defined for this unit.'}
+                            </Typography>
 
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                                <People sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                <Typography variant="caption" fontWeight="bold">{group.members_details?.length || 0} Members</Typography>
-                                <Forum sx={{ fontSize: 16, color: 'text.secondary', ml: 1 }} />
-                                <Typography variant="caption" fontWeight="bold">{group.message_count || 0} Messages</Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <People sx={{ fontSize: 16, color: 'text.disabled' }} />
+                                    <Typography variant="caption" sx={{ fontWeight: 800 }}>{group.members_details?.length || 0} Members</Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Forum sx={{ fontSize: 16, color: 'text.disabled' }} />
+                                    <Typography variant="caption" sx={{ fontWeight: 800 }}>{group.message_count || 0} Messages</Typography>
+                                </Box>
                             </Box>
 
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                                 {group.members_details?.slice(0, 3).map((m: any) => (
-                                    <Chip key={m.id} label={m.name} size="small" variant="outlined" sx={{ fontSize: '0.65rem' }} />
+                                    <Chip
+                                        key={m.id}
+                                        label={m.full_name || m.name}
+                                        size="small"
+                                        sx={{
+                                            fontSize: '0.65rem',
+                                            fontWeight: 700,
+                                            bgcolor: alpha(theme.palette.background.default, 0.5),
+                                            border: '1px solid',
+                                            borderColor: alpha(theme.palette.divider, 0.05)
+                                        }}
+                                    />
                                 ))}
                                 {(group.members_details?.length || 0) > 3 && (
-                                    <Chip label={`+${(group.members_details?.length || 0) - 3} more`} size="small" variant="outlined" sx={{ fontSize: '0.65rem' }} />
+                                    <Chip
+                                        label={`+${(group.members_details?.length || 0) - 3} others`}
+                                        size="small"
+                                        sx={{ fontSize: '0.65rem', fontWeight: 900, bgcolor: 'primary.main', color: '#fff' }}
+                                    />
                                 )}
                             </Box>
                         </Paper>
@@ -806,8 +950,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 ))}
                 {groups.length === 0 && (
                     <Grid item xs={12}>
-                        <Box sx={{ py: 6, textAlign: 'center', bgcolor: alpha(theme.palette.background.default, 0.5), borderRadius: 2, border: '1px dashed', borderColor: 'divider' }}>
-                            <Typography color="text.secondary">No active volunteer groups found. Initialize one above.</Typography>
+                        <Box sx={{ py: 10, textAlign: 'center', bgcolor: alpha(theme.palette.background.paper, 0.3), borderRadius: 4, border: '1px dashed', borderColor: alpha(theme.palette.divider, 0.1) }}>
+                            <Typography sx={{ color: 'text.secondary', fontWeight: 600 }}>No active field units found. Deploy one to begin operations.</Typography>
                         </Box>
                     </Grid>
                 )}
@@ -817,36 +961,43 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
 
     const renderAuditLogs = () => (
         <Box>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3 }}>
                 <Box>
-                    <Typography variant="h5" fontWeight="bold">Global System Audit Trail</Typography>
-                    <Typography variant="body2" color="text.secondary">Real-time immutable record of all administrative and system operations</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>System Audit Protocol</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Immutable ledger of administrative and security events</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <TextField
                         size="small"
-                        placeholder="Filter by event type or detail..."
+                        placeholder="Filter audit events..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         InputProps={{
-                            startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment>,
-                            sx: { borderRadius: 1, width: 300, bgcolor: 'background.paper' }
+                            startAdornment: <InputAdornment position="start"><Search fontSize="small" sx={{ color: 'text.disabled' }} /></InputAdornment>,
+                            sx: { borderRadius: 3, width: 300, bgcolor: 'background.paper', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), '& fieldset': { border: 'none' } }
                         }}
                     />
-                    <Button variant="contained" startIcon={<Refresh />} onClick={() => dispatch(fetchAuditLogs())} sx={{ borderRadius: 1 }}>Refresh Logs</Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<Refresh />}
+                        onClick={() => dispatch(fetchAuditLogs())}
+                        sx={{ borderRadius: 3, fontWeight: 900, textTransform: 'none', px: 3 }}
+                    >
+                        Sync Logs
+                    </Button>
                 </Box>
             </Box>
 
-            <Paper elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
-                <TableContainer sx={{ maxHeight: '60vh' }}>
+            <Paper elevation={0} sx={{ borderRadius: 4, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.08), overflow: 'hidden', bgcolor: 'background.paper' }}>
+                <TableContainer sx={{ maxHeight: '65vh' }}>
                     <Table stickyHeader size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>TIMESTAMP</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>EVENT TYPE</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>DESCRIPTION</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>ACTOR</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>IP ADDRESS</TableCell>
+                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>TIMESTAMP</TableCell>
+                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>PROTOCOL</TableCell>
+                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>REASONING</TableCell>
+                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>AUTHORITY</TableCell>
+                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>IP ORIGIN</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -859,47 +1010,48 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                 const isDeletion = log.event_type?.includes('DELETE') || log.event_type?.includes('REJECT');
 
                                 return (
-                                    <TableRow key={log.id} hover>
-                                        <TableCell sx={{ whiteSpace: 'nowrap', color: 'text.secondary', fontWeight: 500 }}>
-                                            {new Date(log.timestamp).toLocaleString()}
+                                    <TableRow key={log.id} hover sx={{ '&:last-child td': { border: 0 } }}>
+                                        <TableCell sx={{ whiteSpace: 'nowrap', color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem', py: 2 }}>
+                                            {new Date(log.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell sx={{ py: 2 }}>
                                             <Chip
                                                 label={log.event_type?.replace(/_/g, ' ')}
                                                 size="small"
-                                                variant="outlined"
                                                 sx={{
-                                                    fontWeight: 'bold',
-                                                    fontSize: '0.65rem',
+                                                    fontWeight: 900,
+                                                    fontSize: '0.6rem',
+                                                    height: 20,
                                                     color: isSecurity ? 'primary.main' : isDeletion ? 'error.main' : 'info.main',
-                                                    borderColor: isSecurity ? 'primary.light' : isDeletion ? 'error.light' : 'info.light',
-                                                    bgcolor: isSecurity ? alpha(theme.palette.primary.main, 0.05) : isDeletion ? alpha(theme.palette.error.main, 0.05) : alpha(theme.palette.info.main, 0.05)
+                                                    bgcolor: isSecurity ? alpha(theme.palette.primary.main, 0.08) : isDeletion ? alpha(theme.palette.error.main, 0.08) : alpha(theme.palette.info.main, 0.08),
+                                                    border: 'none',
+                                                    borderRadius: 1
                                                 }}
                                             />
                                         </TableCell>
-                                        <TableCell sx={{ fontWeight: 600 }}>{log.description}</TableCell>
-                                        <TableCell>
+                                        <TableCell sx={{ fontWeight: 700, py: 2 }}>{log.description}</TableCell>
+                                        <TableCell sx={{ py: 2 }}>
                                             {log.user_name ? (
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <Box sx={{ width: 24, height: 24, borderRadius: '50%', bgcolor: 'primary.main', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 'bold' }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                    <Avatar sx={{ width: 24, height: 24, bgcolor: 'primary.main', fontSize: '0.65rem', fontWeight: 900 }}>
                                                         {log.user_name[0].toUpperCase()}
-                                                    </Box>
-                                                    <Typography variant="body2" fontWeight="bold">{log.user_name}</Typography>
+                                                    </Avatar>
+                                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>{log.user_name}</Typography>
                                                 </Box>
                                             ) : (
-                                                <Typography variant="caption" color="text.disabled">SYSTEM</Typography>
+                                                <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 900, letterSpacing: 1 }}>KINDRA_CORE</Typography>
                                             )}
                                         </TableCell>
-                                        <TableCell sx={{ fontFamily: 'monospace', color: 'text.secondary', fontSize: '0.75rem' }}>
-                                            {log.ip_address || 'Internal'}
+                                        <TableCell sx={{ fontFamily: 'monospace', color: 'text.secondary', fontSize: '0.75rem', py: 2 }}>
+                                            {log.ip_address || '127.0.0.1'}
                                         </TableCell>
                                     </TableRow>
                                 );
                             })}
                             {auditLogs.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={5} sx={{ py: 10, textAlign: 'center' }}>
-                                        <Typography variant="body2" color="text.secondary">No activity logs found in current registry.</Typography>
+                                    <TableCell colSpan={5} sx={{ py: 12, textAlign: 'center' }}>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>System registry is currently idle.</Typography>
                                     </TableCell>
                                 </TableRow>
                             )}
@@ -911,27 +1063,61 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     );
 
     const renderDefault = () => (
-        <Box sx={{ py: 12, textAlign: 'center', bgcolor: alpha(theme.palette.background.paper, 0.5), borderRadius: 2, border: '2px dashed', borderColor: 'divider' }}>
-            <AdminPanelSettings sx={{ fontSize: 80, mb: 2, opacity: 0.1 }} />
-            <Typography variant="h6" color="text.secondary">System Module Protocol Offline</Typography>
-            <Typography variant="body2" color="text.secondary">Select a valid operation from the primary navigation array.</Typography>
+        <Box sx={{
+            py: 16,
+            textAlign: 'center',
+            bgcolor: alpha(theme.palette.background.paper, 0.3),
+            borderRadius: 4,
+            border: '2px dashed',
+            borderColor: alpha(theme.palette.divider, 0.1)
+        }}>
+            <AdminPanelSettings sx={{ fontSize: 80, mb: 3, opacity: 0.1 }} />
+            <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Module Connection Required</Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', opacity: 0.6, fontWeight: 600 }}>Select a system control node to initialize the administrative interface.</Typography>
         </Box>
     );
 
     return (
-        <Box component={motion.div} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <Box
+            component={motion.div}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            sx={{ px: { xs: 1, sm: 2 } }}
+        >
+            <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 3 }}>
                 <Box>
-                    <Typography variant="h4" fontWeight="900" sx={{ letterSpacing: '-0.02em', mb: 1 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: '-0.04em', mb: 1, fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
                         {activeTab === 'users' ? 'User Infrastructure' :
                             activeTab === 'pending_approvals' ? 'Identity Verification' :
-                                activeTab === 'periodic_tasks' ? 'Operations Core' : 'System Administration'}
+                                activeTab === 'periodic_tasks' ? 'Operations Core' :
+                                    activeTab === 'groups' ? 'Volunteer Units' :
+                                        activeTab === 'audit_logs' ? 'System Audit' : 'System Administration'}
                     </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
-                        Kindra Intelligence & Management Protocol
+                    <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Security fontSize="small" /> Kindra Management Protocol
                     </Typography>
                 </Box>
-                <Button variant="contained" onClick={handleSync} startIcon={<Refresh />} sx={{ borderRadius: 1, fontWeight: 'bold', px: 3, boxShadow: '0 4px 14px 0 rgba(0,118,255,0.39)' }}>Sync Hub</Button>
+                <Button
+                    variant="contained"
+                    onClick={handleSync}
+                    startIcon={adminLoading ? <CircularProgress size={18} color="inherit" /> : <Refresh />}
+                    disabled={adminLoading}
+                    sx={{
+                        borderRadius: 3,
+                        fontWeight: 800,
+                        px: 3,
+                        py: 1.2,
+                        textTransform: 'none',
+                        boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.25)}`,
+                        '&:hover': {
+                            boxShadow: `0 12px 28px ${alpha(theme.palette.primary.main, 0.4)}`,
+                            transform: 'translateY(-2px)'
+                        }
+                    }}
+                >
+                    Synchronize Hub
+                </Button>
             </Box>
 
             <AnimatePresence mode="wait">
@@ -953,34 +1139,84 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             </AnimatePresence>
 
             {/* Edit User Dialog */}
-            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
-                <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.5rem', pb: 0 }}>Identity Modification</DialogTitle>
+            <Dialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: 5,
+                        p: 1.5,
+                        bgcolor: alpha(theme.palette.background.paper, 0.9),
+                        backdropFilter: 'blur(30px)',
+                        boxShadow: '0 24px 80px rgba(0,0,0,0.15)',
+                        border: '1px solid',
+                        borderColor: alpha(theme.palette.divider, 0.05)
+                    }
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: 900, fontSize: '1.75rem', letterSpacing: -1 }}>Identity Override</DialogTitle>
                 <DialogContent>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 3 }}>
-                        <Box sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: 2 }}>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>TARGET IDENTITY</Typography>
-                            <Typography variant="body1" fontWeight="bold">{(selectedUser?.full_name || selectedUser?.email)}</Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, pt: 3 }}>
+                        <Box sx={{ p: 2.5, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled', letterSpacing: 1, display: 'block', mb: 0.5 }}>TARGET SUBJECT</Typography>
+                            <Typography variant="body1" sx={{ fontWeight: 900, color: 'primary.main' }}>{(selectedUser?.full_name || selectedUser?.email)}</Typography>
                         </Box>
 
-                        <TextField fullWidth select label="Authority Clearance" value={editRole} onChange={(e) => setEditRole(e.target.value)} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}>
+                        <TextField
+                            fullWidth
+                            select
+                            label="Clearance Level"
+                            value={editRole}
+                            onChange={(e) => setEditRole(e.target.value)}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, fontWeight: 700 } }}
+                        >
                             <MenuItem value="ADMIN">System Administrator</MenuItem>
                             <MenuItem value="MANAGEMENT">Management Team</MenuItem>
                             <MenuItem value="CASE_WORKER">Case Worker</MenuItem>
-                            <MenuItem value="VOLUNTEER">Field Operation</MenuItem>
+                            <MenuItem value="VOLUNTEER">Field Operative</MenuItem>
                             <MenuItem value="DONOR">Public Donor</MenuItem>
                         </TextField>
 
-                        <TextField fullWidth select label="Account Status" value={editStatus} onChange={(e) => setEditStatus(e.target.value)} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1 } }}>
+                        <TextField
+                            fullWidth
+                            select
+                            label="Account Integrity"
+                            value={editStatus}
+                            onChange={(e) => setEditStatus(e.target.value)}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, fontWeight: 700 } }}
+                        >
                             <MenuItem value="ACTIVE">Verified Active</MenuItem>
                             <MenuItem value="SUSPENDED">Security Suspension</MenuItem>
                         </TextField>
 
-                        <Alert severity="info" icon={<Security />} sx={{ borderRadius: 1 }}>Modifications propagate globally across all field nodes.</Alert>
+                        <Alert
+                            severity="info"
+                            icon={<Security />}
+                            sx={{
+                                borderRadius: 3,
+                                fontWeight: 600,
+                                fontSize: '0.8rem',
+                                bgcolor: alpha(theme.palette.info.main, 0.05),
+                                color: 'info.main',
+                                border: '1px solid',
+                                borderColor: alpha(theme.palette.info.main, 0.1)
+                            }}
+                        >
+                            Changes will synchronize across allKindra field nodes immediately.
+                        </Alert>
                     </Box>
                 </DialogContent>
-                <DialogActions sx={{ p: 3, pt: 0 }}>
-                    <Button onClick={() => setOpenDialog(false)} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Discard</Button>
-                    <Button variant="contained" onClick={handleUpdateClearance} sx={{ borderRadius: 1, px: 4, fontWeight: 'bold' }}>Commit Changes</Button>
+                <DialogActions sx={{ p: 3, pt: 1 }}>
+                    <Button onClick={() => setOpenDialog(false)} sx={{ fontWeight: 900, color: 'text.disabled', textTransform: 'none' }}>Abort</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleUpdateClearance}
+                        sx={{ borderRadius: 2.5, px: 4, fontWeight: 900, textTransform: 'none', boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.25)}` }}
+                    >
+                        Commit Override
+                    </Button>
                 </DialogActions>
             </Dialog>
 
@@ -996,35 +1232,55 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 }}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 4, p: 1 } }}
+                PaperProps={{
+                    sx: {
+                        borderRadius: 5,
+                        p: 1.5,
+                        bgcolor: alpha(theme.palette.background.paper, 0.9),
+                        backdropFilter: 'blur(30px)',
+                        boxShadow: '0 24px 80px rgba(0,0,0,0.15)',
+                        border: '1px solid',
+                        borderColor: alpha(theme.palette.divider, 0.05)
+                    }
+                }}
             >
-                <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
-                    {editingGroupId ? 'Reconfigure Volunteer Unit' : 'Establish Volunteer Unit'}
+                <DialogTitle sx={{ fontWeight: 900, fontSize: '1.75rem', letterSpacing: -1 }}>
+                    {editingGroupId ? 'Unit Reconfiguration' : 'Unit Deployment'}
                 </DialogTitle>
                 <DialogContent>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, pt: 3 }}>
                         <TextField
                             fullWidth
-                            label="Unit Designation (Name)"
+                            label="Unit Designation"
                             value={newGroupName}
                             onChange={(e) => setNewGroupName(e.target.value)}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1 } }}
+                            placeholder="e.g. Rapid Response Team A"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, fontWeight: 700 } }}
                         />
                         <TextField
                             fullWidth
                             multiline
                             rows={3}
-                            label="Operational Mandate (Description)"
+                            label="Operational Mandate"
                             value={newGroupDesc}
                             onChange={(e) => setNewGroupDesc(e.target.value)}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1 } }}
+                            placeholder="Describe the primary objectives of this unit..."
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, fontWeight: 700 } }}
                         />
                         <Box>
-                            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <People fontSize="small" /> Assign Operatives (Volunteers)
+                            <Typography variant="subtitle2" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1, fontWeight: 900, letterSpacing: 0.5 }}>
+                                <People fontSize="small" color="primary" /> ATTACH FIELD AGENTS
                             </Typography>
-                            <Box sx={{ maxHeight: 200, overflow: 'auto', border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 1 }}>
-                                <Grid container spacing={1}>
+                            <Box sx={{
+                                maxHeight: 240,
+                                overflow: 'auto',
+                                border: '1px solid',
+                                borderColor: alpha(theme.palette.divider, 0.08),
+                                borderRadius: 4,
+                                p: 1.5,
+                                bgcolor: alpha(theme.palette.background.default, 0.3)
+                            }}>
+                                <Grid container spacing={1.5}>
                                     {volunteers.map((v: any) => (
                                         <Grid item xs={12} key={v.id}>
                                             <Box
@@ -1036,15 +1292,30 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                                     }
                                                 }}
                                                 sx={{
-                                                    p: 1.5, borderRadius: 1, cursor: 'pointer',
-                                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                                    bgcolor: selectedVolunteers.includes(v.id) ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
-                                                    border: '1px solid', borderColor: selectedVolunteers.includes(v.id) ? 'primary.main' : 'divider',
-                                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05) }
+                                                    p: 2,
+                                                    borderRadius: 3,
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                    bgcolor: selectedVolunteers.includes(v.id) ? alpha(theme.palette.primary.main, 0.1) : 'background.paper',
+                                                    border: '1px solid',
+                                                    borderColor: selectedVolunteers.includes(v.id) ? 'primary.main' : alpha(theme.palette.divider, 0.05),
+                                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), transform: 'scale(1.01)' }
                                                 }}
                                             >
-                                                <Typography variant="body2" fontWeight={selectedVolunteers.includes(v.id) ? "bold" : "normal"}>{v.full_name}</Typography>
-                                                {selectedVolunteers.includes(v.id) && <CheckCircle color="primary" sx={{ fontSize: 18 }} />}
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                    <Avatar sx={{ width: 32, height: 32, fontSize: '0.75rem', fontWeight: 900, bgcolor: selectedVolunteers.includes(v.id) ? 'primary.main' : alpha(theme.palette.divider, 0.1) }}>
+                                                        {v.full_name?.[0].toUpperCase()}
+                                                    </Avatar>
+                                                    <Typography variant="body2" sx={{ fontWeight: selectedVolunteers.includes(v.id) ? 900 : 600 }}>{v.full_name}</Typography>
+                                                </Box>
+                                                {selectedVolunteers.includes(v.id) && (
+                                                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                                                        <CheckCircle color="primary" sx={{ fontSize: 20 }} />
+                                                    </motion.div>
+                                                )}
                                             </Box>
                                         </Grid>
                                     ))}
@@ -1053,16 +1324,20 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         </Box>
                     </Box>
                 </DialogContent>
-                <DialogActions sx={{ p: 3, pt: 0 }}>
+                <DialogActions sx={{ p: 3, pt: 1 }}>
                     <Button onClick={() => {
                         setOpenGroupDialog(false);
                         setEditingGroupId(null);
                         setNewGroupName('');
                         setNewGroupDesc('');
                         setSelectedVolunteers([]);
-                    }} sx={{ fontWeight: 'bold' }}>Abort</Button>
-                    <Button variant="contained" onClick={editingGroupId ? handleUpdateGroup : handleCreateGroup} sx={{ borderRadius: 1, px: 4, fontWeight: 'bold' }}>
-                        {editingGroupId ? 'Commit Reconfiguration' : 'Deploy Unit'}
+                    }} sx={{ fontWeight: 900, color: 'text.disabled', textTransform: 'none' }}>Abort</Button>
+                    <Button
+                        variant="contained"
+                        onClick={editingGroupId ? handleUpdateGroup : handleCreateGroup}
+                        sx={{ borderRadius: 2.5, px: 4, fontWeight: 900, textTransform: 'none', boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.25)}` }}
+                    >
+                        {editingGroupId ? 'Commit Reconfig' : 'Deploy Unit'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -1073,7 +1348,23 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 onClose={() => setSnackbar({ ...snackbar, open: false })}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
-                <Alert severity={snackbar.severity} variant="filled" sx={{ borderRadius: 2, fontWeight: 'bold', boxShadow: theme.shadows[10] }}>{snackbar.message}</Alert>
+                <Alert
+                    severity={snackbar.severity}
+                    variant="filled"
+                    sx={{
+                        borderRadius: 3,
+                        fontWeight: 800,
+                        px: 3,
+                        py: 1.5,
+                        minWidth: 300,
+                        boxShadow: '0 12px 40px rgba(0,0,0,0.2)',
+                        bgcolor: snackbar.severity === 'success' ? '#519755' :
+                            snackbar.severity === 'error' ? '#FF708B' :
+                                snackbar.severity === 'warning' ? '#FFBB33' : '#5D5FEF'
+                    }}
+                >
+                    {snackbar.message}
+                </Alert>
             </Snackbar>
 
             <ConfirmationDialog
@@ -1092,28 +1383,82 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
 const RegistryCard = ({ title, count, items, type, onDelete }: any) => {
     const theme = useTheme();
     return (
-        <Paper elevation={0} sx={{ p: 0, borderRadius: 3, overflow: 'hidden', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-            <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6" fontWeight="bold" fontSize="1rem">{title}</Typography>
-                <Chip label={`${count} TOTAL`} color="primary" size="small" sx={{ fontWeight: 'bold', borderRadius: 1 }} />
+        <Paper
+            elevation={0}
+            sx={{
+                p: 0,
+                borderRadius: 4,
+                overflow: 'hidden',
+                border: '1px solid',
+                borderColor: alpha(theme.palette.divider, 0.08),
+                bgcolor: 'background.paper',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                    borderColor: alpha(theme.palette.primary.main, 0.2),
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.05)'
+                }
+            }}
+        >
+            <Box sx={{
+                p: 2.5,
+                borderBottom: '1px solid',
+                borderColor: alpha(theme.palette.divider, 0.05),
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+            }}>
+                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>{title}</Typography>
+                <Chip
+                    label={`${count} TOTAL`}
+                    color="primary"
+                    size="small"
+                    sx={{ fontWeight: 800, borderRadius: 1.5, fontSize: '0.65rem' }}
+                />
             </Box>
             <Table size="small">
                 <TableBody>
                     {items.map((item: any) => (
-                        <TableRow key={item.id} hover>
-                            <TableCell sx={{ fontWeight: 700, fontFamily: 'monospace', color: 'primary.main' }}>#{type === 'family' ? item.family_code : item.case_number}</TableCell>
-                            <TableCell sx={{ fontWeight: 500 }}>{type === 'family' ? item.primary_contact_name : item.title}</TableCell>
+                        <TableRow key={item.id} hover sx={{ '&:last-child td': { border: 0 } }}>
+                            <TableCell sx={{ fontWeight: 800, fontFamily: 'monospace', color: 'primary.main', py: 2 }}>
+                                #{type === 'family' ? item.family_code : item.case_number}
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>
+                                {type === 'family' ? item.primary_contact_name : item.title}
+                            </TableCell>
                             <TableCell align="right">
-                                <IconButton size="small" color="error" onClick={() => onDelete(item.id, type === 'family' ? item.primary_contact_name : item.title)}>
-                                    <Delete fontSize="small" sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }} />
+                                <IconButton
+                                    size="small"
+                                    color="error"
+                                    onClick={() => onDelete(item.id, type === 'family' ? item.primary_contact_name : item.title)}
+                                    sx={{ opacity: 0.5, '&:hover': { opacity: 1, bgcolor: alpha(theme.palette.error.main, 0.1) } }}
+                                >
+                                    <Delete fontSize="small" />
                                 </IconButton>
                             </TableCell>
                         </TableRow>
                     ))}
-                    {items.length === 0 && <TableRow><TableCell colSpan={3} align="center" sx={{ py: 6, color: 'text.secondary' }}>No active records in registry</TableCell></TableRow>}
+                    {items.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={3} align="center" sx={{ py: 6, color: 'text.secondary', opacity: 0.5 }}>
+                                No active records in registry
+                            </TableCell>
+                        </TableRow>
+                    )}
                 </TableBody>
             </Table>
-            <Button fullWidth sx={{ py: 1, color: 'text.secondary', textTransform: 'none', fontWeight: 'bold' }}>View Full Registry</Button>
+            <Button
+                fullWidth
+                sx={{
+                    py: 1.5,
+                    color: 'text.secondary',
+                    textTransform: 'none',
+                    fontWeight: 800,
+                    fontSize: '0.8rem',
+                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), color: 'primary.main' }
+                }}
+            >
+                View Full Registry
+            </Button>
         </Paper>
     );
 };

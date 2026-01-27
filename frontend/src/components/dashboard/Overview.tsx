@@ -193,16 +193,49 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
     return (
         <Box sx={{ p: { xs: 2, sm: 3 } }}>
             {/* Header / Greeting Area */}
-            <Box sx={{ mb: 3 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, letterSpacing: 0.5 }}>
-                    Holla, {user?.firstName} {user?.lastName}
-                </Typography>
-                <Typography variant="h4" fontWeight="900" sx={{
-                    letterSpacing: -1,
-                    mt: 0.5,
-                    fontSize: { xs: '1.75rem', sm: '2.25rem' }
+            <Box sx={{
+                mb: 6,
+                display: 'flex',
+                flexDirection: 'column',
+                position: 'relative',
+                '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    bottom: -16,
+                    left: 0,
+                    width: 60,
+                    height: 4,
+                    borderRadius: 2,
+                    background: `linear-gradient(to right, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.2)})`
+                }
+            }}>
+                <Typography variant="overline" sx={{
+                    fontWeight: 800,
+                    color: 'primary.main',
+                    letterSpacing: 2,
+                    textTransform: 'uppercase',
+                    opacity: 0.8
                 }}>
-                    Ready for your Task?
+                    Dashboard Overview
+                </Typography>
+                <Typography variant="h3" sx={{
+                    fontWeight: 900,
+                    letterSpacing: -1.5,
+                    mt: 0.5,
+                    fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+                    color: 'text.primary',
+                    lineHeight: 1.1
+                }}>
+                    Welcome back, {user?.firstName || 'Friend'}!
+                </Typography>
+                <Typography variant="body1" sx={{
+                    mt: 1.5,
+                    color: 'text.secondary',
+                    maxWidth: 600,
+                    fontWeight: 500,
+                    opacity: 0.7
+                }}>
+                    Here's what's happening with Kindra today. You have {activities.length} recent activities to review.
                 </Typography>
             </Box>
 

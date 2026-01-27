@@ -36,65 +36,73 @@ export const DonorOverview = ({ stats, charts, activeCampaigns, onDonate }: Dono
     const impactRank = getImpactRank(stats.myTotalDonations);
 
     return (
-        <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-
-
+        <Box
+            component={motion.div}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            sx={{ mt: 1 }}
+        >
             <Box sx={{
                 display: 'flex',
-                gap: 2,
-                mb: 4,
+                gap: 3,
+                mb: 6,
                 overflowX: { xs: 'auto', sm: 'unset' },
                 pb: { xs: 2, sm: 0 },
-                px: { xs: 0.5, sm: 0 },
+                px: { xs: 0.5, sm: 0.5 },
                 '&::-webkit-scrollbar': { display: 'none' },
                 scrollbarWidth: 'none',
                 flexWrap: { xs: 'nowrap', sm: 'wrap' }
             }}>
-                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
+                <Box sx={{ minWidth: { xs: 260, sm: 'calc(50% - 12px)', md: 'calc(33.33% - 20px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="My Total Giving"
                         value={`KES ${stats.myTotalDonations.toLocaleString()}`}
-                        color="#5D5FEF"
+                        color="#519755"
                         icon={<Favorite />}
                         subtitle="Lifetime contribution"
+                        delay={0.1}
                     />
                 </Box>
-                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
+                <Box sx={{ minWidth: { xs: 260, sm: 'calc(50% - 12px)', md: 'calc(33.33% - 20px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Donor Status"
                         value={impactRank}
-                        color="#FF708B"
+                        color="#5D5FEF"
                         icon={<TrendingUp />}
                         subtitle="Community impact rank"
+                        delay={0.2}
                     />
                 </Box>
-                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
+                <Box sx={{ minWidth: { xs: 260, sm: 'calc(50% - 12px)', md: 'calc(33.33% - 20px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Campaigns Supported"
                         value={String(stats.supportedCampaigns)}
-                        color="#4ECCA3"
+                        color="#FF708B"
                         icon={<History />}
                         subtitle="Directly aided"
+                        delay={0.3}
                     />
                 </Box>
             </Box>
 
-            <Grid container spacing={2} sx={{ mb: 3 }}>
+            <Grid container spacing={4} sx={{ mb: 6 }}>
                 <Grid item xs={12} lg={8}>
                     <DonationTrendsChart data={charts.personalTrends} />
                 </Grid>
                 <Grid item xs={12} lg={4}>
-                    <Paper sx={{
-                        p: { xs: 2, sm: 2.5 },
+                    <Paper elevation={0} sx={{
+                        p: 3,
                         height: '100%',
-                        borderRadius: 2,
+                        borderRadius: 4,
                         border: '1px solid',
-                        borderColor: alpha(theme.palette.divider, 0.1),
-                        boxShadow: theme.shadows[1],
+                        borderColor: alpha(theme.palette.divider, 0.08),
+                        bgcolor: 'background.paper',
                         display: 'flex',
-                        flexDirection: 'column'
+                        flexDirection: 'column',
+                        position: 'relative',
+                        overflow: 'hidden'
                     }}>
-                        <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>Impact Spotlight</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 900, mb: 3, letterSpacing: -0.5 }}>Impact Spotlight</Typography>
                         <Box sx={{ flexGrow: 1, minHeight: 300 }}>
                             {charts.impactAllocation.length > 0 ? (
                                 <FundAllocationChart
@@ -103,30 +111,35 @@ export const DonorOverview = ({ stats, charts, activeCampaigns, onDonate }: Dono
                                     hideCard={true}
                                 />
                             ) : (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', flexDirection: 'column', color: 'text.secondary' }}>
-                                    <TrendingUp sx={{ fontSize: 48, opacity: 0.2, mb: 2 }} />
-                                    <Typography variant="body2">No impact allocation data available yet.</Typography>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', flexDirection: 'column', color: 'text.secondary', opacity: 0.5 }}>
+                                    <TrendingUp sx={{ fontSize: 48, mb: 2 }} />
+                                    <Typography variant="body2" fontWeight="600">No impact data yet</Typography>
                                 </Box>
                             )}
                         </Box>
                         <Button
                             fullWidth
                             variant="contained"
-                            size="large"
+                            disableElevation
                             sx={{
-                                mt: 'auto',
-                                borderRadius: 2,
-                                py: 1,
-                                fontWeight: 'bold',
+                                mt: 4,
+                                borderRadius: 3,
+                                py: 1.5,
+                                fontWeight: 800,
                                 textTransform: 'none',
                                 background: theme.palette.primary.main,
                                 '&:hover': {
                                     background: theme.palette.primary.dark,
-                                    boxShadow: theme.shadows[4]
-                                }
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.3)}`
+                                },
+                                transition: 'all 0.3s'
                             }}
                             startIcon={<Share />}
-                            onClick={() => setShareMessage(true)}
+                            onClick={() => {
+                                navigator.clipboard.writeText(`I've achieved ${impactRank} status on Kindra CBO! Proud to support ${stats.supportedCampaigns} campaigns. Join me in making a difference!`);
+                                setShareMessage(true);
+                            }}
                         >
                             Share My Impact
                         </Button>
@@ -136,32 +149,81 @@ export const DonorOverview = ({ stats, charts, activeCampaigns, onDonate }: Dono
 
             {/* Notification */}
             <Snackbar open={shareMessage} autoHideDuration={3000} onClose={() => setShareMessage(false)}>
-                <Alert severity="success" sx={{ width: '100%', borderRadius: 3 }}>
-                    Impact story copied to clipboard! Share it with your network.
+                <Alert severity="success" sx={{ width: '100%', borderRadius: 3, fontWeight: 700 }}>
+                    Impact story copied to clipboard!
                 </Alert>
             </Snackbar>
 
-            <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>Urgent Campaigns Need Your Support</Typography>
-            <Grid container spacing={2}>
-                {activeCampaigns.slice(0, 3).map((c: any) => (
-                    <Grid item xs={12} md={4} key={c.id}>
-                        <Paper sx={{ p: 2, borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1] }}>
-                            <Typography variant="subtitle1" fontWeight="bold">{c.title}</Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{c.description?.substring(0, 100)}...</Typography>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography variant="caption" fontWeight="bold">Progress: {c.target_amount > 0 ? Math.round(((c.raised_amount || 0) / c.target_amount) * 100) : 0}%</Typography>
+            <Box sx={{ mb: 3, px: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Urgent Opportunities</Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary', opacity: 0.7, fontWeight: 500 }}>Support these critical missions today</Typography>
+            </Box>
+
+            <Grid container spacing={3}>
+                {activeCampaigns.slice(0, 3).map((c: any) => {
+                    const progress = c.target_amount > 0 ? Math.round(((c.raised_amount || 0) / c.target_amount) * 100) : 0;
+                    return (
+                        <Grid item xs={12} md={4} key={c.id}>
+                            <Paper elevation={0} sx={{
+                                p: 3,
+                                borderRadius: 4,
+                                border: '1px solid',
+                                borderColor: alpha(theme.palette.divider, 0.08),
+                                bgcolor: 'background.paper',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    transform: 'translateY(-4px)',
+                                    borderColor: theme.palette.primary.main,
+                                    boxShadow: '0 12px 30px rgba(0,0,0,0.04)'
+                                }
+                            }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1, color: progress >= 90 ? 'error.main' : 'text.primary' }}>
+                                    {c.title}
+                                </Typography>
+                                <Typography variant="body2" sx={{
+                                    color: 'text.secondary',
+                                    mb: 3,
+                                    lineHeight: 1.5,
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden',
+                                    height: '3em'
+                                }}>
+                                    {c.description}
+                                </Typography>
+                                <Box sx={{ mb: 2.5 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>Progress</Typography>
+                                        <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main' }}>{progress}%</Typography>
+                                    </Box>
+                                    <Box sx={{ width: '100%', height: 6, bgcolor: alpha(theme.palette.divider, 0.1), borderRadius: 3, overflow: 'hidden' }}>
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${progress}%` }}
+                                            transition={{ duration: 1, ease: 'easeOut' }}
+                                            style={{ height: '100%', background: theme.palette.primary.main, borderRadius: 3 }}
+                                        />
+                                    </Box>
+                                </Box>
                                 <Button
-                                    size="small"
-                                    variant="contained"
+                                    fullWidth
+                                    variant="outlined"
                                     onClick={() => onDonate?.(c)}
-                                    sx={{ borderRadius: 2 }}
+                                    sx={{
+                                        borderRadius: 2.5,
+                                        textTransform: 'none',
+                                        fontWeight: 800,
+                                        borderWidth: 2,
+                                        '&:hover': { borderWidth: 2 }
+                                    }}
                                 >
-                                    Donate
+                                    Contribute Now
                                 </Button>
-                            </Box>
-                        </Paper>
-                    </Grid>
-                ))}
+                            </Paper>
+                        </Grid>
+                    );
+                })}
             </Grid>
         </Box>
     );

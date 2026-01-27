@@ -5,7 +5,14 @@ import {
     Notifications as NotificationsIcon,
     Search,
     Tune,
-    MoreVert
+    Favorite,
+    Event,
+    Assignment,
+    Campaign,
+    Warning,
+    CheckCircle,
+    Info,
+    DoneAll
 } from '@mui/icons-material';
 import {
     Box,
@@ -24,7 +31,7 @@ import {
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { glassCard, glassChatBubble } from '../../theme/glassmorphism';
+import { glassCard } from '../../theme/glassmorphism';
 import apiClient from '../../api/client';
 
 interface User {
@@ -53,12 +60,62 @@ interface Notification {
     title: string;
     message: string;
     time: string;
+    created_at?: string;
     formattedTime?: string;
     read: boolean;
     category?: string;
     targetRoles?: string[];
     link?: string;
 }
+
+// Helper to group notifications
+const groupNotifications = (notifs: Notification[]) => {
+    const groups: { [key: string]: Notification[] } = {
+        'Today': [],
+        'Yesterday': [],
+        'Earlier': []
+    };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    notifs.forEach(n => {
+        const dateStr = n.created_at || n.time;
+        const d = dateStr ? new Date(dateStr) : new Date();
+        d.setHours(0, 0, 0, 0);
+        if (d.getTime() === today.getTime()) groups['Today'].push(n);
+        else if (d.getTime() === yesterday.getTime()) groups['Yesterday'].push(n);
+        else groups['Earlier'].push(n);
+    });
+
+    return Object.entries(groups).filter(([_, items]) => items.length > 0);
+};
+
+const getNotifIcon = (type: string) => {
+    switch (type) {
+        case 'donation': return <Favorite sx={{ fontSize: 18 }} />;
+        case 'event': return <Event sx={{ fontSize: 18 }} />;
+        case 'task': return <Assignment sx={{ fontSize: 18 }} />;
+        case 'campaign': return <Campaign sx={{ fontSize: 18 }} />;
+        case 'warning': return <Warning sx={{ fontSize: 18 }} />;
+        case 'success': return <CheckCircle sx={{ fontSize: 18 }} />;
+        default: return <Info sx={{ fontSize: 18 }} />;
+    }
+};
+
+const getNotifColor = (type: string, theme: any) => {
+    switch (type) {
+        case 'donation': return theme.palette.error.main;
+        case 'event': return theme.palette.primary.main;
+        case 'task': return theme.palette.info.main;
+        case 'campaign': return theme.palette.secondary.main;
+        case 'warning': return theme.palette.warning.main;
+        case 'success': return theme.palette.success.main;
+        default: return theme.palette.primary.main;
+    }
+};
 
 
 
@@ -184,6 +241,17 @@ export const CommunityHub = () => {
         n.message.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const groupedNotifs = groupNotifications(filteredNotifs);
+
+    const handleMarkAllRead = async () => {
+        try {
+            await apiClient.post('/accounts/notifications/mark-all-read/');
+            fetchNotifications();
+        } catch (error) {
+            console.error('Failed to mark notifications as read:', error);
+        }
+    };
+
     return (
         <>
 
@@ -195,7 +263,7 @@ export const CommunityHub = () => {
                         exit={{ x: '100%', opacity: 0 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                         style={{
-                            position: 'fixed',
+                            position: 'fixed' as any,
                             top: isMobile ? 0 : 20,
                             bottom: isMobile ? 0 : 20,
                             right: isMobile ? 0 : 20,
@@ -268,6 +336,11 @@ export const CommunityHub = () => {
                                     />
 
                                     <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                        <IconButton size="small" onClick={handleMarkAllRead}>
+                                            <Tooltip title="Mark all as read">
+                                                <DoneAll sx={{ fontSize: 18, opacity: 0.6 }} />
+                                            </Tooltip>
+                                        </IconButton>
                                         <IconButton size="small" onClick={() => setIsOpen(false)}>
                                             <Close sx={{ fontSize: 18, opacity: 0.6 }} />
                                         </IconButton>
@@ -276,165 +349,152 @@ export const CommunityHub = () => {
 
                                 <Box sx={{ flex: 1, overflowY: 'auto', p: 2, position: 'relative' }}>
                                     {activeSection === 'Community' ? (
-                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                             {messages.map((msg) => (
                                                 <Box key={msg.id} sx={{
                                                     display: 'flex',
-                                                    gap: 2,
+                                                    gap: 1.5,
                                                     flexDirection: msg.is_sender ? 'row-reverse' : 'row',
                                                     alignSelf: msg.is_sender ? 'flex-end' : 'flex-start',
-                                                    maxWidth: '80%'
+                                                    maxWidth: '85%'
                                                 }}>
-                                                    <Avatar src={msg.user?.profile_picture || undefined} sx={{ width: 24, height: 24, mt: 0.5 }}>
+                                                    <Avatar
+                                                        src={msg.user?.profile_picture || undefined}
+                                                        sx={{
+                                                            width: 32,
+                                                            height: 32,
+                                                            mt: 0.5,
+                                                            border: '1.5px solid',
+                                                            borderColor: msg.is_private ? 'success.main' : 'primary.main',
+                                                            p: '0.5px'
+                                                        }}
+                                                    >
                                                         {msg.user?.username?.[0] || '?'}
                                                     </Avatar>
-                                                    <Box>
-                                                        <Box sx={{ display: 'flex', gap: 0.8, mb: 0.2, alignItems: 'center', flexDirection: msg.is_sender ? 'row-reverse' : 'row' }}>
-                                                            <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 600, opacity: 0.7 }}>
+                                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: msg.is_sender ? 'flex-end' : 'flex-start' }}>
+                                                        <Box sx={{ display: 'flex', gap: 1, mb: 0.5, alignItems: 'center', flexDirection: msg.is_sender ? 'row-reverse' : 'row' }}>
+                                                            <Typography variant="caption" sx={{ fontSize: '0.7rem', fontWeight: 700, opacity: 0.8 }}>
                                                                 {msg.user?.first_name || msg.user?.username || 'Unknown'}
                                                             </Typography>
-                                                            <Typography variant="caption" sx={{ fontSize: '0.6rem', opacity: 0.4 }}>
+                                                            <Typography variant="caption" sx={{ fontSize: '0.6rem', opacity: 0.5 }}>
                                                                 {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                             </Typography>
+                                                            {msg.is_private && (
+                                                                <Chip label="Private" size="small" color="success" sx={{ height: 16, fontSize: '0.55rem', fontWeight: 800 }} />
+                                                            )}
                                                         </Box>
-                                                        <Box sx={{
-                                                            ...glassChatBubble(msg.is_sender, msg.is_private),
+                                                        <Paper sx={{
+                                                            py: 1,
                                                             px: 1.5,
-                                                            py: 0.8,
-                                                            borderRadius: msg.is_sender ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-                                                            boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+                                                            borderRadius: msg.is_sender ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                                                            bgcolor: msg.is_sender ? theme.palette.primary.main : alpha(theme.palette.divider, 0.05),
+                                                            color: msg.is_sender ? 'white' : 'text.primary',
+                                                            boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                                                            border: '1px solid',
+                                                            borderColor: msg.is_sender ? 'primary.main' : alpha(theme.palette.divider, 0.1)
                                                         }}>
-                                                            <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>{msg.content}</Typography>
-                                                        </Box>
+                                                            <Typography variant="body2" sx={{ fontSize: '0.85rem', lineHeight: 1.5 }}>
+                                                                {msg.content}
+                                                            </Typography>
+                                                        </Paper>
                                                     </Box>
                                                 </Box>
                                             ))}
                                             <div ref={messagesEndRef} />
                                         </Box>
                                     ) : (
-                                        <Box sx={{ position: 'relative', pl: 8 }}>
-                                            <Box sx={{
-                                                position: 'absolute',
-                                                left: 51,
-                                                top: 0,
-                                                bottom: 0,
-                                                width: 1.5,
-                                                bgcolor: 'rgba(0,0,0,0.06)',
-                                                zIndex: 0
-                                            }} />
-
-                                            {filteredNotifs.map((notif) => (
-                                                <Box key={notif.id} sx={{ mb: 4, display: 'flex', alignItems: 'flex-start', position: 'relative' }}>
-                                                    <Box sx={{
-                                                        position: 'absolute',
-                                                        left: -50,
-                                                        top: 4,
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: 1,
-                                                        width: 80,
-                                                        zIndex: 1
-                                                    }}>
-                                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', width: 40, fontSize: '0.7rem' }}>
-                                                            {notif.formattedTime}
-                                                        </Typography>
-                                                        <Box sx={{
-                                                            width: 8,
-                                                            height: 8,
-                                                            borderRadius: '50%',
-                                                            bgcolor: notif.read ? 'divider' : theme.palette.primary.main,
-                                                            border: '2.5px solid white',
-                                                            boxShadow: '0 0 0 1px rgba(0,0,0,0.05)'
-                                                        }} />
-                                                    </Box>
-
-                                                    <Paper sx={{
-                                                        flex: 1,
-                                                        p: 2,
-                                                        borderRadius: 3,
-                                                        border: selectedNotifId === notif.id ? `1px solid ${theme.palette.primary.main}` : '1px solid rgba(0,0,0,0.06)',
-                                                        boxShadow: selectedNotifId === notif.id ? '0 4px 20px rgba(0,0,0,0.08)' : '0 2px 12px rgba(0,0,0,0.02)',
-                                                        display: 'flex',
-                                                        flexDirection: 'column',
-                                                        gap: 1,
-                                                        cursor: 'pointer',
-                                                        transition: 'all 0.3s ease',
-                                                        '&:hover': { bgcolor: '#fafafa', borderColor: theme.palette.primary.main }
-                                                    }} onClick={() => setSelectedNotifId(selectedNotifId === notif.id ? null : notif.id)}>
-                                                        <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
-                                                            <Avatar sx={{ width: 32, height: 32, bgcolor: alpha(theme.palette.primary.main, 0.1), color: theme.palette.primary.main }}>
-                                                                {(notif.type?.[0] || 'N').toUpperCase()}
-                                                            </Avatar>
-                                                            <Box sx={{ flex: 1 }}>
-                                                                <Typography variant="body2" sx={{ fontWeight: 600, color: '#1a1a1a', mb: 0.5 }}>
-                                                                    <span style={{ color: theme.palette.primary.main }}>{(notif.title || '').split(' ')[0]}</span> {(notif.title || '').split(' ').slice(1).join(' ')}
-                                                                </Typography>
-                                                                <AnimatePresence>
-                                                                    {selectedNotifId !== notif.id && (
-                                                                        <motion.div
-                                                                            initial={{ opacity: 0 }}
-                                                                            animate={{ opacity: 1 }}
-                                                                            exit={{ opacity: 0 }}
-                                                                        >
-                                                                            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8rem', mb: 1, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                                                                {notif.message}
+                                        <Box sx={{ position: 'relative' }}>
+                                            {groupedNotifs.map(([group, items]) => (
+                                                <Box key={group} sx={{ mb: 3 }}>
+                                                    <Typography variant="overline" sx={{ px: 1, fontWeight: 800, color: 'text.secondary', opacity: 0.7, letterSpacing: 1.5 }}>
+                                                        {group}
+                                                    </Typography>
+                                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: 1 }}>
+                                                        {items.map((notif) => (
+                                                            <Paper
+                                                                key={notif.id}
+                                                                elevation={0}
+                                                                sx={{
+                                                                    p: 2,
+                                                                    borderRadius: 3,
+                                                                    border: '1px solid',
+                                                                    borderColor: selectedNotifId === notif.id ? theme.palette.primary.main : alpha(theme.palette.divider, 0.08),
+                                                                    bgcolor: notif.read ? 'transparent' : alpha(theme.palette.primary.main, 0.02),
+                                                                    transition: 'all 0.2s ease',
+                                                                    cursor: 'pointer',
+                                                                    '&:hover': {
+                                                                        borderColor: theme.palette.primary.main,
+                                                                        bgcolor: alpha(theme.palette.primary.main, 0.04),
+                                                                        transform: 'translateY(-2px)'
+                                                                    }
+                                                                }}
+                                                                onClick={() => setSelectedNotifId(selectedNotifId === notif.id ? null : notif.id)}
+                                                            >
+                                                                <Box sx={{ display: 'flex', gap: 2 }}>
+                                                                    <Avatar sx={{
+                                                                        width: 36,
+                                                                        height: 36,
+                                                                        bgcolor: alpha(getNotifColor(notif.type, theme), 0.1),
+                                                                        color: getNotifColor(notif.type, theme),
+                                                                        border: '1px solid',
+                                                                        borderColor: alpha(getNotifColor(notif.type, theme), 0.2)
+                                                                    }}>
+                                                                        {getNotifIcon(notif.type)}
+                                                                    </Avatar>
+                                                                    <Box sx={{ flex: 1 }}>
+                                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
+                                                                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                                                                {notif.title}
                                                                             </Typography>
-                                                                        </motion.div>
-                                                                    )}
-                                                                </AnimatePresence>
-                                                                <Chip
-                                                                    size="small"
-                                                                    label={notif.category || 'System'}
-                                                                    sx={{
-                                                                        height: 20,
-                                                                        fontSize: '0.65rem',
-                                                                        fontWeight: 800,
-                                                                        bgcolor: alpha(theme.palette.primary.main, 0.05),
-                                                                        color: theme.palette.primary.main,
-                                                                        borderRadius: 1
-                                                                    }}
-                                                                />
-                                                            </Box>
-                                                            <IconButton size="small"><MoreVert sx={{ fontSize: 16 }} /></IconButton>
-                                                        </Box>
-
-                                                        <AnimatePresence>
-                                                            {selectedNotifId === notif.id && (
-                                                                <motion.div
-                                                                    initial={{ height: 0, opacity: 0 }}
-                                                                    animate={{ height: 'auto', opacity: 1 }}
-                                                                    exit={{ height: 0, opacity: 0 }}
-                                                                    style={{ overflow: 'hidden' }}
-                                                                >
-                                                                    <Box sx={{ pt: 1, borderTop: '1px solid rgba(0,0,0,0.03)', mt: 1 }}>
-                                                                        <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+                                                                            <Typography variant="caption" sx={{ color: 'text.secondary', opacity: 0.6, fontSize: '0.65rem' }}>
+                                                                                {notif.formattedTime}
+                                                                            </Typography>
+                                                                        </Box>
+                                                                        <Typography variant="body2" sx={{
+                                                                            color: 'text.secondary',
+                                                                            fontSize: '0.8rem',
+                                                                            lineHeight: 1.5,
+                                                                            display: selectedNotifId === notif.id ? 'block' : '-webkit-box',
+                                                                            WebkitLineClamp: 2,
+                                                                            WebkitBoxOrient: 'vertical',
+                                                                            overflow: 'hidden'
+                                                                        }}>
                                                                             {notif.message}
                                                                         </Typography>
-                                                                        {notif.link && (
-                                                                            <Button
-                                                                                size="small"
-                                                                                variant="outlined"
-                                                                                sx={{ mt: 2, borderRadius: 2, textTransform: 'none', fontSize: '0.75rem' }}
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    if (notif.link) {
-                                                                                        navigate(notif.link);
-                                                                                    }
-                                                                                }}
-                                                                            >
-                                                                                View Details
-                                                                            </Button>
-                                                                        )}
+                                                                        <AnimatePresence>
+                                                                            {selectedNotifId === notif.id && (
+                                                                                <motion.div
+                                                                                    initial={{ height: 0, opacity: 0 }}
+                                                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                                                    exit={{ height: 0, opacity: 0 }}
+                                                                                >
+                                                                                    {notif.link && (
+                                                                                        <Button
+                                                                                            size="small"
+                                                                                            variant="contained"
+                                                                                            disableElevation
+                                                                                            sx={{ mt: 1.5, borderRadius: 2, textTransform: 'none', fontSize: '0.7rem', px: 2 }}
+                                                                                            onClick={(e) => { e.stopPropagation(); navigate(notif.link!); }}
+                                                                                        >
+                                                                                            Take Action
+                                                                                        </Button>
+                                                                                    )}
+                                                                                </motion.div>
+                                                                            )}
+                                                                        </AnimatePresence>
                                                                     </Box>
-                                                                </motion.div>
-                                                            )}
-                                                        </AnimatePresence>
-                                                    </Paper>
+                                                                    {!notif.read && (
+                                                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: theme.palette.primary.main, mt: 1 }} />
+                                                                    )}
+                                                                </Box>
+                                                            </Paper>
+                                                        ))}
+                                                    </Box>
                                                 </Box>
                                             ))}
                                             {filteredNotifs.length === 0 && (
                                                 <Box sx={{ textAlign: 'center', py: 8, opacity: 0.5 }}>
-                                                    <Typography>No messages found in this section.</Typography>
+                                                    <Typography variant="body2">No notifications found.</Typography>
                                                 </Box>
                                             )}
                                         </Box>

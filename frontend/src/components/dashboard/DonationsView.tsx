@@ -365,17 +365,17 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
 
     const StatusChip = ({ status }: { status: string }) => {
         let color = theme.palette.info.main;
-        let bgcolor = alpha(theme.palette.info.main, 0.1);
+        let bgcolor = alpha(theme.palette.info.main, 0.08);
 
         if (status === 'ACTIVE') {
             color = theme.palette.success.main;
-            bgcolor = alpha(theme.palette.success.main, 0.1);
+            bgcolor = alpha(theme.palette.success.main, 0.08);
         } else if (status === 'COMPLETED' || status === 'SUCCESS') {
             color = theme.palette.primary.main;
-            bgcolor = alpha(theme.palette.primary.main, 0.1);
+            bgcolor = alpha(theme.palette.primary.main, 0.08);
         } else if (status === 'PAUSED' || status === 'CANCELLED') {
             color = theme.palette.warning.main;
-            bgcolor = alpha(theme.palette.warning.main, 0.1);
+            bgcolor = alpha(theme.palette.warning.main, 0.08);
         }
 
         return (
@@ -383,25 +383,37 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                 label={status}
                 size="small"
                 sx={{
-                    fontWeight: 600,
-                    borderRadius: '6px',
+                    fontWeight: 900,
+                    fontSize: '0.65rem',
+                    letterSpacing: 0.5,
+                    borderRadius: 1.5,
                     bgcolor: bgcolor,
-                    color: color
+                    color: color,
+                    border: 'none'
                 }}
             />
         );
     };
 
     const renderCampaigns = () => (
-        <Box component={motion.div} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h6" fontWeight="bold">{isDonor ? 'Join a Cause' : 'Active Campaigns'}</Typography>
+        <Box component={motion.div} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: '-0.02em' }}>
+                    {isDonor ? 'Join a Cause' : 'Active Campaigns'}
+                </Typography>
                 {isManagement && (
                     <Button
                         variant="contained"
                         startIcon={<Add />}
                         onClick={() => setOpenDialog?.(true)}
-                        sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600, boxShadow: theme.shadows[2] }}
+                        sx={{
+                            borderRadius: 3,
+                            textTransform: 'none',
+                            fontWeight: 800,
+                            boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.25)}`,
+                            px: 3,
+                            py: 1
+                        }}
                     >
                         Create Campaign
                     </Button>
@@ -411,43 +423,59 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                 {campaigns.filter((c: any) => isManagement || c.status !== 'DRAFT').map((camp: any) => (
                     <Grid item xs={12} md={4} key={camp.id}>
                         <Paper sx={{
-                            p: 2,
+                            p: 3,
                             height: '100%',
                             display: 'flex',
                             flexDirection: 'column',
-                            borderRadius: 2,
+                            borderRadius: 4,
                             border: '1px solid',
-                            borderColor: alpha(theme.palette.divider, 0.1),
-                            boxShadow: theme.shadows[1],
-                            transition: 'all 0.3s ease',
-                            '&:hover': { transform: 'translateY(-2px)', boxShadow: theme.shadows[4] }
+                            borderColor: alpha(theme.palette.divider, 0.08),
+                            bgcolor: alpha(theme.palette.background.paper, 0.6),
+                            backdropFilter: 'blur(10px)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                borderColor: alpha(theme.palette.primary.main, 0.2),
+                                boxShadow: '0 12px 40px rgba(0,0,0,0.08)'
+                            }
                         }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <Typography variant="subtitle1" fontWeight="bold" noWrap sx={{ maxWidth: '70%' }}>{camp.title}</Typography>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5, lineHeight: 1.2 }}>
+                                    {camp.title}
+                                </Typography>
                                 <StatusChip status={camp.status} />
                             </Box>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
-                                {camp.description || 'No description provided.'}
+                            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3, flexGrow: 1, fontWeight: 500, lineHeight: 1.6 }}>
+                                {camp.description || 'System initialization pending for campaign narrative.'}
                             </Typography>
-                            <Box sx={{ mb: 3 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                    <Typography variant="caption" fontWeight="bold">Goal: KES {(camp.target_amount || 0).toLocaleString()}</Typography>
-                                    <Typography variant="caption" fontWeight="bold" color="primary.main">
+
+                            <Box sx={{ mb: 3, bgcolor: alpha(theme.palette.background.default, 0.3), p: 2, borderRadius: 3 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5, alignItems: 'center' }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', letterSpacing: 0.5 }}>
+                                        TARGET: KES {(camp.target_amount || 0).toLocaleString()}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.1), px: 1, py: 0.25, borderRadius: 1 }}>
                                         {camp.target_amount > 0 ? Math.round(((camp.raised_amount || 0) / camp.target_amount) * 100) : 0}%
                                     </Typography>
                                 </Box>
                                 <LinearProgress
                                     variant="determinate"
                                     value={camp.target_amount > 0 ? Math.min(((camp.raised_amount || 0) / camp.target_amount) * 100, 100) : 0}
-                                    sx={{ height: 8, borderRadius: 5, bgcolor: alpha(theme.palette.primary.main, 0.1) }}
+                                    sx={{
+                                        height: 6,
+                                        borderRadius: 3,
+                                        bgcolor: alpha(theme.palette.primary.main, 0.05),
+                                        '& .MuiLinearProgress-bar': { borderRadius: 3 }
+                                    }}
                                 />
-                                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                                    Raised: <Box component="span" sx={{ color: 'success.main', fontWeight: 'bold' }}>KES {(camp.raised_amount || 0).toLocaleString()}</Box>
-                                </Typography>
+                                <Box sx={{ mt: 1.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 600 }}>SECURED FUNDING</Typography>
+                                    <Typography variant="caption" sx={{ color: 'success.main', fontWeight: 900 }}>KES {(camp.raised_amount || 0).toLocaleString()}</Typography>
+                                </Box>
                             </Box>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 1.5 }}>
-                                {/* Primary Actions Row */}
-                                <Box sx={{ display: 'flex', gap: 0.5 }}>
+
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 'auto' }}>
+                                <Box sx={{ display: 'flex', gap: 1 }}>
                                     {isManagement && (
                                         <>
                                             <Button
@@ -458,15 +486,16 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                                 onClick={() => handleCompleteCampaign(camp.slug)}
                                                 sx={{
                                                     flex: 1,
-                                                    borderRadius: 1.5,
+                                                    borderRadius: 2,
                                                     textTransform: 'none',
-                                                    fontWeight: 600,
-                                                    fontSize: '0.75rem',
-                                                    py: 0.5,
-                                                    minWidth: 0
+                                                    fontWeight: 800,
+                                                    fontSize: '0.7rem',
+                                                    py: 0.75,
+                                                    borderColor: alpha(theme.palette.success.main, 0.3),
+                                                    '&:hover': { bgcolor: alpha(theme.palette.success.main, 0.05), borderColor: 'success.main' }
                                                 }}
                                             >
-                                                Complete
+                                                Finalize
                                             </Button>
                                             <Button
                                                 variant="outlined"
@@ -475,12 +504,13 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                                 onClick={() => handleDeleteCampaign(camp.slug)}
                                                 sx={{
                                                     flex: 1,
-                                                    borderRadius: 1.5,
+                                                    borderRadius: 2,
                                                     textTransform: 'none',
-                                                    fontWeight: 600,
-                                                    fontSize: '0.75rem',
-                                                    py: 0.5,
-                                                    minWidth: 0
+                                                    fontWeight: 800,
+                                                    fontSize: '0.7rem',
+                                                    py: 0.75,
+                                                    borderColor: alpha(theme.palette.error.main, 0.3),
+                                                    '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.05), borderColor: 'error.main' }
                                                 }}
                                             >
                                                 Delete
@@ -488,8 +518,7 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                         </>
                                     )}
                                 </Box>
-                                {/* Secondary Actions Row */}
-                                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                <Box sx={{ display: 'flex', gap: 1 }}>
                                     {isManagement && (
                                         <Button
                                             variant="outlined"
@@ -497,34 +526,39 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                             onClick={() => handleOpenStatusDialog(camp)}
                                             sx={{
                                                 flex: 1,
-                                                borderRadius: 1.5,
+                                                borderRadius: 2,
                                                 textTransform: 'none',
-                                                fontWeight: 600,
-                                                fontSize: '0.75rem',
-                                                py: 0.5,
-                                                minWidth: 0
+                                                fontWeight: 800,
+                                                fontSize: '0.7rem',
+                                                py: 0.75,
+                                                borderColor: 'divider',
+                                                color: 'text.secondary',
+                                                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main', color: 'primary.main' }
                                             }}
                                         >
-                                            Update
+                                            Metadata
                                         </Button>
                                     )}
                                     <Button
                                         variant="contained"
                                         size="small"
-                                        startIcon={<Payment sx={{ fontSize: '1rem' }} />}
+                                        startIcon={<Payment sx={{ fontSize: '0.9rem' }} />}
                                         onClick={() => handleOpenDonationDialog(camp)}
                                         sx={{
                                             flex: 1,
-                                            borderRadius: 1.5,
+                                            borderRadius: 2,
                                             textTransform: 'none',
-                                            fontWeight: 600,
+                                            fontWeight: 900,
                                             fontSize: '0.75rem',
-                                            py: 0.5,
-                                            minWidth: 0,
-                                            boxShadow: 'none'
+                                            py: 0.75,
+                                            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
+                                            '&:hover': {
+                                                boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
+                                                transform: 'translateY(-1px)'
+                                            }
                                         }}
                                     >
-                                        Donate
+                                        Initiate Contribution
                                     </Button>
                                 </Box>
                             </Box>
@@ -533,9 +567,10 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                 ))}
                 {campaigns.filter((c: any) => isManagement || c.status !== 'DRAFT').length === 0 && (
                     <Grid item xs={12}>
-                        <Paper sx={{ p: 5, textAlign: 'center', borderRadius: 2, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.default, 0.5) }}>
-                            <VolunteerActivism sx={{ fontSize: 60, color: 'text.secondary', opacity: 0.5, mb: 2 }} />
-                            <Typography color="text.secondary" fontWeight="medium">No campaigns found. Start one to begin raising funds.</Typography>
+                        <Paper sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
+                            <VolunteerActivism sx={{ fontSize: 60, color: 'primary.main', opacity: 0.2, mb: 2 }} />
+                            <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>No Active Protocols Found</Typography>
+                            <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Start a new campaign mission to initialize the donation engine.</Typography>
                         </Paper>
                     </Grid>
                 )}
@@ -680,15 +715,35 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
         : (receipts || []);
 
     const renderDonations = () => (
-        <Paper sx={{ p: 0, borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], overflow: 'hidden' }}>
-            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" fontWeight="bold">{isDonor ? 'My Donation History' : 'Recent Donation Registry'}</Typography>
+        <Paper sx={{
+            p: 0,
+            borderRadius: 4,
+            border: '1px solid',
+            borderColor: alpha(theme.palette.divider, 0.08),
+            bgcolor: alpha(theme.palette.background.paper, 0.6),
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.05)',
+            overflow: 'hidden'
+        }}>
+            <Box sx={{ p: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
+                <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>
+                        {isDonor ? 'My Donation History' : 'Recent Donation Registry'}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Immutable ledger of financial contributions</Typography>
+                </Box>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
                         variant="outlined"
                         startIcon={<Refresh />}
                         onClick={() => dispatch(fetchDonations())}
-                        sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
+                        sx={{
+                            borderRadius: 2.5,
+                            textTransform: 'none',
+                            fontWeight: 800,
+                            borderColor: alpha(theme.palette.primary.main, 0.2),
+                            '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main' }
+                        }}
                     >
                         Sync Records
                     </Button>
@@ -706,7 +761,13 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                     setSnackbar({ open: true, message: 'Export failed. Please try again.', severity: 'error' });
                                 }
                             }}
-                            sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600, boxShadow: theme.shadows[2] }}
+                            sx={{
+                                borderRadius: 2.5,
+                                textTransform: 'none',
+                                fontWeight: 800,
+                                boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
+                                px: 3
+                            }}
                         >
                             Export CSV
                         </Button>
@@ -715,26 +776,42 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
             </Box>
             <TableContainer>
                 <Table>
-                    <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+                    <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 600 }}>Donor</TableCell>
-                            <TableCell sx={{ fontWeight: 600 }}>Amount</TableCell>
-                            <TableCell sx={{ fontWeight: 600 }}>Method</TableCell>
-                            <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                            <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Donor</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Amount</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Method</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Status</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Date</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {(showAllDonations ? (displayDonations || []) : (displayDonations || []).slice(0, 4)).map((d: any) => (
-                            <TableRow key={d.id} hover>
-                                <TableCell sx={{ fontWeight: '600' }}>{d.donor_name || 'Anonymous Donor'}</TableCell>
-                                <TableCell sx={{ color: 'success.main', fontWeight: 'bold' }}>KES {(d.amount || 0).toLocaleString()}</TableCell>
-                                <TableCell sx={{ textTransform: 'capitalize' }}>{d.payment_method}</TableCell>
-                                <TableCell>
+                            <TableRow key={d.id} hover sx={{ '&:last-child td': { border: 0 } }}>
+                                <TableCell sx={{ py: 2.5 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>{d.donor_name || 'Anonymous Donor'}</Typography>
+                                </TableCell>
+                                <TableCell sx={{ py: 2.5 }}>
+                                    <Typography variant="body2" sx={{ color: 'success.main', fontWeight: 900 }}>KES {(d.amount || 0).toLocaleString()}</Typography>
+                                </TableCell>
+                                <TableCell sx={{ py: 2.5 }}>
+                                    <Chip
+                                        label={d.payment_method}
+                                        size="small"
+                                        sx={{
+                                            fontWeight: 800,
+                                            fontSize: '0.65rem',
+                                            textTransform: 'uppercase',
+                                            bgcolor: alpha(theme.palette.divider, 0.05),
+                                            borderRadius: 1
+                                        }}
+                                    />
+                                </TableCell>
+                                <TableCell sx={{ py: 2.5 }}>
                                     <StatusChip status={d.status} />
                                 </TableCell>
-                                <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+                                <TableCell sx={{ py: 2.5, color: 'text.secondary', fontWeight: 600, fontSize: '0.85rem' }}>
                                     {(() => {
                                         const dateVal = d.donation_date || d.created_at || d.date;
                                         if (!dateVal) return 'N/A';
@@ -742,15 +819,22 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                         return isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString();
                                     })()}
                                 </TableCell>
-                                <TableCell align="right">
+                                <TableCell align="right" sx={{ py: 2.5 }}>
                                     {isManagement && (
                                         <Button
                                             size="small"
                                             variant="outlined"
                                             onClick={() => handleOpenDonationStatusDialog(d)}
-                                            sx={{ borderRadius: 2, textTransform: 'none' }}
+                                            sx={{
+                                                borderRadius: 1.5,
+                                                textTransform: 'none',
+                                                fontWeight: 800,
+                                                fontSize: '0.7rem',
+                                                borderColor: 'divider',
+                                                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main' }
+                                            }}
                                         >
-                                            Update
+                                            Metadata
                                         </Button>
                                     )}
                                 </TableCell>
@@ -758,9 +842,9 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                         ))}
                         {(donations?.length || 0) === 0 && (
                             <TableRow>
-                                <TableCell colSpan={6} align="center" sx={{ py: 8, color: 'text.secondary' }}>
-                                    <MonetizationOn sx={{ fontSize: 40, opacity: 0.3, mb: 1 }} />
-                                    <Typography>No donations recorded yet</Typography>
+                                <TableCell colSpan={6} align="center" sx={{ py: 12 }}>
+                                    <MonetizationOn sx={{ fontSize: 48, opacity: 0.1, mb: 1, color: 'primary.main' }} />
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>System registry is currently idle.</Typography>
                                 </TableCell>
                             </TableRow>
                         )}
@@ -768,13 +852,13 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                 </Table>
             </TableContainer>
             {(displayDonations || []).length > 4 && (
-                <Box sx={{ p: 2, textAlign: 'center', borderTop: '1px solid', borderColor: 'divider' }}>
+                <Box sx={{ p: 2, textAlign: 'center', borderTop: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
                     <Button
                         size="small"
                         onClick={() => setShowAllDonations(!showAllDonations)}
-                        sx={{ textTransform: 'none', fontWeight: 600 }}
+                        sx={{ textTransform: 'none', fontWeight: 900, color: 'primary.main', '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05) } }}
                     >
-                        {showAllDonations ? 'Show Less' : `View All (${(displayDonations || []).length})`}
+                        {showAllDonations ? 'Collapse Records' : `Expand Registry (${(displayDonations || []).length} items)`}
                     </Button>
                 </Box>
             )}
@@ -782,39 +866,73 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
     );
 
     const renderDonors = () => (
-        <Paper sx={{ p: 0, borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], overflow: 'hidden' }}>
-            <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" fontWeight="bold">Philanthropic Partner Registry</Typography>
+        <Paper sx={{
+            p: 0,
+            borderRadius: 4,
+            border: '1px solid',
+            borderColor: alpha(theme.palette.divider, 0.08),
+            bgcolor: alpha(theme.palette.background.paper, 0.6),
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.05)',
+            overflow: 'hidden'
+        }}>
+            <Box sx={{ p: 4, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
+                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Philanthropic Partner Registry</Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Active network of systemic change agents</Typography>
             </Box>
             <TableContainer>
                 <Table>
-                    <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+                    <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
-                            <TableCell sx={{ fontWeight: 600 }}>Email Contact</TableCell>
-                            <TableCell sx={{ fontWeight: 600 }}>Lifetime Contribution</TableCell>
-                            <TableCell sx={{ fontWeight: 600 }}>Support Count</TableCell>
-                            {isManagement && <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>}
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Partner Identity</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Contact Array</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Lifetime Impact</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Frequency</TableCell>
+                            {isManagement && <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Protocol</TableCell>}
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {(donors || []).map((donor: any) => (
-                            <TableRow key={donor.id} hover>
-                                <TableCell sx={{ fontWeight: 600 }}>{donor.full_name || donor.name}</TableCell>
-                                <TableCell>{donor.email}</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'primary.main' }}>KES {(donor.total_donated || 0).toLocaleString()}</TableCell>
-                                <TableCell>
-                                    <Chip label={`${donor.donation_count || 0} times`} size="small" variant="outlined" sx={{ borderRadius: 1 }} />
+                            <TableRow key={donor.id} hover sx={{ '&:last-child td': { border: 0 } }}>
+                                <TableCell sx={{ py: 2.5 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>{donor.full_name || donor.name}</Typography>
+                                </TableCell>
+                                <TableCell sx={{ py: 2.5 }}>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>{donor.email}</Typography>
+                                </TableCell>
+                                <TableCell sx={{ py: 2.5 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 900, color: 'primary.main' }}>KES {(donor.total_donated || 0).toLocaleString()}</Typography>
+                                </TableCell>
+                                <TableCell sx={{ py: 2.5 }}>
+                                    <Chip
+                                        label={`${donor.donation_count || 0} EVENTS`}
+                                        size="small"
+                                        sx={{
+                                            fontWeight: 900,
+                                            fontSize: '0.6rem',
+                                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                            color: 'primary.main',
+                                            borderRadius: 1,
+                                            border: 'none'
+                                        }}
+                                    />
                                 </TableCell>
                                 {isManagement && (
-                                    <TableCell align="right">
+                                    <TableCell align="right" sx={{ py: 2.5 }}>
                                         <Button
                                             size="small"
                                             variant="outlined"
                                             onClick={() => handleOpenDonorEditDialog(donor)}
-                                            sx={{ borderRadius: 2, textTransform: 'none' }}
+                                            sx={{
+                                                borderRadius: 1.5,
+                                                textTransform: 'none',
+                                                fontWeight: 800,
+                                                fontSize: '0.7rem',
+                                                borderColor: 'divider',
+                                                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main' }
+                                            }}
                                         >
-                                            Edit
+                                            Override
                                         </Button>
                                     </TableCell>
                                 )}
@@ -827,32 +945,55 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
     );
 
     const renderReceipts = () => (
-        <Paper sx={{ p: 0, borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], overflow: 'hidden' }}>
-            <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" fontWeight="bold">Official Donation Receipts</Typography>
+        <Paper sx={{
+            p: 0,
+            borderRadius: 4,
+            border: '1px solid',
+            borderColor: alpha(theme.palette.divider, 0.08),
+            bgcolor: alpha(theme.palette.background.paper, 0.6),
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.05)',
+            overflow: 'hidden'
+        }}>
+            <Box sx={{ p: 4, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
+                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Official Donation Records</Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Verified financial documentation array</Typography>
             </Box>
             <TableContainer>
                 <Table>
-                    <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+                    <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 600 }}>Receipt Number</TableCell>
-                            <TableCell sx={{ fontWeight: 600 }}>Donor</TableCell>
-                            <TableCell sx={{ fontWeight: 600 }}>Issuing Date</TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 600 }}>Documentation</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Record Hash</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Partner</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Timestamp</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {displayReceipts.map((receipt: any) => (
-                            <TableRow key={receipt.id} hover>
-                                <TableCell sx={{ fontWeight: 'bold', fontFamily: 'monospace' }}>{receipt.receipt_number}</TableCell>
-                                <TableCell>{receipt.donor_name}</TableCell>
-                                <TableCell>{receipt.created_at ? new Date(receipt.created_at).toLocaleDateString() : 'N/A'}</TableCell>
-                                <TableCell align="right">
+                            <TableRow key={receipt.id} hover sx={{ '&:last-child td': { border: 0 } }}>
+                                <TableCell sx={{ py: 2.5 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 900, fontFamily: 'monospace', color: 'primary.main' }}>{receipt.receipt_number}</Typography>
+                                </TableCell>
+                                <TableCell sx={{ py: 2.5 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>{receipt.donor_name}</Typography>
+                                </TableCell>
+                                <TableCell sx={{ py: 2.5 }}>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>{receipt.created_at ? new Date(receipt.created_at).toLocaleDateString() : 'N/A'}</Typography>
+                                </TableCell>
+                                <TableCell align="right" sx={{ py: 2.5 }}>
                                     <Button
                                         size="small"
-                                        variant="outlined"
-                                        startIcon={<Receipt />}
-                                        sx={{ borderRadius: 2, textTransform: 'none' }}
+                                        variant="contained"
+                                        startIcon={<Receipt sx={{ fontSize: '0.9rem' }} />}
+                                        sx={{
+                                            borderRadius: 2,
+                                            textTransform: 'none',
+                                            fontWeight: 900,
+                                            fontSize: '0.7rem',
+                                            boxShadow: 'none',
+                                            '&:hover': { boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}` }
+                                        }}
                                         onClick={async () => {
                                             try {
                                                 setSnackbar({ open: true, message: 'Starting download...', severity: 'info' });
@@ -865,15 +1006,16 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                             }
                                         }}
                                     >
-                                        Download PDF
+                                        Extract PDF
                                     </Button>
                                 </TableCell>
                             </TableRow>
                         ))}
                         {(receipts?.length || 0) === 0 && (
                             <TableRow>
-                                <TableCell colSpan={4} align="center" sx={{ py: 8, color: 'text.secondary' }}>
-                                    <Typography>No receipts generated in this cycle</Typography>
+                                <TableCell colSpan={4} align="center" sx={{ py: 12 }}>
+                                    <Receipt sx={{ fontSize: 48, opacity: 0.1, mb: 1, color: 'primary.main' }} />
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>No record hashes available in this cycle.</Typography>
                                 </TableCell>
                             </TableRow>
                         )}
@@ -884,17 +1026,24 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
     );
 
     const renderMaterialDonations = () => (
-        <Box component={motion.div} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h6" fontWeight="bold">Material Donation Requests</Typography>
+        <Box component={motion.div} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: '-0.02em' }}>Material Donation Requests</Typography>
                 {isDonor && (
                     <Button
                         variant="contained"
                         startIcon={<Add />}
                         onClick={() => setOpenMaterialDialog(true)}
-                        sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600, boxShadow: theme.shadows[2] }}
+                        sx={{
+                            borderRadius: 3,
+                            textTransform: 'none',
+                            fontWeight: 800,
+                            boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.25)}`,
+                            px: 3,
+                            py: 1
+                        }}
                     >
-                        Request Pickup
+                        Schedule Pickup
                     </Button>
                 )}
             </Box>
@@ -908,28 +1057,50 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                             flexDirection: 'column',
                             borderRadius: 4,
                             border: '1px solid',
-                            borderColor: 'divider',
-                            bgcolor: alpha(theme.palette.background.paper, 0.5),
-                            transition: 'all 0.3s ease',
-                            '&:hover': { transform: 'translateY(-4px)', boxShadow: theme.shadows[4] }
+                            borderColor: alpha(theme.palette.divider, 0.08),
+                            bgcolor: alpha(theme.palette.background.paper, 0.6),
+                            backdropFilter: 'blur(10px)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                borderColor: alpha(theme.palette.primary.main, 0.2),
+                                boxShadow: '0 12px 40px rgba(0,0,0,0.08)'
+                            }
                         }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <Typography variant="subtitle1" fontWeight="bold">{md.category}</Typography>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>{md.category}</Typography>
                                 <Chip
-                                    label={md.status.replace('_', ' ')}
+                                    label={md.status.replace(/_/g, ' ')}
                                     size="small"
-                                    color={md.status === 'COLLECTED' ? 'success' : md.status === 'REJECTED' ? 'error' : 'info'}
-                                    variant="outlined"
-                                    sx={{ fontWeight: 600 }}
+                                    sx={{
+                                        fontWeight: 900,
+                                        fontSize: '0.65rem',
+                                        borderRadius: 1.5,
+                                        color: md.status === 'COLLECTED' ? 'success.main' : md.status === 'REJECTED' ? 'error.main' : 'info.main',
+                                        bgcolor: md.status === 'COLLECTED' ? alpha(theme.palette.success.main, 0.08) : md.status === 'REJECTED' ? alpha(theme.palette.error.main, 0.08) : alpha(theme.palette.info.main, 0.08),
+                                        border: 'none'
+                                    }}
                                 />
                             </Box>
-                            <Typography variant="body2" sx={{ mb: 2, flexGrow: 1 }}>{md.description}</Typography>
-                            <Box sx={{ bgcolor: alpha(theme.palette.background.default, 0.5), p: 2, borderRadius: 2, mb: 2 }}>
-                                <Typography variant="caption" display="block" color="text.secondary">Quantity: <strong>{md.quantity || '0'}</strong></Typography>
-                                <Typography variant="caption" display="block" color="text.secondary">
-                                    Pickup: <strong>{md.preferred_pickup_date ? new Date(md.preferred_pickup_date).toLocaleDateString() : 'N/A'}</strong>
-                                </Typography>
-                                {md.donor_name && <Typography variant="caption" display="block" color="text.secondary">Donor: <strong>{md.donor_name}</strong></Typography>}
+                            <Typography variant="body2" sx={{ mb: 3, flexGrow: 1, color: 'text.secondary', fontWeight: 500, lineHeight: 1.6 }}>{md.description}</Typography>
+
+                            <Box sx={{ bgcolor: alpha(theme.palette.background.default, 0.3), p: 2, borderRadius: 3, mb: 3 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled' }}>QUANTITY</Typography>
+                                    <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main' }}>{md.quantity || '0'}</Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled' }}>PICKUP</Typography>
+                                    <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main' }}>
+                                        {md.preferred_pickup_date ? new Date(md.preferred_pickup_date).toLocaleDateString() : 'N/A'}
+                                    </Typography>
+                                </Box>
+                                {md.donor_name && (
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled' }}>DONOR</Typography>
+                                        <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main' }}>{md.donor_name}</Typography>
+                                    </Box>
+                                )}
                             </Box>
 
                             {isManagement && (md.status === 'PENDING' || md.status === 'PENDING_PICKUP') && (
@@ -940,7 +1111,13 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                         color="success"
                                         fullWidth
                                         onClick={() => handleApproveMaterial(md.id)}
-                                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
+                                        sx={{
+                                            borderRadius: 2,
+                                            textTransform: 'none',
+                                            fontWeight: 800,
+                                            borderColor: alpha(theme.palette.success.main, 0.3),
+                                            '&:hover': { bgcolor: alpha(theme.palette.success.main, 0.05), borderColor: 'success.main' }
+                                        }}
                                     >
                                         Approve
                                     </Button>
@@ -950,7 +1127,13 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                         color="error"
                                         fullWidth
                                         onClick={() => handleRejectMaterial(md.id)}
-                                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
+                                        sx={{
+                                            borderRadius: 2,
+                                            textTransform: 'none',
+                                            fontWeight: 800,
+                                            borderColor: alpha(theme.palette.error.main, 0.3),
+                                            '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.05), borderColor: 'error.main' }
+                                        }}
                                     >
                                         Reject
                                     </Button>
@@ -962,7 +1145,7 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                     variant="outlined"
                                     size="small"
                                     color="primary"
-                                    startIcon={<Receipt />}
+                                    startIcon={<Receipt sx={{ fontSize: '1rem' }} />}
                                     onClick={async () => {
                                         try {
                                             const url = `/donations/material-donations/${md.id}/acknowledgment/`;
@@ -971,7 +1154,14 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                             setSnackbar({ open: true, message: 'Failed to download acknowledgment.', severity: 'error' });
                                         }
                                     }}
-                                    sx={{ borderRadius: 2, mt: 1, textTransform: 'none', fontWeight: 600 }}
+                                    sx={{
+                                        borderRadius: 2,
+                                        mt: 1,
+                                        textTransform: 'none',
+                                        fontWeight: 800,
+                                        borderColor: 'divider',
+                                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main' }
+                                    }}
                                 >
                                     Acknowledgment
                                 </Button>
@@ -981,9 +1171,11 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                 ))}
                 {materialDonations.length === 0 && (
                     <Grid item xs={12}>
-                        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 4, border: '1px solid', borderColor: 'divider', bgcolor: alpha(theme.palette.background.default, 0.5) }}>
-                            <Typography color="text.secondary">
-                                {isManagement ? 'No pending material donation requests.' : 'No material donations recorded. Click "Request Pickup" to start.'}
+                        <Paper sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
+                            <Box sx={{ fontSize: 60, opacity: 0.2, mb: 2 }}>📦</Box>
+                            <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>No Material Protocols</Typography>
+                            <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>
+                                {isManagement ? 'System registry of physical contributions is empty.' : 'Initialize your first material contribution by scheduling a pickup.'}
                             </Typography>
                         </Paper>
                     </Grid>
@@ -1001,39 +1193,66 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
             return acc;
         }, 0);
 
-        // Mock allocation based on proportions
         const allocationData = [
-            { name: 'Education & Schools', value: totalImpact * 0.35 },
-            { name: 'Healthcare & Medical', value: totalImpact * 0.25 },
-            { name: 'Food & Nutrition', value: totalImpact * 0.20 },
-            { name: 'Shelter & Housing', value: totalImpact * 0.15 },
-            { name: 'Operational Support', value: totalImpact * 0.05 },
+            { name: 'Education Systems', value: totalImpact * 0.35 },
+            { name: 'Healthcare Infrastructure', value: totalImpact * 0.25 },
+            { name: 'Nutrition Programs', value: totalImpact * 0.20 },
+            { name: 'Shelter Initiatives', value: totalImpact * 0.15 },
+            { name: 'Operational Logistics', value: totalImpact * 0.05 },
         ];
 
         return (
-            <Box component={motion.div} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <Box component={motion.div} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
                 <Grid container spacing={4}>
                     <Grid item xs={12} md={7}>
-                        <FundAllocationChart data={allocationData} />
+                        <Paper sx={{
+                            p: 4,
+                            borderRadius: 4,
+                            border: '1px solid',
+                            borderColor: alpha(theme.palette.divider, 0.08),
+                            bgcolor: alpha(theme.palette.background.paper, 0.6),
+                            backdropFilter: 'blur(10px)',
+                            height: '100%'
+                        }}>
+                            <Typography variant="h6" sx={{ fontWeight: 900, mb: 4, letterSpacing: -0.5 }}>Strategic Fund Allocation</Typography>
+                            <FundAllocationChart data={allocationData} />
+                        </Paper>
                     </Grid>
                     <Grid item xs={12} md={5}>
-                        <Paper sx={{ p: 4, borderRadius: 4, height: '100%', bgcolor: alpha(theme.palette.success.main, 0.02), border: '1px solid', borderColor: alpha(theme.palette.success.main, 0.1) }}>
-                            <Typography variant="h6" fontWeight="bold" gutterBottom color="success.main">Impact Statement</Typography>
-                            <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.8 }}>
-                                Your total contribution of <strong>KES {totalImpact.toLocaleString()}</strong> has been strategically allocated to ensure maximum systemic change.
-                                We prioritize direct interventions that empower families toward self-reliance.
+                        <Paper sx={{
+                            p: 4,
+                            borderRadius: 4,
+                            height: '100%',
+                            bgcolor: alpha(theme.palette.success.main, 0.03),
+                            border: '1px solid',
+                            borderColor: alpha(theme.palette.success.main, 0.1),
+                            backdropFilter: 'blur(10px)'
+                        }}>
+                            <Typography variant="h6" sx={{ fontWeight: 900, mb: 2, color: 'success.main', letterSpacing: -0.5 }}>Impact Statement</Typography>
+                            <Typography variant="body1" sx={{ mb: 4, lineHeight: 1.8, color: 'text.secondary', fontWeight: 500 }}>
+                                Your systemic contribution of <Box component="span" sx={{ color: 'success.main', fontWeight: 900 }}>KES {totalImpact.toLocaleString()}</Box> has been strategically distributed across our core operational nodes to maximize humanitarian output.
                             </Typography>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                 {[
-                                    { label: 'Children Supported', count: Math.floor(totalImpact / 5000), icon: '👶' },
-                                    { label: 'Meals Provided', count: Math.floor(totalImpact / 200), icon: '🍲' },
-                                    { label: 'Families Stabilized', count: Math.floor(totalImpact / 15000), icon: '🏠' }
+                                    { label: 'CHILDREN EMPOWERED', count: Math.floor(totalImpact / 5000), icon: '👶' },
+                                    { label: 'NUTRITIONAL CYCLES', count: Math.floor(totalImpact / 200), icon: '🍲' },
+                                    { label: 'FAMILIES STABILIZED', count: Math.floor(totalImpact / 15000), icon: '🏠' }
                                 ].map((stat, i) => (
-                                    <Box key={i} sx={{ display: 'flex', alignItems: 'center', p: 2, bgcolor: 'background.paper', borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                                        <Typography variant="h4" sx={{ mr: 2 }}>{stat.icon}</Typography>
+                                    <Box key={i} sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        p: 2.5,
+                                        bgcolor: alpha(theme.palette.background.paper, 0.8),
+                                        borderRadius: 4,
+                                        border: '1px solid',
+                                        borderColor: alpha(theme.palette.divider, 0.05),
+                                        transition: 'transform 0.2s ease',
+                                        '&:hover': { transform: 'scale(1.02)' }
+                                    }}>
+                                        <Typography variant="h4" sx={{ mr: 2.5, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))' }}>{stat.icon}</Typography>
                                         <Box>
-                                            <Typography variant="h6" fontWeight="bold">{stat.count.toLocaleString()}</Typography>
-                                            <Typography variant="caption" color="text.secondary" fontWeight="bold">{stat.label}</Typography>
+                                            <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: -1 }}>{stat.count.toLocaleString()}</Typography>
+                                            <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>{stat.label}</Typography>
                                         </Box>
                                     </Box>
                                 ))}
@@ -1059,71 +1278,158 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
         const donorEvents = (volunteerEvents || []).filter((e: any) => e.post_to_donors && (isManagement || e.is_active));
 
         return (
-            <Paper sx={{ p: 0, borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], overflow: 'hidden' }}>
-                <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
-                    <Typography variant="h6" fontWeight="bold">Community Engagement</Typography>
-                    <Typography variant="body2" color="text.secondary">Join our volunteer events and community activities</Typography>
+            <Box component={motion.div} initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }}>
+                <Box sx={{ p: 4, mb: 4, borderRadius: 4, bgcolor: alpha(theme.palette.primary.main, 0.03), border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
+                    <Typography variant="h6" sx={{ fontWeight: 900, mb: 1, letterSpacing: -0.5 }}>Community Impact Hub</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Synchronized network of localized humanitarian activations.</Typography>
                 </Box>
-                <Box sx={{ p: 2 }}>
-                    <Grid container spacing={2}>
-                        {donorEvents.map((event: any) => (
-                            <Grid item xs={12} key={event.id}>
-                                <Card variant="outlined" sx={{ borderRadius: 3, borderStyle: 'dashed' }}>
-                                    <CardContent>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                            <Typography variant="subtitle1" fontWeight="bold" color="primary">{event.title}</Typography>
-                                            <Chip label={event.event_type} size="small" color="primary" variant="outlined" />
-                                        </Box>
-                                        <Typography variant="body2" sx={{ mb: 2 }}>{event.description}</Typography>
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
-                                                <LocationOn fontSize="small" />
-                                                <Typography variant="caption" fontWeight="bold">{event.location}</Typography>
-                                            </Box>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
-                                                <Schedule fontSize="small" />
-                                                <Typography variant="caption" fontWeight="bold">
-                                                    {formatEventDateTime(event.start_datetime)}
-                                                </Typography>
-                                            </Box>
-                                        </Box>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
-                        {donorEvents.length === 0 && (
-                            <Grid item xs={12}>
-                                <Box sx={{ p: 6, textAlign: 'center' }}>
-                                    <EventIcon sx={{ fontSize: 40, opacity: 0.2, mb: 1 }} />
-                                    <Typography color="text.secondary">No community events posted for donors yet.</Typography>
+                <Grid container spacing={3}>
+                    {donorEvents.map((event: any) => (
+                        <Grid item xs={12} key={event.id}>
+                            <Paper sx={{
+                                p: 4,
+                                borderRadius: 4,
+                                border: '1px solid',
+                                borderColor: alpha(theme.palette.divider, 0.08),
+                                bgcolor: alpha(theme.palette.background.paper, 0.6),
+                                backdropFilter: 'blur(10px)',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                '&:hover': {
+                                    transform: 'translateY(-2px)',
+                                    borderColor: alpha(theme.palette.primary.main, 0.2),
+                                    boxShadow: '0 8px 32px rgba(0,0,0,0.05)'
+                                }
+                            }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5, color: 'primary.main' }}>{event.title}</Typography>
+                                    <Chip
+                                        label={event.event_type}
+                                        size="small"
+                                        sx={{
+                                            fontWeight: 900,
+                                            fontSize: '0.65rem',
+                                            borderRadius: 1.5,
+                                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                            color: 'primary.main',
+                                            border: 'none'
+                                        }}
+                                    />
                                 </Box>
-                            </Grid>
-                        )}
-                    </Grid>
+                                <Typography variant="body2" sx={{ mb: 3, fontWeight: 500, color: 'text.secondary', lineHeight: 1.6 }}>{event.description}</Typography>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <LocationOn sx={{ fontSize: '1rem', color: 'primary.main' }} />
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled', letterSpacing: 0.5 }}>{event.location.toUpperCase()}</Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Schedule sx={{ fontSize: '1rem', color: 'primary.main' }} />
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled', letterSpacing: 0.5 }}>
+                                            {formatEventDateTime(event.start_datetime)}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </Paper>
+                        </Grid>
+                    ))}
+                    {donorEvents.length === 0 && (
+                        <Grid item xs={12}>
+                            <Paper sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
+                                <EventIcon sx={{ fontSize: 48, opacity: 0.1, mb: 1, color: 'primary.main' }} />
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>No community protocols found in current cycle.</Typography>
+                            </Paper>
+                        </Grid>
+                    )}
+                </Grid>
+            </Box>
+        );
+    };
+
+    const SubTabView = ({ title, tabs, activeTab, onTabChange }: any) => {
+        const activeItem = tabs.find((t: any) => t.id === activeTab) || tabs[0];
+
+        return (
+            <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, gap: 2 }}>
+                    <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main', display: 'flex' }}>
+                        <BusinessCenter sx={{ fontSize: '1.2rem' }} />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>{title}</Typography>
                 </Box>
-            </Paper>
+                <Box sx={{
+                    display: 'flex',
+                    gap: 1,
+                    mb: 5,
+                    p: 0.75,
+                    bgcolor: alpha(theme.palette.background.paper, 0.4),
+                    borderRadius: 3.5,
+                    border: '1px solid',
+                    borderColor: alpha(theme.palette.divider, 0.05),
+                    width: 'fit-content',
+                    overflowX: 'auto',
+                    pb: { xs: 1.5, md: 0.75 }
+                }}>
+                    {tabs.map((tab: any) => (
+                        <Button
+                            key={tab.id}
+                            variant={activeTab === tab.id ? 'contained' : 'text'}
+                            onClick={() => onTabChange(tab.id)}
+                            startIcon={tab.icon}
+                            sx={{
+                                borderRadius: 3,
+                                textTransform: 'none',
+                                fontWeight: activeTab === tab.id ? 900 : 700,
+                                px: 3,
+                                py: 1,
+                                minWidth: 'fit-content',
+                                bgcolor: activeTab === tab.id ? 'primary.main' : 'transparent',
+                                color: activeTab === tab.id ? 'white' : 'text.secondary',
+                                boxShadow: activeTab === tab.id ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}` : 'none',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                '&:hover': {
+                                    bgcolor: activeTab === tab.id ? 'primary.dark' : alpha(theme.palette.primary.main, 0.05),
+                                    transform: activeTab === tab.id ? 'none' : 'translateY(-1px)'
+                                },
+                                '& .MuiButton-startIcon': { mr: 1, color: activeTab === tab.id ? 'white' : 'primary.main' }
+                            }}
+                        >
+                            {tab.label}
+                        </Button>
+                    ))}
+                </Box>
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        {activeItem.component}
+                    </motion.div>
+                </AnimatePresence>
+            </Box>
         );
     };
 
     const tabsSource = [
         { id: 'campaigns', label: 'Campaigns', component: renderCampaigns(), icon: <VolunteerActivism /> },
-        { id: 'impact_analytics', label: 'Impact Analytics', component: renderImpactAnalytics(), icon: <DonutLarge />, hidden: !isDonor },
+        { id: 'impact_analytics', label: 'Analytics', component: renderImpactAnalytics(), icon: <DonutLarge />, hidden: !isDonor },
         { id: 'material_donations', label: 'Material', component: renderMaterialDonations(), icon: <Box sx={{ fontSize: 20 }}>📦</Box> },
         { id: 'donation_records', label: 'History', component: renderDonations(), icon: <MonetizationOn /> },
         { id: 'donors', label: 'Partners', component: renderDonors(), icon: <Box sx={{ fontSize: 20 }}>🤝</Box>, hidden: !isManagement },
-        { id: 'receipts', label: 'Documentation', component: renderReceipts(), icon: <Receipt /> },
-        { id: 'community_events', label: 'Events', component: renderCommunityEvents(), icon: <EventIcon /> },
-        { id: 'social_media', label: 'Social Media', component: <Box sx={{ p: 4, textAlign: 'center' }}><Typography color="text.secondary">Social media tracking module coming soon.</Typography></Box>, icon: <Box sx={{ fontSize: 20 }}>📱</Box>, hidden: !isManagement },
+        { id: 'receipts', label: 'Receipts', component: renderReceipts(), icon: <Receipt /> },
+        { id: 'community_events', label: 'Hub', component: renderCommunityEvents(), icon: <EventIcon /> },
+        { id: 'social_media', label: 'Social', component: <Box sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}><Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Nexus Protocol</Typography><Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Integrated social media tracking module pending initialization.</Typography></Box>, icon: <Box sx={{ fontSize: 20 }}>📱</Box>, hidden: !isManagement },
     ];
 
     const tabs = tabsSource.filter(tab => !tab.hidden);
 
     return (
-        <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+            <Grid container spacing={3} sx={{ mb: 6 }}>
                 <Grid item xs={12} md={4}>
                     <StatsCard
-                        title={isDonor ? "My Lifetime Impact" : "Total Raised"}
+                        title={isDonor ? "PERSONAL IMPACT SCORE" : "TOTAL CAPITAL SECURED"}
                         value={`KES ${((displayDonations || []).reduce((acc: number, curr: any) => {
                             if (['COMPLETED', 'VERIFIED', 'SUCCESS'].includes(curr?.status)) {
                                 return acc + Number(curr?.amount || 0);
@@ -1136,7 +1442,7 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                 </Grid>
                 <Grid item xs={12} md={4}>
                     <StatsCard
-                        title="Active Campaigns"
+                        title="ACTIVE PROTOCOLS"
                         value={campaigns.filter((c: any) => c.status === 'ACTIVE').length}
                         icon={<VolunteerActivism />}
                         color={theme.palette.primary.main}
@@ -1144,20 +1450,20 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                 </Grid>
                 <Grid item xs={12} md={4}>
                     <StatsCard
-                        title={isDonor ? "Personal Impact Rank" : "Total Donors"}
+                        title={isDonor ? "PHILANTHROPIC RANK" : "ACTIVE PARTNERS"}
                         value={isDonor ? getImpactRank((displayDonations || []).reduce((acc: number, curr: any) => {
                             if (['COMPLETED', 'VERIFIED', 'SUCCESS'].includes(curr?.status)) {
                                 return acc + Number(curr?.amount || 0);
                             }
                             return acc;
                         }, 0)) : (donors?.length || 0)}
-                        icon={isDonor ? <Box component="span" sx={{ fontSize: 'inherit' }}>⭐</Box> : <Box component="span" sx={{ fontSize: 'inherit' }}>🤝</Box>}
+                        icon={isDonor ? <Box component="span" sx={{ fontSize: 'inherit', display: 'flex' }}>⭐</Box> : <Box component="span" sx={{ fontSize: 'inherit', display: 'flex' }}>🤝</Box>}
                         color={theme.palette.secondary.main}
                     />
                 </Grid>
             </Grid>
 
-            <SubTabView title="Financial Operations" tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />
+            <SubTabView title="Philanthropic Operations Hub" tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />
 
             {/* Donation Status Update Dialog */}
             <Dialog open={openDonationStatusDialog} onClose={() => setOpenDonationStatusDialog(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 4, boxShadow: theme.shadows[10] } }}>

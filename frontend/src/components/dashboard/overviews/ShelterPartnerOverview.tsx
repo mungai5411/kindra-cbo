@@ -89,99 +89,151 @@ export const ShelterPartnerOverview = ({ stats, shelters, alerts }: ShelterPartn
     };
 
     return (
-        <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-
-
+        <Box
+            component={motion.div}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            sx={{ mt: 1 }}
+        >
             <Box sx={{
                 display: 'flex',
-                gap: 2,
-                mb: 4,
+                gap: 3,
+                mb: 6,
                 overflowX: { xs: 'auto', sm: 'unset' },
                 pb: { xs: 2, sm: 0 },
-                px: { xs: 0.5, sm: 0 },
+                px: { xs: 0.5, sm: 0.5 },
                 '&::-webkit-scrollbar': { display: 'none' },
                 scrollbarWidth: 'none',
                 flexWrap: { xs: 'nowrap', sm: 'wrap' }
             }}>
-                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
+                <Box sx={{ minWidth: { xs: 260, sm: 'calc(50% - 12px)', md: 'calc(33.33% - 20px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Network Occupancy"
                         value={`${Math.round((stats.currentOccupancy / stats.totalCapacity) * 100)}%`}
-                        color="#5D5FEF"
+                        color="#519755"
                         icon={<People />}
                         subtitle={`${stats.currentOccupancy} / ${stats.totalCapacity} beds`}
-                        delay={0}
-                    />
-                </Box>
-                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
-                    <StatsCard
-                        title="Compliance Status"
-                        value={`${stats.complianceRate}%`}
-                        color="#4ECCA3"
-                        icon={<CheckCircle />}
-                        subtitle="Audit score"
                         delay={0.1}
                     />
                 </Box>
-                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(33.33% - 12px)' }, flexShrink: 0 }}>
+                <Box sx={{ minWidth: { xs: 260, sm: 'calc(50% - 12px)', md: 'calc(33.33% - 20px)' }, flexShrink: 0 }}>
+                    <StatsCard
+                        title="Compliance Status"
+                        value={`${stats.complianceRate}%`}
+                        color="#5D5FEF"
+                        icon={<CheckCircle />}
+                        subtitle="Audit score"
+                        delay={0.2}
+                    />
+                </Box>
+                <Box sx={{ minWidth: { xs: 260, sm: 'calc(50% - 12px)', md: 'calc(33.33% - 20px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Verified Homes"
                         value={String(stats.totalShelters)}
-                        color="#FFBA69"
+                        color="#FF708B"
                         icon={<Home />}
                         subtitle="Operational nodes"
-                        delay={0.2}
+                        delay={0.3}
                     />
                 </Box>
             </Box>
 
-            <Grid container spacing={3}>
+            <Grid container spacing={4}>
                 <Grid item xs={12} lg={8}>
                     <ShelterCapacityChart shelters={shelters} />
                 </Grid>
                 <Grid item xs={12} lg={4}>
-                    <Paper sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Warning color="warning" /> Operational Alerts
-                        </Typography>
-                        <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2, flexGrow: 1, overflowY: 'auto', maxHeight: 350 }}>
+                    <Paper elevation={0} sx={{
+                        p: 3,
+                        borderRadius: 4,
+                        border: '1px solid',
+                        borderColor: alpha(theme.palette.divider, 0.08),
+                        bgcolor: 'background.paper',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                            <Typography variant="h6" sx={{ fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1, letterSpacing: -0.5 }}>
+                                <Warning sx={{ color: 'warning.main' }} /> Operational Alerts
+                            </Typography>
+                            {alerts.length > 0 && (
+                                <Box sx={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: '50%',
+                                    bgcolor: 'warning.main',
+                                    animation: 'pulse 2s infinite ease-in-out',
+                                    '@keyframes pulse': {
+                                        '0%': { transform: 'scale(0.8)', opacity: 0.5 },
+                                        '50%': { transform: 'scale(1.2)', opacity: 1 },
+                                        '100%': { transform: 'scale(0.8)', opacity: 0.5 },
+                                    }
+                                }} />
+                            )}
+                        </Box>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, flexGrow: 1, overflowY: 'auto', maxHeight: 350, pr: 1 }}>
                             {alerts.length > 0 ? alerts.map((a: any, idx) => (
-                                <Box key={idx} sx={{
+                                <Paper key={idx} elevation={0} sx={{
                                     p: 2,
                                     borderRadius: 3,
-                                    bgcolor: alpha(theme.palette.warning.main, 0.1),
-                                    color: theme.palette.warning.dark,
+                                    bgcolor: alpha(theme.palette.warning.main, 0.04),
                                     border: '1px solid',
-                                    borderColor: alpha(theme.palette.warning.main, 0.2)
+                                    borderColor: alpha(theme.palette.warning.main, 0.1),
+                                    transition: 'all 0.2s ease',
+                                    '&:hover': {
+                                        bgcolor: alpha(theme.palette.warning.main, 0.08),
+                                        transform: 'translateX(4px)'
+                                    }
                                 }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                        <Typography variant="subtitle2" fontWeight="bold">{a.title}</Typography>
-                                        <Typography variant="caption" sx={{ opacity: 0.7 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'warning.dark' }}>{a.title}</Typography>
+                                        <Typography variant="caption" sx={{ opacity: 0.6, fontSize: '0.65rem' }}>
                                             {new Date(a.created_at).toLocaleDateString()}
                                         </Typography>
                                     </Box>
-                                    <Typography variant="caption" sx={{ display: 'block', mt: 0.5, lineHeight: 1.4 }}>{a.description}</Typography>
-                                </Box>
+                                    <Typography variant="caption" sx={{ display: 'block', lineHeight: 1.4, fontWeight: 500, color: 'text.secondary' }}>
+                                        {a.description}
+                                    </Typography>
+                                </Paper>
                             )) : (
                                 <Box sx={{
-                                    p: 4,
+                                    p: 6,
                                     textAlign: 'center',
-                                    bgcolor: 'action.hover',
-                                    borderRadius: 3,
-                                    border: '1px dashed',
-                                    borderColor: 'divider'
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: 2,
+                                    opacity: 0.5
                                 }}>
-                                    <Typography color="text.secondary" fontWeight="medium">All systems operational.</Typography>
-                                    <Typography variant="caption" color="text.secondary">No active alerts reported.</Typography>
+                                    <CheckCircle sx={{ fontSize: 48, color: 'success.main', opacity: 0.2 }} />
+                                    <Box>
+                                        <Typography variant="body2" fontWeight="800">All Clear</Typography>
+                                        <Typography variant="caption">No active alerts reported.</Typography>
+                                    </Box>
                                 </Box>
                             )}
                         </Box>
+
                         <Button
                             fullWidth
                             variant="contained"
-                            color="warning"
+                            color="primary"
+                            disableElevation
                             onClick={handleOpenModal}
-                            sx={{ mt: 2, borderRadius: 2, fontWeight: 'bold', boxShadow: theme.shadows[1], py: 1 }}
+                            sx={{
+                                mt: 4,
+                                borderRadius: 3,
+                                fontWeight: 800,
+                                py: 1.5,
+                                textTransform: 'none',
+                                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.8)})`,
+                                '&:hover': {
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.3)}`
+                                }
+                            }}
                         >
                             Request Resources
                         </Button>
