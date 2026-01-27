@@ -83,6 +83,39 @@ class ReportService:
                     v.full_name, v.email, v.phone_number, 'VOLUNTEER', 
                     v.status, v.total_hours, v.created_at.strftime('%Y-%m-%d')
                 ])
+        elif report.report_type == 'CASE':
+            from case_management.models import Case
+            writer.writerow(['Case Number', 'Title', 'Status', 'Priority', 'Family', 'Assigned To', 'Opened Date'])
+            qs = Case.objects.all().select_related('family', 'assigned_to')
+            if report.start_date: qs = qs.filter(opened_date__gte=report.start_date)
+            if report.end_date: qs = qs.filter(opened_date__lte=report.end_date)
+            
+            for c in qs:
+                writer.writerow([
+                    c.case_number,
+                    c.title,
+                    c.status,
+                    c.priority,
+                    c.family.family_code,
+                    c.assigned_to.get_full_name() if c.assigned_to else 'Unassigned',
+                    c.opened_date.strftime('%Y-%m-%d')
+                ])
+        elif report.report_type == 'SHELTER':
+            from shelter_homes.models import ShelterHome
+            writer.writerow(['Name', 'Reg Number', 'County', 'Contact', 'Email', 'Phone', 'Capacity', 'Occupancy', 'Status'])
+            qs = ShelterHome.objects.all()
+            for s in qs:
+                writer.writerow([
+                    s.name,
+                    s.registration_number,
+                    s.county,
+                    s.contact_person,
+                    s.email,
+                    s.phone_number,
+                    s.total_capacity,
+                    s.current_occupancy,
+                    s.status
+                ])
         
         content = output.getvalue().encode('utf-8')
         filename = f"report_{report.report_type.lower()}_{report.id.hex[:8]}.csv"

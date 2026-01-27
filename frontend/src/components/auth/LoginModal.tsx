@@ -34,9 +34,10 @@ const ROLES = [
 ];
 
 // Google Sign-In Component
-const GoogleSignInButton = ({ onSuccess, onNewUser }: { onSuccess: (data: any) => void, onNewUser: (credential: string) => void }) => {
+const GoogleSignInButton = ({ onSuccess, onNewUser, selectedRole }: { onSuccess: (data: any) => void, onNewUser: (credential: string) => void, selectedRole: string }) => {
     const [error, setError] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
+    const theme = useTheme();
 
     const handleGoogleSuccess = async (credentialResponse: any) => {
         setIsProcessing(true);
@@ -44,11 +45,17 @@ const GoogleSignInButton = ({ onSuccess, onNewUser }: { onSuccess: (data: any) =
 
         try {
             const response = await apiClient.post(endpoints.auth.googleLogin, {
-                credential: credentialResponse.credential
+                credential: credentialResponse.credential,
+                role: selectedRole
             });
 
             if (response.data.is_new_user) {
-                onNewUser(credentialResponse.credential);
+                // If it's a new user, they already selected the role, so we just finish
+                const { access, refresh, user } = response.data;
+                localStorage.setItem('accessToken', access);
+                localStorage.setItem('refreshToken', refresh);
+                localStorage.setItem('user', JSON.stringify(user));
+                onSuccess(response.data);
                 return;
             }
 
@@ -77,20 +84,37 @@ const GoogleSignInButton = ({ onSuccess, onNewUser }: { onSuccess: (data: any) =
             <Box sx={{
                 width: '100%',
                 display: 'flex',
-                justifyContent: 'center',
-                '& > div': { width: '100% !important' },
-                '& iframe': { width: '100% !important', borderRadius: '8px !important' },
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                p: 3,
+                borderRadius: '16px',
+                bgcolor: alpha(theme.palette.primary.main, 0.03),
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
                 opacity: isProcessing ? 0.7 : 1,
-                pointerEvents: isProcessing ? 'none' : 'auto'
+                pointerEvents: isProcessing ? 'none' : 'auto',
+                transition: 'all 0.3s ease'
             }}>
-                <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={() => setError('Google sign-in failed. Please try again.')}
-                    theme="outline"
-                    size="large"
-                    shape="rectangular"
-                    width="400"
-                />
+                <Typography variant="body2" sx={{ color: '#666', fontWeight: 500, mb: 1 }}>
+                    Sign in with your Google account
+                </Typography>
+                <Box sx={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    '& > div': { width: '100% !important' },
+                    '& iframe': { width: '100% !important', borderRadius: '8px !important' }
+                }}>
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={() => setError('Google sign-in failed. Please try again.')}
+                        theme="filled_blue"
+                        size="large"
+                        shape="pill"
+                        text="continue_with"
+                        width="400"
+                    />
+                </Box>
             </Box>
         </Box>
     );
@@ -122,6 +146,7 @@ export const LoginModal = () => {
     const [step, setStep] = useState<'login' | 'role-selection'>('login');
     const [googleCredential, setGoogleCredential] = useState<string | null>(null);
     const [selectedRole, setSelectedRole] = useState<string>('DONOR');
+    const [isGoogleFlow, setIsGoogleFlow] = useState(false);
 
     // Clear errors when user starts typing
     useEffect(() => {
@@ -139,6 +164,7 @@ export const LoginModal = () => {
             setLocalLoading(false);
             setStep('login');
             setGoogleCredential(null);
+            setIsGoogleFlow(false);
         }
     }, [isLoginOpen]);
 
@@ -265,192 +291,276 @@ export const LoginModal = () => {
                 <DialogContent sx={{ p: isMobile ? 3 : 5, pt: isMobile ? 5 : 6 }}>
                     <Box sx={{ mb: 4 }}>
                         <Typography variant="h4" fontWeight="700" sx={{ color: '#000', mb: 1, letterSpacing: '-0.02em' }}>
-                            Welcome back
+                            {isGoogleFlow ? "Select your role" : "Welcome back"}
                         </Typography>
                         <Typography variant="body1" sx={{ color: '#666', fontWeight: 400 }}>
-                            Please enter your details
+                            {isGoogleFlow ? "Please select how you want to join Kindra" : "Please enter your details"}
                         </Typography>
                     </Box>
 
-                    <GoogleSignInButton
-                        onSuccess={(data) => {
-                            dispatch({
-                                type: 'auth/login/fulfilled',
-                                payload: { access: data.access, refresh: data.refresh, user: data.user }
-                            });
-                            closeLoginModal();
-                            const from = (location.state as any)?.from?.pathname || '/dashboard';
-                            navigate(from, { replace: true });
-                        }}
-                        onNewUser={handleGoogleNewUser}
-                    />
-
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
-                        <Typography variant="body2" sx={{ px: 2, color: '#999', fontWeight: 500 }}>
-                            or
-                        </Typography>
-                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
-                    </Box>
-
-                    {(reduxError || localError) && !rateLimitError && (
-                        <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
-                            {localError || reduxError}
-                        </Alert>
-                    )}
-
-                    {rateLimitError && (
-                        <Alert severity="warning" sx={{ mb: 3, borderRadius: '8px' }}>
-                            {rateLimitError}
-                        </Alert>
-                    )}
-
-                    <form onSubmit={handleSubmit}>
-                        <Box sx={{ mb: 3 }}>
-                            <Typography variant="body2" fontWeight="600" sx={{ mb: 1, color: '#333' }}>
-                                Email address
-                            </Typography>
-                            <TextField
+                    {isGoogleFlow ? (
+                        <>
+                            <Grid container spacing={2} sx={{ mb: 4 }}>
+                                {ROLES.map((role) => (
+                                    <Grid item xs={12} key={role.value}>
+                                        <Paper
+                                            elevation={0}
+                                            onClick={() => setSelectedRole(role.value)}
+                                            sx={{
+                                                p: 2,
+                                                cursor: 'pointer',
+                                                borderRadius: '12px',
+                                                border: '1px solid',
+                                                borderColor: selectedRole === role.value ? '#000' : '#eee',
+                                                bgcolor: selectedRole === role.value ? alpha('#000', 0.02) : '#fff',
+                                                transition: 'all 0.2s',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 2,
+                                                '&:hover': {
+                                                    borderColor: selectedRole === role.value ? '#000' : '#ccc',
+                                                    bgcolor: alpha('#000', 0.01)
+                                                }
+                                            }}
+                                        >
+                                            <Box sx={{
+                                                width: 40,
+                                                height: 40,
+                                                borderRadius: '50%',
+                                                bgcolor: selectedRole === role.value ? '#000' : '#f5f5f5',
+                                                color: selectedRole === role.value ? '#fff' : '#666',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}>
+                                                {role.icon}
+                                            </Box>
+                                            <Box>
+                                                <Typography variant="body1" fontWeight="700" sx={{ color: '#000' }}>
+                                                    {role.label}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: '#666' }}>
+                                                    {role.description}
+                                                </Typography>
+                                            </Box>
+                                        </Paper>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                            <GoogleSignInButton
+                                selectedRole={selectedRole}
+                                onSuccess={(data) => {
+                                    dispatch({
+                                        type: 'auth/login/fulfilled',
+                                        payload: { access: data.access, refresh: data.refresh, user: data.user }
+                                    });
+                                    closeLoginModal();
+                                    const from = (location.state as any)?.from?.pathname || '/dashboard';
+                                    navigate(from, { replace: true });
+                                }}
+                                onNewUser={handleGoogleNewUser}
+                            />
+                            <Button
+                                fullWidth
+                                variant="text"
+                                onClick={() => setIsGoogleFlow(false)}
+                                sx={{ color: 'text.secondary', textTransform: 'none', fontWeight: 600 }}
+                            >
+                                Back to regular login
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button
                                 fullWidth
                                 variant="outlined"
-                                placeholder="Enter your email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                disabled={localLoading || reduxLoading}
-                                required
-                                InputProps={{
-                                    sx: {
-                                        height: '48px',
-                                        borderRadius: '8px',
-                                        '& fieldset': { borderColor: '#ddd' },
-                                        '&:hover fieldset': { borderColor: '#bbb !important' },
-                                        '&.Mui-focused fieldset': { borderColor: '#000 !important', borderWidth: '1px' },
+                                onClick={() => setIsGoogleFlow(true)}
+                                sx={{
+                                    mb: 3,
+                                    py: 1.5,
+                                    borderRadius: '8px',
+                                    borderColor: '#ddd',
+                                    color: '#333',
+                                    textTransform: 'none',
+                                    fontWeight: '600',
+                                    fontSize: '15px',
+                                    '&:hover': {
+                                        borderColor: '#bbb',
+                                        bgcolor: '#f9f9f9'
                                     }
                                 }}
-                            />
-                        </Box>
-
-                        <Box sx={{ mb: 3 }}>
-                            <Typography variant="body2" fontWeight="600" sx={{ mb: 1, color: '#333' }}>
-                                Password
-                            </Typography>
-                            <TextField
-                                fullWidth
-                                variant="outlined"
-                                type={showPassword ? 'text' : 'password'}
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                disabled={localLoading || reduxLoading}
-                                required
-                                InputProps={{
-                                    sx: {
-                                        height: '48px',
-                                        borderRadius: '8px',
-                                        '& fieldset': { borderColor: '#ddd' },
-                                        '&:hover fieldset': { borderColor: '#bbb !important' },
-                                        '&.Mui-focused fieldset': { borderColor: '#000 !important', borderWidth: '1px' },
-                                    },
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                edge="end"
-                                                size="small"
-                                            >
-                                                {showPassword ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    )
-                                }}
-                            />
-                        </Box>
-
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <input
-                                    type="checkbox"
-                                    id="remember_me"
-                                    checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
-                                    style={{
-                                        width: '18px',
-                                        height: '18px',
-                                        cursor: 'pointer',
-                                        accentColor: '#000'
-                                    }}
-                                />
-                                <Typography
-                                    component="label"
-                                    htmlFor="remember_me"
-                                    variant="body2"
-                                    sx={{ ml: 1, cursor: 'pointer', color: '#444', fontWeight: 500 }}
-                                >
-                                    Remember for 30 days
-                                </Typography>
-                            </Box>
-                            <Link
-                                component={RouterLink}
-                                to="/forgot-password"
-                                onClick={closeLoginModal}
-                                sx={{
-                                    color: '#0066ff',
-                                    textDecoration: 'none',
-                                    fontWeight: 700,
-                                    fontSize: '14px',
-                                    '&:hover': { textDecoration: 'underline' }
-                                }}
                             >
-                                Forgot password
-                            </Link>
-                        </Box>
+                                Continue with Google
+                            </Button>
 
-                        <Button
-                            fullWidth
-                            type="submit"
-                            variant="contained"
-                            disabled={localLoading || reduxLoading || !!rateLimitError}
-                            sx={{
-                                bgcolor: '#000',
-                                color: '#fff',
-                                py: 1.5,
-                                borderRadius: '8px',
-                                fontWeight: '700',
-                                textTransform: 'none',
-                                fontSize: '16px',
-                                boxShadow: 'none',
-                                '&:hover': {
-                                    bgcolor: '#222',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                                },
-                                '&:disabled': {
-                                    bgcolor: '#eee',
-                                    color: '#aaa'
-                                }
-                            }}
-                        >
-                            {(localLoading || reduxLoading) ? <CircularProgress size={24} color="inherit" /> : 'Sign in'}
-                        </Button>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                                <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
+                                <Typography variant="body2" sx={{ px: 2, color: '#999', fontWeight: 500 }}>
+                                    or
+                                </Typography>
+                                <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
+                            </Box>
 
-                        <Box sx={{ mt: 4, textAlign: 'center' }}>
-                            <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
-                                Don't have an account?{' '}
-                                <Link
-                                    component="button"
-                                    variant="body2"
-                                    onClick={switchToRegister}
+                            {(reduxError || localError) && !rateLimitError && (
+                                <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
+                                    {localError || reduxError}
+                                </Alert>
+                            )}
+
+                            {rateLimitError && (
+                                <Alert severity="warning" sx={{ mb: 3, borderRadius: '8px' }}>
+                                    {rateLimitError}
+                                </Alert>
+                            )}
+
+                            <form onSubmit={handleSubmit}>
+                                <Box sx={{ mb: 3 }}>
+                                    <Typography variant="body2" fontWeight="600" sx={{ mb: 1, color: '#333' }}>
+                                        Email address
+                                    </Typography>
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
+                                        placeholder="Enter your email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        disabled={localLoading || reduxLoading}
+                                        required
+                                        InputProps={{
+                                            sx: {
+                                                height: '48px',
+                                                borderRadius: '8px',
+                                                '& fieldset': { borderColor: '#ddd' },
+                                                '&:hover fieldset': { borderColor: '#bbb !important' },
+                                                '&.Mui-focused fieldset': { borderColor: '#000 !important', borderWidth: '1px' },
+                                            }
+                                        }}
+                                    />
+                                </Box>
+
+                                <Box sx={{ mb: 3 }}>
+                                    <Typography variant="body2" fontWeight="600" sx={{ mb: 1, color: '#333' }}>
+                                        Password
+                                    </Typography>
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
+                                        type={showPassword ? 'text' : 'password'}
+                                        placeholder="••••••••"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        disabled={localLoading || reduxLoading}
+                                        required
+                                        InputProps={{
+                                            sx: {
+                                                height: '48px',
+                                                borderRadius: '8px',
+                                                '& fieldset': { borderColor: '#ddd' },
+                                                '&:hover fieldset': { borderColor: '#bbb !important' },
+                                                '&.Mui-focused fieldset': { borderColor: '#000 !important', borderWidth: '1px' },
+                                            },
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                        edge="end"
+                                                        size="small"
+                                                    >
+                                                        {showPassword ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                    />
+                                </Box>
+
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <input
+                                            type="checkbox"
+                                            id="remember_me"
+                                            checked={rememberMe}
+                                            onChange={(e) => setRememberMe(e.target.checked)}
+                                            style={{
+                                                width: '18px',
+                                                height: '18px',
+                                                cursor: 'pointer',
+                                                accentColor: '#000'
+                                            }}
+                                        />
+                                        <Typography
+                                            component="label"
+                                            htmlFor="remember_me"
+                                            variant="body2"
+                                            sx={{ ml: 1, cursor: 'pointer', color: '#444', fontWeight: 500 }}
+                                        >
+                                            Remember for 30 days
+                                        </Typography>
+                                    </Box>
+                                    <Link
+                                        component={RouterLink}
+                                        to="/forgot-password"
+                                        onClick={closeLoginModal}
+                                        sx={{
+                                            color: '#0066ff',
+                                            textDecoration: 'none',
+                                            fontWeight: 700,
+                                            fontSize: '14px',
+                                            '&:hover': { textDecoration: 'underline' }
+                                        }}
+                                    >
+                                        Forgot password
+                                    </Link>
+                                </Box>
+
+                                <Button
+                                    fullWidth
+                                    type="submit"
+                                    variant="contained"
+                                    disabled={localLoading || reduxLoading || !!rateLimitError}
                                     sx={{
-                                        color: '#0066ff',
-                                        fontWeight: 700,
-                                        textDecoration: 'none',
-                                        '&:hover': { textDecoration: 'underline' }
+                                        bgcolor: '#000',
+                                        color: '#fff',
+                                        py: 1.5,
+                                        borderRadius: '8px',
+                                        fontWeight: '700',
+                                        textTransform: 'none',
+                                        fontSize: '16px',
+                                        boxShadow: 'none',
+                                        '&:hover': {
+                                            bgcolor: '#222',
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                        },
+                                        '&:disabled': {
+                                            bgcolor: '#eee',
+                                            color: '#aaa'
+                                        }
                                     }}
                                 >
-                                    Sign up
-                                </Link>
-                            </Typography>
-                        </Box>
-                    </form>
+                                    {(localLoading || reduxLoading) ? <CircularProgress size={24} color="inherit" /> : 'Sign in'}
+                                </Button>
+
+                                <Box sx={{ mt: 4, textAlign: 'center' }}>
+                                    <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
+                                        Don't have an account?{' '}
+                                        <Link
+                                            component="button"
+                                            variant="body2"
+                                            onClick={switchToRegister}
+                                            sx={{
+                                                color: '#0066ff',
+                                                fontWeight: 700,
+                                                textDecoration: 'none',
+                                                '&:hover': { textDecoration: 'underline' }
+                                            }}
+                                        >
+                                            Sign up
+                                        </Link>
+                                    </Typography>
+                                </Box>
+                            </form>
+                        </>
+                    )}
                 </DialogContent>
             ) : (
                 <DialogContent sx={{ p: isMobile ? 3 : 5, pt: isMobile ? 5 : 6 }}>
