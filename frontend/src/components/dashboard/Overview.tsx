@@ -1,4 +1,4 @@
-import { Box, Typography, CircularProgress, useTheme, alpha } from '@mui/material';
+import { Box, Typography, CircularProgress, alpha } from '@mui/material';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -22,7 +22,6 @@ interface OverviewProps {
 }
 
 export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps) => {
-    const theme = useTheme();
     const { user } = useSelector((state: RootState) => state.auth);
     const { dashboardData, isLoading: dashboardLoading } = useSelector((state: RootState) => state.reporting);
 
@@ -194,7 +193,7 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
     return (
         <Box sx={{ p: { xs: 2, sm: 3 } }}>
             {/* Header / Greeting Area */}
-            <Box sx={{
+            <Box sx={(theme) => ({
                 mb: 6,
                 display: 'flex',
                 flexDirection: 'column',
@@ -209,7 +208,7 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
                     borderRadius: 2,
                     background: `linear-gradient(to right, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.2)})`
                 }
-            }}>
+            })}>
                 <Typography variant="overline" sx={{
                     fontWeight: 800,
                     color: 'primary.main',
