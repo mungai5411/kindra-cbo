@@ -66,7 +66,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
     const isShelter = userRole === 'SHELTER_PARTNER';
     const isAdmin = user?.is_superuser || userRole === 'ADMIN' || userRole === 'MANAGEMENT';
 
-    const trainings: any[] = [];
+    const trainings = events.filter((e: any) => e.event_type === 'TRAINING');
 
     const [timeLogOpen, setTimeLogOpen] = useState(false);
     const [selectedVolunteer, setSelectedVolunteer] = useState<any>(null);
@@ -1120,18 +1120,20 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 </Box>
                 {isManagement && (
                     <Button
-                        variant="outlined"
-                        startIcon={<School />}
-                        onClick={() => setSnackbar({ open: true, message: 'Synchronizing with Training Academy servers...', severity: 'info' })}
+                        variant="contained"
+                        startIcon={<Add />}
+                        onClick={() => {
+                            setEventForm({ ...eventForm, event_type: 'TRAINING' });
+                            setEventDialogOpen(true);
+                        }}
                         sx={{
                             borderRadius: 3,
                             textTransform: 'none',
                             fontWeight: 900,
-                            borderColor: alpha(theme.palette.primary.main, 0.3),
-                            '&:hover': { borderColor: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.04) }
+                            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
                         }}
                     >
-                        Program Schedule
+                        Provision Module
                     </Button>
                 )}
             </Box>
@@ -1156,18 +1158,71 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                     <Verified sx={{ color: t.is_active ? 'primary.main' : 'text.disabled', fontSize: '1.2rem' }} />
                                 </Box>
                                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 3 }}>
-                                    {new Date(t.created_at).toLocaleDateString()} • {t.completion_count || 0} Completions
+                                    {new Date(t.start_datetime).toLocaleDateString()} • {t.registered_count || 0} Recruits
                                 </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <StatusChip status={t.is_active ? 'ACTIVE' : 'INACTIVE'} />
-                                    {t.is_active && (
-                                        <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 0.5 }}>ENLISTING</Typography>
-                                    )}
+
+                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                        {isVolunteer && t.is_active && (
+                                            t.is_registered ? (
+                                                <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    color="error"
+                                                    onClick={() => handleUnregister(t.id)}
+                                                    sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 800, fontSize: '0.7rem' }}
+                                                >
+                                                    ABORT
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    size="small"
+                                                    variant="contained"
+                                                    onClick={() => handleRegister(t.id)}
+                                                    sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 800, fontSize: '0.7rem' }}
+                                                >
+                                                    ENLIST
+                                                </Button>
+                                            )
+                                        )}
+
+                                        {isManagement && (
+                                            <>
+                                                <Tooltip title="View Recruits">
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleViewParticipants(t)}
+                                                        sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main' }}
+                                                    >
+                                                        <People fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Edit Module">
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleEditEvent(t)}
+                                                        sx={{ bgcolor: alpha(theme.palette.info.main, 0.1), color: 'info.main' }}
+                                                    >
+                                                        <Edit fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </>
+                                        )}
+                                    </Box>
                                 </Box>
                             </CardContent>
                         </Card>
                     </Grid>
                 ))}
+                {trainings.length === 0 && (
+                    <Grid item xs={12}>
+                        <Box sx={{ p: 6, textAlign: 'center', opacity: 0.5 }}>
+                            <School sx={{ fontSize: 48, mb: 2 }} />
+                            <Typography variant="body1" fontWeight="bold">No training modules active.</Typography>
+                        </Box>
+                    </Grid>
+                )}
             </Grid>
         </Paper>
     );
