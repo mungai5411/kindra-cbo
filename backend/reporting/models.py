@@ -6,18 +6,7 @@ Analytics, dashboards, and compliance reporting
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from accounts.models import User
-from decouple import config
 import uuid
-
-# Import custom storage for public file access
-try:
-    if config('CLOUDINARY_CLOUD_NAME', default=''):
-        from kindra_cbo.storage import PublicMediaCloudinaryStorage
-        public_storage = PublicMediaCloudinaryStorage()
-    else:
-        public_storage = None
-except Exception:
-    public_storage = None
 
 
 class Report(models.Model):
@@ -50,9 +39,9 @@ class Report(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     
-    # Format and file
+    # Format and file (stored in MEDIA_ROOT/reports/)
     format = models.CharField(max_length=10, choices=Format.choices, default=Format.PDF)
-    file = models.FileField(upload_to='reports/%Y/%m/', blank=True, null=True, storage=public_storage)
+    file = models.FileField(upload_to='reports/%Y/%m/', blank=True, null=True)
     
     # Parameters (JSON field for filter criteria)
     parameters = models.JSONField(default=dict, blank=True, help_text=_('Report filter parameters'))
