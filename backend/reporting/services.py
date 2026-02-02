@@ -180,7 +180,82 @@ class ReportService:
 
     @staticmethod
     def _generate_pdf(report):
+        """
+        Generate professional PDF report using HTML templates and WeasyPrint
+        """
+        from django.template.loader import render_to_string
+        from weasyprint import HTML
+        from django.conf import settings
         from donations.models import Donation
+        from volunteers.models import Volunteer
+        import os
+        
+        try:
+            # Logo path (optional)
+            logo_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'images', 'logo.jpg')
+            if not os.path.exists(logo_path):
+                logo_path = None
+            
+            # Template selection based on report type
+            template_map = {
+                'DONATION': 'reporting/donation_report.html',
+                'VOLUNTEER': 'reporting/volunteer_report.html',
+                'CASE': 'reporting/case_report.html',
+                'FINANCIAL': 'reporting/financial_report.html',
+                'COMPLIANCE': 'reporting/compliance_report.html',
+                'SHELTER': 'reporting/shelter_report.html',
+            }
+            
+            template_name = template_map.get(report.report_type, 'reporting/base_report.html')
+            
+            # Prepare data based on report type
+            context = {
+                'report': report,
+                'logo_path': logo_path,
+            }
+            
+            if report.report_type == 'DONATION':
+                qs = Donation.objects.all().select_related('donor', 'campaign')
+                if report.start_date: qs = qs.filter(donation_date__gte=report.start_date)
+                if report.end_date: qs = qs.filter(donation_date__lte=report.end_date)
+                
+                donations = list(qs[:500])  # Limit for performance
+                context['donations'] = donations
+                context['summary'] = {
+                    'total_donations': len(donations),
+                    'total_amount': sum(d.amount for d in donations),
+                    'donors_count': len(set(d.donor_id for d in donations if d.donor_id)),
+                }
+                
+            elif report.report_type == 'VOLUNTEER':
+                qs = Volunteer.objects.all()
+                volunteers = list(qs[:500])
+                context['volunteers'] = volunteers
+                context['summary'] = {
+                    'total_volunteers': len(volunteers),
+                    'total_hours': sum(v.total_hours for v in volunteers),
+                    'active_count': len([v for v in volunteers if v.status == 'ACTIVE']),
+                }
+            
+            # Render HTML template
+            html_string = render_to_string(template_name, context)
+            
+            # Generate PDF using WeasyPrint
+            buffer = io.BytesIO()
+            HTML(string=html_string, base_url=settings.BASE_DIR).write_pdf(buffer)
+            
+            buffer.seek(0)
+            content = buffer.read()
+            filename = f\"report_{report.report_type.lower()}_{report.id.hex[:8]}.pdf\"
+            report.file.save(filename, ContentFile(content))
+            
+            logger.info(f\"Generated PDF report {report.id} using {template_name} (WeasyPrint)\")
+            return content
+            
+        except Exception as e:
+            logger.error(f\"Error generating PDF report {report.id}: {str(e)}\", exc_info=True)
+            raise
+
         from volunteers.models import Volunteer
 
         buffer = io.BytesIO()
