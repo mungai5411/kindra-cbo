@@ -215,6 +215,18 @@ export const logTimeEntry = createAsyncThunk(
     }
 );
 
+export const updateTimeLogStatus = createAsyncThunk(
+    'volunteers/updateTimeLogStatus',
+    async ({ id, status }: { id: string; status: string }, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.patch(`${endpoints.volunteers.timelogs}${id}/`, { status });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update time log status');
+        }
+    }
+);
+
 export const fetchTaskApplications = createAsyncThunk(
     'volunteers/fetchTaskApplications',
     async (_, { rejectWithValue }) => {
@@ -313,6 +325,14 @@ const volunteersSlice = createSlice({
         // Log Time Entry
         builder.addCase(logTimeEntry.fulfilled, (state, action) => {
             state.timeLogs.unshift(action.payload);
+        });
+
+        // Update Time Log Status
+        builder.addCase(updateTimeLogStatus.fulfilled, (state, action) => {
+            const index = state.timeLogs.findIndex(l => l.id === action.payload.id);
+            if (index !== -1) {
+                state.timeLogs[index] = action.payload;
+            }
         });
 
 

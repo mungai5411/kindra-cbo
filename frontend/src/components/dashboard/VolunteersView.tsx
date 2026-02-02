@@ -41,9 +41,9 @@ import {
     TablePagination,
     useMediaQuery
 } from '@mui/material';
-import { Person, Assignment, Event as EventIcon, Schedule, School, Verified, Add, AccessTime, Email, Phone, AdminPanelSettings, OpenInNew, Delete, People, Edit } from '@mui/icons-material';
+import { Person, Assignment, Event as EventIcon, Schedule, School, Verified, Add, AccessTime, Email, Phone, AdminPanelSettings, OpenInNew, Delete, People, Edit, Check, Close } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
-import { fetchVolunteers, fetchTasks, fetchEvents, logTimeEntry, addTask, addEvent, updateEvent, deleteEvent, registerForEvent, unregisterFromEvent, fetchTimeLogs, fetchShelters, createTaskApplication, deleteTask, fetchEventParticipants } from '../../features/volunteers/volunteersSlice';
+import { fetchVolunteers, fetchTasks, fetchEvents, logTimeEntry, addTask, addEvent, updateEvent, deleteEvent, registerForEvent, unregisterFromEvent, fetchTimeLogs, fetchShelters, createTaskApplication, deleteTask, fetchEventParticipants, updateTimeLogStatus } from '../../features/volunteers/volunteersSlice';
 import { SubTabView } from './SubTabView';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
@@ -983,6 +983,12 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
             ? timeLogs.filter((log: any) => log.volunteer === currentVolunteerId)
             : timeLogs;
 
+        const handleUpdateLogStatus = (id: string, status: string) => {
+            dispatch(updateTimeLogStatus({ id, status })).unwrap()
+                .then(() => setSnackbar({ open: true, message: `Log ${status.toLowerCase()} successfully`, severity: 'success' }))
+                .catch(() => setSnackbar({ open: true, message: 'Failed to update status', severity: 'error' }));
+        };
+
         return (
             <Paper sx={{
                 p: 0,
@@ -1036,7 +1042,40 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                     <TableCell sx={{ fontWeight: 600, color: 'text.secondary', pl: isVolunteer ? 4 : 2 }}>{log.date}</TableCell>
                                     <TableCell sx={{ fontWeight: 900, color: 'primary.main' }}>{log.hours} <Box component="span" sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>HRS</Box></TableCell>
                                     <TableCell sx={{ fontWeight: 500, color: 'text.secondary' }}>{log.description}</TableCell>
-                                    <TableCell sx={{ pr: 4 }}><StatusChip status={log.status} /></TableCell>
+                                    <TableCell sx={{ pr: 4 }}>
+                                        {isManagement && log.status === 'PENDING' ? (
+                                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                                <Tooltip title="Verify & Approve">
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleUpdateLogStatus(log.id, 'VERIFIED')}
+                                                        sx={{
+                                                            color: 'success.main',
+                                                            bgcolor: alpha(theme.palette.success.main, 0.05),
+                                                            '&:hover': { bgcolor: alpha(theme.palette.success.main, 0.1) }
+                                                        }}
+                                                    >
+                                                        <Check fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Reject">
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleUpdateLogStatus(log.id, 'REJECTED')}
+                                                        sx={{
+                                                            color: 'error.main',
+                                                            bgcolor: alpha(theme.palette.error.main, 0.05),
+                                                            '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.1) }
+                                                        }}
+                                                    >
+                                                        <Close fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Box>
+                                        ) : (
+                                            <StatusChip status={log.status} />
+                                        )}
+                                    </TableCell>
                                 </TableRow>
                             ))}
                             {displayedLogs.length === 0 && (
