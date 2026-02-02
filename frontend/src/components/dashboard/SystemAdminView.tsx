@@ -1090,9 +1090,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: '-0.04em', mb: 1, fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
                         {activeTab === 'users' ? 'User Infrastructure' :
                             activeTab === 'pending_approvals' ? 'Identity Verification' :
-                                activeTab === 'periodic_tasks' ? 'Operations Core' :
-                                    activeTab === 'groups' ? 'Volunteer Units' :
-                                        activeTab === 'audit_logs' ? 'System Audit' : 'System Administration'}
+                                activeTab === 'groups' ? 'Volunteer Units' :
+                                    activeTab === 'audit_logs' ? 'System Audit' : 'System Administration'}
                     </Typography>
                     <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Security fontSize="small" /> Kindra Management Protocol
@@ -1131,10 +1130,9 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     {activeTab === 'admin_sys' ? renderDashboard() :
                         activeTab === 'users' ? renderUsers() :
                             activeTab === 'pending_approvals' ? renderPendingApprovals() :
-                                activeTab === 'periodic_tasks' ? renderPeriodicTasks() :
-                                    activeTab === 'groups' ? renderGroups() :
-                                        activeTab === 'audit_logs' ? renderAuditLogs() :
-                                            renderDefault()}
+                                activeTab === 'groups' ? renderGroups() :
+                                    activeTab === 'audit_logs' ? renderAuditLogs() :
+                                        renderDefault()}
                 </motion.div>
             </AnimatePresence>
 

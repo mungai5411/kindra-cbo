@@ -116,11 +116,10 @@ const NAVIGATION = [
         icon: <Security />,
         adminOnly: true,
         children: [
-            { id: 'users', label: 'Users' },
-            { id: 'pending_approvals', label: 'Pending Approvals' },
-            { id: 'groups', label: 'Groups' },
+            { id: 'users', label: 'User Directory' },
+            { id: 'pending_approvals', label: 'Approvals' },
+            { id: 'groups', label: 'Volunteer Groups' },
             { id: 'audit_logs', label: 'Audit Logs' },
-            { id: 'periodic_tasks', label: 'Periodic Tasks' },
         ]
     },
 ];
