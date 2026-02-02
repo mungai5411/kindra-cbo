@@ -246,14 +246,14 @@ class ReportService:
             
             buffer.seek(0)
             content = buffer.read()
-            filename = f\"report_{report.report_type.lower()}_{report.id.hex[:8]}.pdf\"
+            filename = f"report_{report.report_type.lower()}_{report.id.hex[:8]}.pdf"
             report.file.save(filename, ContentFile(content))
             
-            logger.info(f\"Generated PDF report {report.id} using {template_name} (WeasyPrint)\")
+            logger.info(f"Generated PDF report {report.id} using {template_name} (WeasyPrint)")
             return content
             
         except Exception as e:
-            logger.error(f\"Error generating PDF report {report.id}: {str(e)}\", exc_info=True)
+            logger.error(f"Error generating PDF report {report.id}: {str(e)}", exc_info=True)
             raise
 
         from volunteers.models import Volunteer
