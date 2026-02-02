@@ -5,6 +5,9 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from './store';
+import { fetchProfile } from './features/auth/authSlice';
 // Contexts
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthModalProvider, useAuthModal } from './contexts/AuthModalContext';
@@ -62,6 +65,15 @@ const RegisterRedirect = () => {
 };
 
 function App() {
+    const dispatch = useDispatch<AppDispatch>();
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+    // Validate session on mount
+    useEffect(() => {
+        if (isAuthenticated) {
+            dispatch(fetchProfile());
+        }
+    }, [dispatch, isAuthenticated]);
     // Initialize keep-alive mechanism to prevent server from spinning down
     useEffect(() => {
         startKeepAlive();
