@@ -1,4 +1,4 @@
-import { AppBar, Box, Toolbar, Button, Container, useTheme, alpha, IconButton, Drawer, List, ListItem, ListItemText, Divider } from '@mui/material';
+import { AppBar, Box, Toolbar, Button, Container, useTheme, alpha, IconButton, Drawer, List, ListItem, ListItemText, Divider, Typography, Stack } from '@mui/material';
 import { Menu as MenuIcon, Close } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -61,9 +61,80 @@ export const Navbar = () => {
                         />
                     </Box>
 
-                    {/* Hamburger Menu Button (All Screens) */}
+
+                    {/* Desktop Navigation */}
+                    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 4 }}>
+                        {NAV_ITEMS.map((item) => (
+                            <Typography
+                                key={item.label}
+                                component={Link}
+                                to={item.path}
+                                variant="body2"
+                                sx={{
+                                    textDecoration: 'none',
+                                    color: 'inherit',
+                                    fontWeight: 600,
+                                    position: 'relative',
+                                    '&:after': {
+                                        content: '""',
+                                        position: 'absolute',
+                                        width: '0%',
+                                        height: '2px',
+                                        bottom: -4,
+                                        left: 0,
+                                        bgcolor: 'primary.main',
+                                        transition: 'width 0.3s'
+                                    },
+                                    '&:hover': {
+                                        color: 'primary.main',
+                                        '&:after': { width: '100%' }
+                                    }
+                                }}
+                            >
+                                {item.label}
+                            </Typography>
+                        ))}
+
+                        <Stack direction="row" spacing={2}>
+                            <Button
+                                color="inherit"
+                                onClick={openLoginModal}
+                                size="medium"
+                                sx={{
+                                    fontWeight: 600,
+                                    textTransform: 'none',
+                                    fontSize: '0.9rem'
+                                }}
+                            >
+                                Sign In
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={() => openRegisterModal('VOLUNTEER')}
+                                size="medium"
+                                sx={{
+                                    borderRadius: '50px',
+                                    px: 3,
+                                    boxShadow: theme.shadows[4],
+                                    textTransform: 'none',
+                                    fontWeight: 700,
+                                    bgcolor: scrolled ? 'primary.main' : 'common.white',
+                                    color: scrolled ? 'common.white' : 'primary.main',
+                                    '&:hover': {
+                                        bgcolor: scrolled ? 'primary.dark' : alpha(theme.palette.common.white, 0.9),
+                                        transform: 'translateY(-2px)'
+                                    }
+                                }}
+                            >
+                                Get Involved
+                            </Button>
+                        </Stack>
+                    </Box>
+
+                    {/* Hamburger Menu Button (Mobile Only) */}
                     <IconButton
                         sx={{
+                            display: { xs: 'flex', md: 'none' },
                             color: 'inherit',
                             '&:hover': {
                                 bgcolor: alpha(theme.palette.primary.main, 0.1)

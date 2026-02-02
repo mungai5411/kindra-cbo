@@ -185,6 +185,29 @@ export default function HomePage() {
                                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
 
                                     <Button
+                                        component={Link}
+                                        to="/donate"
+                                        variant="contained"
+                                        size="medium"
+                                        endIcon={<Favorite />}
+                                        sx={{
+                                            py: 1.5,
+                                            px: 4,
+                                            borderRadius: '10px',
+                                            fontSize: '1rem',
+                                            fontWeight: 700,
+                                            boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
+                                            background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                                            '&:hover': {
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: '0 15px 30px rgba(0,0,0,0.15)'
+                                            }
+                                        }}
+                                    >
+                                        Donate Now
+                                    </Button>
+
+                                    <Button
                                         component="a"
                                         href="https://www.youtube.com/channel/UC_placeholder"
                                         target="_blank"
