@@ -2,18 +2,24 @@
  * Utility to handle secure file downloads via Axios
  * This ensures JWT tokens are sent with the request to prevent 401 logouts
  */
+import axios from 'axios';
 import apiClient from '../api/client';
 
 /**
- * Downloads a file from a given URL using the authenticated apiClient
+ * Downloads a file from a given URL
+ * - Uses apiClient (with auth) for relative/internal URLs
+ * - Uses plain axios (no auth) for external URLs to avoid CORS issues with credentials
  * @param url The relative or absolute URL to download from
  * @param defaultFilename Recommended filename for the download
  */
 export const downloadFile = async (url: string, defaultFilename: string = 'download') => {
     try {
-        const response = await apiClient.get(url, {
-            responseType: 'blob',
-        });
+        const isExternal = url.startsWith('http') || url.startsWith('//');
+
+        const response = await (isExternal
+            ? axios.get(url, { responseType: 'blob' })
+            : apiClient.get(url, { responseType: 'blob' })
+        );
 
         // Try to get filename from content-disposition header
         let filename = defaultFilename;
