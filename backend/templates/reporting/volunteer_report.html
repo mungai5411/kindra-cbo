@@ -76,17 +76,17 @@
     <tbody>
         {% for volunteer in volunteers %}
         <tr>
-            <td>{{ volunteer.full_name }}</td>
-            <td>{{ volunteer.email }}</td>
+            <td>{{ volunteer.full_name|default:"-" }}</td>
+            <td>{{ volunteer.email|default:"-" }}</td>
             <td>{{ volunteer.phone_number|default:"-" }}</td>
             <td>
                 <span
                     style="{% if volunteer.status == 'ACTIVE' %}color: #519755; font-weight: bold;{% else %}color: #999;{% endif %}">
-                    {{ volunteer.status }}
+                    {{ volunteer.status|default:"UNKNOWN" }}
                 </span>
             </td>
-            <td style="font-weight: bold;">{{ volunteer.total_hours|floatformat:1 }}</td>
-            <td>{{ volunteer.created_at|date:"d M Y" }}</td>
+            <td style="font-weight: bold;">{{ volunteer.total_hours|default:0|floatformat:1 }}</td>
+            <td>{{ volunteer.created_at|date:"d M Y"|default:"-" }}</td>
         </tr>
         {% empty %}
         <tr>

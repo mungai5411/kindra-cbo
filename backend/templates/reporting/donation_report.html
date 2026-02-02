@@ -70,10 +70,11 @@
     <tbody>
         {% for donation in donations %}
         <tr>
-            <td>{{ donation.donation_date|date:"d M Y H:i" }}</td>
+            <td>{{ donation.donation_date|date:"d M Y H:i"|default:"-" }}</td>
             <td>{{ donation.donor_name|default:donation.donor.full_name|default:"Anonymous" }}</td>
-            <td style="font-weight: bold;">{{ donation.currency }} {{ donation.amount|floatformat:2 }}</td>
-            <td>{{ donation.payment_method }}</td>
+            <td style="font-weight: bold;">{{ donation.currency|default:"KES" }} {{ donation.amount|floatformat:2 }}
+            </td>
+            <td>{{ donation.payment_method|default:"-" }}</td>
             <td>{{ donation.campaign.title|default:"General Fund" }}</td>
             <td>
                 <span
