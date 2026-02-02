@@ -1,9 +1,13 @@
 import { AppBar, Box, Toolbar, Button, Container, useTheme, alpha, IconButton, Drawer, List, ListItem, ListItemText, Divider, Typography, Stack } from '@mui/material';
 import { Menu as MenuIcon, Close } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthModal } from '../../contexts/AuthModalContext';
-import logo from '../../assets/logo.jpg';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../../store';
+import { logout } from '../../features/auth/authSlice';
+import bgLogo from '../../assets/logo.jpg';
+const logo = bgLogo;
 
 
 const NAV_ITEMS = [
@@ -14,6 +18,9 @@ const NAV_ITEMS = [
 export const Navbar = () => {
     const theme = useTheme();
     const location = useLocation();
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
     const { openLoginModal, openRegisterModal } = useAuthModal();
     const [scrolled, setScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -25,6 +32,12 @@ export const Navbar = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate('/');
+        setMobileOpen(false);
+    };
 
     const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
         if (event.type === 'keydown' && ((event as React.KeyboardEvent).key === 'Tab' || (event as React.KeyboardEvent).key === 'Shift')) {
@@ -96,38 +109,71 @@ export const Navbar = () => {
                         ))}
 
                         <Stack direction="row" spacing={2}>
-                            <Button
-                                color="inherit"
-                                onClick={openLoginModal}
-                                size="medium"
-                                sx={{
-                                    fontWeight: 600,
-                                    textTransform: 'none',
-                                    fontSize: '0.9rem'
-                                }}
-                            >
-                                Sign In
-                            </Button>
-                            <Button
-                                variant="contained"
-                                onClick={() => openRegisterModal('VOLUNTEER')}
-                                size="medium"
-                                sx={{
-                                    borderRadius: '50px',
-                                    px: 3,
-                                    boxShadow: theme.shadows[4],
-                                    textTransform: 'none',
-                                    fontWeight: 700,
-                                    bgcolor: scrolled ? 'primary.main' : 'common.white',
-                                    color: scrolled ? 'common.white' : 'primary.main',
-                                    '&:hover': {
-                                        bgcolor: scrolled ? 'primary.dark' : alpha(theme.palette.common.white, 0.9),
-                                        transform: 'translateY(-2px)'
-                                    }
-                                }}
-                            >
-                                Get Involved
-                            </Button>
+                            {isAuthenticated ? (
+                                <>
+                                    <Button
+                                        component={Link}
+                                        to="/dashboard"
+                                        variant="outlined"
+                                        color="primary"
+                                        size="medium"
+                                        sx={{
+                                            fontWeight: 600,
+                                            textTransform: 'none',
+                                            borderRadius: '50px',
+                                        }}
+                                    >
+                                        Dashboard
+                                    </Button>
+                                    <Button
+                                        color="inherit"
+                                        onClick={handleLogout}
+                                        size="medium"
+                                        sx={{
+                                            fontWeight: 600,
+                                            textTransform: 'none',
+                                            fontSize: '0.9rem'
+                                        }}
+                                    >
+                                        Logout
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button
+                                        color="inherit"
+                                        onClick={openLoginModal}
+                                        size="medium"
+                                        sx={{
+                                            fontWeight: 600,
+                                            textTransform: 'none',
+                                            fontSize: '0.9rem'
+                                        }}
+                                    >
+                                        Sign In
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => openRegisterModal('VOLUNTEER')}
+                                        size="medium"
+                                        sx={{
+                                            borderRadius: '50px',
+                                            px: 3,
+                                            boxShadow: theme.shadows[4],
+                                            textTransform: 'none',
+                                            fontWeight: 700,
+                                            bgcolor: scrolled ? 'primary.main' : 'common.white',
+                                            color: scrolled ? 'common.white' : 'primary.main',
+                                            '&:hover': {
+                                                bgcolor: scrolled ? 'primary.dark' : alpha(theme.palette.common.white, 0.9),
+                                                transform: 'translateY(-2px)'
+                                            }
+                                        }}
+                                    >
+                                        Get Involved
+                                    </Button>
+                                </>
+                            )}
                         </Stack>
                     </Box>
 
@@ -254,42 +300,80 @@ export const Navbar = () => {
 
                     {/* CTA Buttons */}
                     <Box sx={{ p: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            onClick={() => {
-                                setMobileOpen(false);
-                                openLoginModal();
-                            }}
-                            size="small"
-                            sx={{
-                                borderRadius: 2,
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                py: 0.5,
-                                fontSize: '0.85rem'
-                            }}
-                        >
-                            Sign In
-                        </Button>
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            onClick={() => {
-                                setMobileOpen(false);
-                                openRegisterModal('VOLUNTEER');
-                            }}
-                            size="small"
-                            sx={{
-                                borderRadius: 2,
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                py: 0.5,
-                                fontSize: '0.85rem'
-                            }}
-                        >
-                            Get Involved
-                        </Button>
+                        {isAuthenticated ? (
+                            <>
+                                <Button
+                                    fullWidth
+                                    component={Link}
+                                    to="/dashboard"
+                                    variant="contained"
+                                    onClick={() => setMobileOpen(false)}
+                                    size="small"
+                                    sx={{
+                                        borderRadius: 2,
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        py: 0.5,
+                                    }}
+                                >
+                                    Go to Dashboard
+                                </Button>
+                                <Button
+                                    fullWidth
+                                    variant="outlined"
+                                    color="error"
+                                    onClick={handleLogout}
+                                    size="small"
+                                    sx={{
+                                        borderRadius: 2,
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        py: 0.5,
+                                    }}
+                                >
+                                    Log Out
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button
+                                    fullWidth
+                                    variant="outlined"
+                                    onClick={() => {
+                                        setMobileOpen(false);
+                                        openLoginModal();
+                                    }}
+                                    size="small"
+                                    sx={{
+                                        borderRadius: 2,
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        py: 0.5,
+                                        fontSize: '0.85rem'
+                                    }}
+                                >
+                                    Sign In
+                                </Button>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    onClick={() => {
+                                        setMobileOpen(false);
+                                        openRegisterModal('VOLUNTEER');
+                                    }}
+                                    size="small"
+                                    sx={{
+                                        borderRadius: 2,
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        py: 0.5,
+                                        fontSize: '0.85rem'
+                                    }}
+                                >
+                                    Get Involved
+                                </Button>
+                            </>
+                        )}
                     </Box>
                 </Box>
             </Drawer>
