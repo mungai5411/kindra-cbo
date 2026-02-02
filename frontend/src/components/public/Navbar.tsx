@@ -113,7 +113,7 @@ export const Navbar = () => {
                                 <>
                                     <Button
                                         component={Link}
-                                        to="/dashboard"
+                                        to="/dashboard/overview"
                                         variant="outlined"
                                         color="primary"
                                         size="medium"
@@ -305,7 +305,7 @@ export const Navbar = () => {
                                 <Button
                                     fullWidth
                                     component={Link}
-                                    to="/dashboard"
+                                    to="/dashboard/overview"
                                     variant="contained"
                                     onClick={() => setMobileOpen(false)}
                                     size="small"

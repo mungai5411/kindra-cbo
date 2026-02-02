@@ -198,7 +198,7 @@ export const LoginModal = () => {
             ]);
 
             closeLoginModal();
-            const from = (location.state as any)?.from?.pathname || '/dashboard';
+            const from = (location.state as any)?.from?.pathname || '/dashboard/overview';
             navigate(from, { replace: true });
         } catch (err: any) {
             if (typeof err === 'string' && err.includes('Rate limit exceeded')) {
@@ -330,7 +330,7 @@ export const LoginModal = () => {
                                         payload: { access: data.access, refresh: data.refresh, user: data.user }
                                     });
                                     closeLoginModal();
-                                    const from = (location.state as any)?.from?.pathname || '/dashboard';
+                                    const from = (location.state as any)?.from?.pathname || '/dashboard/overview';
                                     navigate(from, { replace: true });
                                 }}
                             />

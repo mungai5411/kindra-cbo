@@ -97,6 +97,7 @@ function App() {
                             <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />
 
                             {/* Protected routes */}
+                            <Route path="/dashboard" element={<Navigate to="/dashboard/overview" replace />} />
                             <Route
                                 path="/dashboard/:view/*"
                                 element={
