@@ -202,7 +202,7 @@ logger = logging.getLogger('kindra_cbo')
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def download_report(request, pk):
-    """Download generated report file"""
+    """Download report (generated on-demand, like receipts)"""
     try:
         report = Report.objects.get(pk=pk)
         
@@ -211,39 +211,37 @@ def download_report(request, pk):
             logger.warning(f"User {request.user.id} attempted to access report {pk} without permission")
             return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
         
-        logger.info(f"Processing download for report {report.id} ({report.title})")
+        logger.info(f"Generating on-demand download for report {report.id} ({report.title})")
         
-        # Check if report has been generated
-        if not report.file:
-            logger.error(f"Report {report.id} has no file attached")
-            return Response(
-                {'error': 'Report file not found. Please regenerate the report.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        
-        # Read file from storage
+        # Generate report content on-the-fly based on format
         try:
-            logger.info(f"Reading report file from storage: {report.file.name}")
-            file_content = report.file.read()
+            if report.format == 'PDF':
+                file_content = ReportService._generate_pdf(report)
+                content_type = 'application/pdf'
+                extension = 'pdf'
+            elif report.format == 'EXCEL':
+                file_content = ReportService._generate_excel(report)
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                extension = 'xlsx'
+            elif report.format == 'CSV':
+                file_content = ReportService._generate_csv(report)
+                content_type = 'text/csv'
+                extension = 'csv'
+            else:
+                return Response({'error': 'Unsupported report format'}, status=status.HTTP_400_BAD_REQUEST)
             
-            # Determine content type based on format
-            content_type = {
-                'PDF': 'application/pdf',
-                'EXCEL': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'CSV': 'text/csv'
-            }.get(report.format, 'application/octet-stream')
-            
+            # Return as downloadable file
             response = HttpResponse(file_content, content_type=content_type)
-            filename = report.file.name.split('/')[-1]
+            filename = f"report_{report.report_type.lower()}_{report.id.hex[:8]}.{extension}"
             response['Content-Disposition'] = f'attachment; filename="{filename}"'
             
-            logger.info(f"Successfully serving report {report.id}")
+            logger.info(f"Successfully generated and serving report {report.id}")
             return response
             
         except Exception as e:
-            logger.error(f"Error reading report file from storage: {str(e)}", exc_info=True)
+            logger.error(f"Error generating report content: {str(e)}", exc_info=True)
             return Response(
-                {'error': 'Failed to retrieve report file. Please try again or regenerate the report.'},
+                {'error': 'Failed to generate report. Please try again.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             

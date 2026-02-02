@@ -7,7 +7,6 @@ import io
 import csv
 import logging
 from django.utils import timezone
-from django.core.files.base import ContentFile
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
@@ -246,8 +245,6 @@ class ReportService:
             
             buffer.seek(0)
             content = buffer.read()
-            filename = f"report_{report.report_type.lower()}_{report.id.hex[:8]}.pdf"
-            report.file.save(filename, ContentFile(content))
             
             logger.info(f"Generated PDF report {report.id} using {template_name} (WeasyPrint)")
             return content
