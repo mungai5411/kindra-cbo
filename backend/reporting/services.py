@@ -7,6 +7,7 @@ import io
 import csv
 import logging
 from django.utils import timezone
+from django.core.files.base import ContentFile
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
@@ -117,8 +118,6 @@ class ReportService:
                 ])
         
         content = output.getvalue().encode('utf-8')
-        filename = f"report_{report.report_type.lower()}_{report.id.hex[:8]}.csv"
-        report.file.save(filename, ContentFile(content))
         return content
 
     @staticmethod
@@ -173,8 +172,6 @@ class ReportService:
         wb.save(buffer)
         buffer.seek(0)
         content = buffer.read()
-        filename = f"report_{report.report_type.lower()}_{report.id.hex[:8]}.xlsx"
-        report.file.save(filename, ContentFile(content))
         return content
 
     @staticmethod
@@ -252,67 +249,3 @@ class ReportService:
         except Exception as e:
             logger.error(f"Error generating PDF report {report.id}: {str(e)}", exc_info=True)
             raise
-
-        from volunteers.models import Volunteer
-
-        buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
-        elements = []
-        styles = getSampleStyleSheet()
-
-        # Title
-        title = f"Kindra CBO - {report.report_type} REPORT"
-        elements.append(Paragraph(title, styles['Title']))
-        elements.append(Spacer(1, 0.2 * inch))
-
-        # Meta info
-        meta_text = f"Generated: {timezone.now().strftime('%d %b %Y %H:%M')} | Range: {report.start_date or 'Life'} to {report.end_date or 'Present'}"
-        elements.append(Paragraph(meta_text, styles['Normal']))
-        elements.append(Spacer(1, 0.3 * inch))
-
-        data = []
-        if report.report_type == 'DONATION':
-            data.append(['Date', 'Donor', 'Amount', 'Method', 'Campaign', 'Status'])
-            qs = Donation.objects.all()
-            if report.start_date: qs = qs.filter(donation_date__gte=report.start_date)
-            if report.end_date: qs = qs.filter(donation_date__lte=report.end_date)
-
-            for d in qs[:500]: # Limit PDF for performance
-                data.append([
-                    d.donation_date.strftime('%Y-%m-%d'),
-                    (d.donor_name or str(d.donor or "Anon"))[:20],
-                    f"{d.amount:,.2f}",
-                    d.payment_method,
-                    (d.campaign.title if d.campaign else 'General')[:20],
-                    d.status
-                ])
-        elif report.report_type == 'VOLUNTEER':
-            data.append(['Name', 'Email', 'Role', 'Status', 'Hours'])
-            qs = Volunteer.objects.all()
-            for v in qs[:500]:
-                data.append([
-                    v.full_name[:25], v.email[:25], 'VOLUNTEER', v.status, str(v.total_hours)
-                ])
-
-        # Table Styling
-        if data:
-            t = Table(data, hAlign='LEFT')
-            t.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#519755")),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 12),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
-                ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-                ('FONTSIZE', (0, 1), (-1, -1), 10),
-            ]))
-            elements.append(t)
-
-        doc.build(elements)
-        buffer.seek(0)
-        content = buffer.read()
-        filename = f"report_{report.report_type.lower()}_{report.id.hex[:8]}.pdf"
-        report.file.save(filename, ContentFile(content))
-        return content
