@@ -447,10 +447,10 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                 <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                         <Box sx={{ pr: 1, minWidth: 0 }}>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 900, lineHeight: 1.2, mb: 0.5, noWrap: true }}>
+                                            <Typography variant="subtitle1" noWrap sx={{ fontWeight: 900, lineHeight: 1.2, mb: 0.5 }}>
                                                 {u.full_name || 'Anonymous User'}
                                             </Typography>
-                                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1, noWrap: true, fontWeight: 600 }}>
+                                            <Typography variant="caption" noWrap sx={{ color: 'text.secondary', display: 'block', mb: 1, fontWeight: 600 }}>
                                                 {u.email}
                                             </Typography>
                                             <Chip
@@ -606,8 +606,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                         <HourglassTop />
                                     </Avatar>
                                     <Box sx={{ minWidth: 0 }}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 900, noWrap: true }}>{u.full_name || u.email}</Typography>
-                                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', noWrap: true }}>
+                                        <Typography variant="subtitle1" noWrap sx={{ fontWeight: 900 }}>{u.full_name || u.email}</Typography>
+                                        <Typography variant="caption" noWrap sx={{ color: 'text.secondary', fontWeight: 600, display: 'block' }}>
                                             {u.organization || 'Independent Partner'}
                                         </Typography>
                                         <Typography variant="caption" sx={{ color: 'warning.dark', fontWeight: 900, textTransform: 'uppercase', fontSize: '0.6rem' }}>
@@ -652,216 +652,6 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 </Grid>
             )}
         </Box>
-    );
-
-    const renderPeriodicTasks = () => (
-        <Grid container spacing={4}>
-            <Grid item xs={12} md={8}>
-                <Paper sx={{
-                    p: 4,
-                    borderRadius: 4,
-                    border: '1px solid',
-                    borderColor: alpha(theme.palette.divider, 0.08),
-                    bgcolor: 'background.paper',
-                    boxShadow: '0 4px 32px rgba(0,0,0,0.02)'
-                }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, mb: 4 }}>
-                        <Avatar sx={{ p: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.1), borderRadius: 2.5 }}>
-                            <Schedule color="primary" sx={{ fontSize: 32 }} />
-                        </Avatar>
-                        <Box>
-                            <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Lifecycle Automation</Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>Real-time coordination of background protocols</Typography>
-                        </Box>
-                    </Box>
-
-                    <Box sx={{
-                        mb: 4,
-                        p: 3,
-                        bgcolor: alpha(theme.palette.background.default, 0.5),
-                        borderRadius: 3.5,
-                        border: '1px solid',
-                        borderColor: alpha(theme.palette.primary.main, 0.1),
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.04)'
-                    }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                            <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                    <Autorenew sx={{ fontSize: 20, color: 'primary.main' }} /> Identity Hygiene Engine
-                                </Typography>
-                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Protocol v2.4 (Kindra Intelligence Integrated)</Typography>
-                            </Box>
-                            <Chip label="RUNNING DAILY" size="small" color="success" sx={{ borderRadius: 1.5, fontWeight: 900, fontSize: '0.65rem' }} />
-                        </Box>
-
-                        <Typography variant="body2" sx={{ mb: 4, lineHeight: 1.6, color: 'text.secondary', fontWeight: 500 }}>
-                            Ensures data integrity by monitoring inactivity thresholds. Stale identities (&gt; 6 months) are automatically processed through a multi-stage decommissioning workflow.
-                        </Typography>
-
-                        <Grid container spacing={2} sx={{ mb: 4 }}>
-                            {[
-                                { m: '1', a: 'Discovery' },
-                                { m: '2', a: 'Insight' },
-                                { m: '3', a: 'Re-engage' },
-                                { m: '4', a: 'Warning' },
-                                { m: '5', a: 'DELETION' },
-                                { m: '6', a: 'PURGE' },
-                            ].map((step, i) => (
-                                <Grid item xs={4} md={2} key={i}>
-                                    <Box sx={{ textAlign: 'center' }}>
-                                        <Box sx={{
-                                            width: '100%', pt: '100%', position: 'relative',
-                                            bgcolor: i >= 4 ? alpha(theme.palette.error.main, 0.08) : alpha(theme.palette.primary.main, 0.05),
-                                            borderRadius: 2, mb: 1, border: '1px solid',
-                                            borderColor: i >= 4 ? alpha(theme.palette.error.main, 0.15) : alpha(theme.palette.primary.main, 0.1)
-                                        }}>
-                                            <Typography sx={{
-                                                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                                                fontWeight: 900, fontSize: '0.85rem',
-                                                color: i >= 4 ? 'error.main' : 'primary.main'
-                                            }}>
-                                                {step.m}M
-                                            </Typography>
-                                        </Box>
-                                        <Typography variant="caption" sx={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', color: i >= 4 ? 'error.main' : 'text.secondary' }}>
-                                            {step.a}
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                            ))}
-                        </Grid>
-
-                        <Box sx={{ p: 2.5, bgcolor: 'background.paper', borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.05), display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Box>
-                                <Typography variant="caption" sx={{ display: 'block', fontWeight: 800, color: 'text.disabled', letterSpacing: 0.5, mb: 0.5 }}>STATUS MONITOR</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: 800 }}>Next Cycle: 02:00 AM UTC</Typography>
-                            </Box>
-                            <Button
-                                variant="contained"
-                                startIcon={adminLoading ? <CircularProgress size={16} color="inherit" /> : <Refresh />}
-                                onClick={() => {
-                                    dispatch(triggerInactivityCleanup()).then(() => {
-                                        setSnackbar({ open: true, message: 'Cleanup logic triggered: Scanning records...', severity: 'info' });
-                                    });
-                                }}
-                                disabled={adminLoading}
-                                sx={{ borderRadius: 2.5, px: 3, fontWeight: 900, textTransform: 'none', boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}` }}
-                            >
-                                Force Scan
-                            </Button>
-                        </Box>
-                    </Box>
-
-                    <Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 900, letterSpacing: -0.2 }}>Active Executions</Typography>
-                            <Button size="small" variant="text" onClick={() => dispatch(fetchTaskResults())} startIcon={<Refresh />} sx={{ fontWeight: 800, textTransform: 'none' }}>Refresh Logs</Button>
-                        </Box>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                            {taskResults.length > 0 ? taskResults.slice(0, 5).map((result: any) => (
-                                <Box key={result.id} sx={{ p: 2.5, bgcolor: alpha(theme.palette.background.default, 0.3), borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.06) }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
-                                        <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main', fontFamily: 'monospace' }}>{result.task_name?.split('.').pop()}</Typography>
-                                        <Chip
-                                            label={result.status}
-                                            size="small"
-                                            color={result.status === 'SUCCESS' ? 'success' : result.status === 'FAILURE' ? 'error' : 'warning'}
-                                            sx={{ fontSize: '0.6rem', height: 18, fontWeight: 900, borderRadius: 1 }}
-                                        />
-                                    </Box>
-                                    <LinearProgress
-                                        variant="determinate"
-                                        value={result.status === 'SUCCESS' ? 100 : result.status === 'FAILURE' ? 0 : 50}
-                                        sx={{
-                                            borderRadius: 5,
-                                            height: 6,
-                                            bgcolor: alpha(theme.palette.divider, 0.1),
-                                            '& .MuiLinearProgress-bar': { borderRadius: 5 }
-                                        }}
-                                    />
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1.5 }}>
-                                        <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 600 }}>Ref: {result.task_id.substring(0, 8)}</Typography>
-                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>{new Date(result.date_done).toLocaleTimeString()}</Typography>
-                                    </Box>
-                                </Box>
-                            )) : (
-                                <Box sx={{ p: 4, textAlign: 'center', bgcolor: alpha(theme.palette.background.default, 0.2), borderRadius: 3, border: '1px dashed', borderColor: alpha(theme.palette.divider, 0.1) }}>
-                                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>No execution history available.</Typography>
-                                </Box>
-                            )}
-                        </Box>
-                    </Box>
-                </Paper>
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-                <Paper sx={{
-                    p: 4,
-                    borderRadius: 4,
-                    border: '1px solid',
-                    borderColor: alpha('#fff', 0.1),
-                    height: '100%',
-                    bgcolor: '#1a1f2c',
-                    color: '#fff',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    boxShadow: '0 12px 40px rgba(0,0,0,0.15)'
-                }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-                        <Avatar sx={{ bgcolor: alpha('#fff', 0.1), borderRadius: 2 }}>
-                            <AccessTime sx={{ color: '#fff' }} fontSize="small" />
-                        </Avatar>
-                        <Typography variant="h6" sx={{ fontWeight: 900 }}>Operational Core</Typography>
-                    </Box>
-                    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 2.5, overflow: 'auto', pr: 1 }}>
-                        {periodicTasks.length > 0 ? periodicTasks.map((task: any) => (
-                            <Box key={task.id} sx={{ p: 2.5, borderRadius: 3, bgcolor: alpha('#fff', 0.04), border: '1px solid', borderColor: alpha('#fff', 0.08), transition: 'all 0.2s ease', '&:hover': { bgcolor: alpha('#fff', 0.06), borderColor: alpha('#fff', 0.2) } }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.light' }}>{task.name}</Typography>
-                                    <Chip
-                                        label={task.enabled ? "ACTIVE" : "PAUSED"}
-                                        size="small"
-                                        sx={{
-                                            height: 16, fontSize: '0.55rem',
-                                            bgcolor: task.enabled ? alpha('#519755', 0.2) : alpha('#FF708B', 0.2),
-                                            color: task.enabled ? '#a6e3ae' : '#ffb3c1',
-                                            fontWeight: 900
-                                        }}
-                                    />
-                                </Box>
-                                <Typography variant="caption" sx={{ display: 'block', mb: 2, opacity: 0.6, fontWeight: 500, lineHeight: 1.4 }}>{task.schedule_description}</Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Schedule sx={{ fontSize: 14, opacity: 0.4 }} />
-                                    <Typography variant="caption" sx={{ opacity: 0.4, fontWeight: 600 }}>Sync: {task.last_run_at ? new Date(task.last_run_at).toLocaleTimeString() : 'Pending'}</Typography>
-                                </Box>
-                            </Box>
-                        )) : (
-                            <Box sx={{ p: 6, textAlign: 'center', opacity: 0.2 }}>
-                                <Autorenew sx={{ fontSize: 48, mb: 1 }} />
-                                <Typography variant="caption" sx={{ display: 'block', fontWeight: 600 }}>Syncing Protocols...</Typography>
-                            </Box>
-                        )}
-                    </Box>
-                    <Button
-                        fullWidth
-                        variant="outlined"
-                        onClick={() => dispatch(fetchPeriodicTasks())}
-                        sx={{
-                            mt: 4,
-                            color: '#94a3b8',
-                            borderRadius: 2.5,
-                            borderColor: alpha('#fff', 0.1),
-                            fontWeight: 900,
-                            textTransform: 'none',
-                            py: 1.2,
-                            '&:hover': { bgcolor: alpha('#fff', 0.05), borderColor: '#fff', color: '#fff' }
-                        }}
-                    >
-                        Sync Scheduler
-                    </Button>
-                </Paper>
-            </Grid>
-        </Grid>
     );
 
     const renderGroups = () => (

@@ -127,7 +127,7 @@ const NAVIGATION = [
 interface NavigationItem {
     id: string;
     label: string;
-    icon: JSX.Element;
+    icon: React.ReactElement;
     adminOnly?: boolean;
     children?: { id: string; label: string; adminOnly?: boolean }[];
 }
