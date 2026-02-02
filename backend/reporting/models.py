@@ -5,8 +5,12 @@ Analytics, dashboards, and compliance reporting
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.files.storage import FileSystemStorage
 from accounts.models import User
 import uuid
+
+# Force local storage for reports (not Cloudinary)
+local_storage = FileSystemStorage()
 
 
 class Report(models.Model):
@@ -39,9 +43,9 @@ class Report(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     
-    # Format and file (stored in MEDIA_ROOT/reports/)
+    # Format and file (stored in MEDIA_ROOT/reports/, NOT Cloudinary)
     format = models.CharField(max_length=10, choices=Format.choices, default=Format.PDF)
-    file = models.FileField(upload_to='reports/%Y/%m/', blank=True, null=True)
+    file = models.FileField(upload_to='reports/%Y/%m/', storage=local_storage, blank=True, null=True)
     
     # Parameters (JSON field for filter criteria)
     parameters = models.JSONField(default=dict, blank=True, help_text=_('Report filter parameters'))
