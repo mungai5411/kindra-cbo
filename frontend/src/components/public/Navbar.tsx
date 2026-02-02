@@ -12,7 +12,6 @@ const logo = bgLogo;
 
 const NAV_ITEMS = [
     { label: 'Stories', path: '/stories' },
-    { label: 'Donate', path: '/donate' },
 ];
 
 export const Navbar = () => {
