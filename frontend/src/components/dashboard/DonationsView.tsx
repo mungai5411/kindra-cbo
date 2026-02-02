@@ -40,7 +40,8 @@ import {
     DonutLarge,
     LocationOn,
     Schedule,
-    Event as EventIcon
+    Event as EventIcon,
+    BusinessCenter
 } from '@mui/icons-material';
 import { FundAllocationChart } from '../charts/DashboardCharts';
 import { RootState, AppDispatch } from '../../store';
@@ -63,7 +64,7 @@ import {
 import { fetchEvents } from '../../features/volunteers/volunteersSlice';
 import { getRandomMessage } from '../../utils/heartwarmingMessages';
 import { SubTabView } from './SubTabView';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { StatsCard } from './StatCards';
 import { ConfirmationDialog } from './ConfirmationDialog';
 import { downloadFile } from '../../utils/downloadHelper';

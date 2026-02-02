@@ -52,6 +52,13 @@ import { CommunityHub } from '../components/dashboard/CommunityHub';
 import { VolunteerGroupsView } from '../components/dashboard/VolunteerGroupsView';
 import { useDeviceType } from '../hooks/useDeviceType';
 
+// Fetch Actions
+import { fetchFamilies, fetchChildren, fetchCases } from '../features/caseManagement/caseManagementSlice';
+import { fetchShelters, fetchIncidents } from '../features/shelters/shelterSlice';
+import { fetchVolunteers, fetchTasks, fetchEvents } from '../features/volunteers/volunteersSlice';
+import { fetchCampaigns, fetchDonations } from '../features/donations/donationsSlice';
+import { fetchDashboardData } from '../features/reporting/reportingSlice';
+
 const DRAWER_WIDTH = 280;
 
 const USER_ROLES = [
@@ -75,7 +82,7 @@ export default function DashboardPage() {
 
     // URL Parsing for Active Tab
     const { view } = useParams<{ view?: string }>();
-    const activeTab = view || 'overview';
+    const activeTab = view?.split('/')[0] || 'overview';
 
     // UI State
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -179,6 +186,19 @@ export default function DashboardPage() {
     useEffect(() => {
         if (isAuthenticated) {
             dispatch(fetchProfile());
+
+            // Initial Data Load for Dashboard Overview & Sections
+            dispatch(fetchDashboardData());
+            dispatch(fetchVolunteers());
+            dispatch(fetchTasks());
+            dispatch(fetchEvents());
+            dispatch(fetchCampaigns());
+            dispatch(fetchDonations());
+            dispatch(fetchFamilies());
+            dispatch(fetchChildren());
+            dispatch(fetchCases());
+            dispatch(fetchShelters());
+            dispatch(fetchIncidents());
         }
     }, [dispatch, isAuthenticated]);
 

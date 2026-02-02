@@ -120,7 +120,8 @@ apiClient.interceptors.response.use(
                 // Refresh failed - logout user
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
-                window.location.href = '/login';
+                // Redirect to home instead of login to avoid loops with LoginRedirect component
+                window.location.href = '/';
                 return Promise.reject(refreshError);
             } finally {
                 isRefreshing = false;

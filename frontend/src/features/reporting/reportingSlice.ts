@@ -10,7 +10,7 @@ export const fetchDashboardData = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const response = await apiClient.get(endpoints.reports.dashboard);
-            return response.data;
+            console.log('Dashboard Data Response:', response.data); return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch dashboard data');
         }

@@ -81,9 +81,9 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
                 <AdminOverview
                     stats={{
                         totalDonations: dashboardData?.donations?.total_this_year || 0,
-                        donationCount: donationRecords.length,
+                        donationCount: donationRecords?.length || 0,
                         activeVolunteers: dashboardData?.overview?.active_volunteers || 0,
-                        totalVolunteers: volunteers.length,
+                        totalVolunteers: volunteers?.length || 0,
                         activeCases: dashboardData?.overview?.active_cases || 0,
                         totalChildren: dashboardData?.overview?.total_children || 0,
                         shelterCount: dashboardData?.shelter_homes?.total_homes || 0

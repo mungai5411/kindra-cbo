@@ -135,11 +135,12 @@ export default function HomePage() {
             <Box
                 sx={{
                     position: 'relative',
-                    minHeight: '80vh',
+                    minHeight: { xs: 'auto', md: '65vh' },
                     display: 'flex',
                     alignItems: 'center',
                     background: `radial-gradient(circle at 20% 30%, ${alpha(theme.palette.primary.light, 0.05)} 0%, transparent 60%), radial-gradient(circle at 80% 70%, ${alpha(theme.palette.secondary.light, 0.03)} 0%, transparent 60%), #f8f9fa`,
-                    pt: 6,
+                    pt: { xs: 12, md: 6 },
+                    pb: { xs: 8, md: 6 },
                 }}
             >
                 {/* ... Hero Content ... */}
