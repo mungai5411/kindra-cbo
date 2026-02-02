@@ -2,13 +2,12 @@
  * Utility to handle secure file downloads via Axios
  * This ensures JWT tokens are sent with the request to prevent 401 logouts
  */
-import axios from 'axios';
 import apiClient from '../api/client';
 
 /**
  * Downloads a file from a given URL
  * - Uses apiClient (with auth) for relative/internal URLs
- * - Uses plain axios (no auth) for external URLs to avoid CORS issues with credentials
+ * - Uses native fetch (no auth) for external URLs to avoid CORS/401 issues
  * @param url The relative or absolute URL to download from
  * @param defaultFilename Recommended filename for the download
  */
@@ -16,26 +15,33 @@ export const downloadFile = async (url: string, defaultFilename: string = 'downl
     try {
         const isExternal = url.startsWith('http') || url.startsWith('//');
 
-        const response = await (isExternal
-            ? axios.get(url, { responseType: 'blob' })
-            : apiClient.get(url, { responseType: 'blob' })
-        );
+        let blob: Blob;
 
-        // Try to get filename from content-disposition header
-        let filename = defaultFilename;
-        const contentDisposition = response.headers['content-disposition'];
-        if (contentDisposition && contentDisposition.includes('filename=')) {
-            const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
-            if (filenameMatch && filenameMatch[1]) {
-                filename = filenameMatch[1];
+        if (isExternal) {
+            // Use native fetch for external URLs to ensure NO headers are sent
+            const response = await fetch(url, {
+                method: 'GET',
+                mode: 'cors', // Explicitly request CORS access
+            });
+
+            if (!response.ok) {
+                throw new Error(`Download failed: ${response.status} ${response.statusText}`);
             }
+
+            blob = await response.blob();
+        } else {
+            // Use authenticated apiClient for internal URLs
+            const response = await apiClient.get(url, {
+                responseType: 'blob',
+            });
+            blob = new Blob([response.data]);
         }
 
         // Create blob link to download
-        const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+        const blobUrl = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = blobUrl;
-        link.setAttribute('download', filename);
+        link.setAttribute('download', defaultFilename);
 
         // Append to html link element page
         document.body.appendChild(link);
@@ -48,8 +54,6 @@ export const downloadFile = async (url: string, defaultFilename: string = 'downl
         window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
         console.error('Download failed:', error);
-        // We don't throw here to avoid triggering global error handlers 
-        // if the caller wants to handle it specifically
         throw error;
     }
 };
