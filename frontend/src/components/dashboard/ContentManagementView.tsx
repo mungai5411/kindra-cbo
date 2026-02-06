@@ -70,8 +70,10 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
 
     // Dialog States
     const [mediaDialogOpen, setMediaDialogOpen] = useState(false);
+    const [mediaEditDialogOpen, setMediaEditDialogOpen] = useState(false);
     const [teamDialogOpen, setTeamDialogOpen] = useState(false);
     const [contentDialogOpen, setContentDialogOpen] = useState(false);
+    const [selectedMedia, setSelectedMedia] = useState<any>(null);
     const [selectedTeam, setSelectedTeam] = useState<any>(null);
     const [selectedContent, setSelectedContent] = useState<any>(null);
     const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean, id: string, type: 'media' | 'team' | 'content', title: string }>({ open: false, id: '', type: 'media', title: '' });
@@ -80,6 +82,7 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
     const [mediaForm, setMediaForm] = useState({
         title: '',
         alt_text: '',
+        shelter_name: '',
         source_type: 'GENERAL',
         file: null as File | null
     });
@@ -138,11 +141,12 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
             formData.append('file', mediaForm.file);
             formData.append('title', mediaForm.title || mediaForm.file.name);
             formData.append('alt_text', mediaForm.alt_text || '');
+            formData.append('shelter_name', mediaForm.shelter_name || '');
             formData.append('source_type', mediaForm.source_type);
 
             await apiClient.post('/blog/admin/media/', formData);
             setMediaDialogOpen(false);
-            setMediaForm({ title: '', alt_text: '', source_type: 'GENERAL', file: null });
+            setMediaForm({ title: '', alt_text: '', shelter_name: '', source_type: 'GENERAL', file: null });
             fetchData();
         } catch (err: any) {
             console.error('Upload failed:', err);
@@ -157,6 +161,37 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
             setLoading(false);
         }
     };
+
+    // Media Update Handler
+    const handleMediaUpdate = async () => {
+        if (!selectedMedia) return;
+        setLoading(true);
+        setError(null);
+        try {
+            const formData = new FormData();
+            formData.append('title', mediaForm.title || '');
+            formData.append('shelter_name', mediaForm.shelter_name || '');
+            formData.append('source_type', mediaForm.source_type);
+
+            await apiClient.patch(`/blog/admin/media/${selectedMedia.id}/`, formData);
+            setMediaEditDialogOpen(false);
+            setSelectedMedia(null);
+            setMediaForm({ title: '', alt_text: '', shelter_name: '', source_type: 'GENERAL', file: null });
+            fetchData();
+        } catch (err: any) {
+            console.error('Update failed:', err);
+            let errorMsg = 'Update failed';
+            if (err.response?.data) {
+                errorMsg = typeof err.response.data === 'object'
+                    ? JSON.stringify(err.response.data)
+                    : err.response.data;
+            }
+            setError(`Media update failed: ${errorMsg}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     // Team Handlers
     const handleTeamSubmit = async () => {
@@ -307,6 +342,25 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                                         display: 'flex',
                                         gap: 0.5
                                     }}>
+                                        <Tooltip title="Edit Media">
+                                            <IconButton
+                                                size="small"
+                                                sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: 'white', '&:hover': { bgcolor: 'primary.main' } }}
+                                                onClick={() => {
+                                                    setSelectedMedia(asset);
+                                                    setMediaForm({
+                                                        title: asset.title || '',
+                                                        alt_text: asset.alt_text || '',
+                                                        shelter_name: asset.shelter_name || '',
+                                                        source_type: asset.source_type || 'GENERAL',
+                                                        file: null
+                                                    });
+                                                    setMediaEditDialogOpen(true);
+                                                }}
+                                            >
+                                                <Edit fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
                                         <Tooltip title="Delete Permanently">
                                             <IconButton
                                                 size="small"
@@ -320,6 +374,11 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                                 </Box>
                                 <CardContent sx={{ flexGrow: 1, p: 2 }}>
                                     <Typography variant="subtitle2" noWrap fontWeight="bold">{asset.title || 'Untitled Asset'}</Typography>
+                                    {asset.shelter_name && (
+                                        <Typography variant="caption" color="primary.main" sx={{ display: 'block', mt: 0.5, fontWeight: 600 }}>
+                                            📍 {asset.shelter_name}
+                                        </Typography>
+                                    )}
                                     <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <Chip
                                             label={SOURCE_LABELS[asset.source_type] || asset.source_type}
@@ -575,6 +634,15 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                             size="small"
                         />
                         <TextField
+                            label="Shelter/Community Center Name"
+                            fullWidth
+                            value={mediaForm.shelter_name}
+                            onChange={(e) => setMediaForm({ ...mediaForm, shelter_name: e.target.value })}
+                            placeholder="e.g. Grace Community Center"
+                            size="small"
+                            helperText="This name will be displayed on the photo"
+                        />
+                        <TextField
                             select
                             label="Classification"
                             fullWidth
@@ -603,6 +671,55 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                         startIcon={loading ? <CircularProgress size={20} /> : <CloudUpload />}
                     >
                         Upload to Cloud
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Media Edit Dialog */}
+            <Dialog open={mediaEditDialogOpen} onClose={() => setMediaEditDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Edit Media Asset</DialogTitle>
+                <DialogContent>
+                    <Stack spacing={3} sx={{ pt: 1 }}>
+                        <TextField
+                            label="Asset Title"
+                            fullWidth
+                            value={mediaForm.title}
+                            onChange={(e) => setMediaForm({ ...mediaForm, title: e.target.value })}
+                            placeholder="e.g. Campaign Hero Banner"
+                            size="small"
+                        />
+                        <TextField
+                            label="Shelter/Community Center Name"
+                            fullWidth
+                            value={mediaForm.shelter_name}
+                            onChange={(e) => setMediaForm({ ...mediaForm, shelter_name: e.target.value })}
+                            placeholder="e.g. Grace Community Center"
+                            size="small"
+                            helperText="This name will be displayed on the photo"
+                        />
+                        <TextField
+                            select
+                            label="Classification"
+                            fullWidth
+                            value={mediaForm.source_type}
+                            onChange={(e) => setMediaForm({ ...mediaForm, source_type: e.target.value })}
+                            size="small"
+                        >
+                            {Object.entries(SOURCE_LABELS).map(([key, label]) => (
+                                <MenuItem key={key} value={key}>{label}</MenuItem>
+                            ))}
+                        </TextField>
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button onClick={() => setMediaEditDialogOpen(false)}>Cancel</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleMediaUpdate}
+                        disabled={loading}
+                        startIcon={loading ? <CircularProgress size={20} /> : <Save />}
+                    >
+                        Update Media
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store';
 import logo from '../assets/logo.jpg';
 import { fetchPublicStats } from '../features/reporting/reportingSlice';
+import apiClient from '../api/client';
 import {
     Container,
     Typography,
@@ -103,12 +104,29 @@ export default function HomePage() {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
     const { dashboardData } = useSelector((state: RootState) => state.reporting);
+    const [mediaAssets, setMediaAssets] = useState<any[]>([]);
 
     useEffect(() => {
         dispatch(fetchPublicStats());
+        // Fetch shelter media for landing page from public gallery
+        const fetchMedia = async () => {
+            try {
+                const response = await apiClient.get('/blog/admin/media/gallery/', {
+                    params: { source_type: 'SHELTER' }
+                });
+                setMediaAssets(response.data.results || response.data || []);
+            } catch (error) {
+                console.error('Failed to fetch media assets:', error);
+            }
+        };
+        fetchMedia();
     }, [dispatch]);
 
     const statsData = dashboardData?.public || {};
+
+    // Get specific media for sections
+    const heroMedia = mediaAssets[0]; // First shelter media for hero
+    const partnerMedia = mediaAssets[1]; // Second shelter media for partner section
 
     const STATS = [
         { value: statsData.children_supported ?? 0, label: 'Children Supported', icon: <School />, color: '#6366f1' },
@@ -289,23 +307,43 @@ export default function HomePage() {
                                     border: '1px solid',
                                     borderColor: alpha(theme.palette.divider, 0.5)
                                 }}>
-                                    <Box
-                                        component="img"
-                                        src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop"
-                                        sx={{ width: '100%', height: 350, objectFit: 'cover' }}
-                                    />
-                                    <Box sx={{
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        left: 0,
-                                        right: 0,
-                                        p: 4,
-                                        background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%)',
-                                        color: 'common.white'
-                                    }}>
-                                        <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'white', mb: 0.2 }}>Grace Community Center</Typography>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.9)', display: 'block' }}>Supporting mobile education in Nairobi slums</Typography>
-                                    </Box>
+                                    {heroMedia?.file ? (
+                                        <>
+                                            <Box
+                                                component="img"
+                                                src={heroMedia.file}
+                                                sx={{ width: '100%', height: 350, objectFit: 'cover' }}
+                                            />
+                                            <Box sx={{
+                                                position: 'absolute',
+                                                bottom: 0,
+                                                left: 0,
+                                                right: 0,
+                                                p: 4,
+                                                background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%)',
+                                                color: 'common.white'
+                                            }}>
+                                                <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'white', mb: 0.2 }}>
+                                                    {heroMedia.shelter_name || 'Community Center'}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.9)', display: 'block' }}>
+                                                    {heroMedia.title || 'Supporting communities across Kenya'}
+                                                </Typography>
+                                            </Box>
+                                        </>
+                                    ) : (
+                                        <Box sx={{
+                                            width: '100%',
+                                            height: 350,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                            color: 'text.secondary'
+                                        }}>
+                                            <Typography variant="body2">Upload shelter images to feature here</Typography>
+                                        </Box>
+                                    )}
                                 </Card>
 
                                 {/* Floating Stat Card */}
@@ -473,19 +511,36 @@ export default function HomePage() {
                                     borderRadius: 3,
                                     zIndex: 0
                                 }} />
-                                <Box
-                                    component="img"
-                                    src="https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=2070&auto=format&fit=crop"
-                                    sx={{
+                                {partnerMedia?.file ? (
+                                    <Box
+                                        component="img"
+                                        src={partnerMedia.file}
+                                        sx={{
+                                            width: '100%',
+                                            height: 350,
+                                            objectFit: 'cover',
+                                            borderRadius: 8,
+                                            position: 'relative',
+                                            zIndex: 1,
+                                            boxShadow: theme.shadows[20]
+                                        }}
+                                    />
+                                ) : (
+                                    <Box sx={{
                                         width: '100%',
                                         height: 350,
-                                        objectFit: 'cover',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
                                         borderRadius: 8,
                                         position: 'relative',
                                         zIndex: 1,
-                                        boxShadow: theme.shadows[20]
-                                    }}
-                                />
+                                        color: 'text.secondary'
+                                    }}>
+                                        <Typography variant="body2">Upload second shelter image</Typography>
+                                    </Box>
+                                )}
                             </Box>
                         </Grid>
                         <Grid item xs={12} md={6}>

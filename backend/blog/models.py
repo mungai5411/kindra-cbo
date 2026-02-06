@@ -313,6 +313,7 @@ class MediaAsset(models.Model):
     title = models.CharField(max_length=255, blank=True)
     file = models.FileField(upload_to='media_library/%Y/%m/')
     alt_text = models.CharField(max_length=255, blank=True)
+    shelter_name = models.CharField(max_length=200, blank=True, help_text=_('Community center or shelter name displayed on the photo'))
     
     source_type = models.CharField(max_length=20, choices=SourceType.choices, default=SourceType.GENERAL)
     source_id = models.UUIDField(null=True, blank=True, help_text=_('ID of the related object (e.g. Campaign ID)'))
