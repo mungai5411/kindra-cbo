@@ -437,7 +437,7 @@ class MediaAssetViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(uploaded_by=self.request.user)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
     def gallery(self, request):
         """Public gallery view (SAFE_METHODS)"""
         queryset = self.filter_queryset(self.get_queryset())
