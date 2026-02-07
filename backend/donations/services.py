@@ -144,11 +144,15 @@ class PaymentService:
             'status': Donation.Status.PENDING
         })
         
+        # Simulation: Auto-finalize for immediate receipt generation
+        # In production, this would happen in a callback
+        logger.info(f"Auto-finalizing M-Pesa payment for simulation: {donation.transaction_id}")
+        receipt = DonationService.finalize_donation(donation)
+        
         # Notify admins
         NotificationService.notify_pending_donation(donation, f"M-Pesa from {data.get('phone_number')}")
         
-        logger.info(f"Processed M-Pesa payment: {donation.transaction_id}")
-        return donation
+        return donation, receipt
     
     @staticmethod
     def process_paypal_payment(data):
@@ -167,20 +171,17 @@ class PaymentService:
         donation = DonationService.create_donation({
             'amount': data.get('amount'),
             'payment_method': Donation.PaymentMethod.PAYPAL,
-            'transaction_id': data.get('order_id'),
+            'transaction_id': data.get('order_id', f"PAYPAL-{uuid.uuid4().hex[:10].upper()}"),
             'donor_name': data.get('donor_name', 'PayPal Donor'),
             'donor_email': data.get('donor_email', ''),
             'is_anonymous': data.get('is_anonymous', False),
             'message': data.get('message', ''),
             'campaign': data.get('campaign'),
-            'status': Donation.Status.COMPLETED
+            'status': Donation.Status.COMPLETED # PayPal is usually instant
         })
         
-        # Auto-finalize PayPal donations
-        DonationService.finalize_donation(donation)
-        
-        logger.info(f"Processed PayPal payment: {donation.transaction_id}")
-        return donation
+        receipt = DonationService.finalize_donation(donation)
+        return donation, receipt
     
     @staticmethod
     def process_stripe_payment(data):
@@ -193,13 +194,13 @@ class PaymentService:
         Returns:
             Donation instance
         """
-        if not data.get('amount') or not data.get('token'):
-            raise ValueError('Amount and token are required')
+        if not data.get('amount'):
+            raise ValueError('Amount is required')
         
         donation = DonationService.create_donation({
             'amount': data.get('amount'),
             'payment_method': Donation.PaymentMethod.STRIPE,
-            'transaction_id': f"STRIPE-{uuid.uuid4().hex[:10].upper()}",
+            'transaction_id': data.get('token', f"STRIPE-{uuid.uuid4().hex[:10].upper()}"),
             'donor_name': data.get('donor_name', 'Stripe Donor'),
             'donor_email': data.get('donor_email', ''),
             'is_anonymous': data.get('is_anonymous', False),
@@ -208,11 +209,8 @@ class PaymentService:
             'status': Donation.Status.COMPLETED
         })
         
-        # Auto-finalize Stripe donations
-        DonationService.finalize_donation(donation)
-        
-        logger.info(f"Processed Stripe payment: {donation.transaction_id}")
-        return donation
+        receipt = DonationService.finalize_donation(donation)
+        return donation, receipt
 
 
 class ReceiptService:

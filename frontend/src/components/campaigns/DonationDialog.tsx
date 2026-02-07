@@ -62,6 +62,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
     const [transactionId, setTransactionId] = useState('');
+    const [receiptId, setReceiptId] = useState<string | null>(null);
 
     const handleAmountSelect = (value: number) => {
         setAmount(value.toString());
@@ -111,6 +112,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
             const response = await apiClient.post(endpoint, payload);
 
             setTransactionId(response.data.transaction_id);
+            setReceiptId(response.data.receipt_id);
             setSuccess(true);
         } catch (err: any) {
             setError(err.response?.data?.error || 'Payment failed. Please try again.');
@@ -127,6 +129,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
             setSuccess(false);
             setError('');
             setTransactionId('');
+            setReceiptId(null);
             onClose();
         }
     };
@@ -341,14 +344,30 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
 
             <DialogActions sx={{ p: 3, borderTop: '1px solid', borderColor: 'divider' }}>
                 {success ? (
-                    <Button
-                        variant="contained"
-                        onClick={handleClose}
-                        fullWidth
-                        sx={{ borderRadius: 2, py: 1.5, fontWeight: 'bold' }}
-                    >
-                        Close
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
+                        {receiptId && (
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                fullWidth
+                                onClick={() => {
+                                    const downloadUrl = `${apiClient.defaults.baseURL}donations/receipts/${receiptId}/download/`;
+                                    window.open(downloadUrl, '_blank');
+                                }}
+                                sx={{ borderRadius: 2, py: 1.5, fontWeight: 'bold' }}
+                            >
+                                Download Receipt
+                            </Button>
+                        )}
+                        <Button
+                            variant="contained"
+                            onClick={handleClose}
+                            fullWidth
+                            sx={{ borderRadius: 2, py: 1.5, fontWeight: 'bold' }}
+                        >
+                            Close
+                        </Button>
+                    </Box>
                 ) : (
                     <>
                         <Button onClick={handleClose} disabled={loading} sx={{ fontWeight: 600 }}>

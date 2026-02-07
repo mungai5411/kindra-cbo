@@ -167,11 +167,12 @@ class ReceiptDetailView(generics.RetrieveAPIView):
 def process_mpesa_payment(request):
     """Process M-Pesa payment (simulated)"""
     try:
-        donation = PaymentService.process_mpesa_payment(request.data)
+        donation, receipt = PaymentService.process_mpesa_payment(request.data)
         return Response({
             'status': 'success',
             'message': 'Donation received and pending admin approval',
-            'transaction_id': donation.transaction_id
+            'transaction_id': donation.transaction_id,
+            'receipt_id': receipt.id if receipt else None
         }, status=status.HTTP_200_OK)
     except ValueError as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -189,11 +190,12 @@ def process_mpesa_payment(request):
 def process_paypal_payment(request):
     """Process PayPal payment (simulated)"""
     try:
-        donation = PaymentService.process_paypal_payment(request.data)
+        donation, receipt = PaymentService.process_paypal_payment(request.data)
         return Response({
             'status': 'success',
             'message': 'Donation processed successfully',
-            'transaction_id': donation.transaction_id
+            'transaction_id': donation.transaction_id,
+            'receipt_id': receipt.id if receipt else None
         }, status=status.HTTP_200_OK)
     except ValueError as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -211,11 +213,12 @@ def process_paypal_payment(request):
 def process_stripe_payment(request):
     """Process Stripe payment (simulated)"""
     try:
-        donation = PaymentService.process_stripe_payment(request.data)
+        donation, receipt = PaymentService.process_stripe_payment(request.data)
         return Response({
             'status': 'success',
             'message': 'Donation processed successfully',
-            'transaction_id': donation.transaction_id
+            'transaction_id': donation.transaction_id,
+            'receipt_id': receipt.id if receipt else None
         }, status=status.HTTP_200_OK)
     except ValueError as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -386,54 +389,52 @@ def reject_material_donation(request, pk):
 
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.AllowAny])
 def download_receipt(request, pk):
     """Download PDF receipt for a donation"""
     try:
         receipt = Receipt.objects.get(pk=pk)
         
-        # Check permissions - donor can only download their own receipt
-        if request.user.role == 'DONOR':
-            if not receipt.donation.donor or receipt.donation.donor.user != request.user:
-                logger.warning(f"User {request.user.id} attempted to access receipt {pk} without permission")
-                return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        # Check permissions for authenticated users
+        if request.user.is_authenticated:
+            if request.user.role == 'DONOR':
+                if not receipt.donation.donor or receipt.donation.donor.user != request.user:
+                    logger.warning(f"User {request.user.id} attempted to access receipt {pk} without permission")
+                    return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        
+        # For guests/anonymous, allowing access if they have the UUID is acceptable as it's unguessable.
+        # However, for production we might want to verify a transient token.
         
         logger.info(f"Processing receipt download for receipt {receipt.receipt_number} (ID: {pk})")
         
         # Determine which copy to serve
-        # For admins, allow choosing via query param ?type=client|office|both (default office)
-        # For donors, force client copy
-        target_copy = request.query_params.get('type', 'office')
+        target_copy = request.query_params.get('type', 'client')
         
-        if request.user.role == 'DONOR':
+        if not request.user.is_authenticated or request.user.role == 'DONOR':
             target_copy = 'client'
         elif target_copy not in ['office', 'client', 'both']:
             target_copy = 'office'
             
-        logger.info(f"Generating {target_copy} copy for {request.user.email} (Role: {request.user.role})")
+        logger.info(f"Generating {target_copy} copy for guest or user {request.user}")
         
         file_content = ReceiptService.generate_pdf_receipt(receipt, target_copy=target_copy)
         
         if file_content:
-            # Mark as sent if not already (or at least track the status)
             if not receipt.donation.receipt_sent:
                 receipt.donation.receipt_sent = True
                 receipt.donation.receipt_sent_at = timezone.now()
                 receipt.donation.save(update_fields=['receipt_sent', 'receipt_sent_at'])
-                logger.info(f"Marked donation {receipt.donation.id} as receipt sent")
 
             response = HttpResponse(file_content, content_type='application/pdf')
             filename = f"receipt_{receipt.receipt_number}_{target_copy}.pdf"
             response['Content-Disposition'] = f'attachment; filename="{filename}"'
             return response
 
-        logger.error(f"Failed to generate or retrieve receipt {receipt.receipt_number}")
         return Response(
             {'error': 'Failed to generate receipt. Please contact support.'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     except Receipt.DoesNotExist:
-        logger.warning(f"Receipt not found: {pk}")
         return Response({'error': 'Receipt not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         logger.error(f"Unexpected error in download_receipt for {pk}: {str(e)}", exc_info=True)
