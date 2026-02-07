@@ -4,7 +4,7 @@ Blog & Public Campaigns Admin Configuration
 
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Category, Tag, BlogPost, Comment, Newsletter
+from .models import Category, Tag, BlogPost, Comment, Newsletter, TeamMember, MediaAsset, SiteContent
 
 
 @admin.register(Category)
@@ -168,4 +168,37 @@ class NewsletterAdmin(admin.ModelAdmin):
         emails = queryset.filter(status='ACTIVE').values_list('email', flat=True)
         email_list = ', '.join(emails)
         self.message_user(request, f'Emails: {email_list}')
-    export_emails.short_description = 'Export email addresses'
+@admin.register(TeamMember)
+class TeamMemberAdmin(admin.ModelAdmin):
+    list_display = ('name', 'role', 'order', 'is_active', 'created_at')
+    list_filter = ('is_active', 'role')
+    search_fields = ('name', 'role', 'bio')
+    ordering = ('order', 'name')
+    
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="width: 50px; height: auto;" />', obj.image.url)
+        return "No image"
+    image_preview.short_description = 'Preview'
+
+
+@admin.register(MediaAsset)
+class MediaAssetAdmin(admin.ModelAdmin):
+    list_display = ('title', 'source_type', 'shelter_name', 'image_preview', 'created_at')
+    list_filter = ('source_type', 'created_at')
+    search_fields = ('title', 'alt_text', 'shelter_name')
+    ordering = ('-created_at',)
+    
+    def image_preview(self, obj):
+        if obj.file:
+            return format_html('<img src="{}" style="width: 50px; height: auto;" />', obj.file.url)
+        return "No file"
+    image_preview.short_description = 'Preview'
+
+
+@admin.register(SiteContent)
+class SiteContentAdmin(admin.ModelAdmin):
+    list_display = ('key', 'section', 'title', 'is_active', 'updated_at')
+    list_filter = ('section', 'is_active')
+    search_fields = ('key', 'title', 'content')
+    ordering = ('section', 'key')
