@@ -55,7 +55,6 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
     const [donorName, setDonorName] = useState(user ? `${user.firstName} ${user.lastName}` : '');
     const [donorEmail, setDonorEmail] = useState(user?.email || '');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [isAnonymous, setIsAnonymous] = useState(false);
     const [message, setMessage] = useState('');
 
     const [loading, setLoading] = useState(false);
@@ -92,9 +91,9 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
             const payload: any = {
                 amount: parseFloat(amount),
                 campaign: campaign.id,
-                donor_name: isAnonymous ? 'Anonymous' : donorName,
+                donor_name: donorName,
                 donor_email: donorEmail,
-                is_anonymous: isAnonymous,
+                is_anonymous: false,
                 message: message
             };
 
@@ -279,16 +278,19 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                         <TextField
                                             fullWidth
+                                            required
                                             label="Full Name"
+                                            placeholder="Enter your legal name"
                                             value={donorName}
                                             onChange={(e) => setDonorName(e.target.value)}
-                                            disabled={isAnonymous}
                                             InputProps={{ sx: { borderRadius: 2 } }}
                                         />
                                         <TextField
                                             fullWidth
-                                            label="Email"
+                                            required
+                                            label="Email Address"
                                             type="email"
+                                            placeholder="your@email.com"
                                             value={donorEmail}
                                             onChange={(e) => setDonorEmail(e.target.value)}
                                             InputProps={{ sx: { borderRadius: 2 } }}
@@ -296,6 +298,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                                         {paymentMethod === 'MPESA' && (
                                             <TextField
                                                 fullWidth
+                                                required
                                                 label="M-Pesa Phone Number"
                                                 placeholder="254712345678"
                                                 value={phoneNumber}
@@ -303,15 +306,6 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                                                 InputProps={{ sx: { borderRadius: 2 } }}
                                             />
                                         )}
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox
-                                                    checked={isAnonymous}
-                                                    onChange={(e) => setIsAnonymous(e.target.checked)}
-                                                />
-                                            }
-                                            label="Make this donation anonymous"
-                                        />
                                     </Box>
                                 </Box>
 
