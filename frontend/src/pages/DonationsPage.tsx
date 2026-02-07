@@ -7,13 +7,13 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Container, Grid, Card, CardContent, Typography, Box, Button,
-    LinearProgress, useTheme, alpha, CircularProgress, Stack
+    LinearProgress, useTheme, alpha, Stack
 } from '@mui/material';
 import {
     Favorite, Security, Public, VolunteerActivism,
     MonetizationOn, TipsAndUpdates, AutoAwesome
 } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { AppDispatch, RootState } from '../store';
 import { fetchCampaigns } from '../features/donations/donationsSlice';
 import DonationDialog from '../components/campaigns/DonationDialog';
@@ -64,7 +64,7 @@ export default function DonationsPage() {
     };
 
     // Stagger container for list animations
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         show: {
             opacity: 1,
@@ -74,9 +74,9 @@ export default function DonationsPage() {
         }
     };
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
+        show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 100 } }
     };
 
     return (
@@ -293,7 +293,7 @@ export default function DonationsPage() {
                     <motion.div variants={containerVariants} initial="hidden" animate="show">
                         <Grid container spacing={4}>
                             <AnimatePresence>
-                                {activeCampaigns.map((campaign: any, i: number) => {
+                                {activeCampaigns.map((campaign: any) => {
                                     const progress = (campaign.raised_amount / campaign.target_amount) * 100;
                                     return (
                                         <Grid item xs={12} md={6} lg={4} key={campaign.id}>
@@ -400,7 +400,7 @@ export default function DonationsPage() {
 
                                                     <Box sx={{ p: 4, pt: 0, display: 'flex', gap: 2 }}>
                                                         <Button
-                                                            variant="soft"
+                                                            variant="text"
                                                             fullWidth
                                                             size="large"
                                                             onClick={() => handleOpenMaterialDialog(campaign)}
