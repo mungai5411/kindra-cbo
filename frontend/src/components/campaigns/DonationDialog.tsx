@@ -21,8 +21,6 @@ import {
     Alert,
     CircularProgress,
     InputAdornment,
-    Checkbox,
-    FormControlLabel,
     alpha,
     useTheme,
     Divider
@@ -345,7 +343,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                                 color="primary"
                                 fullWidth
                                 onClick={() => {
-                                    const downloadUrl = `${apiClient.defaults.baseURL}donations/receipts/${receiptId}/download/`;
+                                    const downloadUrl = `${apiClient.defaults.baseURL}/donations/receipts/${receiptId}/download/`;
                                     window.open(downloadUrl, '_blank');
                                 }}
                                 sx={{ borderRadius: 2, py: 1.5, fontWeight: 'bold' }}

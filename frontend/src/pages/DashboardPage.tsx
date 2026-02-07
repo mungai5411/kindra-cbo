@@ -48,7 +48,6 @@ import { BlogManagementView } from '../components/dashboard/BlogManagementView';
 import { ContentManagementView } from '../components/dashboard/ContentManagementView';
 import { LogoutDialog } from '../components/common/LogoutDialog';
 import { MobileBottomNav } from '../components/dashboard/MobileBottomNav';
-import { CommunityHub } from '../components/dashboard/CommunityHub';
 import { VolunteerGroupsView } from '../components/dashboard/VolunteerGroupsView';
 import { useDeviceType } from '../hooks/useDeviceType';
 
@@ -613,9 +612,6 @@ export default function DashboardPage() {
                 onClose={() => setOpenLogoutDialog(false)}
                 onConfirm={handleConfirmLogout}
             />
-
-            {/* Unified Community Hub */}
-            <CommunityHub />
         </Box>
     );
 }

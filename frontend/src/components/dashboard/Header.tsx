@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Box, Avatar, Badge, Tooltip, useTheme, alpha, Menu, MenuItem, ListItemIcon, Divider, TextField } from '@mui/material';
 import { Menu as MenuIcon, Notifications, Search, Logout, Settings } from '@mui/icons-material';
 import { SettingsDrawer } from './SettingsDrawer';
+import { NotificationsDrawer } from './NotificationsDrawer';
 
 interface HeaderProps {
     handleDrawerToggle: () => void;
@@ -13,6 +14,7 @@ export const Header = ({ handleDrawerToggle, user, handleLogout }: HeaderProps) 
     const theme = useTheme();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [notificationsOpen, setNotificationsOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const open = Boolean(anchorEl);
 
@@ -42,7 +44,7 @@ export const Header = ({ handleDrawerToggle, user, handleLogout }: HeaderProps) 
     }, []);
 
     const handleNotificationsClick = () => {
-        window.dispatchEvent(new CustomEvent('open-community-hub', { detail: { tab: 0 } }));
+        setNotificationsOpen(true);
     };
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -233,6 +235,12 @@ export const Header = ({ handleDrawerToggle, user, handleLogout }: HeaderProps) 
             <SettingsDrawer
                 open={settingsOpen}
                 onClose={() => setSettingsOpen(false)}
+                user={user}
+            />
+
+            <NotificationsDrawer
+                open={notificationsOpen}
+                onClose={() => setNotificationsOpen(false)}
                 user={user}
             />
         </>
