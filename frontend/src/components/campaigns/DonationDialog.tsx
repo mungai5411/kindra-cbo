@@ -52,7 +52,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
 
     const [paymentMethod, setPaymentMethod] = useState<'MPESA' | 'PAYPAL' | 'STRIPE'>('MPESA');
     const [amount, setAmount] = useState('');
-    const [donorName, setDonorName] = useState(user ? `${user.firstName} ${user.lastName}` : '');
+    const [donorName, setDonorName] = useState(user ? `${user.first_name} ${user.last_name}` : '');
     const [donorEmail, setDonorEmail] = useState(user?.email || '');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [message, setMessage] = useState('');
