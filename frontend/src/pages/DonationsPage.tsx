@@ -179,7 +179,16 @@ export default function DonationsPage() {
                                 variant="contained"
                                 size="large"
                                 startIcon={<Favorite />}
-                                onClick={() => activeCampaigns.length > 0 && handleOpenDonationDialog(activeCampaigns[0])}
+                                onClick={() => {
+                                    if (activeCampaigns.length > 0) {
+                                        handleOpenDonationDialog(activeCampaigns[0]);
+                                    } else {
+                                        const element = document.getElementById('active-campaigns');
+                                        if (element) {
+                                            element.scrollIntoView({ behavior: 'smooth' });
+                                        }
+                                    }
+                                }}
                                 sx={{
                                     borderRadius: 4,
                                     px: 5,
@@ -223,7 +232,7 @@ export default function DonationsPage() {
             {/* Main Content Area */}
             <Container maxWidth="lg" sx={{ pb: 12, position: 'relative', zIndex: 1 }}>
                 {/* Section Header */}
-                <Box sx={{ mb: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box id="active-campaigns" sx={{ mb: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box>
                         <Typography variant="h3" fontWeight="800">Active Campaigns</Typography>
                         <Typography variant="body1" color="text.secondary">Directly supporting those in need</Typography>
