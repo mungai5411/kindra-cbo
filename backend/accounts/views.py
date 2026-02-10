@@ -130,30 +130,26 @@ class UserRegistrationView(generics.CreateAPIView):
             token_type=VerificationToken.TokenType.VERIFICATION
         )
 
-        # Send Verification Email
+        # Send Verification Email (Async via Celery)
         verify_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/verify?token={verification_token.token}"
         
         if settings.DEBUG:
             print(f"Verification URL for {user.email}: {verify_url}")
 
-        try:
-            send_mail(
-                'Verify your email for Kindra',
-                f'Please verify your email by clicking: {verify_url}',
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                html_message=f'''
-                <p>Welcome to Kindra!</p>
-                <p>Please verify your email by clicking below:</p>
-                <a href="{verify_url}"
-                   style="display:inline-block;padding:10px 20px;background:#007BFF;color:#fff;text-decoration:none;border-radius:5px;">
-                   Verify Email
-                </a>
-                ''',
-                fail_silently=True
-            )
-        except Exception as e:
-            print(f"Failed to send email: {e}")
+        from kindra_cbo.tasks import send_email_notification
+        send_email_notification.delay(
+            recipient=user.email,
+            subject='Verify your email for Kindra',
+            message=f'Please verify your email by clicking: {verify_url}',
+            html_message=f'''
+            <p>Welcome to Kindra!</p>
+            <p>Please verify your email by clicking below:</p>
+            <a href="{verify_url}"
+               style="display:inline-block;padding:10px 20px;background:#007BFF;color:#fff;text-decoration:none;border-radius:5px;">
+               Verify Email
+            </a>
+            '''
+        )
         
         # Create response
         response = Response({
@@ -608,28 +604,24 @@ class PasswordResetRequestView(APIView):
                 token_type=VerificationToken.TokenType.PASSWORD_RESET
             )
             
-            # Send Email
+            # Send Reset Email (Async via Celery)
             reset_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/reset-password?token={token.token}"
             
-            try:
-                send_mail(
-                    'Reset Your Password',
-                    f'Click below to reset your password: {reset_url}',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    html_message=f'''
-                    <p>Hello,</p>
-                    <p>You requested to reset your password. Click below to set a new one:</p>
-                    <a href="{reset_url}"
-                       style="display:inline-block;padding:10px 20px;background:#28a745;color:#fff;text-decoration:none;border-radius:5px;">
-                       Reset Password
-                    </a>
-                    <p>If you didn’t request this, ignore this email.</p>
-                    ''',
-                    fail_silently=True
-                )
-            except Exception as e:
-                print(f"Failed to send email: {e}")
+            from kindra_cbo.tasks import send_email_notification
+            send_email_notification.delay(
+                recipient=email,
+                subject='Reset Your Password',
+                message=f'Click below to reset your password: {reset_url}',
+                html_message=f'''
+                <p>Hello,</p>
+                <p>You requested to reset your password. Click below to set a new one:</p>
+                <a href="{reset_url}"
+                   style="display:inline-block;padding:10px 20px;background:#28a745;color:#fff;text-decoration:none;border-radius:5px;">
+                   Reset Password
+                </a>
+                <p>If you didn’t request this, ignore this email.</p>
+                '''
+            )
 
             if settings.DEBUG:
                 print(f"Password reset link for {email}: {reset_url}")
