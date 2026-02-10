@@ -13,6 +13,7 @@ from decouple import config, Csv
 from datetime import timedelta
 import socket
 import dj_database_url
+import ssl
 
 def get_local_ip():
     """Detects the local IP address of the machine."""
@@ -367,9 +368,17 @@ CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=config('REDIS_URL', defa
 CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default=config('REDIS_URL', default='redis://localhost:6379/0'))
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# Handle secure Redis (Upstash/Render/Heroku)
+if CELERY_BROKER_URL.startswith('rediss://'):
+    CELERY_BROKER_USE_SSL = {
+        'ssl_cert_reqs': ssl.CERT_NONE
+    }
+    CELERY_REDIS_BACKEND_USE_SSL = {
+        'ssl_cert_reqs': ssl.CERT_NONE
+    }
 
 # Celery task settings for free tier (reduced frequency)
 CELERY_TASK_ALWAYS_EAGER = DEBUG  # Run tasks synchronously in development
