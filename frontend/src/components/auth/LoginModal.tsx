@@ -16,106 +16,15 @@ import {
     Dialog,
     DialogContent,
     useTheme,
-    alpha,
-    useMediaQuery,
-    Grid,
-    Paper
+    useMediaQuery
 } from '@mui/material';
-import { Visibility, VisibilityOff, Close, Groups, Favorite, Business } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Close } from '@mui/icons-material';
 import { Checkbox, FormControlLabel } from '@mui/material';
 import DOMPurify from 'isomorphic-dompurify';
 import { useAuthModal } from '../../contexts/AuthModalContext';
-import { GoogleLogin } from '@react-oauth/google';
-import apiClient, { endpoints } from '../../api/client';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
-const ROLES = [
-    { value: 'DONOR', label: 'Donor', icon: <Favorite />, description: 'I want to donate and support causes' },
-    { value: 'VOLUNTEER', label: 'Volunteer', icon: <Groups />, description: 'I want to offer my time and skills' },
-    { value: 'SHELTER_PARTNER', label: 'Shelter Home', icon: <Business />, description: 'I represent a partner organization' },
-];
 
-// Google Sign-In Component
-const GoogleSignInButton = ({ onSuccess, selectedRole }: { onSuccess: (data: any) => void, selectedRole: string }) => {
-    const [error, setError] = useState('');
-    const [isProcessing, setIsProcessing] = useState(false);
-
-    const handleGoogleSuccess = async (credentialResponse: any) => {
-        setIsProcessing(true);
-        setError('');
-
-        try {
-            const response = await apiClient.post(endpoints.auth.googleLogin, {
-                credential: credentialResponse.credential,
-                role: selectedRole
-            });
-
-            if (response.data.is_new_user) {
-                const { access, refresh, user } = response.data;
-                localStorage.setItem('accessToken', access);
-                localStorage.setItem('refreshToken', refresh);
-                localStorage.setItem('user', JSON.stringify(user));
-                onSuccess(response.data);
-                return;
-            }
-
-            const { access, refresh, user } = response.data;
-            localStorage.setItem('accessToken', access);
-            localStorage.setItem('refreshToken', refresh);
-            localStorage.setItem('user', JSON.stringify(user));
-
-            onSuccess(response.data);
-        } catch (err: any) {
-            setError(err.response?.data?.error || 'Google sign-in failed');
-        } finally {
-            setIsProcessing(false);
-        }
-    };
-
-    return (
-        <Box sx={{ mb: 2 }}>
-            {error && (
-                <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
-                    {error}
-                </Alert>
-            )}
-            <Box sx={{
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 1.5,
-                p: 2.5,
-                borderRadius: '16px',
-                bgcolor: '#fcfcfc',
-                border: '1px solid #f0f0f0',
-                opacity: isProcessing ? 0.7 : 1,
-                pointerEvents: isProcessing ? 'none' : 'auto',
-                transition: 'all 0.3s ease'
-            }}>
-                <Typography variant="caption" sx={{ color: '#888', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
-                    Secure Sign In
-                </Typography>
-                <Box sx={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    minHeight: '40px',
-                    '& > div': { width: '100% !important', display: 'flex', justifyContent: 'center' },
-                }}>
-                    <GoogleLogin
-                        onSuccess={handleGoogleSuccess}
-                        onError={() => setError('Google sign-in failed. Please try again.')}
-                        theme="outline"
-                        size="large"
-                        shape="rectangular"
-                        text="continue_with"
-                        width="320"
-                    />
-                </Box>
-            </Box>
-        </Box>
-    );
-};
 
 // Input sanitization function
 const sanitizeInput = (input: string): string => {
@@ -139,7 +48,7 @@ export const LoginModal = () => {
     const [rateLimitError, setRateLimitError] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
 
-    const [selectedRole, setSelectedRole] = useState<string>('DONOR');
+
     const [isGoogleFlow, setIsGoogleFlow] = useState(false);
 
     // Clear errors when user starts typing
@@ -248,82 +157,17 @@ export const LoginModal = () => {
                 <DialogContent sx={{ p: isMobile ? 3 : 5, pt: isMobile ? 5 : 6 }}>
                     <Box sx={{ mb: 4 }}>
                         <Typography variant="h4" fontWeight="700" sx={{ color: '#000', mb: 1, letterSpacing: '-0.02em' }}>
-                            {isGoogleFlow ? "Select your role" : "Welcome back"}
+                            {isGoogleFlow ? "Sign in with Google" : "Welcome back"}
                         </Typography>
                         <Typography variant="body1" sx={{ color: '#666', fontWeight: 400 }}>
-                            {isGoogleFlow ? "Please select how you want to join Kindra" : "Please enter your details"}
+                            {isGoogleFlow ? "Access your account securely" : "Please enter your details"}
                         </Typography>
                     </Box>
 
                     {isGoogleFlow ? (
                         <>
-                            <Grid container spacing={2} sx={{ mb: 3 }}>
-                                {ROLES.map((role) => {
-                                    const isSelected = selectedRole === role.value;
-                                    return (
-                                        <Grid item xs={12} key={role.value}>
-                                            <Paper
-                                                elevation={isSelected ? 4 : 0}
-                                                onClick={() => setSelectedRole(role.value)}
-                                                sx={{
-                                                    p: 2,
-                                                    cursor: 'pointer',
-                                                    borderRadius: '16px',
-                                                    border: '2px solid',
-                                                    borderColor: isSelected ? 'primary.main' : '#f0f0f0',
-                                                    bgcolor: isSelected ? alpha(theme.palette.primary.main, 0.02) : '#fff',
-                                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: 2.5,
-                                                    position: 'relative',
-                                                    overflow: 'hidden',
-                                                    '&:hover': {
-                                                        borderColor: isSelected ? 'primary.main' : '#ddd',
-                                                        transform: 'translateY(-2px)',
-                                                        boxShadow: '0 8px 24px rgba(0,0,0,0.05)'
-                                                    },
-                                                    '&::after': isSelected ? {
-                                                        content: '""',
-                                                        position: 'absolute',
-                                                        top: 0,
-                                                        right: 0,
-                                                        width: '40px',
-                                                        height: '40px',
-                                                        background: `linear-gradient(135deg, transparent 50%, ${theme.palette.primary.main} 50%)`,
-                                                        opacity: 0.1
-                                                    } : {}
-                                                }}
-                                            >
-                                                <Box sx={{
-                                                    width: 48,
-                                                    height: 48,
-                                                    borderRadius: '12px',
-                                                    bgcolor: isSelected ? 'primary.main' : '#f8f9fa',
-                                                    color: isSelected ? '#fff' : 'text.secondary',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    transition: 'all 0.3s ease',
-                                                    boxShadow: isSelected ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}` : 'none'
-                                                }}>
-                                                    {role.icon}
-                                                </Box>
-                                                <Box sx={{ flex: 1 }}>
-                                                    <Typography variant="subtitle1" fontWeight="800" sx={{ color: '#1a1a1a', lineHeight: 1.2 }}>
-                                                        {role.label}
-                                                    </Typography>
-                                                    <Typography variant="caption" sx={{ color: '#666', fontWeight: 500, mt: 0.5, display: 'block' }}>
-                                                        {role.description}
-                                                    </Typography>
-                                                </Box>
-                                            </Paper>
-                                        </Grid>
-                                    );
-                                })}
-                            </Grid>
                             <GoogleSignInButton
-                                selectedRole={selectedRole}
+                                selectedRole={null} // No role for login flow
                                 onSuccess={(data: any) => {
                                     dispatch({
                                         type: 'auth/login/fulfilled',
@@ -332,6 +176,13 @@ export const LoginModal = () => {
                                     closeLoginModal();
                                     const from = (location.state as any)?.from?.pathname || '/dashboard/overview';
                                     navigate(from, { replace: true });
+                                }}
+                                onError={(msg) => {
+                                    if (msg.includes('not found') || msg.includes('sign up')) {
+                                        switchToRegister();
+                                    } else {
+                                        setLocalError(msg); // Will be displayed in Alert
+                                    }
                                 }}
                             />
                             <Button

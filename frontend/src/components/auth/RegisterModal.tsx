@@ -22,6 +22,7 @@ import { Close, Visibility, VisibilityOff } from '@mui/icons-material';
 import { register } from '../../features/auth/authSlice';
 import type { AppDispatch } from '../../store';
 import { useAuthModal } from '../../contexts/AuthModalContext';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 const ROLES = [
     { value: 'VOLUNTEER', label: 'Volunteer' },
@@ -304,6 +305,27 @@ export const RegisterModal = () => {
                     >
                         {loading ? <CircularProgress size={24} color="inherit" /> : 'Create account'}
                     </Button>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', my: 3 }}>
+                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
+                        <Typography variant="body2" sx={{ px: 2, color: '#999', fontWeight: 500 }}>
+                            or
+                        </Typography>
+                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
+                    </Box>
+
+                    <GoogleSignInButton
+                        selectedRole={formData.role}
+                        buttonText="signup_with"
+                        onSuccess={(data: any) => {
+                            dispatch({
+                                type: 'auth/register/fulfilled',
+                                payload: { access: data.access, refresh: data.refresh, user: data.user }
+                            });
+                            closeRegisterModal();
+                            navigate('/dashboard');
+                        }}
+                    />
 
                     <Box sx={{ mt: 3, textAlign: 'center' }}>
                         <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>

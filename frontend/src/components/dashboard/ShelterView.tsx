@@ -51,7 +51,11 @@ import {
     PersonAdd,
     NoAccounts,
     VerifiedUser,
-    Delete
+    Delete,
+    ReportProblem,
+    LocalShipping,
+    Security,
+    Update
 } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
 import {
@@ -72,7 +76,11 @@ import {
     createStaffCredential,
     verifyStaffCredential,
     deleteStaffCredential,
-    updateShelter
+    updateShelter,
+    fetchIncidents,
+    createIncident,
+    fetchResourceRequests,
+    createResourceRequest
 } from '../../features/shelters/shelterSlice';
 import { fetchChildren } from '../../features/caseManagement/caseManagementSlice';
 import { fetchEvents } from '../../features/volunteers/volunteersSlice';
@@ -125,7 +133,7 @@ const StatusChip = ({ status }: { status: string }) => {
 export function ShelterView({ activeTab }: { activeTab?: string }) {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
-    const { shelters, pendingShelters, resources, staff, placements, staffCredentials } = useSelector((state: RootState) => state.shelters);
+    const { shelters, pendingShelters, resources, staff, placements, staffCredentials, incidents, resourceRequests } = useSelector((state: RootState) => state.shelters);
     const { children } = useSelector((state: RootState) => state.caseManagement);
     const { volunteers, events: volunteerEvents } = useSelector((state: RootState) => state.volunteers);
     const { user } = useSelector((state: RootState) => state.auth);
@@ -135,7 +143,7 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
 
     // UI States
     const [openDialog, setOpenDialog] = useState(false);
-    const [dialogType, setDialogType] = useState<'SHELTER' | 'PLACEMENT' | 'RESOURCE' | 'ASSIGN'>('SHELTER');
+    const [dialogType, setDialogType] = useState<'SHELTER' | 'PLACEMENT' | 'RESOURCE' | 'ASSIGN' | 'INCIDENT' | 'REQUEST'>('SHELTER');
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' | 'info' | 'warning' });
 
     // New shelter management states
@@ -165,6 +173,20 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
         certificate_of_good_conduct: false,
     });
 
+    const [incidentForm, setIncidentForm] = useState({
+        shelter_home: '',
+        title: '',
+        description: '',
+        severity: 'MEDIUM'
+    });
+
+    const [requestForm, setRequestForm] = useState({
+        shelter_home: '',
+        item_category: 'FOOD',
+        items_description: '',
+        priority: 'MEDIUM'
+    });
+
     // Confirmation Dialog State
     const [confirmDialog, setConfirmDialog] = useState<{
         open: boolean;
@@ -185,6 +207,8 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
         dispatch(fetchResources());
         dispatch(fetchStaff());
         dispatch(fetchChildren());
+        dispatch(fetchIncidents());
+        dispatch(fetchResourceRequests());
         if (isAdmin) {
             dispatch(fetchPendingShelters());
             dispatch(fetchStaffCredentials());
@@ -280,6 +304,36 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
             setSnackbar({ open: true, message: 'Staff credential registered successfully', severity: 'success' });
         } catch (error: any) {
             setSnackbar({ open: true, message: typeof error === 'string' ? error : 'Failed to register credential', severity: 'error' });
+        }
+    };
+
+    const handleIncidentSubmit = async () => {
+        if (!incidentForm.shelter_home || !incidentForm.title || !incidentForm.description) {
+            setSnackbar({ open: true, message: 'Shelter, Title and Description are required', severity: 'error' });
+            return;
+        }
+        try {
+            await dispatch(createIncident(incidentForm)).unwrap();
+            setOpenDialog(false);
+            setIncidentForm({ shelter_home: '', title: '', description: '', severity: 'MEDIUM' });
+            setSnackbar({ open: true, message: 'Incident reported successfully', severity: 'warning' });
+        } catch (error: any) {
+            setSnackbar({ open: true, message: typeof error === 'string' ? error : 'Failed to report incident', severity: 'error' });
+        }
+    };
+
+    const handleRequestSubmit = async () => {
+        if (!requestForm.shelter_home || !requestForm.items_description) {
+            setSnackbar({ open: true, message: 'Shelter and Description are required', severity: 'error' });
+            return;
+        }
+        try {
+            await dispatch(createResourceRequest(requestForm)).unwrap();
+            setOpenDialog(false);
+            setRequestForm({ shelter_home: '', item_category: 'FOOD', items_description: '', priority: 'MEDIUM' });
+            setSnackbar({ open: true, message: 'Resource request submitted', severity: 'success' });
+        } catch (error: any) {
+            setSnackbar({ open: true, message: typeof error === 'string' ? error : 'Failed to submit request', severity: 'error' });
         }
     };
 
@@ -592,7 +646,9 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                                     </Box>
                                 </TableCell>
                                 <TableCell>{cred.position}</TableCell>
-                                <TableCell color="text.secondary">{cred.id_number}</TableCell>
+                                <TableCell sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>
+                                    {isAdmin ? cred.id_number : `****${cred.id_number?.slice(-4) || '****'}`}
+                                </TableCell>
                                 <TableCell>
                                     <Chip
                                         label={cred.certificate_of_good_conduct ? "Present" : "Missing"}
@@ -759,6 +815,114 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
         </Paper>
     );
 
+    const renderIncidents = () => (
+        <Paper sx={{ p: 0, borderRadius: 4, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
+            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Box>
+                    <Typography variant="h6" fontWeight="bold">Incident Command Center</Typography>
+                    <Typography variant="caption" color="text.secondary">Real-time reporting and tracking of environmental and safety issues</Typography>
+                </Box>
+                <Button
+                    variant="contained"
+                    color="error"
+                    startIcon={<ReportProblem />}
+                    onClick={() => handleOpenDialog('INCIDENT' as any)}
+                    sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
+                >
+                    Report Incident
+                </Button>
+            </Box>
+            <TableContainer>
+                <Table>
+                    <TableHead sx={{ bgcolor: alpha(theme.palette.error.main, 0.04) }}>
+                        <TableRow>
+                            <TableCell sx={{ fontWeight: 600 }}>Severity</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Title</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Shelter</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Reported At</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {(incidents || []).map((incident: any) => (
+                            <TableRow key={incident.id} hover>
+                                <TableCell>
+                                    <Chip
+                                        label={incident.severity}
+                                        size="small"
+                                        color={incident.severity === 'CRITICAL' || incident.severity === 'HIGH' ? 'error' : 'warning'}
+                                        sx={{ fontWeight: 800, borderRadius: 1.5 }}
+                                    />
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>{incident.title}</TableCell>
+                                <TableCell>{incident.shelter_name || 'Global'}</TableCell>
+                                <TableCell><StatusChip status={incident.status} /></TableCell>
+                                <TableCell color="text.secondary">{new Date(incident.created_at).toLocaleString()}</TableCell>
+                            </TableRow>
+                        ))}
+                        {(incidents || []).length === 0 && (
+                            <TableRow><TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>No incidents reported.</TableCell></TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Paper>
+    );
+
+    const renderResourceRequests = () => (
+        <Paper sx={{ p: 0, borderRadius: 4, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
+            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Box>
+                    <Typography variant="h6" fontWeight="bold">Supply Logistics & Requests</Typography>
+                    <Typography variant="caption" color="text.secondary">Request essential resources and track fulfillment status</Typography>
+                </Box>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<LocalShipping />}
+                    onClick={() => handleOpenDialog('REQUEST' as any)}
+                    sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
+                >
+                    New Supply Request
+                </Button>
+            </Box>
+            <TableContainer>
+                <Table>
+                    <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+                        <TableRow>
+                            <TableCell sx={{ fontWeight: 600 }}>Category</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Description</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Priority</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Requested On</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {(resourceRequests || []).map((req: any) => (
+                            <TableRow key={req.id} hover>
+                                <TableCell sx={{ fontWeight: 600 }}>{req.item_category}</TableCell>
+                                <TableCell sx={{ maxWidth: 300, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{req.items_description}</TableCell>
+                                <TableCell>
+                                    <Chip
+                                        label={req.priority}
+                                        variant="outlined"
+                                        size="small"
+                                        color={req.priority === 'URGENT' || req.priority === 'HIGH' ? 'error' : 'info'}
+                                    />
+                                </TableCell>
+                                <TableCell><StatusChip status={req.status} /></TableCell>
+                                <TableCell color="text.secondary">{new Date(req.created_at).toLocaleDateString()}</TableCell>
+                            </TableRow>
+                        ))}
+                        {(resourceRequests || []).length === 0 && (
+                            <TableRow><TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>No supply requests found.</TableCell></TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Paper>
+    );
+
     const formatEventDateTime = (value: any) => {
         const d = new Date(value);
         if (Number.isNaN(d.getTime())) return 'TBD';
@@ -845,6 +1009,8 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
             hidden: !canManageStaff
         },
         { id: 'resources', label: 'Inventory', icon: <Inventory />, component: renderResources() },
+        { id: 'incidents', label: 'Incident Command', icon: <ReportProblem />, component: renderIncidents() },
+        { id: 'logistics', label: 'Supply Requests', icon: <LocalShipping />, component: renderResourceRequests() },
         { id: 'events', label: 'Partner Events', icon: <EventIcon />, component: renderPartnerEvents() },
     ].filter(t => !t.hidden);
 
@@ -853,13 +1019,22 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
                 <Box>
                     <Typography variant="h4" fontWeight="900" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Home sx={{ fontSize: 40, color: 'primary.main' }} />
-                        Shelter Coordination Hub
+                        {isPartner ? <Security sx={{ fontSize: 40, color: 'secondary.main' }} /> : <Home sx={{ fontSize: 40, color: 'primary.main' }} />}
+                        {isPartner ? 'Partner Command Center' : 'Shelter Coordination Hub'}
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
-                        Unified interface for habitat management and personnel distribution
+                        {isPartner ? 'Secured administration interface for facility management' : 'Unified interface for habitat management and personnel distribution'}
                     </Typography>
                 </Box>
+                {isPartner && (
+                    <Box sx={{ textAlign: 'right' }}>
+                        <Typography variant="subtitle2" fontWeight="bold">Sync Status</Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'success.main' }}>
+                            <Update fontSize="small" />
+                            <Typography variant="caption" fontWeight="bold">LIVE SECURE CONNECTION</Typography>
+                        </Box>
+                    </Box>
+                )}
             </Box>
 
             <Grid container spacing={{ xs: 1.5, sm: 3 }} sx={{ mb: 4 }}>
@@ -897,7 +1072,10 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
 
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 4 } }}>
                 <DialogTitle sx={{ fontWeight: 'bold' }}>
-                    {dialogType === 'ASSIGN' ? 'Shelter Assignment' : `Register New ${dialogType}`}
+                    {dialogType === 'ASSIGN' ? 'Shelter Assignment' :
+                        dialogType === 'INCIDENT' ? 'Report Operational Incident' :
+                            dialogType === 'REQUEST' ? 'New Logistics Request' :
+                                `Register New ${dialogType}`}
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -998,6 +1176,106 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                                     </Select>
                                 </FormControl>
                                 <Button variant="contained" onClick={handleStaffCredentialSubmit} sx={{ py: 1.5, borderRadius: 3 }}>Register Now</Button>
+                            </>
+                        )}
+                        {dialogType === 'INCIDENT' && (
+                            <>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    label="Target Shelter"
+                                    value={incidentForm.shelter_home}
+                                    onChange={(e) => setIncidentForm({ ...incidentForm, shelter_home: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                >
+                                    {shelters.map((s: any) => (
+                                        <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>
+                                    ))}
+                                </TextField>
+                                <TextField
+                                    fullWidth
+                                    label="Incident Title"
+                                    value={incidentForm.title}
+                                    onChange={(e) => setIncidentForm({ ...incidentForm, title: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    label="Detailed Description"
+                                    value={incidentForm.description}
+                                    onChange={(e) => setIncidentForm({ ...incidentForm, description: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    select
+                                    label="Severity Level"
+                                    value={incidentForm.severity}
+                                    onChange={(e) => setIncidentForm({ ...incidentForm, severity: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                >
+                                    <MenuItem value="LOW">Low - Operational Note</MenuItem>
+                                    <MenuItem value="MEDIUM">Medium - Attention Required</MenuItem>
+                                    <MenuItem value="HIGH">High - Significant Issue</MenuItem>
+                                    <MenuItem value="CRITICAL">Critical - Immediate Emergency</MenuItem>
+                                </TextField>
+                                <Button variant="contained" color="error" onClick={handleIncidentSubmit} sx={{ py: 1.5, borderRadius: 3 }}>Submit Report</Button>
+                            </>
+                        )}
+                        {dialogType === 'REQUEST' && (
+                            <>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    label="Requesting Shelter"
+                                    value={requestForm.shelter_home}
+                                    onChange={(e) => setRequestForm({ ...requestForm, shelter_home: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                >
+                                    {shelters.map((s: any) => (
+                                        <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>
+                                    ))}
+                                </TextField>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    label="Resource Category"
+                                    value={requestForm.item_category}
+                                    onChange={(e) => setRequestForm({ ...requestForm, item_category: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                >
+                                    <MenuItem value="FOOD">Food Supplies</MenuItem>
+                                    <MenuItem value="CLOTHING">Clothing & Bedding</MenuItem>
+                                    <MenuItem value="MEDICAL">Medical Supplies</MenuItem>
+                                    <MenuItem value="EDUCATIONAL">Educational Materials</MenuItem>
+                                    <MenuItem value="OTHER">Other / Miscellaneous</MenuItem>
+                                </TextField>
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    label="Items & Quantity Description"
+                                    value={requestForm.items_description}
+                                    onChange={(e) => setRequestForm({ ...requestForm, items_description: e.target.value })}
+                                    placeholder="e.g., 50kg Maize Flour, 2 boxes of Paracetamol..."
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    select
+                                    label="Priority"
+                                    value={requestForm.priority}
+                                    onChange={(e) => setRequestForm({ ...requestForm, priority: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                >
+                                    <MenuItem value="LOW">Low</MenuItem>
+                                    <MenuItem value="MEDIUM">Medium</MenuItem>
+                                    <MenuItem value="HIGH">High</MenuItem>
+                                    <MenuItem value="URGENT">Urgent (Restock ASAP)</MenuItem>
+                                </TextField>
+                                <Button variant="contained" onClick={handleRequestSubmit} sx={{ py: 1.5, borderRadius: 3 }}>Submit Request</Button>
                             </>
                         )}
                         {dialogType === 'SHELTER' && (

@@ -31,8 +31,7 @@ interface AdminOverviewProps {
 }
 
 export const AdminOverview = ({ stats, charts, activities }: AdminOverviewProps) => {
-    const deviceType = useDeviceType();
-    const isMobile = deviceType === 'MOBILE';
+
 
     return (
         <Box

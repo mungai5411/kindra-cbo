@@ -80,6 +80,12 @@ def google_login(request):
         is_new_user = False
         
         if not user:
+            if not requested_role:
+                 return Response(
+                    {'error': 'User not found. Please sign up to create an account.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
             is_new_user = True
             # Validate requested role or default to DONOR
             final_role = User.Role.DONOR

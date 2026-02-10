@@ -238,15 +238,43 @@ export const fetchIncidents = createAsyncThunk(
     }
 );
 
+// New: Create incident report
+export const createIncident = createAsyncThunk(
+    'shelters/createIncident',
+    async (incidentData: any, { rejectWithValue, dispatch }) => {
+        try {
+            const response = await apiClient.post(endpoints.shelters.incidents, incidentData);
+            dispatch(fetchIncidents());
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || 'Failed to create incident report');
+        }
+    }
+);
+
 // New: Create resource request
 export const createResourceRequest = createAsyncThunk(
     'shelters/createResourceRequest',
-    async (requestData: any, { rejectWithValue }) => {
+    async (requestData: any, { rejectWithValue, dispatch }) => {
         try {
             const response = await apiClient.post(endpoints.shelters.requests, requestData);
+            dispatch(fetchResourceRequests());
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data || 'Failed to create resource request');
+        }
+    }
+);
+
+// New: Fetch resource requests
+export const fetchResourceRequests = createAsyncThunk(
+    'shelters/fetchResourceRequests',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get(endpoints.shelters.requests);
+            return response.data.results || response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch resource requests');
         }
     }
 );
@@ -355,6 +383,7 @@ interface ShelterState {
     staff: any[];
     staffCredentials: any[];
     incidents: any[];
+    resourceRequests: any[];
     isLoading: boolean;
     error: string | null;
 }
@@ -367,6 +396,7 @@ const initialState: ShelterState = {
     staff: [],
     staffCredentials: [],
     incidents: [],
+    resourceRequests: [],
     isLoading: false,
     error: null,
 };
@@ -434,9 +464,19 @@ const shelterSlice = createSlice({
             state.incidents = Array.isArray(action.payload) ? action.payload : [];
         });
 
+        // Create Incident
+        builder.addCase(createIncident.fulfilled, (state, action) => {
+            state.incidents.unshift(action.payload);
+        });
+
+        // Fetch Resource Requests
+        builder.addCase(fetchResourceRequests.fulfilled, (state, action: PayloadAction<any[]>) => {
+            state.resourceRequests = Array.isArray(action.payload) ? action.payload : [];
+        });
+
         // Create Resource Request
-        builder.addCase(createResourceRequest.fulfilled, () => {
-            // You might want to add this to a requests list if you had one in state
+        builder.addCase(createResourceRequest.fulfilled, (state, action) => {
+            state.resourceRequests.unshift(action.payload);
         });
     },
 });
