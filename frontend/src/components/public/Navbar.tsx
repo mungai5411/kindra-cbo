@@ -11,7 +11,10 @@ const logo = bgLogo;
 
 
 const NAV_ITEMS = [
+    { label: 'About', path: '/about' },
     { label: 'Stories', path: '/stories' },
+    { label: 'Impact', path: '/#impact' },
+    { label: 'Donate', path: '/donate' },
 ];
 
 export const Navbar = () => {

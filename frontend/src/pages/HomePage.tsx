@@ -40,7 +40,7 @@ import {
     AccordionSummary,
     AccordionDetails,
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Navbar } from '../components/public/Navbar';
 
@@ -102,6 +102,7 @@ const FAQS = [
 
 export default function HomePage() {
     const theme = useTheme();
+    const location = useLocation();
     const dispatch = useDispatch<AppDispatch>();
     const { dashboardData } = useSelector((state: RootState) => state.reporting);
     const [mediaAssets, setMediaAssets] = useState<any[]>([]);
@@ -121,6 +122,18 @@ export default function HomePage() {
         };
         fetchMedia();
     }, [dispatch]);
+
+    // Handle hash scrolling
+    useEffect(() => {
+        if (location.hash) {
+            const element = document.getElementById(location.hash.substring(1));
+            if (element) {
+                setTimeout(() => {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
+        }
+    }, [location]);
 
     const statsData = dashboardData?.public || {};
 
