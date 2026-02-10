@@ -16,7 +16,7 @@ import {
     alpha,
     useTheme
 } from '@mui/material';
-import { CheckCircle, Error, MarkEmailRead } from '@mui/icons-material';
+import { CheckCircle, Error } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import apiClient from '../api/client';
 import { fetchProfile } from '../features/auth/authSlice';
@@ -44,7 +44,7 @@ export default function VerifyEmailPage() {
                 const response = await apiClient.post('/auth/verify-email/', { token });
                 setStatus('success');
                 setMessage('Email verified successfully! You can now access all features.');
-                
+
                 // If tokens returned, update session
                 if (response.data.tokens) {
                     localStorage.setItem('accessToken', response.data.tokens.access);
@@ -105,10 +105,10 @@ export default function VerifyEmailPage() {
                     </Box>
 
                     <Typography variant="h4" fontWeight="bold" gutterBottom>
-                        {status === 'loading' ? 'Verifying...' : 
-                         status === 'success' ? 'Email Verified!' : 'Verification Failed'}
+                        {status === 'loading' ? 'Verifying...' :
+                            status === 'success' ? 'Email Verified!' : 'Verification Failed'}
                     </Typography>
-                    
+
                     <Typography variant="body1" color="text.secondary" sx={{ mb: 4, fontSize: '1.1rem' }}>
                         {message}
                     </Typography>
