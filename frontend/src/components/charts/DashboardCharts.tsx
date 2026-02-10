@@ -106,11 +106,11 @@ const ChartCard = ({ title, children, hideCard = false }: ChartCardProps) => {
 };
 
 // Donation Trends Bar Chart
-export const DonationTrendsChart = ({ data }: { data: any[] }) => {
+export const DonationTrendsChart = ({ data, embedded = false }: { data: any[], embedded?: boolean }) => {
     const theme = useTheme();
 
     return (
-        <ChartCard title="Donation Trends">
+        <ChartCard title={embedded ? undefined : "Donation Trends"} hideCard={embedded}>
             <ResponsiveContainer width="100%" height="100%" minHeight={200}>
                 <BarChart data={data} margin={{ left: -20, right: 0, top: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} vertical={false} />
@@ -144,11 +144,11 @@ export const DonationTrendsChart = ({ data }: { data: any[] }) => {
 };
 
 // Campaign Progress Bar Chart
-export const CampaignProgressChart = ({ campaigns }: { campaigns: any[] }) => {
+export const CampaignProgressChart = ({ campaigns, embedded = false }: { campaigns: any[], embedded?: boolean }) => {
     const theme = useTheme();
 
     return (
-        <ChartCard title="Campaign Goals">
+        <ChartCard title={embedded ? undefined : "Campaign Goals"} hideCard={embedded}>
             <ResponsiveContainer width="100%" height="100%" minHeight={200}>
                 <BarChart data={campaigns} layout="vertical" margin={{ left: 0, right: 20, top: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} horizontal={false} />
@@ -175,11 +175,11 @@ export const CampaignProgressChart = ({ campaigns }: { campaigns: any[] }) => {
 };
 
 // Volunteer Hours Area Chart
-export const VolunteerHoursChart = ({ data }: { data: any[] }) => {
+export const VolunteerHoursChart = ({ data, embedded = false }: { data: any[], embedded?: boolean }) => {
     const theme = useTheme();
 
     return (
-        <ChartCard title="Volunteer Contributions">
+        <ChartCard title={embedded ? undefined : "Volunteer Contributions"} hideCard={embedded}>
             <ResponsiveContainer width="100%" height="100%" minHeight={200}>
                 <AreaChart data={data} margin={{ left: -20, right: 0, top: 10, bottom: 0 }}>
                     <defs>
@@ -217,9 +217,9 @@ export const VolunteerHoursChart = ({ data }: { data: any[] }) => {
 };
 
 // Children Distribution Pie Chart
-export const ChildrenDistributionChart = ({ data }: { data: any[] }) => {
+export const ChildrenDistributionChart = ({ data, embedded = false }: { data: any[], embedded?: boolean }) => {
     return (
-        <ChartCard title="Child Demographics">
+        <ChartCard title={embedded ? undefined : "Child Demographics"} hideCard={embedded}>
             <ResponsiveContainer width="100%" height="100%" minHeight={200}>
                 <PieChart>
                     <Pie
@@ -250,9 +250,9 @@ export const ChildrenDistributionChart = ({ data }: { data: any[] }) => {
 };
 
 // Donation Methods Pie Chart
-export const DonationMethodsChart = ({ data }: { data: any[] }) => {
+export const DonationMethodsChart = ({ data, embedded = false }: { data: any[], embedded?: boolean }) => {
     return (
-        <ChartCard title="Donation Sources">
+        <ChartCard title={embedded ? undefined : "Donation Sources"} hideCard={embedded}>
             <ResponsiveContainer width="100%" height="100%" minHeight={200}>
                 <PieChart>
                     <Pie
@@ -316,11 +316,11 @@ export const FundAllocationChart = ({ data, title, hideCard = false }: { data: a
 };
 
 // Shelter Capacity Chart
-export const ShelterCapacityChart = ({ shelters }: { shelters: any[] }) => {
+export const ShelterCapacityChart = ({ shelters, embedded = false }: { shelters: any[], embedded?: boolean }) => {
     const theme = useTheme();
 
     return (
-        <ChartCard title="Shelter Occupancy">
+        <ChartCard title={embedded ? undefined : "Shelter Occupancy"} hideCard={embedded}>
             <ResponsiveContainer width="100%" height="100%" minHeight={200}>
                 <BarChart data={shelters} margin={{ left: -20, right: 0, top: 0, bottom: 0 }} barGap={2}>
                     <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} vertical={false} />
@@ -399,11 +399,11 @@ export const StatCard = ({ title, value, subtitle, color }: StatCardProps) => {
 };
 
 // Impact Trends Line Chart
-export const ImpactTrendsChart = ({ data }: { data: any[] }) => {
+export const ImpactTrendsChart = ({ data, embedded = false }: { data: any[], embedded?: boolean }) => {
     const theme = useTheme();
 
     return (
-        <ChartCard title="Impact Trends">
+        <ChartCard title={embedded ? undefined : "Impact Trends"} hideCard={embedded}>
             <ResponsiveContainer width="100%" height="100%" minHeight={200}>
                 <AreaChart data={data} margin={{ left: -20, right: 0, top: 10, bottom: 0 }}>
                     <defs>

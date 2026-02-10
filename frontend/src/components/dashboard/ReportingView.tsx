@@ -52,7 +52,7 @@ import {
     FilterList,
     Download,
     Warning,
-    FolderShared,
+    Folder,
     LocationOn
 } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
@@ -173,12 +173,14 @@ export function ReportingView({ activeTab }: { activeTab?: string }) {
     const renderSummary = () => (
         <Grid container spacing={2}>
             <Grid item xs={12} md={8}>
-                <Paper sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 2, height: '100%', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1] }}>
+                <Paper sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 2, height: 'auto', minHeight: 450, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="h6" fontWeight="bold">Donation Trends</Typography>
                         <Chip label="Live Data" size="small" color="success" variant="outlined" />
                     </Box>
-                    <DonationTrendsChart data={donationTrends} />
+                    <Box sx={{ height: 350, width: '100%' }}>
+                        <DonationTrendsChart data={donationTrends} embedded />
+                    </Box>
                 </Paper>
             </Grid>
             <Grid item xs={12} md={4}>
@@ -231,15 +233,19 @@ export function ReportingView({ activeTab }: { activeTab?: string }) {
                 </Paper>
             </Grid>
             <Grid item xs={12} md={6}>
-                <Paper sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 1, height: '100%', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1] }}>
+                <Paper sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 1, height: 'auto', minHeight: 400, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], display: 'flex', flexDirection: 'column' }}>
                     <Typography variant="h6" fontWeight="bold" gutterBottom>Donation Methods</Typography>
-                    <DonationMethodsChart data={dashboardData?.donation_methods || []} />
+                    <Box sx={{ height: 300, width: '100%' }}>
+                        <DonationMethodsChart data={dashboardData?.donation_methods || []} embedded />
+                    </Box>
                 </Paper>
             </Grid>
             <Grid item xs={12} md={6}>
-                <Paper sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 1, height: '100%', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1] }}>
+                <Paper sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 1, height: 'auto', minHeight: 400, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], display: 'flex', flexDirection: 'column' }}>
                     <Typography variant="h6" fontWeight="bold" gutterBottom>Campaign Progress</Typography>
-                    <CampaignProgressChart campaigns={dashboardData?.campaign_progress || []} />
+                    <Box sx={{ height: 300, width: '100%' }}>
+                        <CampaignProgressChart campaigns={dashboardData?.campaign_progress || []} embedded />
+                    </Box>
                 </Paper>
             </Grid>
         </Grid>
@@ -552,7 +558,7 @@ export function ReportingView({ activeTab }: { activeTab?: string }) {
                                 />
                             </ListItem>
                             <ListItem sx={{ bgcolor: alpha(theme.palette.info.main, 0.1), borderRadius: 2, mb: 1 }}>
-                                <ListItemIcon><FolderShared color="info" /></ListItemIcon>
+                                <ListItemIcon><Folder color="info" /></ListItemIcon>
                                 <ListItemText
                                     primary="Resource Allocation Optimization"
                                     secondary="High overlap detected in Sub-county B. Recommend consolidating volunteer outreach."
