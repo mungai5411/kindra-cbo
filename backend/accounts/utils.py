@@ -272,23 +272,34 @@ def send_email_async_safe(recipient, subject, message, html_message=None):
             print(f"DEBUG: Async email queued for {recipient}")
         return True
     except Exception as e:
-        # Fallback to standard synchronous sending if Celery broker is unreachable
-        logger.warning(f"Celery delivery failed, falling back to sync send for {recipient}. Error: {str(e)}")
+        # Fallback to threaded synchronous sending if Celery broker is unreachable
+        logger.warning(f"Celery delivery failed, falling back to threaded sync send for {recipient}. Error: {str(e)}")
         if settings.DEBUG:
-            print(f"DEBUG: Celery failed ({e}), falling back to sync send.")
+            print(f"DEBUG: Celery failed ({e}), falling back to threaded sync send.")
         
         try:
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[recipient],
-                html_message=html_message,
-                fail_silently=False
-            )
+            import threading
+            def _send_sync():
+                try:
+                    send_mail(
+                        subject=subject,
+                        message=message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[recipient],
+                        html_message=html_message,
+                        fail_silently=False
+                    )
+                    logger.info(f"Threaded fallback email sent to {recipient}")
+                except Exception as sync_e:
+                    logger.error(f"Threaded fallback email failed for {recipient}: {str(sync_e)}")
+
+            # Start thread and don't join (fire and forget)
+            thread = threading.Thread(target=_send_sync)
+            thread.daemon = True
+            thread.start()
             return True
-        except Exception as sync_e:
-            logger.error(f"Sync email fallback also failed for {recipient}: {str(sync_e)}")
+        except Exception as thread_e:
+            logger.error(f"Failed to start fallback thread for {recipient}: {str(thread_e)}")
             return False
 
 

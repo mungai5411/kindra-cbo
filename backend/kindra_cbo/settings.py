@@ -403,6 +403,7 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='kindra-cbo@zohomail.com')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_TIMEOUT = 10 # Seconds before SMTP connection is closed
 
 
 # Email templates
