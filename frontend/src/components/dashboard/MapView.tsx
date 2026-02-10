@@ -34,7 +34,7 @@ const familyIcon = createCustomIcon('#2e7d32'); // Green
 const shelterIcon = createCustomIcon('#0288d1'); // Blue
 
 
-export const MapView: React.FC = () => {
+export const MapView: React.FC<{ height?: string | number, embedded?: boolean }> = ({ height = 'calc(100vh - 120px)', embedded = false }) => {
     const theme = useTheme();
     const families = useSelector((state: RootState) => state.caseManagement.families);
     const shelters = useSelector((state: RootState) => state.shelters.shelters);
@@ -47,18 +47,20 @@ export const MapView: React.FC = () => {
     const center: [number, number] = [-1.286389, 36.817223];
 
     return (
-        <Box sx={{ height: 'calc(100vh - 120px)', width: '100%', position: 'relative' }}>
-            <Box sx={{ mb: 3 }}>
-                <Typography variant="h4" fontWeight="900" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                    <LocationOn sx={{ fontSize: 40, color: 'primary.main' }} />
-                    Geospatial Resource Hub
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                    Real-time mapping of humanitarian resources, family locations, and shelter availability across the region.
-                </Typography>
-            </Box>
+        <Box sx={{ height: height, width: '100%', position: 'relative' }}>
+            {!embedded && (
+                <Box sx={{ mb: 3 }}>
+                    <Typography variant="h4" fontWeight="900" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                        <LocationOn sx={{ fontSize: 40, color: 'primary.main' }} />
+                        Geospatial Resource Hub
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                        Real-time mapping of humanitarian resources, family locations, and shelter availability across the region.
+                    </Typography>
+                </Box>
+            )}
 
-            <Grid container spacing={2} sx={{ height: 'calc(100% - 80px)' }}>
+            <Grid container spacing={2} sx={{ height: embedded ? '100%' : 'calc(100% - 80px)' }}>
                 <Grid item xs={12} md={9}>
                     <Paper
                         sx={{

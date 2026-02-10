@@ -9,8 +9,6 @@ import {
     BarChart, Bar, PieChart, Pie, AreaChart, Area,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell
 } from 'recharts';
-import { useDeviceType } from '../../hooks/useDeviceType';
-
 // Modern clean palette
 const CHART_COLORS = [
     '#6366f1', // Indigo (Primary)
@@ -110,8 +108,6 @@ const ChartCard = ({ title, children, hideCard = false }: ChartCardProps) => {
 // Donation Trends Bar Chart
 export const DonationTrendsChart = ({ data }: { data: any[] }) => {
     const theme = useTheme();
-    const deviceType = useDeviceType();
-    const isMobile = deviceType === 'MOBILE';
 
     return (
         <ChartCard title="Donation Trends">
@@ -150,8 +146,6 @@ export const DonationTrendsChart = ({ data }: { data: any[] }) => {
 // Campaign Progress Bar Chart
 export const CampaignProgressChart = ({ campaigns }: { campaigns: any[] }) => {
     const theme = useTheme();
-    const deviceType = useDeviceType();
-    const isMobile = deviceType === 'MOBILE';
 
     return (
         <ChartCard title="Campaign Goals">
@@ -183,8 +177,6 @@ export const CampaignProgressChart = ({ campaigns }: { campaigns: any[] }) => {
 // Volunteer Hours Area Chart
 export const VolunteerHoursChart = ({ data }: { data: any[] }) => {
     const theme = useTheme();
-    const deviceType = useDeviceType();
-    const isMobile = deviceType === 'MOBILE';
 
     return (
         <ChartCard title="Volunteer Contributions">
@@ -403,5 +395,62 @@ export const StatCard = ({ title, value, subtitle, color }: StatCardProps) => {
                 )}
             </CardContent>
         </Card>
+    );
+};
+
+// Impact Trends Line Chart
+export const ImpactTrendsChart = ({ data }: { data: any[] }) => {
+    const theme = useTheme();
+
+    return (
+        <ChartCard title="Impact Trends">
+            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+                <AreaChart data={data} margin={{ left: -20, right: 0, top: 10, bottom: 0 }}>
+                    <defs>
+                        <linearGradient id="colorImproved" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={theme.palette.success.main} stopOpacity={0.2} />
+                            <stop offset="95%" stopColor={theme.palette.success.main} stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorDeclined" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={theme.palette.error.main} stopOpacity={0.2} />
+                            <stop offset="95%" stopColor={theme.palette.error.main} stopOpacity={0} />
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} vertical={false} />
+                    <XAxis
+                        dataKey="date"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: theme.palette.text.secondary, fontSize: 10 }}
+                        dy={10}
+                    />
+                    <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: theme.palette.text.secondary, fontSize: 10 }}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+                    <Area
+                        type="monotone"
+                        dataKey="improved"
+                        name="Condition Improved"
+                        stroke={theme.palette.success.main}
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#colorImproved)"
+                    />
+                    <Area
+                        type="monotone"
+                        dataKey="declined"
+                        name="At Risk"
+                        stroke={theme.palette.error.main}
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#colorDeclined)"
+                    />
+                </AreaChart>
+            </ResponsiveContainer>
+        </ChartCard>
     );
 };
