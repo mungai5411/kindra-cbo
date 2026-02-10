@@ -48,6 +48,10 @@ class ShelterHome(models.Model):
     sub_county = models.CharField(max_length=100, blank=True)
     physical_address = models.TextField()
     
+    # GPS coordinates (optional)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    
     # Capacity
     total_capacity = models.IntegerField(validators=[MinValueValidator(1)])
     current_occupancy = models.IntegerField(default=0)

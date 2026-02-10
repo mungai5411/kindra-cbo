@@ -10,7 +10,8 @@ import {
     Security,
     ExpandLess,
     ExpandMore,
-    PermMedia
+    PermMedia,
+    LocationOn
 } from '@mui/icons-material';
 import logo from '../../assets/logo.jpg';
 
@@ -30,6 +31,11 @@ const NAVIGATION = [
         id: 'overview',
         label: 'Dashboard',
         icon: <DashboardIcon />,
+    },
+    {
+        id: 'map',
+        label: 'Map Hub',
+        icon: <LocationOn />,
     },
     {
         id: 'blog_campaigns',

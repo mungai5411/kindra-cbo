@@ -12,6 +12,8 @@ interface Family {
     assigned_case_worker: string;
     is_active: boolean;
     registration_date: string;
+    latitude?: number;
+    longitude?: number;
 }
 
 interface Child {

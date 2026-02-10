@@ -328,9 +328,28 @@ export const requestShelterInfo = createAsyncThunk(
 );
 
 
+interface Shelter {
+    id: string;
+    name: string;
+    registration_number: string;
+    contact_person: string;
+    phone_number: string;
+    email: string;
+    county: string;
+    physical_address: string;
+    latitude?: number;
+    longitude?: number;
+    total_capacity: number;
+    current_occupancy: number;
+    available_beds: number;
+    occupancy_percentage: number;
+    is_active: boolean;
+    approval_status: string;
+}
+
 interface ShelterState {
-    shelters: any[];
-    pendingShelters: any[];
+    shelters: Shelter[];
+    pendingShelters: Shelter[];
     placements: any[];
     resources: any[];
     staff: any[];

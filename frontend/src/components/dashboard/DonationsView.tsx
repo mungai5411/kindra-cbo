@@ -4,8 +4,6 @@ import {
     Box,
     Typography,
     Paper,
-    Card,
-    CardContent,
     Table,
     TableBody,
     TableCell,
@@ -25,7 +23,8 @@ import {
     Alert,
     useTheme,
     alpha,
-    Snackbar
+    Snackbar,
+    IconButton
 } from '@mui/material';
 import {
     VolunteerActivism,
@@ -41,7 +40,9 @@ import {
     LocationOn,
     Schedule,
     Event as EventIcon,
-    BusinessCenter
+    BusinessCenter,
+    Verified,
+    InfoOutlined
 } from '@mui/icons-material';
 import { FundAllocationChart } from '../charts/DashboardCharts';
 import { RootState, AppDispatch } from '../../store';
@@ -63,7 +64,6 @@ import {
 } from '../../features/donations/donationsSlice';
 import { fetchEvents } from '../../features/volunteers/volunteersSlice';
 import { getRandomMessage } from '../../utils/heartwarmingMessages';
-import { SubTabView } from './SubTabView';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StatsCard } from './StatCards';
 import { ConfirmationDialog } from './ConfirmationDialog';
@@ -783,6 +783,7 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                             <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Amount</TableCell>
                             <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Method</TableCell>
                             <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Status</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Impact Verification</TableCell>
                             <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Date</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Actions</TableCell>
                         </TableRow>
@@ -811,6 +812,23 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                 </TableCell>
                                 <TableCell sx={{ py: 2.5 }}>
                                     <StatusChip status={d.status} />
+                                </TableCell>
+                                <TableCell sx={{ py: 2.5 }}>
+                                    {d.campaign ? (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Verified sx={{ fontSize: 16, color: 'success.main' }} />
+                                            <Typography variant="caption" sx={{ fontWeight: 700, color: 'success.main' }}>
+                                                Direct Impact
+                                            </Typography>
+                                            <IconButton size="small" onClick={() => setSnackbar({ open: true, message: `Actively funding: ${d.campaign_name || 'Associated Campaign'}`, severity: 'success' })}>
+                                                <InfoOutlined sx={{ fontSize: 16 }} />
+                                            </IconButton>
+                                        </Box>
+                                    ) : (
+                                        <Typography variant="caption" color="text.disabled" sx={{ fontStyle: 'italic' }}>
+                                            General Fund
+                                        </Typography>
+                                    )}
                                 </TableCell>
                                 <TableCell sx={{ py: 2.5, color: 'text.secondary', fontWeight: 600, fontSize: '0.85rem' }}>
                                     {(() => {

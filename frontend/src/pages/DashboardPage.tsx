@@ -49,6 +49,7 @@ import { ContentManagementView } from '../components/dashboard/ContentManagement
 import { LogoutDialog } from '../components/common/LogoutDialog';
 import { MobileBottomNav } from '../components/dashboard/MobileBottomNav';
 import { VolunteerGroupsView } from '../components/dashboard/VolunteerGroupsView';
+import { MapView } from '../components/dashboard/MapView';
 import { useDeviceType } from '../hooks/useDeviceType';
 
 // Fetch Actions
@@ -164,17 +165,17 @@ export default function DashboardPage() {
 
         // Shelter Partners ONLY see shelter-related content
         if (user.role === 'SHELTER_PARTNER') {
-            return ['overview', 'shelter', 'shelters', 'placements', 'resources'].includes(itemId);
+            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'map'].includes(itemId);
         }
 
         // Case Workers see case management and shelter content
         if (user.role === 'CASE_WORKER') {
-            return ['overview', 'case_management', 'cases', 'assessments', 'case_notes', 'children', 'families', 'documents', 'shelter', 'shelters', 'placements'].includes(itemId);
+            return ['overview', 'case_management', 'cases', 'assessments', 'case_notes', 'children', 'families', 'documents', 'shelter', 'shelters', 'placements', 'map'].includes(itemId);
         }
 
         // Social Media see blog and donation content
         if (user.role === 'SOCIAL_MEDIA') {
-            return ['overview', 'blog_campaigns', 'blog_posts', 'categories', 'comments', 'newsletter', 'tags', 'donations', 'campaigns', 'donation_records', 'donors', 'social_media'].includes(itemId);
+            return ['overview', 'blog_campaigns', 'blog_posts', 'categories', 'comments', 'newsletter', 'tags', 'donations', 'campaigns', 'donation_records', 'donors', 'social_media', 'map'].includes(itemId);
         }
 
         // Default: deny access
@@ -268,6 +269,7 @@ export default function DashboardPage() {
                     }}
                 />
             ),
+            'map': <MapView />,
             'volunteers': <VolunteersView setOpenDialog={setOpenVolunteerDialog} activeTab={activeTab} />,
             'volunteer_list': <VolunteersView setOpenDialog={setOpenVolunteerDialog} activeTab={activeTab} />,
             'tasks': <VolunteersView setOpenDialog={setOpenVolunteerDialog} activeTab={activeTab} />,
