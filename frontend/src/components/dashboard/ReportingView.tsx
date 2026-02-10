@@ -581,7 +581,7 @@ export function ReportingView({ activeTab }: { activeTab?: string }) {
         { id: 'overview', label: 'General Overview', icon: <BarChart />, component: renderSummary() },
         { id: 'predictive', label: 'Predictive Insights', icon: <Psychology />, component: renderPredictiveInsights() },
         { id: 'geospatial', label: 'Geospatial Analysis', icon: <LocationOn />, component: renderGeospatial() },
-        { id: 'reports', label: 'Financial Reports', icon: <Description />, component: renderReportsList() },
+        { id: 'reports', label: 'Report Archive', icon: <Description />, component: renderReportsList() },
         { id: 'kpis', label: 'Impact KPIs', icon: <Timeline />, component: renderKPIs() },
         { id: 'compliance', label: 'Compliance & Audits', icon: <PieChart />, component: renderCompliance() },
     ];
