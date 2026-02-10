@@ -17,6 +17,13 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     musl-dev \
     libpq-dev \
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
+    libharfbuzz-subset0 \
+    libjpeg-dev \
+    libopenjp2-7-dev \
+    libxcb1 \
+    libcairo2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
