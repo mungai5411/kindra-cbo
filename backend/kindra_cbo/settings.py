@@ -385,6 +385,11 @@ if CELERY_BROKER_URL.startswith('rediss://'):
 # Celery task settings for free tier (reduced frequency)
 CELERY_TASK_ALWAYS_EAGER = DEBUG  # Run tasks synchronously in development
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BROKER_CONNECTION_TIMEOUT = 5.0 # Seconds before failing and falling back
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'socket_timeout': 5.0,
+    'socket_connect_timeout': 5.0,
+}
 
 # ==================================
 # EMAIL CONFIGURATION (Zoho SMTP)

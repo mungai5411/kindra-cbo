@@ -247,6 +247,51 @@ def validate_password_strength(password):
     return True, "Password is strong"
 
 
+def send_email_async_safe(recipient, subject, message, html_message=None):
+    """
+    Attempts to send email via Celery background tasks.
+    Falls back to synchronous sending if the Celery broker or DNS is unavailable.
+    This prevents 500 errors during registration when infrastructure (Redis) is down.
+    """
+    import logging
+    from django.conf import settings
+    from django.core.mail import send_mail
+    
+    logger = logging.getLogger(__name__)
+
+    try:
+        # Try to import and delay the task
+        from kindra_cbo.tasks import send_email_notification
+        send_email_notification.delay(
+            recipient=recipient,
+            subject=subject,
+            message=message,
+            html_message=html_message
+        )
+        if settings.DEBUG:
+            print(f"DEBUG: Async email queued for {recipient}")
+        return True
+    except Exception as e:
+        # Fallback to standard synchronous sending if Celery broker is unreachable
+        logger.warning(f"Celery delivery failed, falling back to sync send for {recipient}. Error: {str(e)}")
+        if settings.DEBUG:
+            print(f"DEBUG: Celery failed ({e}), falling back to sync send.")
+        
+        try:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[recipient],
+                html_message=html_message,
+                fail_silently=False
+            )
+            return True
+        except Exception as sync_e:
+            logger.error(f"Sync email fallback also failed for {recipient}: {str(sync_e)}")
+            return False
+
+
 # Export all functions
 __all__ = [
     'sanitize_html',
@@ -261,4 +306,5 @@ __all__ = [
     'sanitize_sql_input',
     'sanitize_json_input',
     'validate_password_strength',
+    'send_email_async_safe',
 ]

@@ -14,6 +14,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
+from .utils import send_email_async_safe
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django.core.cache import cache
@@ -130,14 +131,13 @@ class UserRegistrationView(generics.CreateAPIView):
             token_type=VerificationToken.TokenType.VERIFICATION
         )
 
-        # Send Verification Email (Async via Celery)
+        # Send Verification Email (Safe Async/Sync Failover)
         verify_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/verify?token={verification_token.token}"
         
         if settings.DEBUG:
             print(f"Verification URL for {user.email}: {verify_url}")
 
-        from kindra_cbo.tasks import send_email_notification
-        send_email_notification.delay(
+        send_email_async_safe(
             recipient=user.email,
             subject='Verify your email for Kindra',
             message=f'Please verify your email by clicking: {verify_url}',
@@ -604,11 +604,10 @@ class PasswordResetRequestView(APIView):
                 token_type=VerificationToken.TokenType.PASSWORD_RESET
             )
             
-            # Send Reset Email (Async via Celery)
+            # Send Reset Email (Safe Async/Sync Failover)
             reset_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/reset-password?token={token.token}"
             
-            from kindra_cbo.tasks import send_email_notification
-            send_email_notification.delay(
+            send_email_async_safe(
                 recipient=email,
                 subject='Reset Your Password',
                 message=f'Click below to reset your password: {reset_url}',
