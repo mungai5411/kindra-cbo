@@ -718,6 +718,24 @@ class NotificationListView(generics.ListAPIView):
             "message": f"Marked {updated_count} notifications as read"
         })
 
+
+class MarkAllNotificationsReadView(APIView):
+    """
+    Mark all unread notifications for the current user as read
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        updated_count = Notification.objects.filter(
+            recipient=request.user,
+            read=False
+        ).update(read=True)
+
+        return Response({
+            "success": True,
+            "message": f"Marked all ({updated_count}) notifications as read"
+        })
+
 from django.core.management import call_command
 
 @api_view(['POST'])

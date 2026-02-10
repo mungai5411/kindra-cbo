@@ -22,6 +22,7 @@ from .views import (
     approve_user_view,
     delete_profile_picture_view,
     VerifyEmailView,
+    MarkAllNotificationsReadView,
 )
 from .google_auth import google_login
 
@@ -61,6 +62,7 @@ urlpatterns = [
     
     # Notifications
     path('notifications/', NotificationListView.as_view(), name='notifications'),
+    path('notifications/mark-all-read/', MarkAllNotificationsReadView.as_view(), name='notifications_mark_all_read'),
     
     # Admin Tasks
     path('admin/cleanup-inactivity/', trigger_cleanup_view, name='cleanup_inactivity'),
