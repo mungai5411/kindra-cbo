@@ -398,7 +398,11 @@ def download_receipt(request, pk):
         # Check permissions for authenticated users
         if request.user.is_authenticated:
             if request.user.role == 'DONOR':
-                if not receipt.donation.donor or receipt.donation.donor.user != request.user:
+                # Allow if user is the linked donor OR if the email matches (for guest checkout by registered users)
+                is_linked_donor = receipt.donation.donor and receipt.donation.donor.user == request.user
+                is_email_match = receipt.donation.donor_email and receipt.donation.donor_email.lower() == request.user.email.lower()
+                
+                if not (is_linked_donor or is_email_match):
                     logger.warning(f"User {request.user.id} attempted to access receipt {pk} without permission")
                     return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
         

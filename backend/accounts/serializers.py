@@ -11,8 +11,9 @@ from django.conf import settings
 from django.utils.html import strip_tags
 
 from rest_framework import serializers
-from .models import User, AuditLog, Notification
+from .models import User, AuditLog, Notification, VerificationToken
 from django.contrib.auth.password_validation import validate_password
+from django.utils import timezone
 import re
 
 class NotificationSerializer(serializers.ModelSerializer):
@@ -212,3 +213,34 @@ class AuditLogSerializer(serializers.ModelSerializer):
             'timestamp'
         )
         read_only_fields = fields
+
+
+class VerificationSerializer(serializers.Serializer):
+    """Serializer for email verification"""
+    token = serializers.CharField(required=True)
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    """Serializer for password reset request"""
+    email = serializers.EmailField(required=True)
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    """Serializer for password reset confirmation"""
+    token = serializers.CharField(required=True)
+    new_password = serializers.CharField(
+        required=True,
+        validators=[validate_password],
+        style={'input_type': 'password'}
+    )
+    new_password_confirm = serializers.CharField(
+        required=True,
+        style={'input_type': 'password'}
+    )
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['new_password_confirm']:
+            raise serializers.ValidationError({
+                "new_password": "New password fields didn't match."
+            })
+        return attrs

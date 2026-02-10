@@ -6,7 +6,10 @@ Custom user model with role-based permissions for Kindra CBO system
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from datetime import timedelta
 import uuid
+import secrets
 
 
 class UserManager(BaseUserManager):
@@ -227,3 +230,35 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.recipient.email}"
+
+
+class VerificationToken(models.Model):
+    """
+    Token for Email Verification and Password Reset
+    """
+    class TokenType(models.TextChoices):
+        VERIFICATION = 'VERIFICATION', _('Email Verification')
+        PASSWORD_RESET = 'PASSWORD_RESET', _('Password Reset')
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='verification_tokens')
+    token = models.CharField(max_length=64, unique=True)
+    token_type = models.CharField(max_length=20, choices=TokenType.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = secrets.token_urlsafe(32)
+        if not self.expires_at:
+            # Default to 15 minutes expiry
+            self.expires_at = timezone.now() + timedelta(minutes=15)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_valid(self):
+        return not self.is_used and self.expires_at > timezone.now()
+
+    def __str__(self):
+        return f"{self.token_type} for {self.user.email}"

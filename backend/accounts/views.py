@@ -26,8 +26,12 @@ from .serializers import (
     UserProfileUpdateSerializer,
     ChangePasswordSerializer,
     AuditLogSerializer,
-    NotificationSerializer
+    NotificationSerializer,
+    VerificationSerializer,
+    PasswordResetRequestSerializer,
+    PasswordResetConfirmSerializer
 )
+from .models import User, AuditLog, Notification, VerificationToken
 from .permissions import IsAdminOrManagement
 from kindra_cbo.throttling import RegistrationRateThrottle
 from reporting.utils import log_analytics_event
@@ -120,10 +124,41 @@ class UserRegistrationView(generics.CreateAPIView):
             request=request
         )
         
+        # Generate Verification Token
+        verification_token = VerificationToken.objects.create(
+            user=user,
+            token_type=VerificationToken.TokenType.VERIFICATION
+        )
+
+        # Send Verification Email
+        verify_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/verify?token={verification_token.token}"
+        
+        if settings.DEBUG:
+            print(f"Verification URL for {user.email}: {verify_url}")
+
+        try:
+            send_mail(
+                'Verify your email for Kindra',
+                f'Please verify your email by clicking: {verify_url}',
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                html_message=f'''
+                <p>Welcome to Kindra!</p>
+                <p>Please verify your email by clicking below:</p>
+                <a href="{verify_url}"
+                   style="display:inline-block;padding:10px 20px;background:#007BFF;color:#fff;text-decoration:none;border-radius:5px;">
+                   Verify Email
+                </a>
+                ''',
+                fail_silently=True
+            )
+        except Exception as e:
+            print(f"Failed to send email: {e}")
+        
         # Create response
         response = Response({
             'user': UserSerializer(user).data,
-            'message': 'User registered successfully' + (' and waiting for admin approval' if approval_needed else ''),
+            'message': 'User registered successfully. Please check your email to verify your account.',
             'tokens': {
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
@@ -481,6 +516,74 @@ def logout_view(request):
         )
 
 
+class VerifyEmailView(APIView):
+    """
+    Verify user email with token
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = VerificationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        token_str = serializer.validated_data['token']
+        
+        try:
+            token = VerificationToken.objects.get(
+                token=token_str,
+                token_type=VerificationToken.TokenType.VERIFICATION,
+                is_used=False
+            )
+            
+            if not token.is_valid:
+                return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
+                
+            # Verify user
+            user = token.user
+            user.is_verified = True
+            user.save()
+            
+            # Mark token as used
+            token.is_used = True
+            token.save()
+            
+            # Generate new tokens
+            refresh = RefreshToken.for_user(user)
+
+            # Log verification
+            log_analytics_event(
+                event_type='EMAIL_VERIFIED',
+                description=f'User verified email: {user.email}',
+                user=user,
+                request=request
+            )
+            
+            response = Response({
+                'message': 'Email verified successfully',
+                'tokens': {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                }
+            })
+            
+            # Set cookies
+            from django.conf import settings
+            response.set_cookie(
+                key='access_token',
+                value=str(refresh.access_token),
+                max_age=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds(),
+                httponly=True,
+                secure=not settings.DEBUG,
+                samesite='Lax',
+                path='/'
+            )
+            
+            return response
+            
+        except VerificationToken.DoesNotExist:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class PasswordResetRequestView(APIView):
     """
     Request password reset link
@@ -488,39 +591,53 @@ class PasswordResetRequestView(APIView):
     permission_classes = [permissions.AllowAny]
     
     def post(self, request):
-        email = request.data.get('email')
-        if not email:
-            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        email = serializer.validated_data['email']
             
         try:
             user = User.objects.get(email=email)
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
             
-            # In a real app, send an email here.
-            # For now, we'll return the token/uid for testing if DEBUG is True
-            # Or just send it to console
-            reset_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/reset-password/{uid}/{token}/"
+            if not user.is_verified:
+                 return Response({'error': 'Please verify your email first.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Create Token
+            token = VerificationToken.objects.create(
+                user=user,
+                token_type=VerificationToken.TokenType.PASSWORD_RESET
+            )
             
+            # Send Email
+            reset_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/reset-password?token={token.token}"
+            
+            try:
+                send_mail(
+                    'Reset Your Password',
+                    f'Click below to reset your password: {reset_url}',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    html_message=f'''
+                    <p>Hello,</p>
+                    <p>You requested to reset your password. Click below to set a new one:</p>
+                    <a href="{reset_url}"
+                       style="display:inline-block;padding:10px 20px;background:#28a745;color:#fff;text-decoration:none;border-radius:5px;">
+                       Reset Password
+                    </a>
+                    <p>If you didn’t request this, ignore this email.</p>
+                    ''',
+                    fail_silently=True
+                )
+            except Exception as e:
+                print(f"Failed to send email: {e}")
+
             if settings.DEBUG:
                 print(f"Password reset link for {email}: {reset_url}")
-                
-            # Simulate sending email
-            # send_mail(
-            #     'Password Reset Request',
-            #     f'Click the link to reset your password: {reset_url}',
-            #     settings.DEFAULT_FROM_EMAIL,
-            #     [email],
-            #     fail_silently=False,
-            # )
             
             return Response({
                 'message': 'If an account exists with this email, a reset link has been sent.',
-                # return debug info only in dev
-                'debug_link': reset_url if settings.DEBUG else None 
             })
         except User.DoesNotExist:
-            # Don't reveal if user exists
             return Response({'message': 'If an account exists with this email, a reset link has been sent.'})
 
 
@@ -531,22 +648,29 @@ class PasswordResetConfirmView(APIView):
     permission_classes = [permissions.AllowAny]
     
     def post(self, request):
-        uidb64 = request.data.get('uid')
-        token = request.data.get('token')
-        new_password = request.data.get('new_password')
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         
-        if not all([uidb64, token, new_password]):
-            return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
-            
+        token_str = serializer.validated_data['token']
+        new_password = serializer.validated_data['new_password']
+        
         try:
-            uid = force_str(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(pk=uid)
+            token = VerificationToken.objects.get(
+                token=token_str,
+                token_type=VerificationToken.TokenType.PASSWORD_RESET,
+                is_used=False
+            )
             
-            if not default_token_generator.check_token(user, token):
-                return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
+            if not token.is_valid:
+                return Response({'error': 'Token expired'}, status=status.HTTP_400_BAD_REQUEST)
                 
+            user = token.user
             user.set_password(new_password)
             user.save()
+            
+            # Mark token as used
+            token.is_used = True
+            token.save()
             
             # Log password reset
             log_analytics_event(
@@ -557,7 +681,7 @@ class PasswordResetConfirmView(APIView):
             )
             
             return Response({'message': 'Password has been reset successfully'})
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        except VerificationToken.DoesNotExist:
             return Response({'error': 'Invalid link'}, status=status.HTTP_400_BAD_REQUEST)
 
 

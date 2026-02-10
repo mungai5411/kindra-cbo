@@ -27,6 +27,7 @@ import DonationsPage from './pages/DonationsPage';
 // RegisterPage removed
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 import { PendingApprovalView } from './components/auth/PendingApprovalView';
 
 // Modals
@@ -106,7 +107,8 @@ function App() {
 
                             <Route path="/donate" element={<DonationsPage />} />
                             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                            <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />
+                            <Route path="/reset-password" element={<ResetPasswordPage />} />
+                            <Route path="/verify" element={<VerifyEmailPage />} />
 
                             {/* Protected routes */}
                             <Route path="/dashboard" element={<Navigate to="/dashboard/overview" replace />} />

@@ -19,7 +19,9 @@ from .views import (
     trigger_cleanup_view,
     PendingApprovalsListView,
     approve_user_view,
+    approve_user_view,
     delete_profile_picture_view,
+    VerifyEmailView,
 )
 from .google_auth import google_login
 
@@ -49,6 +51,9 @@ urlpatterns = [
         
     # Audit Logs
     path('audit-logs/', AuditLogListView.as_view(), name='audit_logs'),
+
+    # Email Verification
+    path('verify-email/', VerifyEmailView.as_view(), name='verify_email'),
 
     # Password Reset
     path('password-reset/', PasswordResetRequestView.as_view(), name='password_reset'),

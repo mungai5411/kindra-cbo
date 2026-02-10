@@ -50,6 +50,7 @@ export const RegisterModal = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState(false);
 
     useEffect(() => {
         if (isRegisterOpen) {
@@ -66,6 +67,7 @@ export const RegisterModal = () => {
             }));
             setError('');
             setLoading(false);
+            setSuccess(false);
             setShowPassword(false);
         }
     }, [isRegisterOpen, initialRole]);
@@ -88,8 +90,10 @@ export const RegisterModal = () => {
                 dispatch(register(formData)).unwrap(),
                 new Promise(resolve => setTimeout(resolve, 800))
             ]);
-            closeRegisterModal();
-            navigate('/dashboard');
+            // Instead of closing and navigating, show a success message
+            // or close but don't log in automatically (depending on UX preference)
+            // The prompt asks for verification, so we shouldn't auto-login to dashboard.
+            setSuccess(true);
         } catch (err: any) {
             console.error('Registration error:', err);
             setError(typeof err === 'string' ? err : 'Registration failed. Please check your details.');
@@ -153,199 +157,214 @@ export const RegisterModal = () => {
             <DialogContent sx={{ p: isMobile ? 3 : 5, pt: isMobile ? 5 : 6 }}>
                 <Box sx={{ mb: 4 }}>
                     <Typography variant="h4" fontWeight="700" sx={{ color: '#000', mb: 1, letterSpacing: '-0.02em' }}>
-                        Create account
+                        {success ? 'Check your email' : 'Create account'}
                     </Typography>
                     <Typography variant="body1" sx={{ color: '#666', fontWeight: 400 }}>
-                        Join the Kindra community today
+                        {success
+                            ? `We've sent a verification link to ${formData.email}. Please verify your account to continue.`
+                            : 'Join the Kindra community today'}
                     </Typography>
                 </Box>
 
-                <Box component="form" onSubmit={handleSubmit}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <LabelComponent>First Name *</LabelComponent>
-                            <TextField
-                                fullWidth
-                                name="first_name"
-                                placeholder="Jane"
-                                value={formData.first_name}
-                                onChange={handleChange}
-                                required
-                                InputProps={{ sx: inputInnerSx }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <LabelComponent>Last Name *</LabelComponent>
-                            <TextField
-                                fullWidth
-                                name="last_name"
-                                placeholder="Doe"
-                                value={formData.last_name}
-                                onChange={handleChange}
-                                required
-                                InputProps={{ sx: inputInnerSx }}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <LabelComponent>Email Address *</LabelComponent>
-                            <TextField
-                                fullWidth
-                                name="email"
-                                type="email"
-                                placeholder="jane@example.com"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                                InputProps={{ sx: inputInnerSx }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <LabelComponent>Phone Number</LabelComponent>
-                            <TextField
-                                fullWidth
-                                name="phone_number"
-                                placeholder="+254..."
-                                value={formData.phone_number}
-                                onChange={handleChange}
-                                InputProps={{ sx: inputInnerSx }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <LabelComponent>I am a... *</LabelComponent>
-                            <TextField
-                                fullWidth
-                                select
-                                name="role"
-                                value={formData.role}
-                                onChange={handleChange}
-                                required
-                                InputProps={{ sx: inputInnerSx }}
-                            >
-                                {ROLES.map((option) => (
-                                    <MenuItem key={option.value} value={option.value} sx={{ fontSize: '0.9rem' }}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <LabelComponent>Organization (Optional)</LabelComponent>
-                            <TextField
-                                fullWidth
-                                name="organization"
-                                placeholder="Organization name"
-                                value={formData.organization}
-                                onChange={handleChange}
-                                InputProps={{ sx: inputInnerSx }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <LabelComponent>Password *</LabelComponent>
-                            <TextField
-                                fullWidth
-                                name="password"
-                                type={showPassword ? 'text' : 'password'}
-                                placeholder="••••••••"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                                InputProps={{
-                                    sx: inputInnerSx,
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                edge="end"
-                                                size="small"
-                                            >
-                                                {showPassword ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    )
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <LabelComponent>Confirm Password *</LabelComponent>
-                            <TextField
-                                fullWidth
-                                name="password_confirm"
-                                type={showPassword ? 'text' : 'password'}
-                                placeholder="••••••••"
-                                value={formData.password_confirm}
-                                onChange={handleChange}
-                                required
-                                InputProps={{ sx: inputInnerSx }}
-                            />
-                        </Grid>
-                    </Grid>
-
-                    {error && <Alert severity="error" sx={{ mt: 3, mb: 0, borderRadius: '8px' }}>{error}</Alert>}
-
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        disabled={loading}
-                        sx={{
-                            mt: 4,
-                            py: 1.5,
-                            borderRadius: '8px',
-                            fontWeight: '700',
-                            textTransform: 'none',
-                            fontSize: '16px',
-                            bgcolor: '#000',
-                            color: '#fff',
-                            boxShadow: 'none',
-                            '&:hover': {
-                                bgcolor: '#222',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                            },
-                        }}
-                    >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Create account'}
-                    </Button>
-
-                    <Box sx={{ display: 'flex', alignItems: 'center', my: 3 }}>
-                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
-                        <Typography variant="body2" sx={{ px: 2, color: '#999', fontWeight: 500 }}>
-                            or
-                        </Typography>
-                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
+                {success ? (
+                    <Box sx={{ textAlign: 'center', py: 2 }}>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            onClick={closeRegisterModal}
+                            sx={{ borderRadius: '8px', py: 1.5, fontWeight: '700', textTransform: 'none' }}
+                        >
+                            Back to Home
+                        </Button>
                     </Box>
+                ) : (
+                    <Box component="form" onSubmit={handleSubmit}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                                <LabelComponent>First Name *</LabelComponent>
+                                <TextField
+                                    fullWidth
+                                    name="first_name"
+                                    placeholder="Jane"
+                                    value={formData.first_name}
+                                    onChange={handleChange}
+                                    required
+                                    InputProps={{ sx: inputInnerSx }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <LabelComponent>Last Name *</LabelComponent>
+                                <TextField
+                                    fullWidth
+                                    name="last_name"
+                                    placeholder="Doe"
+                                    value={formData.last_name}
+                                    onChange={handleChange}
+                                    required
+                                    InputProps={{ sx: inputInnerSx }}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <LabelComponent>Email Address *</LabelComponent>
+                                <TextField
+                                    fullWidth
+                                    name="email"
+                                    type="email"
+                                    placeholder="jane@example.com"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    required
+                                    InputProps={{ sx: inputInnerSx }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <LabelComponent>Phone Number</LabelComponent>
+                                <TextField
+                                    fullWidth
+                                    name="phone_number"
+                                    placeholder="+254..."
+                                    value={formData.phone_number}
+                                    onChange={handleChange}
+                                    InputProps={{ sx: inputInnerSx }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <LabelComponent>I am a... *</LabelComponent>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    name="role"
+                                    value={formData.role}
+                                    onChange={handleChange}
+                                    required
+                                    InputProps={{ sx: inputInnerSx }}
+                                >
+                                    {ROLES.map((option) => (
+                                        <MenuItem key={option.value} value={option.value} sx={{ fontSize: '0.9rem' }}>
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <LabelComponent>Organization (Optional)</LabelComponent>
+                                <TextField
+                                    fullWidth
+                                    name="organization"
+                                    placeholder="Organization name"
+                                    value={formData.organization}
+                                    onChange={handleChange}
+                                    InputProps={{ sx: inputInnerSx }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <LabelComponent>Password *</LabelComponent>
+                                <TextField
+                                    fullWidth
+                                    name="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder="••••••••"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                    InputProps={{
+                                        sx: inputInnerSx,
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    edge="end"
+                                                    size="small"
+                                                >
+                                                    {showPassword ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <LabelComponent>Confirm Password *</LabelComponent>
+                                <TextField
+                                    fullWidth
+                                    name="password_confirm"
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder="••••••••"
+                                    value={formData.password_confirm}
+                                    onChange={handleChange}
+                                    required
+                                    InputProps={{ sx: inputInnerSx }}
+                                />
+                            </Grid>
+                        </Grid>
 
-                    <GoogleSignInButton
-                        selectedRole={formData.role}
-                        buttonText="signup_with"
-                        onSuccess={(data: any) => {
-                            dispatch({
-                                type: 'auth/register/fulfilled',
-                                payload: { access: data.access, refresh: data.refresh, user: data.user }
-                            });
-                            closeRegisterModal();
-                            navigate('/dashboard');
-                        }}
-                    />
+                        {error && <Alert severity="error" sx={{ mt: 3, mb: 0, borderRadius: '8px' }}>{error}</Alert>}
 
-                    <Box sx={{ mt: 3, textAlign: 'center' }}>
-                        <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
-                            Already have an account?{' '}
-                            <Link
-                                component="button"
-                                variant="body2"
-                                onClick={switchToLogin}
-                                sx={{
-                                    color: '#0066ff',
-                                    fontWeight: 700,
-                                    textDecoration: 'none',
-                                    '&:hover': { textDecoration: 'underline' }
-                                }}
-                            >
-                                Sign in
-                            </Link>
-                        </Typography>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            disabled={loading}
+                            sx={{
+                                mt: 4,
+                                py: 1.5,
+                                borderRadius: '8px',
+                                fontWeight: '700',
+                                textTransform: 'none',
+                                fontSize: '16px',
+                                bgcolor: '#000',
+                                color: '#fff',
+                                boxShadow: 'none',
+                                '&:hover': {
+                                    bgcolor: '#222',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                },
+                            }}
+                        >
+                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Create account'}
+                        </Button>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', my: 3 }}>
+                            <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
+                            <Typography variant="body2" sx={{ px: 2, color: '#999', fontWeight: 500 }}>
+                                or
+                            </Typography>
+                            <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
+                        </Box>
+
+                        <GoogleSignInButton
+                            selectedRole={formData.role}
+                            buttonText="signup_with"
+                            onSuccess={(data: any) => {
+                                dispatch({
+                                    type: 'auth/register/fulfilled',
+                                    payload: { access: data.access, refresh: data.refresh, user: data.user }
+                                });
+                                closeRegisterModal();
+                                navigate('/dashboard');
+                            }}
+                        />
+
+                        <Box sx={{ mt: 3, textAlign: 'center' }}>
+                            <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
+                                Already have an account?{' '}
+                                <Link
+                                    component="button"
+                                    variant="body2"
+                                    onClick={switchToLogin}
+                                    sx={{
+                                        color: '#0066ff',
+                                        fontWeight: 700,
+                                        textDecoration: 'none',
+                                        '&:hover': { textDecoration: 'underline' }
+                                    }}
+                                >
+                                    Sign in
+                                </Link>
+                            </Typography>
+                        </Box>
                     </Box>
-                </Box>
+                )}
             </DialogContent>
         </Dialog>
     );

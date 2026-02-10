@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     Box,
     Container,
@@ -24,7 +24,8 @@ import { motion } from 'framer-motion';
 import apiClient from '../api/client';
 
 export default function ResetPasswordPage() {
-    const { uid, token } = useParams();
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get('token');
     const navigate = useNavigate();
     const theme = useTheme();
 
@@ -54,9 +55,9 @@ export default function ResetPasswordPage() {
 
         try {
             await apiClient.post('/auth/password-reset-confirm/', {
-                uid,
                 token,
-                new_password: password
+                new_password: password,
+                new_password_confirm: confirmPassword
             });
             setMessage('Password reset successfully! Redirecting to login...');
 
@@ -65,6 +66,9 @@ export default function ResetPasswordPage() {
             }, 3000);
         } catch (err: any) {
             setError(err.response?.data?.error || 'Failed to reset password. The link may be expired.');
+            if (err.response?.data?.new_password) {
+                setError(err.response.data.new_password[0]);
+            }
         } finally {
             setIsLoading(false);
         }

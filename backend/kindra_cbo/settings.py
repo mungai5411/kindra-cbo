@@ -376,13 +376,18 @@ CELERY_TASK_ALWAYS_EAGER = DEBUG  # Run tasks synchronously in development
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 # ==================================
-# EMAIL CONFIGURATION (SendGrid)
+# EMAIL CONFIGURATION (Zoho SMTP)
 # ==================================
 
-EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
-SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='')
-DEFAULT_FROM_EMAIL = config('SENDGRID_FROM_EMAIL', default='kindra-cbo@zohomail.com')
-SENDGRID_SANDBOX_MODE_IN_DEBUG = DEBUG
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.zoho.com'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='kindra-cbo@zohomail.com')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 
 # Email templates
 EMAIL_TEMPLATES = {
