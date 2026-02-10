@@ -27,7 +27,7 @@ def backup_database():
         raise
 
 
-@shared_task
+@shared_task(ignore_result=True)
 def send_email_notification(recipient, subject, message, html_message=None):
     """
     Send email notification

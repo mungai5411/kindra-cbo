@@ -365,11 +365,13 @@ CORS_ALLOW_CREDENTIALS = True
 # ==================================
 
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=config('REDIS_URL', default='redis://localhost:6379/0'))
-CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default=config('REDIS_URL', default='redis://localhost:6379/0'))
+CELERY_RESULT_BACKEND = None  # Disable result backend to avoid connection issues
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_TASK_IGNORE_RESULT = True  # Globally ignore results
 
 # Handle secure Redis (Upstash/Render/Heroku)
 if CELERY_BROKER_URL.startswith('rediss://'):
