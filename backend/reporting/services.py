@@ -232,6 +232,31 @@ class ReportService:
                     'total_hours': sum(v.total_hours for v in volunteers),
                     'active_count': len([v for v in volunteers if v.status == 'ACTIVE']),
                 }
+
+            elif report.report_type == 'SHELTER':
+                from shelter_homes.models import ShelterHome
+                qs = ShelterHome.objects.all()
+                shelters = list(qs)
+                context['shelters'] = shelters
+                context['summary'] = {
+                    'total_shelters': len(shelters),
+                    'total_capacity': sum(s.total_capacity for s in shelters),
+                    'total_occupancy': sum(s.current_occupancy for s in shelters),
+                }
+
+            elif report.report_type == 'CASE':
+                from case_management.models import Case
+                qs = Case.objects.all().select_related('family', 'assigned_to')
+                if report.start_date: qs = qs.filter(opened_date__gte=report.start_date)
+                if report.end_date: qs = qs.filter(opened_date__lte=report.end_date)
+                
+                cases = list(qs[:500])
+                context['cases'] = cases
+                context['summary'] = {
+                    'total_cases': len(cases),
+                    'open_cases': len([c for c in cases if c.status == 'OPEN']),
+                    'high_priority': len([c for c in cases if c.priority == 'HIGH']),
+                }
             
             # Render HTML template
             html_string = render_to_string(template_name, context)

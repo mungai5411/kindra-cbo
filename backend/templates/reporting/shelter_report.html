@@ -1,0 +1,88 @@
+{% extends "reporting/base_report.html" %}
+
+{% block title %}{{ report.title }}{% endblock %}
+
+{% block content %}
+<div class="report-header">
+    <div class="logo-section">
+        {% if logo_path %}
+        <img src="file://{{ logo_path }}" class="logo-img" alt="Logo">
+        {% else %}
+        <div style="width: 70px; height: 70px; background-color: #eee;"></div>
+        {% endif %}
+    </div>
+    <div class="org-info">
+        <h1 class="org-name">Kindra CBO</h1>
+        <p class="org-details">Shelter Coordination Unit</p>
+        <p class="org-details">Generated: {{ report.generated_at|date:"F j, Y, P" }}</p>
+    </div>
+    <div class="report-badge">
+        SHELTER REPORT
+    </div>
+</div>
+
+<div class="report-meta">
+    <h2 class="report-title">{{ report.title }}</h2>
+    <div class="meta-row">
+        <span class="meta-label">Report ID:</span>
+        <span class="meta-value">{{ report.id }}</span>
+    </div>
+    <div class="meta-row">
+        <span class="meta-label">Total Shelters:</span>
+        <span class="meta-value">{{ summary.total_shelters }}</span>
+    </div>
+    <div class="meta-row">
+        <span class="meta-label">Total Capacity:</span>
+        <span class="meta-value">{{ summary.total_capacity }}</span>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ summary.total_shelters }}</div>
+        <div class="stat-label">Active Shelters</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ summary.total_capacity }}</div>
+        <div class="stat-label">Total Bed Capacity</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ summary.total_occupancy }}</div>
+        <div class="stat-label">Current Occupancy</div>
+    </div>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Shelter Name</th>
+            <th>County</th>
+            <th>Contact Person</th>
+            <th>Capacity</th>
+            <th>Occupancy</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for shelter in shelters %}
+        <tr>
+            <td>{{ shelter.name }}</td>
+            <td>{{ shelter.county }}</td>
+            <td>{{ shelter.contact_person }}</td>
+            <td>{{ shelter.total_capacity }}</td>
+            <td>{{ shelter.current_occupancy }}</td>
+            <td>{{ shelter.status }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" style="text-align: center; padding: 20px;">No shelter records found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="report-footer">
+    <p>Confidential Document - Internal Use Only</p>
+    <p>&copy; {% now "Y" %} Kindra Community Based Organization. All rights reserved.</p>
+</div>
+{% endblock %}
