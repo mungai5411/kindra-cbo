@@ -1,10 +1,10 @@
-import { Menu as MenuIcon, Close, LightMode, DarkMode } from '@mui/icons-material';
+import { Menu as MenuIcon, Close } from '@mui/icons-material';
 import {
     AppBar, Toolbar, Container, Box, Typography, Button, Stack,
-    Tooltip, IconButton, Drawer, List, ListItem, ListItemText,
+    IconButton, Drawer, List, ListItem, ListItemText,
     Divider, alpha, useTheme
 } from '@mui/material';
-import { useColorMode } from '../../contexts/ThemeContext';
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthModal } from '../../contexts/AuthModalContext';
@@ -27,7 +27,7 @@ export const Navbar = () => {
     const dispatch = useDispatch<AppDispatch>();
     const location = useLocation();
     const navigate = useNavigate();
-    const { mode, toggleColorMode } = useColorMode();
+
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
     const { openLoginModal, openRegisterModal } = useAuthModal();
     const [scrolled, setScrolled] = useState(false);
@@ -117,11 +117,7 @@ export const Navbar = () => {
                         ))}
 
                         <Stack direction="row" spacing={2}>
-                            <Tooltip title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}>
-                                <IconButton onClick={toggleColorMode} color="inherit" size="small">
-                                    {mode === 'light' ? <DarkMode fontSize="small" /> : <LightMode fontSize="small" />}
-                                </IconButton>
-                            </Tooltip>
+
                             {isAuthenticated ? (
                                 <>
                                     <Button
