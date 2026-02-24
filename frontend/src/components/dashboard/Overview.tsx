@@ -95,7 +95,7 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
             count += (dashboardData?.overview?.active_cases || 0);
         }
 
-        return count || recentActivities.length;
+        return count;
     };
 
     const actionsCount = getActionsNeededCount();
