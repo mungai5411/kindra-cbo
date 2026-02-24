@@ -1,7 +1,9 @@
 import { Box, Typography, CircularProgress, alpha } from '@mui/material';
 
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../../store';
+import { fetchNotifications } from '../../features/auth/authSlice';
+import { useEffect } from 'react';
 import {
     aggregateDonationsByDay,
     calculateCampaignProgress,
@@ -22,7 +24,8 @@ interface OverviewProps {
 }
 
 export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps) => {
-    const { user } = useSelector((state: RootState) => state.auth);
+    const dispatch = useDispatch<AppDispatch>();
+    const { user, unreadNotificationsCount } = useSelector((state: RootState) => state.auth);
     const { dashboardData, isLoading: dashboardLoading } = useSelector((state: RootState) => state.reporting);
 
     // Keep individual slices for specific lists if needed, but rely on dashboardData for stats
@@ -30,6 +33,11 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
     const { campaigns, donations: donationRecords } = useSelector((state: RootState) => state.donations);
     const { cases, children } = useSelector((state: RootState) => state.caseManagement);
     const { shelters, incidents } = useSelector((state: RootState) => state.shelters);
+    const { pendingUsers } = useSelector((state: RootState) => state.admin);
+
+    useEffect(() => {
+        dispatch(fetchNotifications());
+    }, [dispatch]);
 
     const isLoading = dashboardLoading;
 
@@ -70,7 +78,27 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
             description: `Case ${c.case_number} for ${c.child_name}`,
             timestamp: c.created_at || new Date().toISOString()
         }))
-    ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 6);
+    ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    const recentActivities = activities.slice(0, 6);
+
+    // Calculate dynamic actions needed
+    const getActionsNeededCount = () => {
+        let count = unreadNotificationsCount || 0;
+
+        const role = user?.role;
+        if (role === 'ADMIN' || role === 'MANAGEMENT') {
+            count += (pendingUsers?.length || 0);
+        } else if (role === 'VOLUNTEER') {
+            count += tasks.filter((t: any) => t.status === 'PENDING').length;
+        } else if (role === 'CASE_WORKER') {
+            count += (dashboardData?.overview?.active_cases || 0);
+        }
+
+        return count || recentActivities.length;
+    };
+
+    const actionsCount = getActionsNeededCount();
 
     const renderRoleSpecificOverview = () => {
         const role = user?.role;
@@ -89,7 +117,7 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
                         shelterCount: dashboardData?.shelter_homes?.total_homes || 0
                     }}
                     charts={{ donationTrends, campaignProgress, donationMethods, shelterCapacity }}
-                    activities={activities}
+                    activities={recentActivities}
                 />
             );
         }
@@ -235,7 +263,7 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
                     fontWeight: 500,
                     opacity: 0.7
                 }}>
-                    Here's what's happening with Kindra today. You have {activities.length} recent activities to review.
+                    Here's what's happening with Kindra today. You have {actionsCount} {actionsCount === 1 ? 'item' : 'items'} requiring your attention.
                 </Typography>
             </Box>
 

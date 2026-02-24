@@ -58,6 +58,7 @@ import { fetchShelters, fetchIncidents } from '../features/shelters/shelterSlice
 import { fetchVolunteers, fetchTasks, fetchEvents } from '../features/volunteers/volunteersSlice';
 import { fetchCampaigns, fetchDonations } from '../features/donations/donationsSlice';
 import { fetchDashboardData } from '../features/reporting/reportingSlice';
+import { fetchPendingUsers } from '../features/admin/adminSlice';
 
 const DRAWER_WIDTH = 280;
 
@@ -199,8 +200,12 @@ export default function DashboardPage() {
             dispatch(fetchCases());
             dispatch(fetchShelters());
             dispatch(fetchIncidents());
+
+            if (user?.is_superuser || user?.role === 'ADMIN' || user?.role === 'MANAGEMENT') {
+                dispatch(fetchPendingUsers());
+            }
         }
-    }, [dispatch, isAuthenticated]);
+    }, [dispatch, isAuthenticated, user?.role, user?.is_superuser]);
 
     useEffect(() => {
         if (!isAuthenticated && !authLoading) {

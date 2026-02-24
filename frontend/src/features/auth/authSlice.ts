@@ -27,6 +27,7 @@ interface AuthState {
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
+    unreadNotificationsCount: number;
 }
 
 const initialState: AuthState = {
@@ -36,6 +37,7 @@ const initialState: AuthState = {
     isAuthenticated: !!localStorage.getItem('accessToken'),
     isLoading: false,
     error: null,
+    unreadNotificationsCount: 0,
 };
 
 // Async thunks
@@ -234,6 +236,22 @@ export const updateProfile = createAsyncThunk(
     }
 );
 
+export const fetchNotifications = createAsyncThunk(
+    'auth/fetchNotifications',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get(endpoints.auth.notifications);
+            const notifications = response.data.results || response.data;
+            const unreadCount = Array.isArray(notifications)
+                ? notifications.filter((n: any) => !n.read).length
+                : 0;
+            return unreadCount;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch notifications');
+        }
+    }
+);
+
 // Slice
 const authSlice = createSlice({
     name: 'auth',
@@ -325,6 +343,10 @@ const authSlice = createSlice({
         builder.addCase(updateProfile.rejected, (state, action) => {
             state.isLoading = false;
             state.error = action.payload as string;
+        });
+        // Fetch Notifications
+        builder.addCase(fetchNotifications.fulfilled, (state, action: PayloadAction<number>) => {
+            state.unreadNotificationsCount = action.payload;
         });
     },
 });

@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Box, Avatar, Badge, Tooltip, useTheme, alpha, Menu, MenuItem, ListItemIcon, Divider, TextField } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 import { Menu as MenuIcon, Notifications, Search, Logout, Settings } from '@mui/icons-material';
 import { SettingsDrawer } from './SettingsDrawer';
 import { NotificationsDrawer } from './NotificationsDrawer';
@@ -15,33 +17,10 @@ export const Header = ({ handleDrawerToggle, user, handleLogout }: HeaderProps) 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [notificationsOpen, setNotificationsOpen] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0);
+    const { unreadNotificationsCount } = useSelector((state: RootState) => state.auth);
     const open = Boolean(anchorEl);
 
-    // Load unread notification count
-    useEffect(() => {
-        const loadUnreadCount = () => {
-            const stored = sessionStorage.getItem('notifications');
-            if (stored) {
-                try {
-                    const notifications = JSON.parse(stored);
-                    const count = notifications.filter((n: any) => !n.read).length;
-                    setUnreadCount(count);
-                } catch {
-                    setUnreadCount(0);
-                }
-            } else {
-                // Default mock notifications have 2 unread
-                setUnreadCount(2);
-            }
-        };
-
-        loadUnreadCount();
-
-        // Listen for storage changes
-        window.addEventListener('storage', loadUnreadCount);
-        return () => window.removeEventListener('storage', loadUnreadCount);
-    }, []);
+    // Notifications count is now managed via Redux (authSlice)
 
     const handleNotificationsClick = () => {
         setNotificationsOpen(true);
@@ -129,7 +108,7 @@ export const Header = ({ handleDrawerToggle, user, handleLogout }: HeaderProps) 
                                     p: { xs: 1, sm: 1.25 }
                                 }}
                             >
-                                <Badge badgeContent={unreadCount} color="error" variant="dot">
+                                <Badge badgeContent={unreadNotificationsCount} color="error" variant="standard">
                                     <Notifications fontSize="small" />
                                 </Badge>
                             </IconButton>
