@@ -426,13 +426,22 @@ class MediaAssetViewSet(viewsets.ModelViewSet):
     """
     ViewSet for centralized media library management
     """
-    queryset = MediaAsset.objects.all().select_related('uploaded_by')
     serializer_class = MediaAssetSerializer
-    permission_classes = [permissions.IsAuthenticated, IsAdminManagementOrSocialMedia]
+    permission_classes = [permissions.IsAuthenticated] # Adjusted to allow Partners
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['source_type', 'uploaded_by']
     search_fields = ['title', 'alt_text']
     ordering = ['-created_at']
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = MediaAsset.objects.all().select_related('uploaded_by')
+        
+        if user.is_staff or user.role in ['ADMIN', 'MANAGEMENT', 'SOCIAL_MEDIA']:
+            return queryset
+            
+        # Partners only see their own uploads
+        return queryset.filter(uploaded_by=user)
 
     def perform_create(self, serializer):
         serializer.save(uploaded_by=self.request.user)

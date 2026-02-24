@@ -13,6 +13,8 @@ import resourcesReducer from './features/resources/resourcesSlice';
 import caseManagementReducer from './features/caseManagement/caseManagementSlice';
 import adminReducer from './features/admin/adminSlice';
 import groupsReducer from './features/volunteers/groupsSlice';
+import mediaReducer from './features/media/mediaSlice';
+import impactReducer from './features/donations/impactSlice';
 
 export const store = configureStore({
     reducer: {
@@ -26,6 +28,8 @@ export const store = configureStore({
         resources: resourcesReducer,
         caseManagement: caseManagementReducer,
         admin: adminReducer,
+        media: mediaReducer,
+        impact: impactReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

@@ -80,6 +80,7 @@ const NAVIGATION = [
             { id: 'donors', label: 'Donors' },
             { id: 'receipts', label: 'Receipts' },
             { id: 'social_media', label: 'Social Media' },
+            { id: 'impact', label: 'Impact Tracker' },
         ]
     },
     {
@@ -90,6 +91,7 @@ const NAVIGATION = [
             { id: 'shelters', label: 'Shelter Homes' },
             { id: 'placements', label: 'Placements' },
             { id: 'resources', label: 'Resources' },
+            { id: 'media', label: 'Media Library' },
             { id: 'staff_creds', label: 'Staff Credentials', adminOnly: true },
         ]
     },

@@ -11,11 +11,13 @@ from rest_framework.response import Response
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 from django.utils import timezone
-from .models import Donor, Campaign, Donation, Receipt, SocialMediaPost, MaterialDonation
+from .models import Donor, Campaign, Donation, Receipt, SocialMediaPost, MaterialDonation, DonationImpact
 from .serializers import (
     DonorSerializer, CampaignSerializer, DonationSerializer, 
-    ReceiptSerializer, SocialMediaPostSerializer, MaterialDonationSerializer
+    ReceiptSerializer, SocialMediaPostSerializer, MaterialDonationSerializer,
+    DonationImpactSerializer
 )
 from .services import DonationService, PaymentService, NotificationService, MaterialAcknowledgmentService, ReceiptService
 from accounts.models import User, Notification, AuditLog
@@ -538,3 +540,70 @@ def delete_campaign_image(request, pk):
             {'error': f'Failed to delete image: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+class DonationImpactListCreateView(generics.ListCreateAPIView):
+    """
+    List and create donation impact records
+    """
+    serializer_class = DonationImpactSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['shelter_home', 'is_reported']
+    ordering = ['-impact_date']
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ['ADMIN', 'MANAGEMENT']:
+            return DonationImpact.objects.all()
+        # Partners see impacts for their own shelters
+        return DonationImpact.objects.filter(shelter_home__partner_user=user)
+
+    def perform_create(self, serializer):
+        # Validate that the partner manages the shelter
+        shelter_home = serializer.validated_data.get('shelter_home')
+        if self.request.user.role not in ['ADMIN', 'MANAGEMENT'] and shelter_home.partner_user != self.request.user:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You can only record impact for your own shelter.")
+        serializer.save()
+
+
+class DonationImpactDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a donation impact record
+    """
+    serializer_class = DonationImpactSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ['ADMIN', 'MANAGEMENT']:
+            return DonationImpact.objects.all()
+        return DonationImpact.objects.filter(shelter_home__partner_user=user)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def submit_impact_summary(request):
+    """
+    Submit multiple impact records as a summary to admins
+    """
+    impact_ids = request.data.get('impact_ids', [])
+    impacts = DonationImpact.objects.filter(
+        id__in=impact_ids, 
+        shelter_home__partner_user=request.user,
+        is_reported=False
+    )
+    
+    if not impacts.exists():
+        return Response({'error': 'No new impact records found to report.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    impact_count = impacts.count()
+    # Mark as reported
+    impacts.update(is_reported=True)
+    
+    # Notify admins
+    shelter = impacts.first().shelter_home
+    NotificationService.notify_impact_summary(shelter, impact_count)
+    
+    return Response({'message': f'Summary of {impact_count} impact records submitted to admin.'}, status=status.HTTP_200_OK)

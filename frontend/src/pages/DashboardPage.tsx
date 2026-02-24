@@ -46,6 +46,8 @@ import { ReportingView } from '../components/dashboard/ReportingView';
 import { SystemAdminView } from '../components/dashboard/SystemAdminView';
 import { BlogManagementView } from '../components/dashboard/BlogManagementView';
 import { ContentManagementView } from '../components/dashboard/ContentManagementView';
+import MediaLibraryView from '../features/media/MediaLibraryView';
+import ImpactTrackingView from '../features/donations/ImpactTrackingView';
 import { LogoutDialog } from '../components/common/LogoutDialog';
 import { MobileBottomNav } from '../components/dashboard/MobileBottomNav';
 import { VolunteerGroupsView } from '../components/dashboard/VolunteerGroupsView';
@@ -166,7 +168,7 @@ export default function DashboardPage() {
 
         // Shelter Partners ONLY see shelter-related content
         if (user.role === 'SHELTER_PARTNER') {
-            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'map'].includes(itemId);
+            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'map', 'media', 'impact'].includes(itemId);
         }
 
         // Case Workers see case management and shelter content
@@ -326,7 +328,8 @@ export default function DashboardPage() {
             'tags': <BlogManagementView initialTab={activeTab} />,
 
             'content_management': <ContentManagementView initialTab={activeTab} />,
-            'media': <ContentManagementView initialTab={activeTab} />,
+            'media': <MediaLibraryView />,
+            'impact': <ImpactTrackingView />,
             'team': <ContentManagementView initialTab={activeTab} />,
 
             'system_admin': <SystemAdminView />,

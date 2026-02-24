@@ -49,7 +49,8 @@ class ShelterHomeSerializer(serializers.ModelSerializer):
             ]
             missing_fields = []
             for field in required_fields:
-                if field not in data or not data[field]:
+                val = data.get(field)
+                if val is None or val == '':
                     missing_fields.append(field)
             
             if missing_fields:

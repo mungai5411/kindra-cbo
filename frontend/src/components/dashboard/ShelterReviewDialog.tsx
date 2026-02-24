@@ -33,18 +33,20 @@ interface ShelterReviewDialogProps {
     open: boolean;
     shelter: any;
     onClose: () => void;
-    onApprove: (shelterId: string) => void;
-    onReject: (shelterId: string, reason: string) => void;
-    onRequestInfo: (shelterId: string, reason: string) => void;
+    onApprove?: (shelterId: string) => void;
+    onReject?: (shelterId: string, reason: string) => void;
+    onRequestInfo?: (shelterId: string, reason: string) => void;
+    readOnly?: boolean;
 }
 
 export function ShelterReviewDialog({
     open,
     shelter,
     onClose,
-    onApprove,
-    onReject,
-    onRequestInfo
+    onApprove = () => { },
+    onReject = () => { },
+    onRequestInfo = () => { },
+    readOnly = false
 }: ShelterReviewDialogProps) {
     const theme = useTheme();
     const [showRejectDialog, setShowRejectDialog] = useState(false);
@@ -98,7 +100,7 @@ export function ShelterReviewDialog({
                 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Home color="primary" />
-                        Review Shelter Application
+                        {readOnly ? 'Shelter Application Details' : 'Review Shelter Application'}
                     </Box>
                 </DialogTitle>
 
@@ -253,31 +255,37 @@ export function ShelterReviewDialog({
                 </DialogContent>
 
                 <DialogActions sx={{ p: 3, borderTop: '1px solid', borderColor: 'divider', gap: 1 }}>
-                    <Button onClick={onClose}>Cancel</Button>
-                    <Button
-                        variant="outlined"
-                        color="info"
-                        startIcon={<Info />}
-                        onClick={() => setShowInfoDialog(true)}
-                    >
-                        Request Info
+                    <Button onClick={onClose} variant={readOnly ? "contained" : "text"} sx={{ borderRadius: 2 }}>
+                        {readOnly ? 'Dismiss' : 'Cancel'}
                     </Button>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        startIcon={<Cancel />}
-                        onClick={() => setShowRejectDialog(true)}
-                    >
-                        Reject
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="success"
-                        startIcon={<CheckCircle />}
-                        onClick={handleApprove}
-                    >
-                        Approve
-                    </Button>
+                    {!readOnly && (
+                        <>
+                            <Button
+                                variant="outlined"
+                                color="info"
+                                startIcon={<Info />}
+                                onClick={() => setShowInfoDialog(true)}
+                            >
+                                Request Info
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                startIcon={<Cancel />}
+                                onClick={() => setShowRejectDialog(true)}
+                            >
+                                Reject
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="success"
+                                startIcon={<CheckCircle />}
+                                onClick={handleApprove}
+                            >
+                                Approve
+                            </Button>
+                        </>
+                    )}
                 </DialogActions>
             </Dialog>
 

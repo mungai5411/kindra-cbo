@@ -1727,7 +1727,8 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 {viewingVolunteer && (
                     <>
                         <Box sx={{
-                            p: 6,
+                            p: 3,
+                            px: 4,
                             background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                             color: 'white',
                             position: 'relative',
@@ -1749,17 +1750,17 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 <Avatar
                                     src={viewingVolunteer.account_details?.profile_picture}
                                     sx={{
-                                        width: 120,
-                                        height: 120,
-                                        border: '6px solid rgba(255,255,255,0.2)',
-                                        boxShadow: '0 12px 24px rgba(0,0,0,0.2)'
+                                        width: 80,
+                                        height: 80,
+                                        border: '4px solid rgba(255,255,255,0.2)',
+                                        boxShadow: '0 8px 16px rgba(0,0,0,0.2)'
                                     }}
                                 >
-                                    <Typography variant="h2">{viewingVolunteer.full_name[0]}</Typography>
+                                    <Typography variant="h3">{viewingVolunteer.full_name[0]}</Typography>
                                 </Avatar>
                                 <Box>
-                                    <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: -1 }}>{viewingVolunteer.full_name}</Typography>
-                                    <Stack direction="row" spacing={1.5} sx={{ mt: 2 }}>
+                                    <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>{viewingVolunteer.full_name}</Typography>
+                                    <Stack direction="row" spacing={1.5} sx={{ mt: 1 }}>
                                         <Chip
                                             label={viewingVolunteer.account_details?.role?.toUpperCase() || 'OPERATIVE'}
                                             size="small"
@@ -1791,7 +1792,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 </Box>
                             </Box>
                         </Box>
-                        <DialogContent sx={{ p: 6 }}>
+                        <DialogContent sx={{ p: 4 }}>
                             <Grid container spacing={6}>
                                 <Grid item xs={12} md={6}>
                                     <Typography variant="overline" sx={{ color: 'text.disabled', fontWeight: 900, letterSpacing: 2 }}>System Credentials</Typography>

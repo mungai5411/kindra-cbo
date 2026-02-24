@@ -8,6 +8,7 @@ from .views import (
     CampaignListCreateView, CampaignDetailView,
     DonationListCreateView, DonationDetailView, ReceiptListView, ReceiptDetailView,
     MaterialDonationListCreateView, MaterialDonationDetailView,
+    DonationImpactListCreateView, DonationImpactDetailView, submit_impact_summary,
     process_mpesa_payment, process_paypal_payment, process_stripe_payment,
     approve_donation, reject_donation,
     approve_material_donation, reject_material_donation,
@@ -31,6 +32,11 @@ urlpatterns = [
     path('material-donations/', MaterialDonationListCreateView.as_view(), name='material-donation-list'),
     path('material-donations/<uuid:pk>/', MaterialDonationDetailView.as_view(), name='material-donation-detail'),
     path('material-donations/<uuid:pk>/acknowledgment/', download_material_acknowledgment, name='material-acknowledgment'),
+    
+    # Donation Impact tracking
+    path('impact/', DonationImpactListCreateView.as_view(), name='impact-list'),
+    path('impact/<uuid:pk>/', DonationImpactDetailView.as_view(), name='impact-detail'),
+    path('impact/submit-summary/', submit_impact_summary, name='impact-submit-summary'),
     
     # Payment processing endpoints
     path('payments/mpesa/', process_mpesa_payment, name='mpesa-payment'),

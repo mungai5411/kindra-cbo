@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from accounts.models import User
+from django.utils import timezone
 import uuid
 
 
@@ -338,3 +339,40 @@ class SocialMediaPost(models.Model):
 
     def __str__(self):
         return f"{self.platform} - {self.post_id}"
+
+
+class DonationImpact(models.Model):
+    """
+    Impact records for donations (recorded by partners)
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    shelter_home = models.ForeignKey('shelter_homes.ShelterHome', on_delete=models.CASCADE, related_name='impact_records')
+    
+    # Linked donations
+    donation = models.ForeignKey(Donation, on_delete=models.SET_NULL, null=True, blank=True, related_name='impacts')
+    material_donation = models.ForeignKey(MaterialDonation, on_delete=models.SET_NULL, null=True, blank=True, related_name='impacts')
+    
+    # Impact details
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    impact_date = models.DateField(default=timezone.now)
+    monetary_value = models.DecimalField(max_digits=12, decimal_places=2, default=0, help_text=_('Estimated value of material impact if applicable'))
+    
+    # Media/Files
+    media = models.ManyToManyField('blog.MediaAsset', blank=True, related_name='linked_impacts')
+    
+    # Reporting
+    is_reported = models.BooleanField(default=False, help_text=_('Whether this impact has been submitted to admin'))
+    admin_feedback = models.TextField(blank=True)
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = _('donation impact')
+        verbose_name_plural = _('donation impacts')
+        ordering = ['-impact_date']
+
+    def __str__(self):
+        return f"{self.title} - {self.shelter_home.name}"

@@ -423,3 +423,20 @@ class NotificationService:
             )
         
         logger.info(f"Sent material donation notifications for {material_donation.id}")
+
+    @staticmethod
+    def notify_impact_summary(shelter_home, impact_count):
+        """
+        Send notification to admins when a partner submits an impact summary
+        """
+        admins = User.objects.filter(role__in=['ADMIN', 'MANAGEMENT'])
+        for admin in admins:
+            Notification.objects.create(
+                recipient=admin,
+                title="Impact Summary Submitted",
+                message=f"{shelter_home.name} has submitted a summary of {impact_count} new donation impact records.",
+                type=Notification.Type.INFO,
+                category=Notification.Category.DONATION,
+                link=f"/dashboard/donations/impact?shelter={shelter_home.id}"
+            )
+        logger.info(f"Sent impact summary notifications for shelter {shelter_home.id}")

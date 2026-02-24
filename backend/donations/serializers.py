@@ -4,7 +4,9 @@ Donation Serializers
 
 from rest_framework import serializers
 from django.utils.html import strip_tags
-from .models import Donor, Campaign, Donation, Receipt, SocialMediaPost, MaterialDonation
+from .models import Donor, Campaign, Donation, Receipt, SocialMediaPost, MaterialDonation, DonationImpact
+from blog.models import MediaAsset
+from blog.serializers import MediaAssetSerializer
 
 
 class DonorSerializer(serializers.ModelSerializer):
@@ -89,4 +91,30 @@ class MaterialDonationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Pickup address is required.')
         if len(value) > 2000:
             raise serializers.ValidationError('Pickup address is too long.')
+        return value
+
+
+class DonationImpactSerializer(serializers.ModelSerializer):
+    """
+    Serializer for donation impact records
+    """
+    shelter_name = serializers.CharField(source='shelter_home.name', read_only=True)
+    media_assets = MediaAssetSerializer(many=True, source='media', read_only=True)
+    media_ids = serializers.PrimaryKeyRelatedField(
+        many=True, 
+        queryset=MediaAsset.objects.all(), 
+        write_only=True, 
+        source='media',
+        required=False
+    )
+    
+    class Meta:
+        model = DonationImpact
+        fields = '__all__'
+        read_only_fields = ('id', 'created_at', 'updated_at', 'is_reported', 'admin_feedback')
+
+    def validate_description(self, value):
+        value = strip_tags(value or '').strip()
+        if not value:
+            raise serializers.ValidationError('Description is required.')
         return value

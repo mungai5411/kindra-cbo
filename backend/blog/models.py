@@ -315,6 +315,7 @@ class MediaAsset(models.Model):
         SHELTER = 'SHELTER', _('Shelter')
         TEAM = 'TEAM', _('Team Member')
         USER = 'USER', _('User Profile')
+        IMPACT = 'IMPACT', _('Donation Impact')
         GENERAL = 'GENERAL', _('General/Other')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

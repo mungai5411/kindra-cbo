@@ -102,15 +102,18 @@ const StatusChip = ({ status }: { status: string }) => {
 
     const lowerStatus = status.toLowerCase();
 
-    if (lowerStatus === 'compliant' || lowerStatus === 'synced') {
+    if (lowerStatus === 'compliant' || lowerStatus === 'synced' || lowerStatus === 'approved') {
         bgcolor = alpha(theme.palette.success.main, 0.1);
         textColor = theme.palette.success.dark;
-    } else if (lowerStatus === 'warning' || lowerStatus === 'non-compliant' || lowerStatus === 'review') {
+    } else if (lowerStatus === 'warning' || lowerStatus === 'non-compliant' || lowerStatus === 'review' || lowerStatus === 'pending') {
         bgcolor = alpha(theme.palette.warning.main, 0.1);
         textColor = theme.palette.warning.main;
-    } else if (lowerStatus === 'critical') {
+    } else if (lowerStatus === 'critical' || lowerStatus === 'rejected') {
         bgcolor = alpha(theme.palette.error.main, 0.1);
         textColor = theme.palette.error.main;
+    } else if (lowerStatus === 'info_requested') {
+        bgcolor = alpha(theme.palette.info.main, 0.1);
+        textColor = theme.palette.info.main;
     }
 
     return (
@@ -424,18 +427,20 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                     <Typography variant="h6" fontWeight="bold">Partner Homes</Typography>
                     <Typography variant="caption" color="text.secondary">Registered shelter homes and occupancy</Typography>
                 </Box>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<Add />}
-                    onClick={() => {
-                        setSelectedShelter(null);
-                        setShowRegisterDialog(true);
-                    }}
-                    sx={{ borderRadius: 3, boxShadow: theme.shadows[2], textTransform: 'none', fontWeight: 600 }}
-                >
-                    Register Shelter
-                </Button>
+                {(!isPartner || (isPartner && shelters.length === 0)) && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<Add />}
+                        onClick={() => {
+                            setSelectedShelter(null);
+                            setShowRegisterDialog(true);
+                        }}
+                        sx={{ borderRadius: 3, boxShadow: theme.shadows[2], textTransform: 'none', fontWeight: 600 }}
+                    >
+                        Register Shelter
+                    </Button>
+                )}
             </Box>
             <TableContainer>
                 <Table>
@@ -445,7 +450,8 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                             <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Location</TableCell>
                             <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Contact</TableCell>
                             <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Occupancy</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Status</TableCell>
+                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Compliance</TableCell>
+                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Verification</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 600, color: 'text.secondary' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
@@ -471,7 +477,11 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                                 <TableCell>
                                     <StatusChip status={s.compliance_status} />
                                 </TableCell>
+                                <TableCell>
+                                    <StatusChip status={s.approval_status} />
+                                </TableCell>
                                 <TableCell align="right">
+                                    <Tooltip title="View Details"><IconButton size="small" sx={{ color: 'info.main' }} onClick={() => handleReviewShelter(s)}><Assessment fontSize="small" /></IconButton></Tooltip>
                                     <Tooltip title="Edit Home"><IconButton size="small" sx={{ color: 'primary.main' }} onClick={() => handleEditShelter(s)}><Edit fontSize="small" /></IconButton></Tooltip>
                                     <Tooltip title="Delete Home"><IconButton size="small" sx={{ color: 'error.main' }} onClick={() => handleDeleteShelter(s.id)}><NoAccounts fontSize="small" /></IconButton></Tooltip>
                                 </TableCell>
@@ -1037,6 +1047,19 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                 )}
             </Box>
 
+            {isPartner && shelters.length > 0 && shelters[0].approval_status !== 'APPROVED' && (
+                <Alert
+                    severity={shelters[0].approval_status === 'INFO_REQUESTED' ? "info" : "warning"}
+                    variant="filled"
+                    icon={shelters[0].approval_status === 'INFO_REQUESTED' ? <Info /> : <Schedule />}
+                    sx={{ mb: 3, borderRadius: 3, fontWeight: 600 }}
+                >
+                    {shelters[0].approval_status === 'PENDING' && "Your shelter application is currently being reviewed by our administrative team. You can view your details below."}
+                    {shelters[0].approval_status === 'INFO_REQUESTED' && "Our team has requested additional information regarding your shelter. Please check your notifications or contact support."}
+                    {shelters[0].approval_status === 'REJECTED' && "Your application was not approved at this time. Please see the rejection reason for more details."}
+                </Alert>
+            )}
+
             <Grid container spacing={{ xs: 1.5, sm: 3 }} sx={{ mb: 4 }}>
                 <Grid item xs={12} md={4}>
                     <StatsCard
@@ -1396,6 +1419,7 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                 onApprove={handleApproveShelter}
                 onReject={handleRejectShelter}
                 onRequestInfo={handleRequestInfo}
+                readOnly={!isAdmin}
             />
 
             <ConfirmationDialog

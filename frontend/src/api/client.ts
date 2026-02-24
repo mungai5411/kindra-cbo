@@ -164,6 +164,8 @@ export const endpoints = {
         adminCategories: '/blog/admin/categories/',
         adminTags: '/blog/admin/tags/',
         adminComments: '/blog/admin/comments/',
+        media: '/blog/media/',
+        adminMedia: '/blog/admin/media/',
     },
 
     // Donations
@@ -176,6 +178,8 @@ export const endpoints = {
         paypal: '/donations/payments/paypal/',
         stripe: '/donations/payments/stripe/',
         materialDonations: '/donations/material-donations/',
+        impact: '/donations/impact/',
+        impactSummary: '/donations/impact/submit-summary/',
     },
 
     // Volunteers

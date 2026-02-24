@@ -43,8 +43,15 @@ class ShelterHomeListCreateView(generics.ListCreateAPIView):
         return ShelterHome.objects.filter(approval_status='APPROVED').prefetch_related('photos')
     
     def perform_create(self, serializer):
-        """New shelters start as PENDING"""
-        shelter = serializer.save(partner_user=self.request.user)
+        """New shelters start as PENDING. Partners are limited to one shelter."""
+        user = self.request.user
+        
+        if user.role == 'SHELTER_PARTNER':
+            if ShelterHome.objects.filter(partner_user=user).exists():
+                from rest_framework.exceptions import ValidationError
+                raise ValidationError("Shelter partners are limited to registering one shelter home.")
+                
+        shelter = serializer.save(partner_user=user)
         
         # Notify admins about new shelter registration
         admins = User.objects.filter(role__in=['ADMIN', 'MANAGEMENT'])
