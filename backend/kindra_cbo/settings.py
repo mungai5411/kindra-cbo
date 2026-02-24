@@ -327,7 +327,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     # API Versioning
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'ALLOWED_VERSIONS': ['v1'],
     # API Throttling for DDoS protection
     'DEFAULT_THROTTLE_CLASSES': [
