@@ -1,12 +1,24 @@
 """
-Input Sanitization Utilities
-Provides functions to sanitize and validate user input
+Input Sanitization & Shared Utilities
+Provides functions to sanitize and validate user input, plus shared request helpers.
 """
 
 import re
 import bleach
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
+
+
+def get_client_ip(request):
+    """
+    Extract the real client IP address from a Django request.
+    Handles reverse proxies that set X-Forwarded-For headers.
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        # Take the first (original) IP in the chain
+        return x_forwarded_for.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR', '127.0.0.1')
 
 
 # Allowed HTML tags for rich text (if needed)
@@ -305,6 +317,7 @@ def send_email_async_safe(recipient, subject, message, html_message=None):
 
 # Export all functions
 __all__ = [
+    'get_client_ip',
     'sanitize_html',
     'sanitize_text',
     'validate_phone_number',

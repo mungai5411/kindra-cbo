@@ -23,10 +23,10 @@ class Donor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='donor_profile')
     
-    # Basic information
+    # Basic information (Will sync from User if linked)
     donor_type = models.CharField(max_length=20, choices=DonorType.choices, default=DonorType.INDIVIDUAL)
-    full_name = models.CharField(max_length=200)
-    email = models.EmailField()
+    full_name = models.CharField(max_length=200, blank=True)
+    email = models.EmailField(blank=True)
     phone_number = models.CharField(max_length=20, blank=True)
     
     # Organization details (if applicable)
@@ -60,7 +60,19 @@ class Donor(models.Model):
         ]
     
     def __str__(self):
-        return self.full_name
+        return self.get_display_name()
+
+    def get_display_name(self):
+        """Helper to get donor name from profile or linked user"""
+        if self.user:
+            return self.user.get_full_name()
+        return self.full_name or self.organization_name or _("Anonymous Donor")
+
+    def get_display_email(self):
+        """Helper to get donor email from profile or linked user"""
+        if self.user:
+            return self.user.email
+        return self.email
 
 
 class Campaign(models.Model):
@@ -141,6 +153,19 @@ class Campaign(models.Model):
         if self.target_amount == 0:
             return 0
         return min((self.raised_amount / self.target_amount) * 100, 100)
+
+    def recalculate_raised_amount(self):
+        """
+        Recalculate raised_amount from the sum of completed donations.
+        Call this after any donation refund or deletion to keep the field accurate.
+        """
+        from django.db.models import Sum
+        total = self.donations.filter(
+            status='COMPLETED'
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        self.raised_amount = total
+        self.save(update_fields=['raised_amount'])
+        return self.raised_amount
 
 
 class Donation(models.Model):
@@ -250,6 +275,7 @@ class MaterialDonation(models.Model):
         PENDING_PICKUP = 'PENDING_PICKUP', _('Pending Pickup')
         COLLECTED = 'COLLECTED', _('Collected')
         DISTRIBUTED = 'DISTRIBUTED', _('Distributed')
+        REJECTED = 'REJECTED', _('Rejected')
         CANCELLED = 'CANCELLED', _('Cancelled')
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

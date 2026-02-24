@@ -168,23 +168,38 @@ else:
 # ==================================
 # Auto-detect: Use Redis for production, local memory for development
 
-# if config('REDIS_URL', default=''):
-#     CACHES = {
-#         "default": {
-#             "BACKEND": "django_redis.cache.RedisCache",
-#             "LOCATION": config('REDIS_URL'),
-#             "OPTIONS": {
-#                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#             }
-#         }
-#     }
-# else:
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "LOCATION": "unique-snowflake",
+_REDIS_URL = config('REDIS_URL', default='')
+
+# Only enable Redis cache when both the URL is set AND django_redis is installed
+_django_redis_available = False
+if _REDIS_URL:
+    try:
+        import django_redis  # noqa: F401
+        _django_redis_available = True
+    except ImportError:
+        pass
+
+if _django_redis_available:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": _REDIS_URL,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "SOCKET_CONNECT_TIMEOUT": 5,
+                "SOCKET_TIMEOUT": 5,
+                "IGNORE_EXCEPTIONS": True,  # Degrade gracefully on Redis failure
+            },
+        }
     }
-}
+else:
+    # Fallback: dev environment without Redis, or django_redis not installed
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "unique-snowflake",
+        }
+    }
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Session configuration
@@ -226,16 +241,17 @@ USE_I18N = True
 USE_TZ = True
 
 # ==================================
+# FRONTEND URL
+# ==================================
+# Used to build absolute links in emails (verification, password reset)
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
+
+# ==================================
 # STATIC & MEDIA FILES
 # ==================================
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Whitenoise configuration for production static files
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Whitenoise configuration is now in STORAGES
 
 # Media files (user uploads)
 MEDIA_URL = '/media/'
@@ -310,6 +326,9 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # API Versioning
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'ALLOWED_VERSIONS': ['v1'],
     # API Throttling for DDoS protection
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
@@ -389,6 +408,15 @@ CELERY_BROKER_CONNECTION_TIMEOUT = 5.0 # Seconds before failing and falling back
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     'socket_timeout': 5.0,
     'socket_connect_timeout': 5.0,
+}
+
+# Scheduled periodic tasks
+CELERY_BEAT_SCHEDULE = {
+    'cleanup-old-notifications-daily': {
+        'task': 'kindra_cbo.tasks.cleanup_old_notifications',
+        'schedule': 86400,  # Every 24 hours (seconds)
+        'kwargs': {'days': 90},
+    },
 }
 
 # ==================================

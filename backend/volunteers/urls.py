@@ -11,7 +11,8 @@ from .views import (
     TrainingListCreateView, TrainingDetailView,
     TrainingCompletionListCreateView, TrainingCompletionDetailView,
     TaskApplicationListCreateView, TaskApplicationDetailView,
-    VolunteerGroupListCreateView, VolunteerGroupDetailView, GroupMessageListCreateView
+    VolunteerGroupListCreateView, VolunteerGroupDetailView, GroupMessageListCreateView,
+    DownloadCertificateView
 )
 
 app_name = 'volunteers'
@@ -43,6 +44,7 @@ urlpatterns = [
     path('training/<uuid:pk>/', TrainingDetailView.as_view(), name='training-detail'),
     path('training/completions/', TrainingCompletionListCreateView.as_view(), name='training-completion-list'),
     path('training/completions/<uuid:pk>/', TrainingCompletionDetailView.as_view(), name='training-completion-detail'),
+    path('training/completions/<uuid:pk>/certificate/', DownloadCertificateView.as_view(), name='training-certificate-download'),
     
     # Groups
     path('groups/', VolunteerGroupListCreateView.as_view(), name='group-list'),

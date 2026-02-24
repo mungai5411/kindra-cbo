@@ -9,6 +9,23 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+@shared_task(name='kindra_cbo.tasks.cleanup_old_notifications')
+def cleanup_old_notifications(days=90):
+    """
+    Delete Notification records older than `days` days.
+    Register in CELERY_BEAT_SCHEDULE to run periodically (e.g. daily).
+    """
+    from django.utils import timezone
+    from datetime import timedelta
+    from accounts.models import Notification
+
+    cutoff = timezone.now() - timedelta(days=days)
+    deleted, _ = Notification.objects.filter(created_at__lt=cutoff).delete()
+    logger.info(f"Deleted {deleted} notifications older than {days} days.")
+    return f"Deleted {deleted} notifications older than {days} days."
+
+
+
 @shared_task
 def backup_database():
     """

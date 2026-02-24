@@ -19,10 +19,10 @@ from .views import (
     trigger_cleanup_view,
     PendingApprovalsListView,
     approve_user_view,
-    approve_user_view,
     delete_profile_picture_view,
     VerifyEmailView,
     MarkAllNotificationsReadView,
+    ResendVerificationView,
 )
 from .google_auth import google_login
 
@@ -59,6 +59,7 @@ urlpatterns = [
     # Password Reset
     path('password-reset/', PasswordResetRequestView.as_view(), name='password_reset'),
     path('password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('resend-verification/', ResendVerificationView.as_view(), name='resend_verification'),
     
     # Notifications
     path('notifications/', NotificationListView.as_view(), name='notifications'),

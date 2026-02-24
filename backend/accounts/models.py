@@ -248,12 +248,18 @@ class VerificationToken(models.Model):
     expires_at = models.DateTimeField()
     is_used = models.BooleanField(default=False)
 
+    # Expiry durations by token type
+    EXPIRY_DURATIONS = {
+        'VERIFICATION': timedelta(hours=24),   # 24 hours — user may check email later
+        'PASSWORD_RESET': timedelta(hours=1),   # 1 hour  — shorter is more secure
+    }
+
     def save(self, *args, **kwargs):
         if not self.token:
             self.token = secrets.token_urlsafe(32)
         if not self.expires_at:
-            # Default to 15 minutes expiry
-            self.expires_at = timezone.now() + timedelta(minutes=15)
+            duration = self.EXPIRY_DURATIONS.get(self.token_type, timedelta(hours=1))
+            self.expires_at = timezone.now() + duration
         super().save(*args, **kwargs)
 
     @property

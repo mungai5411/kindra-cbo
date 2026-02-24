@@ -14,7 +14,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
-from .utils import send_email_async_safe
+from .utils import send_email_async_safe, get_client_ip
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django.core.cache import cache
@@ -48,8 +48,7 @@ def rate_limit(key_prefix, limit, period):
     """
     def decorator(func):
         def wrapper(self, request, *args, **kwargs):
-            # Get client IP
-            ip = self.get_client_ip(request) if hasattr(self, 'get_client_ip') else request.META.get('REMOTE_ADDR')
+            ip = get_client_ip(request)
             cache_key = f"{key_prefix}:{ip}"
             
             # Get current attempts
@@ -132,7 +131,7 @@ class UserRegistrationView(generics.CreateAPIView):
         )
 
         # Send Verification Email (Safe Async/Sync Failover)
-        verify_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/verify?token={verification_token.token}"
+        verify_url = f"{settings.FRONTEND_URL}/verify?token={verification_token.token}"
         
         if settings.DEBUG:
             print(f"Verification URL for {user.email}: {verify_url}")
@@ -193,13 +192,7 @@ class UserRegistrationView(generics.CreateAPIView):
         )
     
     def get_client_ip(self, request):
-        """Get client IP address from request"""
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
-        else:
-            ip = request.META.get('REMOTE_ADDR')
-        return ip
+        return get_client_ip(request)
 
 
 
@@ -229,7 +222,7 @@ class LoginView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Check rate limit BEFORE authentication
-        ip = self.get_client_ip(request)
+        ip = get_client_ip(request)
         cache_key = f"login_attempts:{ip}"
         attempts = cache.get(cache_key, {'count': 0, 'reset_time': time.time() + 900})
         
@@ -327,14 +320,7 @@ class LoginView(APIView):
             path='/'
         )
     
-    def get_client_ip(self, request):
-        """Get client IP address from request"""
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
-        else:
-            ip = request.META.get('REMOTE_ADDR')
-        return ip
+    # get_client_ip is now the shared utility imported from accounts.utils
 
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
@@ -384,22 +370,13 @@ class ChangePasswordView(APIView):
             resource_type='User',
             resource_id=str(user.id),
             description='Password changed',
-            ip_address=self.get_client_ip(request)
+            ip_address=get_client_ip(request)
         )
         
         return Response({
             'message': 'Password changed successfully'
         })
     
-    def get_client_ip(self, request):
-        """Get client IP address from request"""
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
-        else:
-            ip = request.META.get('REMOTE_ADDR')
-        return ip
-
 
 class UserListView(generics.ListAPIView):
     """
@@ -580,6 +557,73 @@ class VerifyEmailView(APIView):
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ResendVerificationView(APIView):
+    """
+    Resend email verification link
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        email = serializer.validated_data['email']
+        
+        try:
+            user = User.objects.get(email=email)
+            
+            if user.is_verified:
+                return Response({'message': 'Email is already verified.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check for existing valid token to prevent spam
+            # Only allow resending every 5 minutes
+            recent_token = VerificationToken.objects.filter(
+                user=user,
+                token_type=VerificationToken.TokenType.VERIFICATION,
+                created_at__gte=timezone.now() - timedelta(minutes=5)
+            ).exists()
+            
+            if recent_token:
+                return Response({
+                    'error': 'Please wait a few minutes before requesting another verification email.'
+                }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+            # Create new Token
+            verification_token = VerificationToken.objects.create(
+                user=user,
+                token_type=VerificationToken.TokenType.VERIFICATION
+            )
+
+            # Send Verification Email
+            verify_url = f"{settings.FRONTEND_URL}/verify?token={verification_token.token}"
+            
+            send_email_async_safe(
+                recipient=user.email,
+                subject='Verify your email for Kindra',
+                message=f'Please verify your email by clicking: {verify_url}',
+                html_message=f'''
+                <p>Welcome to Kindra!</p>
+                <p>Please verify your email by clicking below:</p>
+                <a href="{verify_url}"
+                   style="display:inline-block;padding:10px 20px;background:#007BFF;color:#fff;text-decoration:none;border-radius:5px;">
+                   Verify Email
+                </a>
+                '''
+            )
+            
+            if settings.DEBUG:
+                print(f"Resent Verification URL for {user.email}: {verify_url}")
+
+            return Response({
+                'message': 'Verification email has been resent. Please check your inbox.',
+            })
+        except User.DoesNotExist:
+            # Return subtle message to avoid email enumeration
+            return Response({
+                'message': 'If an account exists with this email, a verification link has been sent.',
+            })
+
+
 class PasswordResetRequestView(APIView):
     """
     Request password reset link
@@ -605,7 +649,7 @@ class PasswordResetRequestView(APIView):
             )
             
             # Send Reset Email (Safe Async/Sync Failover)
-            reset_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/reset-password?token={token.token}"
+            reset_url = f"{settings.FRONTEND_URL}/reset-password?token={token.token}"
             
             send_email_async_safe(
                 recipient=email,

@@ -10,6 +10,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from .health_views import HealthCheckView
 
 urlpatterns = [
     # Admin panel
@@ -20,15 +21,18 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     
     # API v1 Endpoints
-    path('api/v1/accounts/', include('accounts.urls')),
-    path('api/v1/cases/', include('case_management.urls')),
-    path('api/v1/shelters/', include('shelter_homes.urls')),
-    path('api/v1/donations/', include('donations.urls')),
-    path('api/v1/volunteers/', include('volunteers.urls')),
-    path('api/v1/reports/', include('reporting.urls')),  # Backwards compatibility
-    path('api/v1/reporting/', include('reporting.urls')),  # Alternative path
-    path('api/v1/blog/', include('blog.urls')),
-    path('api/v1/chat/', include('social_chat.urls')),
+    path('api/<str:version>/accounts/', include('accounts.urls')),
+    path('api/<str:version>/cases/', include('case_management.urls')),
+    path('api/<str:version>/shelters/', include('shelter_homes.urls')),
+    path('api/<str:version>/donations/', include('donations.urls')),
+    path('api/<str:version>/volunteers/', include('volunteers.urls')),
+    path('api/<str:version>/reporting/', include('reporting.urls')),
+    path('api/<str:version>/blog/', include('blog.urls')),
+    path('api/<str:version>/chat/', include('social_chat.urls')),
+    
+    # Health check
+    path('health/', HealthCheckView.as_view(), name='health_check'),
+    path('api/health/', HealthCheckView.as_view(), name='api_health_check'),
     
     # Django Allauth (for social authentication)
     path('accounts/', include('allauth.urls')),

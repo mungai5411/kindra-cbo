@@ -93,12 +93,20 @@ class BlogPost(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     tags = models.ManyToManyField(Tag, blank=True, related_name='posts')
     
-    # SEO
+    # SEO & Social
     meta_description = models.CharField(max_length=160, blank=True, help_text=_('SEO meta description'))
     meta_keywords = models.CharField(max_length=255, blank=True, help_text=_('Comma-separated keywords'))
+    canonical_url = models.URLField(blank=True, help_text=_('Canonical URL if this is a cross-post'))
     
-    # Social media
+    og_title = models.CharField(max_length=200, blank=True, help_text=_('Open Graph title (defaults to title)'))
+    og_description = models.TextField(max_length=300, blank=True, help_text=_('Open Graph description (defaults to excerpt)'))
     og_image = models.ImageField(upload_to='blog/og_images/', blank=True, null=True, help_text=_('Open Graph image for social sharing'))
+    
+    class TwitterCard(models.TextChoices):
+        SUMMARY = 'summary', _('Summary')
+        SUMMARY_LARGE = 'summary_large_image', _('Summary with Large Image')
+        
+    twitter_card = models.CharField(max_length=20, choices=TwitterCard.choices, default=TwitterCard.SUMMARY_LARGE)
     
     # Status and visibility
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)

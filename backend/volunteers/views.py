@@ -16,6 +16,8 @@ from .serializers import (
     TrainingSerializer, TrainingCompletionSerializer, TaskApplicationSerializer,
     VolunteerGroupSerializer, GroupMessageSerializer, EventRegistrationSerializer
 )
+from .services import CertificateService
+from django.http import HttpResponse
 
 
 class VolunteerListCreateView(generics.ListCreateAPIView):
@@ -23,7 +25,7 @@ class VolunteerListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['status', 'county']
-    search_fields = ['full_name', 'email', 'skills']
+    search_fields = ['full_name', 'email', 'skills_list__name', 'skills']
     ordering_fields = ['join_date', 'total_hours', 'tasks_completed']
     ordering = ['-join_date']
 
@@ -379,3 +381,32 @@ class GroupMessageListCreateView(generics.ListCreateAPIView):
         except VolunteerGroup.DoesNotExist:
             from rest_framework.exceptions import NotFound
             raise NotFound("Volunteer group not found.")
+
+
+class DownloadCertificateView(generics.GenericAPIView):
+    """
+    Download a PDF certificate for a training completion
+    """
+    queryset = TrainingCompletion.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        completion = self.get_object()
+        
+        # Security: Only the volunteer or an admin can download
+        if completion.volunteer.user != request.user and not (request.user.role == User.Role.ADMIN or request.user.is_staff):
+            return Response({"detail": "You do not have permission to download this certificate."}, status=status.HTTP_403_FORBIDDEN)
+            
+        if not completion.certificate_issued:
+            return Response({"detail": "Certificate has not been issued for this training."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        pdf_content = CertificateService.generate_training_certificate(completion)
+        
+        if not pdf_content:
+            return Response({"detail": "Error generating certificate."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        filename = f"Certificate_{completion.certificate_number}.pdf"
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        return response

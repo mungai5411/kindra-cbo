@@ -31,16 +31,19 @@ class DonationService:
     @transaction.atomic
     def finalize_donation(donation):
         """
-        Finalize a successful donation
-        Updates campaign, donor, creates receipt, and sends notifications
-        
-        Args:
-            donation: Donation instance
-            
-        Returns:
-            Receipt instance
+        Finalize a successful donation.
+        Updates campaign, donor, creates receipt, and sends notifications.
+        Idempotent: calling this on an already-COMPLETED donation is a no-op.
         """
         try:
+            # Guard against double-finalization
+            if donation.status == Donation.Status.COMPLETED:
+                logger.warning(
+                    f"finalize_donation called on already-completed donation {donation.id}. "
+                    "Skipping to prevent double-counting."
+                )
+                return Receipt.objects.filter(donation=donation).first()
+
             # Update donation status
             donation.status = Donation.Status.COMPLETED
             donation.save()
@@ -294,32 +297,30 @@ class ReceiptService:
 class MaterialAcknowledgmentService:
     """
     Service for generating "Gift in Kind" acknowledgments
+    Uses WeasyPrint (same library as ReceiptService) for consistency.
     """
 
     @staticmethod
     def generate_acknowledgment_pdf(material_donation):
         """
-        Generate a professional PDF acknowledgment for physical donations using HTML templates
+        Generate a professional PDF acknowledgment for physical donations using WeasyPrint.
         """
         try:
             from django.template.loader import render_to_string
-            from xhtml2pdf import pisa
-            import os
+            from weasyprint import HTML
             from django.conf import settings
-        
-            # Physical paths for assets
+
             logo_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'images', 'logo.jpg')
             font_path = os.path.join(settings.BASE_DIR, 'donations', 'static', 'donations', 'Handwritten.ttf')
-            
-            # Fallback if files don't exist
+
             if not os.path.exists(logo_path):
-                logo_path = None
+                logo_path = ''
             if not os.path.exists(font_path):
-                font_path = None
+                font_path = ''
 
             context = {
                 'material_donation': material_donation,
-                'donor_name': material_donation.donor.full_name if material_donation.donor else "Anonymous",
+                'donor_name': material_donation.donor.full_name if material_donation.donor else 'Anonymous',
                 'donation_date': material_donation.updated_at.strftime('%d %b %Y'),
                 'category': material_donation.category,
                 'description': material_donation.description,
@@ -329,19 +330,15 @@ class MaterialAcknowledgmentService:
                 'font_path': font_path,
                 'server_url': settings.BACKEND_URL if hasattr(settings, 'BACKEND_URL') else 'http://localhost:8000',
             }
-            
+
             html_string = render_to_string('donations/acknowledgment.html', context)
             buffer = io.BytesIO()
-            pisa_status = pisa.CreatePDF(html_string, dest=buffer)
-            
-            if pisa_status.err:
-                logger.error(f"PDF generation error for acknowledgment {material_donation.id}")
-                return None
-                
-            return buffer.getvalue()
-            
+            HTML(string=html_string, base_url=settings.BASE_DIR).write_pdf(buffer)
+            buffer.seek(0)
+            return buffer.read()
+
         except Exception as e:
-            logger.error(f"Error generating acknowledgment PDF: {str(e)}")
+            logger.error(f"Error generating acknowledgment PDF: {str(e)}", exc_info=True)
             return None
 
 

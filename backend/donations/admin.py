@@ -26,6 +26,17 @@ class DonationAdmin(admin.ModelAdmin):
     list_display = ('donor_name', 'amount', 'currency', 'payment_method', 'status', 'donation_date')
     list_filter = ('status', 'payment_method', 'donation_date')
     search_fields = ('transaction_id', 'donor_name', 'donor_email')
+    actions = ['approve_donations', 'reject_donations']
+
+    @admin.action(description='Approve selected donations')
+    def approve_donations(self, request, queryset):
+        count = queryset.filter(status='PENDING').update(status='COMPLETED')
+        self.message_user(request, f'{count} donations were successfully approved.')
+
+    @admin.action(description='Reject selected donations')
+    def reject_donations(self, request, queryset):
+        count = queryset.filter(status='PENDING').update(status='FAILED')
+        self.message_user(request, f'{count} donations were rejected.')
 
 
 @admin.register(Receipt)

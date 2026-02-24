@@ -109,15 +109,39 @@ class CampaignDetailView(generics.RetrieveUpdateDestroyAPIView):
 class DonationListCreateView(generics.ListCreateAPIView):
     queryset = Donation.objects.all()
     serializer_class = DonationSerializer
-    permission_classes = [permissions.AllowAny]  # Public endpoint for donations
+    permission_classes = [permissions.IsAuthenticated]  # Authenticated users only
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['campaign', 'status', 'payment_method']
 
+    def get_queryset(self):
+        """Donors only see their own donations; admins see all"""
+        user = self.request.user
+        if user.role in ['ADMIN', 'MANAGEMENT', 'SOCIAL_MEDIA']:
+            return Donation.objects.all()
+        # Regular users: only donations linked to their donor profile
+        if hasattr(user, 'donor_profile'):
+            return Donation.objects.filter(donor=user.donor_profile)
+        return Donation.objects.none()
 
 class DonationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Donation.objects.all()
     serializer_class = DonationSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        """Only allow admins/management to access any donation; donors see their own."""
+        obj = super().get_object()
+        user = self.request.user
+        if user.role in ['ADMIN', 'MANAGEMENT', 'SOCIAL_MEDIA']:
+            return obj
+        # Donor can only read their own donation, never modify
+        if self.request.method in ('PUT', 'PATCH', 'DELETE'):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('Only admin can modify donation records.')
+        if hasattr(user, 'donor_profile') and obj.donor == user.donor_profile:
+            return obj
+        from rest_framework.exceptions import PermissionDenied
+        raise PermissionDenied('You do not have permission to access this donation.')
 
     def perform_destroy(self, instance):
         tx_id = instance.transaction_id

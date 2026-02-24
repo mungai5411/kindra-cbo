@@ -14,7 +14,6 @@ import { AuthModalProvider, useAuthModal } from './contexts/AuthModalContext';
 import CssBaseline from '@mui/material/CssBaseline';
 import ProtectedRoute from './components/ProtectedRoute';
 // Utilities
-import { startKeepAlive, stopKeepAlive } from './utils/keepAlive';
 
 // Page Components
 import HomePage from './pages/HomePage';
@@ -75,15 +74,6 @@ function App() {
             dispatch(fetchProfile());
         }
     }, [dispatch, isAuthenticated]);
-    // Initialize keep-alive mechanism to prevent server from spinning down
-    useEffect(() => {
-        startKeepAlive();
-
-        // Cleanup on unmount
-        return () => {
-            stopKeepAlive();
-        };
-    }, []);
 
     return (
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>

@@ -4,11 +4,31 @@ Volunteer Management Serializers
 
 from rest_framework import serializers
 from django.utils.html import strip_tags
-from .models import Volunteer, Task, Event, EventPhoto, TimeLog, Training, TrainingCompletion, TaskApplication, VolunteerGroup, GroupMessage
+from .models import (
+    Volunteer, Task, Event, EventPhoto, TimeLog, Training, 
+    TrainingCompletion, TaskApplication, VolunteerGroup, 
+    GroupMessage, Skill, AvailabilitySlot
+)
+
+
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = ('id', 'name', 'description')
+
+
+class AvailabilitySlotSerializer(serializers.ModelSerializer):
+    day_display = serializers.CharField(source='get_day_of_week_display', read_only=True)
+    
+    class Meta:
+        model = AvailabilitySlot
+        fields = ('id', 'day_of_week', 'day_display', 'start_time', 'end_time')
 
 
 class VolunteerSerializer(serializers.ModelSerializer):
     total_hours_formatted = serializers.SerializerMethodField()
+    skills_details = SkillSerializer(source='skills_list', many=True, read_only=True)
+    availability_details = AvailabilitySlotSerializer(source='availability_slots', many=True, read_only=True)
     
     class Meta:
         model = Volunteer

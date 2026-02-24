@@ -12,6 +12,50 @@ from shelter_homes.models import ShelterHome
 import uuid
 
 
+class Skill(models.Model):
+    """
+    Standardized skills for volunteers
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    
+    class Meta:
+        verbose_name = _('skill')
+        verbose_name_plural = _('skills')
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class AvailabilitySlot(models.Model):
+    """
+    Standardized availability for volunteers
+    """
+    class DayOfWeek(models.IntegerChoices):
+        MONDAY = 0, _('Monday')
+        TUESDAY = 1, _('Tuesday')
+        WEDNESDAY = 2, _('Wednesday')
+        THURSDAY = 3, _('Thursday')
+        FRIDAY = 4, _('Friday')
+        SATURDAY = 5, _('Saturday')
+        SUNDAY = 6, _('Sunday')
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    day_of_week = models.IntegerField(choices=DayOfWeek.choices)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    
+    class Meta:
+        verbose_name = _('availability slot')
+        verbose_name_plural = _('availability slots')
+        ordering = ['day_of_week', 'start_time']
+
+    def __str__(self):
+        return f"{self.get_day_of_week_display()}: {self.start_time}-{self.end_time}"
+
+
 class Volunteer(models.Model):
     """
     Volunteer profiles and management
@@ -43,9 +87,13 @@ class Volunteer(models.Model):
     emergency_contact_relationship = models.CharField(max_length=100)
     
     # Skills and availability
-    skills = models.TextField(help_text=_('Comma-separated skills'))
+    skills_list = models.ManyToManyField(Skill, blank=True, related_name='volunteers')
+    availability_slots = models.ManyToManyField(AvailabilitySlot, blank=True, related_name='volunteers')
+    
+    # Legacy fields for migration (will be removed after data migration)
+    skills = models.TextField(help_text=_('Comma-separated skills (Legacy)'), blank=True)
     areas_of_interest = models.TextField(blank=True)
-    availability = models.TextField(help_text=_('Available days/times'))
+    availability = models.TextField(help_text=_('Available days/times (Legacy)'), blank=True)
     
     # Background check
     background_check_completed = models.BooleanField(default=False)
@@ -390,7 +438,9 @@ class TrainingCompletion(models.Model):
     # Completion details
     completed_date = models.DateField()
     score = models.IntegerField(null=True, blank=True, help_text=_('Test score if applicable'))
+    certificate_template = 'volunteers/certificate_template.html'
     certificate_issued = models.BooleanField(default=False)
+    certificate_number = models.CharField(max_length=50, blank=True, unique=True)
     certificate_file = models.FileField(upload_to='training/certificates/', blank=True, null=True)
     
     # Expiry (for certifications that expire)

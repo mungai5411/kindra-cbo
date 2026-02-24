@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: letter landscape;
+            margin: 0;
+        }
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .certificate-container {
+            width: 10in;
+            height: 7.5in;
+            margin: 0.25in auto;
+            border: 15px solid #519755;
+            background-color: #fff;
+            padding: 0.5in;
+            box-sizing: border-box;
+            position: relative;
+            text-align: center;
+        }
+        .inner-border {
+            border: 2px solid #519755;
+            height: 100%;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+        .org-name {
+            font-size: 28pt;
+            color: #519755;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .title {
+            font-size: 36pt;
+            font-weight: bold;
+            margin: 30px 0;
+            color: #333;
+        }
+        .sub-title {
+            font-size: 18pt;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        .recipient-name {
+            font-size: 32pt;
+            font-weight: bold;
+            border-bottom: 2px solid #333;
+            display: inline-block;
+            margin: 20px 0;
+            min-width: 300px;
+        }
+        .training-title {
+            font-size: 22pt;
+            font-weight: bold;
+            color: #519755;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .signature-line {
+            border-top: 1px solid #333;
+            width: 200px;
+            margin: 0 auto;
+            padding-top: 5px;
+            font-size: 12pt;
+        }
+        .cert-info {
+            position: absolute;
+            bottom: 30px;
+            left: 50px;
+            font-size: 10pt;
+            color: #666;
+            text-align: left;
+        }
+        .date-info {
+            position: absolute;
+            bottom: 30px;
+            right: 50px;
+            font-size: 10pt;
+            color: #666;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate-container">
+        <div class="inner-border">
+            <div class="header">
+                {% if logo_path %}
+                    <img src="file://{{ logo_path }}" class="logo" alt="Logo">
+                {% endif %}
+                <h1 class="org-name">{{ organization_name }}</h1>
+            </div>
+            
+            <div class="title">CERTIFICATE OF COMPLETION</div>
+            <div class="sub-title">This is to certify that</div>
+            
+            <div class="recipient-name">{{ volunteer.full_name }}</div>
+            
+            <p style="font-size: 16pt;">has successfully completed the training course</p>
+            
+            <div class="training-title">{{ training.title }}</div>
+            
+            <div style="margin-top: 40px;">
+                <div style="display: inline-block; width: 40%; vertical-align: bottom;">
+                    <div class="signature-line">Program Director</div>
+                </div>
+                <div style="display: inline-block; width: 40%; vertical-align: bottom;">
+                    <div class="signature-line">Training Supervisor</div>
+                </div>
+            </div>
+            
+            <div class="cert-info">
+                Certificate ID: {{ certificate_number }}
+            </div>
+            <div class="date-info">
+                Date: {{ completion_date|date:"F d, Y" }}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
