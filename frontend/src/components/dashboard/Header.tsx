@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Box, Avatar, Badge, Tooltip, useTheme, alpha, Menu, MenuItem, ListItemIcon, Divider, TextField } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { Menu as MenuIcon, Notifications, Search, Logout, Settings } from '@mui/icons-material';
+import { Menu as MenuIcon, Notifications, Search, Logout, Settings, LightMode, DarkMode } from '@mui/icons-material';
+import { useColorMode } from '../../contexts/ThemeContext';
 import { SettingsDrawer } from './SettingsDrawer';
 import { NotificationsDrawer } from './NotificationsDrawer';
 
@@ -16,7 +17,7 @@ export const Header = ({ handleDrawerToggle, user, handleLogout }: HeaderProps) 
     const theme = useTheme();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [settingsOpen, setSettingsOpen] = useState(false);
-    const [notificationsOpen, setNotificationsOpen] = useState(false);
+    const { mode, toggleColorMode } = useColorMode();
     const { unreadNotificationsCount } = useSelector((state: RootState) => state.auth);
     const open = Boolean(anchorEl);
 
@@ -96,6 +97,21 @@ export const Header = ({ handleDrawerToggle, user, handleLogout }: HeaderProps) 
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1.5 } }}>
 
+
+                        <Tooltip title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}>
+                            <IconButton
+                                onClick={toggleColorMode}
+                                color="inherit"
+                                sx={{
+                                    border: { xs: 'none', sm: '1px solid' },
+                                    borderColor: 'divider',
+                                    borderRadius: 2,
+                                    p: { xs: 1, sm: 1.25 }
+                                }}
+                            >
+                                {mode === 'light' ? <DarkMode fontSize="small" /> : <LightMode fontSize="small" />}
+                            </IconButton>
+                        </Tooltip>
 
                         <Tooltip title="Community Updates">
                             <IconButton
