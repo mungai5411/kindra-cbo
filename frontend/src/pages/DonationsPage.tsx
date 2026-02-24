@@ -82,9 +82,7 @@ export default function DonationsPage() {
     return (
         <Box sx={{
             minHeight: '100vh',
-            background: theme.palette.mode === 'dark'
-                ? '#0f172a'
-                : '#f8fafc',
+            background: theme.palette.background.default,
             overflow: 'hidden',
             position: 'relative'
         }}>
@@ -159,7 +157,7 @@ export default function DonationsPage() {
                             background: `linear-gradient(135deg, ${theme.palette.text.primary} 30%, ${theme.palette.primary.main} 100%)`,
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
-                            lineHeight: 1.1
+                            lineHeight: 1.15
                         }}>
                             Fueling Hope, <br /> One Gift at a Time
                         </Typography>
@@ -209,7 +207,7 @@ export default function DonationsPage() {
                                 size="large"
                                 startIcon={<TipsAndUpdates />}
                                 sx={{
-                                    borderRadius: 4,
+                                    borderRadius: 5,
                                     px: 5,
                                     py: 2,
                                     fontSize: '1rem',
@@ -311,7 +309,7 @@ export default function DonationsPage() {
                                                     height: '100%',
                                                     display: 'flex',
                                                     flexDirection: 'column',
-                                                    borderRadius: 5,
+                                                    borderRadius: 5, // theme radius 16px / 20px
                                                     overflow: 'hidden',
                                                     background: alpha(theme.palette.background.paper, 0.8),
                                                     backdropFilter: 'blur(20px)',

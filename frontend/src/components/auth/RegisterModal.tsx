@@ -16,7 +16,8 @@ import {
     Typography,
     IconButton,
     useMediaQuery,
-    InputAdornment
+    InputAdornment,
+    alpha
 } from '@mui/material';
 import { Close, Visibility, VisibilityOff } from '@mui/icons-material';
 import { register } from '../../features/auth/authSlice';
@@ -104,11 +105,11 @@ export const RegisterModal = () => {
 
     const inputInnerSx = {
         height: '46px',
-        borderRadius: '8px',
-        bgcolor: '#fff',
-        '& fieldset': { borderColor: '#ddd' },
-        '&:hover fieldset': { borderColor: '#bbb !important' },
-        '&.Mui-focused fieldset': { borderColor: '#000 !important', borderWidth: '1px' },
+        borderRadius: 3,
+        bgcolor: 'background.paper',
+        '& fieldset': { borderColor: 'divider' },
+        '&:hover fieldset': { borderColor: alpha(theme.palette.primary.main, 0.4) },
+        '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main, borderWidth: '1px' },
         fontSize: '0.9rem',
     };
 
@@ -129,10 +130,10 @@ export const RegisterModal = () => {
             fullWidth
             PaperProps={{
                 sx: {
-                    borderRadius: '16px',
-                    backgroundColor: '#fff',
+                    borderRadius: 5,
+                    backgroundColor: 'background.paper',
                     backgroundImage: 'none',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                    boxShadow: theme.shadows[10],
                     overflow: 'visible',
                     mx: isMobile ? 2 : 'auto',
                     width: isMobile ? 'calc(100% - 32px)' : '460px',
@@ -156,10 +157,10 @@ export const RegisterModal = () => {
 
             <DialogContent sx={{ p: isMobile ? 3 : 5, pt: isMobile ? 5 : 6 }}>
                 <Box sx={{ mb: 4 }}>
-                    <Typography variant="h4" fontWeight="700" sx={{ color: '#000', mb: 1, letterSpacing: '-0.02em' }}>
+                    <Typography variant="h4" fontWeight="700" sx={{ mb: 1, letterSpacing: '-0.02em' }}>
                         {success ? 'Check your email' : 'Create account'}
                     </Typography>
-                    <Typography variant="body1" sx={{ color: '#666', fontWeight: 400 }}>
+                    <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 400 }}>
                         {success
                             ? `We've sent a verification link to ${formData.email}. Please verify your account to continue.`
                             : 'Join the Kindra community today'}
@@ -172,7 +173,7 @@ export const RegisterModal = () => {
                             fullWidth
                             variant="outlined"
                             onClick={closeRegisterModal}
-                            sx={{ borderRadius: '8px', py: 1.5, fontWeight: '700', textTransform: 'none' }}
+                            sx={{ borderRadius: 3, py: 1.5, fontWeight: '700', textTransform: 'none' }}
                         >
                             Back to Home
                         </Button>
@@ -308,16 +309,16 @@ export const RegisterModal = () => {
                             sx={{
                                 mt: 4,
                                 py: 1.5,
-                                borderRadius: '8px',
+                                borderRadius: 3,
                                 fontWeight: '700',
                                 textTransform: 'none',
                                 fontSize: '16px',
-                                bgcolor: '#000',
-                                color: '#fff',
-                                boxShadow: 'none',
+                                bgcolor: 'primary.main',
+                                color: 'primary.contrastText',
+                                boxShadow: theme.shadows[4],
                                 '&:hover': {
-                                    bgcolor: '#222',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                    bgcolor: 'primary.dark',
+                                    boxShadow: theme.shadows[8]
                                 },
                             }}
                         >

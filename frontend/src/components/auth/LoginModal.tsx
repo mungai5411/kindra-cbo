@@ -16,7 +16,8 @@ import {
     Dialog,
     DialogContent,
     useTheme,
-    useMediaQuery
+    useMediaQuery,
+    alpha
 } from '@mui/material';
 import { Visibility, VisibilityOff, Close } from '@mui/icons-material';
 import { Checkbox, FormControlLabel } from '@mui/material';
@@ -128,10 +129,10 @@ export const LoginModal = () => {
             fullWidth
             PaperProps={{
                 sx: {
-                    borderRadius: '16px',
-                    backgroundColor: '#fff',
+                    borderRadius: 5,
+                    backgroundColor: 'background.paper',
                     backgroundImage: 'none',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                    boxShadow: theme.shadows[10],
                     overflow: 'visible',
                     mx: isMobile ? 2 : 'auto',
                     width: isMobile ? 'calc(100% - 32px)' : '440px',
@@ -146,8 +147,8 @@ export const LoginModal = () => {
                     position: 'absolute',
                     right: 16,
                     top: 16,
-                    color: '#999',
-                    '&:hover': { color: '#333' }
+                    color: 'text.disabled',
+                    '&:hover': { color: 'text.primary' }
                 }}
             >
                 <Close />
@@ -156,10 +157,10 @@ export const LoginModal = () => {
             {isLoginOpen && (
                 <DialogContent sx={{ p: isMobile ? 3 : 5, pt: isMobile ? 5 : 6 }}>
                     <Box sx={{ mb: 4 }}>
-                        <Typography variant="h4" fontWeight="700" sx={{ color: '#000', mb: 1, letterSpacing: '-0.02em' }}>
+                        <Typography variant="h4" fontWeight="700" sx={{ mb: 1, letterSpacing: '-0.02em' }}>
                             {isGoogleFlow ? "Sign in with Google" : "Welcome back"}
                         </Typography>
-                        <Typography variant="body1" sx={{ color: '#666', fontWeight: 400 }}>
+                        <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 400 }}>
                             {isGoogleFlow ? "Access your account securely" : "Please enter your details"}
                         </Typography>
                     </Box>
@@ -209,9 +210,9 @@ export const LoginModal = () => {
                                 sx={{
                                     mb: 3,
                                     py: 1.5,
-                                    borderRadius: '8px',
-                                    borderColor: '#ddd',
-                                    color: '#333',
+                                    borderRadius: 3,
+                                    borderColor: 'divider',
+                                    color: 'text.primary',
                                     textTransform: 'none',
                                     fontWeight: '600',
                                     fontSize: '15px',
@@ -260,10 +261,10 @@ export const LoginModal = () => {
                                         InputProps={{
                                             sx: {
                                                 height: '48px',
-                                                borderRadius: '8px',
-                                                '& fieldset': { borderColor: '#ddd' },
-                                                '&:hover fieldset': { borderColor: '#bbb !important' },
-                                                '&.Mui-focused fieldset': { borderColor: '#000 !important', borderWidth: '1px' },
+                                                borderRadius: 3,
+                                                '& fieldset': { borderColor: 'divider' },
+                                                '&:hover fieldset': { borderColor: alpha(theme.palette.primary.main, 0.4) },
+                                                '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main, borderWidth: '1px' },
                                             }
                                         }}
                                     />
@@ -285,10 +286,10 @@ export const LoginModal = () => {
                                         InputProps={{
                                             sx: {
                                                 height: '48px',
-                                                borderRadius: '8px',
-                                                '& fieldset': { borderColor: '#ddd' },
-                                                '&:hover fieldset': { borderColor: '#bbb !important' },
-                                                '&.Mui-focused fieldset': { borderColor: '#000 !important', borderWidth: '1px' },
+                                                borderRadius: 3,
+                                                '& fieldset': { borderColor: 'divider' },
+                                                '&:hover fieldset': { borderColor: alpha(theme.palette.primary.main, 0.4) },
+                                                '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main, borderWidth: '1px' },
                                             },
                                             endAdornment: (
                                                 <InputAdornment position="end">
@@ -312,8 +313,8 @@ export const LoginModal = () => {
                                                 checked={rememberMe}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRememberMe(e.target.checked)}
                                                 sx={{
-                                                    color: '#ddd',
-                                                    '&.Mui-checked': { color: '#000' }
+                                                    color: 'divider',
+                                                    '&.Mui-checked': { color: 'primary.main' }
                                                 }}
                                             />
                                         }
@@ -345,14 +346,14 @@ export const LoginModal = () => {
                                     variant="contained"
                                     disabled={localLoading || reduxLoading || !!rateLimitError}
                                     sx={{
-                                        bgcolor: '#000',
-                                        color: '#fff',
+                                        bgcolor: 'primary.main',
+                                        color: 'primary.contrastText',
                                         py: 1.5,
-                                        borderRadius: '8px',
+                                        borderRadius: 3,
                                         fontWeight: '700',
                                         textTransform: 'none',
                                         fontSize: '16px',
-                                        boxShadow: 'none',
+                                        boxShadow: theme.shadows[4],
                                         '&:hover': {
                                             bgcolor: '#222',
                                             boxShadow: '0 4px 12px rgba(0,0,0,0.1)'

@@ -7,22 +7,22 @@ import { alpha } from '@mui/material';
 
 // Harmonized color palette matching new Theme
 export const glassColors = {
-    primaryGradient: 'linear-gradient(135deg, #519755 0%, #3d7240 100%)', // Green Gradient
-    secondaryGradient: 'linear-gradient(to right, #BE91BE 0%, #DBAAA7 100%)', // Purple/Pink Gradient
-    accentGradient: 'linear-gradient(to bottom right, #A8DCAB 0%, #519755 100%)', // Light Green to Dark
-    successGradient: 'linear-gradient(45deg, #519755 0%, #A8DCAB 100%)',
-    warningGradient: 'linear-gradient(45deg, #ffa726 0%, #f57c00 100%)',
+    primaryGradient: 'linear-gradient(135deg, #43A047 0%, #00701A 100%)', // Good Hope Green Gradient
+    secondaryGradient: 'linear-gradient(to right, #FFB300 0%, #C68400 100%)', // Hope Amber Gradient
+    accentGradient: 'linear-gradient(to bottom right, #76D275 0%, #43A047 100%)', // Light Green to Dark
+    successGradient: 'linear-gradient(45deg, #43A047 0%, #76D275 100%)',
+    warningGradient: 'linear-gradient(45deg, #FB8C00 0%, #C25E00 100%)',
 
     // Radial backgrounds (Strictly Light Mode)
-    primaryBgLight: (alpha: any) => `radial-gradient(circle at 20% 30%, ${alpha('#519755', 0.15)} 0%, transparent 50%), #f4f9f4`,
-    secondaryBgLight: (alpha: any) => `radial-gradient(circle at 20% 30%, ${alpha('#BE91BE', 0.15)} 0%, transparent 50%), #f4f9f4`,
-    successBgLight: (alpha: any) => `radial-gradient(circle at 20% 30%, ${alpha('#519755', 0.12)} 0%, transparent 50%), #f4f9f4`,
-    warningBgLight: (alpha: any) => `radial-gradient(circle at 20% 30%, ${alpha('#ffa726', 0.12)} 0%, transparent 50%), #f4f9f4`,
+    primaryBgLight: (alpha: any) => `radial-gradient(circle at 20% 30%, ${alpha('#43A047', 0.15)} 0%, transparent 50%), #f8fafb`,
+    secondaryBgLight: (alpha: any) => `radial-gradient(circle at 20% 30%, ${alpha('#FFB300', 0.15)} 0%, transparent 50%), #f8fafb`,
+    successBgLight: (alpha: any) => `radial-gradient(circle at 20% 30%, ${alpha('#43A047', 0.12)} 0%, transparent 50%), #f8fafb`,
+    warningBgLight: (alpha: any) => `radial-gradient(circle at 20% 30%, ${alpha('#FB8C00', 0.12)} 0%, transparent 50%), #f8fafb`,
 
     // Chat Bubble Colors
-    bubbleSender: 'linear-gradient(135deg, #519755 0%, #3d7240 100%)',
-    bubbleReceiver: 'rgba(255, 255, 255, 0.9)',
-    bubblePrivate: 'rgba(240, 240, 240, 0.5)',
+    bubbleSender: 'linear-gradient(135deg, #43A047 0%, #00701A 100%)',
+    bubbleReceiver: 'rgba(255, 255, 255, 0.95)',
+    bubblePrivate: 'rgba(240, 240, 240, 0.6)',
 };
 
 // Glassmorphism card style
@@ -30,8 +30,8 @@ export const glassCard = (theme: any, variant: 'default' | 'elevated' = 'default
     background: alpha(theme.palette.background.paper, 0.8),
     backdropFilter: 'blur(20px)',
     border: '1px solid',
-    borderColor: alpha(theme.palette.divider, 0.5),
-    borderRadius: variant === 'elevated' ? 1 : 0.5,
+    borderColor: alpha(theme.palette.divider, 0.4),
+    borderRadius: variant === 'elevated' ? 2 : 1.5,
     boxShadow: variant === 'elevated'
         ? '0 12px 40px rgba(0,0,0,0.15)'
         : '0 8px 32px rgba(0,0,0,0.1)',
@@ -46,10 +46,10 @@ export const glassCard = (theme: any, variant: 'default' | 'elevated' = 'default
 
 // Glassmorphism input field
 export const glassInput = {
-    borderRadius: 3,
+    borderRadius: 4,
     '& .MuiOutlinedInput-root': {
-        borderRadius: 3,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderRadius: 4,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
         backdropFilter: 'blur(10px)',
         transition: 'all 0.3s',
         '&:hover': {
@@ -147,9 +147,9 @@ export const glassNotificationItem = (theme: any, read: boolean) => ({
 // Specialized glass chat bubble
 export const glassChatBubble = (isSender: boolean, isPrivate: boolean, isMobile: boolean = false) => ({
     p: isMobile ? 1 : 1.5,
-    borderRadius: isSender ? '4px 4px 1px 4px' : '4px 4px 4px 1px',
+    borderRadius: isSender ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
     background: isPrivate ? glassColors.bubblePrivate : (isSender ? glassColors.bubbleSender : glassColors.bubbleReceiver),
-    color: isSender ? '#ffffff' : '#1a2e1c',
+    color: isSender ? '#ffffff' : '#1A2327',
     boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
     border: isPrivate ? '1px dashed rgba(0,0,0,0.1)' : '1px solid rgba(255,255,255,0.3)',
     position: 'relative',

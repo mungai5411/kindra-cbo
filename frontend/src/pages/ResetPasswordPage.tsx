@@ -81,7 +81,7 @@ export default function ResetPasswordPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                 py: 4
             }}
         >
@@ -93,9 +93,9 @@ export default function ResetPasswordPage() {
                     elevation={24}
                     sx={{
                         p: 4,
-                        borderRadius: 2,
+                        borderRadius: 5,
                         backdropFilter: 'blur(10px)',
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        backgroundColor: alpha(theme.palette.background.paper, 0.95),
                         border: '1px solid',
                         borderColor: alpha(theme.palette.divider, 0.1),
                         boxShadow: theme.shadows[10]
@@ -171,7 +171,7 @@ export default function ResetPasswordPage() {
                             startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
                             sx={{
                                 py: 1.5,
-                                borderRadius: 3,
+                                borderRadius: 5,
                                 fontWeight: 'bold',
                                 textTransform: 'none',
                                 fontSize: '1.1rem'

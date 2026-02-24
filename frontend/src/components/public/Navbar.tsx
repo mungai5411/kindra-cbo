@@ -122,7 +122,7 @@ export const Navbar = () => {
                                         sx={{
                                             fontWeight: 600,
                                             textTransform: 'none',
-                                            borderRadius: '50px',
+                                            borderRadius: 5,
                                         }}
                                     >
                                         Dashboard
@@ -159,12 +159,12 @@ export const Navbar = () => {
                                         onClick={() => openRegisterModal('VOLUNTEER')}
                                         size="medium"
                                         sx={{
-                                            borderRadius: '50px',
+                                            borderRadius: 5,
                                             px: 3,
                                             boxShadow: theme.shadows[4],
                                             textTransform: 'none',
                                             fontWeight: 700,
-                                            bgcolor: scrolled ? 'primary.main' : 'common.white',
+                                            bgcolor: scrolled ? 'primary.main' : 'background.paper',
                                             color: scrolled ? 'common.white' : 'primary.main',
                                             '&:hover': {
                                                 bgcolor: scrolled ? 'primary.dark' : alpha(theme.palette.common.white, 0.9),
@@ -210,7 +210,7 @@ export const Navbar = () => {
                         right: '16px !important',
                         bottom: 'auto !important',
                         left: 'auto !important',
-                        borderRadius: 3,
+                        borderRadius: 4,
                         bgcolor: 'background.paper',
                         backgroundImage: 'none',
                         boxShadow: (theme) => theme.shadows[8],

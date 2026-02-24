@@ -158,8 +158,8 @@ export default function AboutPage() {
                 <Grid container spacing={3}>
                     {[
                         { title: getTitle('about-mission', 'Our Mission'), icon: <VolunteerActivism />, text: getContent('about-mission', "To empower vulnerable communities through sustainable social, health, and economic support systems."), color: theme.palette.primary.main, delay: 0 },
-                        { title: getTitle('about-vision', 'Our Vision'), icon: <Lightbulb />, text: getContent('about-vision', "A world where every family has the resources, dignity, and opportunity to build their own prosperous future."), color: '#BE91BE', delay: 0.1 },
-                        { title: getTitle('about-values', 'Our Values'), icon: <TrendingUp />, text: getContent('about-values', "Integrity, Radical Transparency, Community-First Action, and Unwavering Commitment to measurable Impact."), color: '#DBAAA7', delay: 0.2 }
+                        { title: getTitle('about-vision', 'Our Vision'), icon: <Lightbulb />, text: getContent('about-vision', "A world where every family has the resources, dignity, and opportunity to build their own prosperous future."), color: theme.palette.secondary.main, delay: 0.1 },
+                        { title: getTitle('about-values', 'Our Values'), icon: <TrendingUp />, text: getContent('about-values', "Integrity, Radical Transparency, Community-First Action, and Unwavering Commitment to measurable Impact."), color: theme.palette.primary.light, delay: 0.2 }
                     ].map((item, index) => (
                         <Grid item xs={12} md={4} key={index}>
                             <MotionBox
@@ -172,7 +172,7 @@ export default function AboutPage() {
                                     ...glassCard(theme, 'elevated'),
                                     height: '100%',
                                     p: { xs: 3, md: 4 },
-                                    borderRadius: 6,
+                                    borderRadius: 5,
                                     textAlign: 'center',
                                     display: 'flex',
                                     flexDirection: 'column',
@@ -250,15 +250,15 @@ export default function AboutPage() {
                                     bottom: -10,
                                     left: -10,
                                     background: glassColors.secondaryGradient,
-                                    borderRadius: 8,
+                                    borderRadius: 5,
                                     filter: 'blur(40px)',
                                     opacity: 0.1,
                                     zIndex: 0
                                 }} />
                                 <Card sx={{
-                                    borderRadius: 6,
+                                    borderRadius: 5,
                                     overflow: 'hidden',
-                                    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                                    boxShadow: `0 20px 40px ${alpha(theme.palette.text.primary, 0.1)}`,
                                     zIndex: 1,
                                     position: 'relative'
                                 }}>
@@ -300,7 +300,7 @@ export default function AboutPage() {
                             <Grid item xs={12} sm={6} md={3} key={i}>
                                 <Paper sx={{
                                     p: 3,
-                                    borderRadius: 4,
+                                    borderRadius: 5,
                                     height: '100%',
                                     bgcolor: 'background.paper',
                                     border: '1px solid',
@@ -343,7 +343,7 @@ export default function AboutPage() {
                                 >
                                     <Card sx={{
                                         textAlign: 'center',
-                                        borderRadius: 6,
+                                        borderRadius: 5,
                                         p: 3,
                                         background: 'transparent',
                                         boxShadow: 'none',

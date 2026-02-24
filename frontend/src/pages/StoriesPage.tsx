@@ -161,10 +161,10 @@ export default function StoriesPage() {
                     transition={{ delay: 0.3 }}
                     elevation={0}
                     sx={{
-                        borderRadius: 2,
+                        borderRadius: 5,
                         border: '1px solid',
                         borderColor: alpha(theme.palette.divider, 0.1),
-                        boxShadow: theme.shadows[1],
+                        boxShadow: theme.shadows[4],
                         mb: 4,
                         background: alpha(theme.palette.background.paper, 0.7),
                         backdropFilter: 'blur(10px)',
@@ -272,7 +272,7 @@ export default function StoriesPage() {
                                                     height: '100%',
                                                     display: 'flex',
                                                     flexDirection: 'column',
-                                                    borderRadius: 2,
+                                                    borderRadius: 5,
                                                     border: '1px solid',
                                                     borderColor: alpha(theme.palette.divider, 0.1),
                                                     boxShadow: theme.shadows[1],
@@ -398,7 +398,7 @@ export default function StoriesPage() {
                                                         height: '100%',
                                                         display: 'flex',
                                                         flexDirection: 'column',
-                                                        borderRadius: 2,
+                                                        borderRadius: 5,
                                                         border: '1px solid',
                                                         borderColor: alpha(theme.palette.divider, 0.1),
                                                         boxShadow: theme.shadows[1],
@@ -482,7 +482,7 @@ export default function StoriesPage() {
                                                                 sx={{
                                                                     height: 8,
                                                                     borderRadius: 4,
-                                                                    bgcolor: alpha(theme.palette.primary.main, 0.1)
+                                                                    bgcolor: alpha(theme.palette.primary.main, 0.08)
                                                                 }}
                                                             />
                                                             <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
@@ -576,7 +576,7 @@ export default function StoriesPage() {
                         variant="outlined"
                         size="large"
                         onClick={() => navigate('/')}
-                        sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600, border: '2px solid' }}
+                        sx={{ borderRadius: 5, textTransform: 'none', fontWeight: 600, border: '2px solid' }}
                     >
                         Back to Home
                     </Button>

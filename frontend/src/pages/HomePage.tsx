@@ -169,7 +169,7 @@ export default function HomePage() {
                     minHeight: { xs: 'auto', md: '65vh' },
                     display: 'flex',
                     alignItems: 'center',
-                    background: `radial-gradient(circle at 20% 30%, ${alpha(theme.palette.primary.light, 0.05)} 0%, transparent 60%), radial-gradient(circle at 80% 70%, ${alpha(theme.palette.secondary.light, 0.03)} 0%, transparent 60%), #f8f9fa`,
+                    background: `radial-gradient(circle at 20% 30%, ${alpha(theme.palette.primary.light, 0.08)} 0%, transparent 60%), radial-gradient(circle at 80% 70%, ${alpha(theme.palette.secondary.light, 0.05)} 0%, transparent 60%), #f8f9fa`,
                     pt: { xs: 12, md: 6 },
                     pb: { xs: 8, md: 6 },
                 }}
@@ -224,10 +224,10 @@ export default function HomePage() {
                                         sx={{
                                             py: 1.5,
                                             px: 4,
-                                            borderRadius: '10px',
+                                            borderRadius: 5,
                                             fontSize: '1rem',
                                             fontWeight: 700,
-                                            boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
+                                            boxShadow: `0 10px 20px ${alpha(theme.palette.primary.main, 0.15)}`,
                                             background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                                             '&:hover': {
                                                 transform: 'translateY(-2px)',
@@ -249,7 +249,7 @@ export default function HomePage() {
                                         sx={{
                                             py: 1.5,
                                             px: 3,
-                                            borderRadius: '10px',
+                                            borderRadius: 5,
                                             fontSize: '1rem',
                                             fontWeight: 700,
                                             borderWidth: '2px',
@@ -312,9 +312,9 @@ export default function HomePage() {
                                 }} />
 
                                 <Card sx={{
-                                    borderRadius: 8,
+                                    borderRadius: 5,
                                     overflow: 'hidden',
-                                    boxShadow: '0 32px 64px rgba(0,0,0,0.1)',
+                                    boxShadow: `0 32px 64px ${alpha(theme.palette.text.primary, 0.1)}`,
                                     position: 'relative',
                                     zIndex: 1,
                                     border: '1px solid',
@@ -478,7 +478,7 @@ export default function HomePage() {
                                     <Card sx={{
                                         height: '100%',
                                         p: 3,
-                                        borderRadius: 3,
+                                        borderRadius: 4,
                                         border: '1px solid',
                                         borderColor: alpha(theme.palette.divider, 0.1),
                                         background: alpha(theme.palette.background.paper, 0.8),
