@@ -1,4 +1,9 @@
 import { Menu as MenuIcon, Close, LightMode, DarkMode } from '@mui/icons-material';
+import {
+    AppBar, Toolbar, Container, Box, Typography, Button, Stack,
+    Tooltip, IconButton, Drawer, List, ListItem, ListItemText,
+    Divider, alpha, useTheme
+} from '@mui/material';
 import { useColorMode } from '../../contexts/ThemeContext';
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -19,6 +24,7 @@ const NAV_ITEMS = [
 
 export const Navbar = () => {
     const theme = useTheme();
+    const dispatch = useDispatch<AppDispatch>();
     const location = useLocation();
     const navigate = useNavigate();
     const { mode, toggleColorMode } = useColorMode();
