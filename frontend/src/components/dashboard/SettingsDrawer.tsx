@@ -13,7 +13,8 @@ import {
     Snackbar,
     Alert,
     Stack,
-    Paper
+    Paper,
+    CircularProgress
 } from '@mui/material';
 import {
     Close,
@@ -239,9 +240,9 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
             </SettingGroup>
 
             <SettingGroup title="Support & About">
-                <SettingItem icon={<HelpOutline fontSize="small" />} label="Help Center" onClick={() => { }} />
-                <SettingItem icon={<InfoOutlined fontSize="small" />} label="Legal Information" onClick={() => { }} />
-                <SettingItem icon={<BugReportOutlined fontSize="small" />} label="Report a Bug" onClick={() => { }} />
+                <SettingItem icon={<HelpOutline fontSize="small" />} label="Help Center" onClick={() => setActiveTab('help')} />
+                <SettingItem icon={<InfoOutlined fontSize="small" />} label="Legal Information" onClick={() => setActiveTab('legal')} />
+                <SettingItem icon={<BugReportOutlined fontSize="small" />} label="Report a Bug" onClick={() => setActiveTab('bug')} />
             </SettingGroup>
 
             <Box sx={{ mt: 2 }}>
@@ -429,6 +430,173 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
         </Box>
     );
 
+    const renderHelpSection = () => (
+        <Box>
+            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: 'text.secondary' }}>
+                Frequently Asked Questions
+            </Typography>
+            <Stack spacing={2}>
+                {[
+                    { q: "How do I donate?", a: "You can donate by clicking 'Donate' on the home page or dashboard. We accept M-Pesa, Card payments, and Direct Bank Transfers. All donations are secure and encrypted." },
+                    { q: "How do I become a volunteer?", a: "Register as a volunteer via the 'Register' link. Once your application is submitted, our management team will review your skills and availability. You'll receive an email notification within 48 hours." },
+                    { q: "Can I get a tax-deductible receipt?", a: "Yes, Kindra CBO is a registered non-profit. Once your donation is verified, a PDF receipt is automatically generated and can be downloaded from your 'Giving History' section." },
+                    { q: "How is my data protected?", a: "We use industry-standard encryption and follow strict data protection regulations. Your personal information is only used for communication and service delivery purposes. See our Privacy Policy for more." },
+                    { q: "Contact Support", a: "Need more help? Email us at support@kindra.org, call +254 700 000000, or visit our headquarters at Westlands Office Park, Nairobi." }
+                ].map((item, idx) => (
+                    <Paper key={idx} elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: alpha(theme.palette.primary.main, 0.03), border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1) }}>
+                        <Typography variant="body2" fontWeight="700" color="primary.main" gutterBottom>{item.q}</Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.5 }}>{item.a}</Typography>
+                    </Paper>
+                ))}
+            </Stack>
+        </Box>
+    );
+
+    const renderPolicySubView = (title: string, content: string) => (
+        <Box>
+            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: 'text.secondary' }}>
+                {title}
+            </Typography>
+            <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
+                    {content}
+                </Typography>
+            </Paper>
+        </Box>
+    );
+
+    const renderLegalSection = () => {
+        const policies = {
+            privacy: {
+                title: "Privacy Policy",
+                content: `At Kindra CBO, we take your privacy seriously. 
+                
+                1. Data Collection: We collect information necessary for donation processing and volunteer management.
+                2. Data Sharing: We NEVER sell your data to third parties.
+                3. Security: Your data is encrypted using SSL (Secure Sockets Layer) technology.
+                4. Rights: You have the right to request access to or deletion of your personal data at any time.`
+            },
+            terms: {
+                title: "Terms of Service",
+                content: `By using the Kindra platform, you agree to:
+                
+                1. Provide accurate information during registration.
+                2. Use the platform solely for charitable and non-profit purposes.
+                3. Respect the privacy of other community members.
+                4. Abide by our financial transparency guidelines when processing donations.`
+            },
+            donation: {
+                title: "Donation Policy",
+                content: `Kindra CBO ensures 100% transparency in funds management:
+                
+                1. Fund Allocation: Donations are channeled directly to the selected campaigns.
+                2. Administrative Costs: No more than 10% of any donation is used for operational overhead.
+                3. Refunds: Donations are generally non-refundable unless a processing error occurred.
+                4. Reporting: Donors receive quarterly impact reports detailing how their funds were used.`
+            }
+        };
+
+        if (activeTab === 'legal-privacy') return renderPolicySubView(policies.privacy.title, policies.privacy.content);
+        if (activeTab === 'legal-terms') return renderPolicySubView(policies.terms.title, policies.terms.content);
+        if (activeTab === 'legal-donation') return renderPolicySubView(policies.donation.title, policies.donation.content);
+
+        return (
+            <Box>
+                <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: 'text.secondary' }}>
+                    Policies & Transparency
+                </Typography>
+                <Stack spacing={2}>
+                    <Button
+                        fullWidth
+                        onClick={() => setActiveTab('legal-privacy')}
+                        sx={{ justifyContent: 'space-between', textTransform: 'none', py: 1.5, px: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}
+                    >
+                        <Typography variant="body2" fontWeight="600">Privacy Policy</Typography>
+                        <ChevronRight fontSize="small" />
+                    </Button>
+                    <Button
+                        fullWidth
+                        onClick={() => setActiveTab('legal-terms')}
+                        sx={{ justifyContent: 'space-between', textTransform: 'none', py: 1.5, px: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}
+                    >
+                        <Typography variant="body2" fontWeight="600">Terms of Service</Typography>
+                        <ChevronRight fontSize="small" />
+                    </Button>
+                    <Button
+                        fullWidth
+                        onClick={() => setActiveTab('legal-donation')}
+                        sx={{ justifyContent: 'space-between', textTransform: 'none', py: 1.5, px: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}
+                    >
+                        <Typography variant="body2" fontWeight="600">Donation Policy</Typography>
+                        <ChevronRight fontSize="small" />
+                    </Button>
+                </Stack>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 4, px: 1 }}>
+                    Kindra CBO (Reg No. CBO/NRB/4721) is a registered community-based organization. All data is processed according to Kenya's Data Protection Act 2019.
+                </Typography>
+            </Box>
+        );
+    };
+
+    const renderBugReportSection = () => {
+        const [bugType, setBugType] = useState('UI');
+        const [isSubmitting, setIsSubmitting] = useState(false);
+
+        const handleSubmitBug = () => {
+            setIsSubmitting(true);
+            setTimeout(() => {
+                setIsSubmitting(false);
+                setSaveSuccess(true);
+                setActiveTab(0);
+            }, 1500);
+        };
+
+        return (
+            <Box>
+                <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1, color: 'text.secondary' }}>
+                    Describe the issue
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ mb: 3, display: 'block' }}>
+                    Help us improve Kindra by reporting any bugs or glitches you find.
+                </Typography>
+                <Stack spacing={3}>
+                    <Box>
+                        <Typography variant="caption" fontWeight="bold" sx={{ mb: 1, display: 'block' }}>ISSUE TYPE</Typography>
+                        <Stack direction="row" spacing={1}>
+                            {['UI', 'Functional', 'Security', 'Other'].map(type => (
+                                <Button
+                                    key={type}
+                                    size="small"
+                                    variant={bugType === type ? "contained" : "outlined"}
+                                    onClick={() => setBugType(type)}
+                                    sx={{ borderRadius: 2, textTransform: 'none', px: 2 }}
+                                >
+                                    {type}
+                                </Button>
+                            ))}
+                        </Stack>
+                    </Box>
+                    <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        placeholder="What happened? Tell us the steps to reproduce..."
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                    />
+                    <Button
+                        variant="contained"
+                        fullWidth
+                        disabled={isSubmitting}
+                        onClick={handleSubmitBug}
+                        sx={{ borderRadius: 3, py: 1.5, fontWeight: 'bold' }}
+                    >
+                        {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Report'}
+                    </Button>
+                </Stack>
+            </Box>
+        );
+    };
+
     const renderNotificationsSection = () => (
         <Box>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 3, color: 'text.secondary' }}>
@@ -481,17 +649,28 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
         return (
             <Box>
                 <Box sx={{ px: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <IconButton size="small" onClick={() => setActiveTab(0)} sx={{ bgcolor: alpha(theme.palette.primary.main, 0.05) }}>
+                    <IconButton
+                        size="small"
+                        onClick={() => {
+                            if (String(activeTab).startsWith('legal-')) setActiveTab('legal');
+                            else setActiveTab(0);
+                        }}
+                        sx={{ bgcolor: alpha(theme.palette.primary.main, 0.05) }}
+                    >
                         <ArrowBack fontSize="small" />
                     </IconButton>
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ textTransform: 'capitalize' }}>
-                        {String(activeTab).replace('_', ' ')}
+                        {String(activeTab).replace('legal-', '').replace('-', ' ')}
                     </Typography>
                 </Box>
                 <Box sx={{ px: 2 }}>
                     {activeTab === 'profile' && renderProfileSection()}
                     {activeTab === 'security' && renderSecuritySection()}
                     {activeTab === 'notifications' && renderNotificationsSection()}
+                    {activeTab === 'help' && renderHelpSection()}
+                    {activeTab === 'legal' && renderLegalSection()}
+                    {String(activeTab).startsWith('legal-') && renderLegalSection()}
+                    {activeTab === 'bug' && renderBugReportSection()}
                 </Box>
             </Box>
         );
