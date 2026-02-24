@@ -211,9 +211,9 @@ export const endpoints = {
 
     // Reports
     reports: {
-        dashboard: '/reports/dashboard/',
-        reports: '/reports/reports/',
-        kpis: '/reports/kpis/',
-        analytics: '/reports/activity/',
+        dashboard: '/reporting/dashboard/',
+        reports: '/reporting/reports/',
+        kpis: '/reporting/kpis/',
+        analytics: '/reporting/activity/',
     },
 };
