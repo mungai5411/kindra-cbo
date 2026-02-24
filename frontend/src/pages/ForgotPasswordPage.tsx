@@ -17,7 +17,8 @@ import {
     Link,
     alpha,
     useTheme,
-    InputAdornment
+    InputAdornment,
+    Grid
 } from '@mui/material';
 import { Key, ArrowBack, Email } from '@mui/icons-material';
 import { motion } from 'framer-motion';
@@ -49,125 +50,159 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <Box
-            sx={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                py: 4
-            }}
-        >
-            <Container maxWidth="sm">
-                <Paper
-                    component={motion.div}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    elevation={24}
-                    sx={{
-                        p: 4,
-                        borderRadius: 5,
-                        backdropFilter: 'blur(10px)',
-                        backgroundColor: alpha(theme.palette.background.paper, 0.95),
-                        border: '1px solid',
-                        borderColor: alpha(theme.palette.divider, 0.1),
-                        boxShadow: theme.shadows[10]
-                    }}
-                >
-                    <Box sx={{ textAlign: 'center', mb: 4 }}>
-                        <Box sx={{
-                            width: 80,
-                            height: 80,
-                            borderRadius: '50%',
-                            bgcolor: alpha(theme.palette.primary.main, 0.1),
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            mx: 'auto',
-                            mb: 2
-                        }}>
-                            <Key sx={{ fontSize: 40, color: 'primary.main' }} />
-                        </Box>
-                        <Typography variant="h4" fontWeight="bold" gutterBottom>
-                            Forgot Password?
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            No worries! Enter your email and we'll send you reset instructions.
-                        </Typography>
-                    </Box>
-
-                    {message && (
-                        <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
-                            {message}
-                        </Alert>
-                    )}
-
-                    {error && (
-                        <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-                            {error}
-                        </Alert>
-                    )}
-
-                    <form onSubmit={handleSubmit}>
-                        <TextField
-                            fullWidth
-                            label="Email Address"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            disabled={isLoading}
-                            required
-                            sx={{ mb: 3 }}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <Email color="action" />
-                                    </InputAdornment>
-                                ),
-                                sx: { borderRadius: 3 }
-                            }}
-                        />
-
-                        <Button
-                            fullWidth
-                            type="submit"
-                            variant="contained"
-                            size="large"
-                            disabled={isLoading}
-                            startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
-                            sx={{
-                                py: 1.5,
-                                borderRadius: 5,
-                                fontWeight: 'bold',
-                                textTransform: 'none',
-                                fontSize: '1.1rem',
-                                mb: 3
-                            }}
+        <Box sx={{ minHeight: '100vh', display: 'flex', bgcolor: '#050505' }}>
+            <Grid container>
+                {/* Left Column - Visual/Mission */}
+                <Grid item xs={12} md={7} sx={{
+                    display: { xs: 'none', md: 'flex' },
+                    position: 'relative',
+                    overflow: 'hidden',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    p: 8,
+                    '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundImage: 'url("https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=2070")',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        filter: 'brightness(0.4) saturate(1.2)',
+                    },
+                    '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: `linear-gradient(45deg, ${alpha('#050505', 0.9)} 0%, ${alpha('#050505', 0.2)} 100%)`,
+                    }
+                }}>
+                    <Box sx={{ position: 'relative', zIndex: 1, maxWidth: 600 }}>
+                        <motion.div
+                            initial={{ opacity: 0, x: -30 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8 }}
                         >
-                            {isLoading ? 'Sending Link...' : 'Send Reset Link'}
-                        </Button>
-                    </form>
+                            <Typography variant="h1" sx={{ color: 'white', mb: 3, fontSize: '3.5rem', fontWeight: 900 }}>
+                                Build on <span style={{ color: theme.palette.primary.main }}>Purpose</span>.
+                            </Typography>
+                            <Typography variant="h3" sx={{ color: alpha('#fff', 0.7), mb: 4, fontWeight: 400, lineHeight: 1.4 }}>
+                                Kindra CBO empowers community resilience and optimizes family support at scale.
+                            </Typography>
 
-                    <Box sx={{ textAlign: 'center' }}>
-                        <Link
-                            component={RouterLink}
-                            to="/login"
-                            sx={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 1,
-                                fontWeight: 600,
-                                color: 'text.secondary',
-                                textDecoration: 'none',
-                                '&:hover': { color: 'primary.main' }
-                            }}
-                        >
-                            <ArrowBack fontSize="small" /> Back to Login
-                        </Link>
+                            <Box sx={{ display: 'flex', gap: 4, mt: 6 }}>
+                                <Box>
+                                    <Typography variant="h4" sx={{ color: 'white', mb: 1 }}>94%</Typography>
+                                    <Typography variant="body2" sx={{ color: alpha('#fff', 0.5) }}>Resource Optimization</Typography>
+                                </Box>
+                                <Box>
+                                    <Typography variant="h4" sx={{ color: 'white', mb: 1 }}>24/7</Typography>
+                                    <Typography variant="body2" sx={{ color: alpha('#fff', 0.5) }}>Crisis Monitoring</Typography>
+                                </Box>
+                            </Box>
+                        </motion.div>
                     </Box>
-                </Paper>
-            </Container>
+                </Grid>
+
+                {/* Right Column - Form */}
+                <Grid item xs={12} md={5} sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: '#050505',
+                    borderLeft: '1px solid',
+                    borderColor: alpha('#fff', 0.05)
+                }}>
+                    <Container maxWidth="xs">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <Box sx={{ mb: 6 }}>
+                                <Link component={RouterLink} to="/" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary', textDecoration: 'none', mb: 6, '&:hover': { color: 'white' } }}>
+                                    <ArrowBack fontSize="small" /> Home
+                                </Link>
+
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                    <Box sx={{ p: 1, borderRadius: 2, bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main' }}>
+                                        <Key />
+                                    </Box>
+                                    <Typography variant="h5" fontWeight="bold" sx={{ color: 'white' }}>
+                                        Reset your password
+                                    </Typography>
+                                </Box>
+                                <Typography variant="body1" sx={{ color: alpha('#fff', 0.6) }}>
+                                    Enter your email address and we will send you a password reset link.
+                                </Typography>
+                            </Box>
+
+                            {message && (
+                                <Alert severity="success" sx={{ mb: 4, borderRadius: 2, bgcolor: alpha(theme.palette.success.main, 0.1), color: 'success.light' }}>
+                                    {message}
+                                </Alert>
+                            )}
+
+                            {error && (
+                                <Alert severity="error" sx={{ mb: 4, borderRadius: 2, bgcolor: alpha(theme.palette.error.main, 0.1), color: 'error.light' }}>
+                                    {error}
+                                </Alert>
+                            )}
+
+                            <form onSubmit={handleSubmit}>
+                                <TextField
+                                    fullWidth
+                                    label="Enter your email"
+                                    type="email"
+                                    variant="outlined"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    disabled={isLoading}
+                                    required
+                                    sx={{
+                                        mb: 4,
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: 2,
+                                            bgcolor: alpha('#fff', 0.03),
+                                            color: 'white',
+                                            '& fieldset': { borderColor: alpha('#fff', 0.1) },
+                                            '&:hover fieldset': { borderColor: alpha('#fff', 0.2) },
+                                            '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main },
+                                        },
+                                        '& .MuiInputLabel-root': { color: alpha('#fff', 0.4) },
+                                        '& .MuiInputLabel-root.Mui-focused': { color: theme.palette.primary.main },
+                                    }}
+                                />
+
+                                <Button
+                                    fullWidth
+                                    type="submit"
+                                    variant="contained"
+                                    size="large"
+                                    disabled={isLoading}
+                                    sx={{
+                                        py: 1.8,
+                                        borderRadius: 2,
+                                        fontWeight: 'bold',
+                                        textTransform: 'none',
+                                        fontSize: '0.95rem',
+                                        bgcolor: 'primary.main',
+                                        '&:hover': { bgcolor: 'primary.dark' },
+                                        color: 'white'
+                                    }}
+                                >
+                                    {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Send password reset email'}
+                                </Button>
+                            </form>
+                        </motion.div>
+                    </Container>
+                </Grid>
+            </Grid>
         </Box>
     );
 }
