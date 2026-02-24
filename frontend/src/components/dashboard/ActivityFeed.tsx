@@ -29,7 +29,7 @@ export const ActivityFeed = ({ activities }: ActivityFeedProps) => {
 
     const getColors = (type: string) => {
         switch (type) {
-            case 'donation': return { main: '#4ECCA3', light: alpha('#4ECCA3', 0.1) };
+            case 'donation': return { main: theme.palette.primary.main, light: alpha(theme.palette.primary.main, 0.1) };
             case 'volunteer': return { main: '#5D5FEF', light: alpha('#5D5FEF', 0.1) };
             case 'case': return { main: '#FF708B', light: alpha('#FF708B', 0.1) };
             case 'campaign': return { main: '#FFBA69', light: alpha('#FFBA69', 0.1) };
@@ -63,7 +63,7 @@ export const ActivityFeed = ({ activities }: ActivityFeedProps) => {
             </Box>
 
             <Paper elevation={0} sx={{
-                borderRadius: 4,
+                borderRadius: 4, // Card radius 16px
                 border: '1px solid',
                 borderColor: alpha(theme.palette.divider, 0.08),
                 overflow: 'hidden',

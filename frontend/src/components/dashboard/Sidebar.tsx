@@ -209,13 +209,13 @@ export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionTo
                                     onClick={() => hasChildren ? handleSectionToggle(item.id) : handleNavigation(item.id)}
                                     selected={activeTab === item.id}
                                     sx={{
-                                        borderRadius: 2,
+                                        borderRadius: 3, // Sidebar radius 12px
                                         mb: 0.5,
                                         color: isActive ? theme.palette.primary.main : theme.palette.text.secondary,
-                                        bgcolor: isActive ? alpha('#8DA88D', 0.25) : 'transparent',
-                                        boxShadow: isActive ? `0 4px 12px ${alpha('#8DA88D', 0.3)}` : 'none',
+                                        bgcolor: isActive ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
+                                        boxShadow: isActive ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}` : 'none',
                                         '&:hover': {
-                                            bgcolor: isActive ? alpha('#8DA88D', 0.25) : alpha(theme.palette.text.primary, 0.04),
+                                            bgcolor: isActive ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.text.primary, 0.04),
                                             color: theme.palette.primary.main,
                                         }
                                     }}
@@ -256,13 +256,13 @@ export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionTo
                                                 key={child.id}
                                                 sx={{
                                                     pl: 3,
-                                                    borderRadius: '0 10px 10px 0',
+                                                    borderRadius: '0 12px 12px 0',
                                                     mb: 0.2,
                                                     minHeight: isMobile ? 44 : 36, // Larger touch target on mobile
                                                     color: activeTab === child.id ? theme.palette.primary.main : theme.palette.text.secondary,
-                                                    bgcolor: activeTab === child.id ? alpha('#8DA88D', 0.1) : 'transparent',
+                                                    bgcolor: activeTab === child.id ? alpha(theme.palette.primary.main, 0.05) : 'transparent',
                                                     '&:hover': {
-                                                        bgcolor: alpha('#8DA88D', 0.15),
+                                                        bgcolor: alpha(theme.palette.primary.main, 0.08),
                                                         color: theme.palette.primary.main,
                                                     },
                                                     transition: 'all 0.2s ease',

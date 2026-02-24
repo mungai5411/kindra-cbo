@@ -351,7 +351,7 @@ export default function DashboardPage() {
         <Box sx={{
             display: 'flex',
             minHeight: '100vh',
-            background: `radial-gradient(circle at 20% 30%, ${alpha(theme.palette.primary.light, 0.12)} 0%, transparent 50%), #f4f9f4`
+            background: `radial-gradient(circle at 20% 30%, ${alpha(theme.palette.primary.light, 0.12)} 0%, transparent 50%), #F9FAFB`
         }}>
             <Header
                 user={user}

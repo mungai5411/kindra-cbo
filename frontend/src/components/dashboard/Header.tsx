@@ -83,8 +83,8 @@ export const Header = ({ handleDrawerToggle, user, handleLogout }: HeaderProps) 
                             InputProps={{
                                 startAdornment: <Search fontSize="small" sx={{ mr: 1, opacity: 0.5 }} />,
                                 sx: {
-                                    borderRadius: 3,
-                                    bgcolor: alpha(theme.palette.common.black, 0.03),
+                                    borderRadius: 3, // Header radius 12px
+                                    bgcolor: alpha(theme.palette.text.primary, 0.03),
                                     '& fieldset': { border: 'none' },
                                     '&:hover': { bgcolor: alpha(theme.palette.common.black, 0.05) }
                                 }
@@ -104,7 +104,7 @@ export const Header = ({ handleDrawerToggle, user, handleLogout }: HeaderProps) 
                                 sx={{
                                     border: { xs: 'none', sm: '1px solid' },
                                     borderColor: 'divider',
-                                    borderRadius: '8px',
+                                    borderRadius: 2, // Header radius 8px (slightly smaller for buttons)
                                     p: { xs: 1, sm: 1.25 }
                                 }}
                             >

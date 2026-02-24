@@ -31,7 +31,7 @@ export const StatsCard = ({ title, value, color, icon, subtitle, description, de
                     height: '100%',
                     position: 'relative',
                     overflow: 'hidden',
-                    borderRadius: 4,
+                    borderRadius: 4, // Card radius 16px
                     background: alpha(cardColor, 0.03),
                     border: '1px solid',
                     borderColor: alpha(cardColor, 0.1),
@@ -136,7 +136,7 @@ export const DashboardStatCard = ({ title, value, subtitle, color, icon }: StatC
             elevation={0}
             sx={{
                 p: 2.5,
-                borderRadius: 4,
+                borderRadius: 4, // Card radius 16px
                 bgcolor: 'background.paper',
                 border: '1px solid',
                 borderColor: alpha(theme.palette.divider, 0.1),
@@ -155,7 +155,7 @@ export const DashboardStatCard = ({ title, value, subtitle, color, icon }: StatC
                     <Avatar sx={{
                         bgcolor: alpha(cardColor, 0.1),
                         color: cardColor,
-                        borderRadius: 2,
+                        borderRadius: 3,
                         width: 44,
                         height: 44
                     }}>

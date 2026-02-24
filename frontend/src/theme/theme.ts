@@ -1,8 +1,8 @@
 /**
  * Material-UI Theme Configuration
  * Premium Professional styling for Kindra CBO
- * Palette: Green/Pink/Purple (Strictly Requested)
- * Colors: #A8DCAB, #519755, #DBAAA7, #BE91BE
+ * Palette: Good Hope Green (Refined)
+ * Colors: #43A047 (Primary), #FFB300 (Hope Accent), #F9FAFB (Background)
  */
 
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
@@ -10,56 +10,56 @@ import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 // Premium Color Palette
 export const colors = {
     primary: {
-        main: '#519755', // Deeper Green
-        light: '#A8DCAB', // Light Green
-        dark: '#3d7240',
+        main: '#43A047', // Vibrant Charitable Green
+        light: '#76D275',
+        dark: '#00701A',
         contrastText: '#ffffff',
     },
     secondary: {
-        main: '#BE91BE', // Purple
-        light: '#DBAAA7', // Pinkish/Salmon
-        dark: '#9c739c',
-        contrastText: '#ffffff',
+        main: '#FFB300', // Amber "Hope" Accent
+        light: '#FFE54C',
+        dark: '#C68400',
+        contrastText: '#1a2e1c',
     },
     info: {
-        main: '#7da780', // Leafy Green/Gray
-        light: '#9cbda0',
-        dark: '#5e8561',
+        main: '#2196F3', // Professional Blue
+        light: '#6EC6FF',
+        dark: '#0069C0',
         contrastText: '#ffffff',
     },
     success: {
-        main: '#519755', // Primary Green
-        light: '#A8DCAB',
-        dark: '#3d7240',
+        main: '#43A047',
+        light: '#76D275',
+        dark: '#00701A',
         contrastText: '#ffffff',
     },
     error: {
-        main: '#d32f2f', // Red 700
-        light: '#ef5350',
-        dark: '#c62828',
+        main: '#E53935',
+        light: '#FF6F60',
+        dark: '#AB000D',
         contrastText: '#ffffff',
     },
     warning: {
-        main: '#ffa726', // Orange 400
-        light: '#ffb74d',
-        dark: '#f57c00',
+        main: '#FB8C00',
+        light: '#FFBD45',
+        dark: '#C25E00',
         contrastText: '#ffffff',
     },
     background: {
-        default: '#f4f9f4', // Very light green tint
+        default: '#F9FAFB', // Clean off-white
         paper: '#ffffff',
     },
     text: {
-        primary: '#1a2e1c', // Deep forest green - high contrast
-        secondary: '#4a5d4c', // Muted green-gray
-        disabled: '#9cbda0',
+        primary: '#1A2327', // Deep charcol/forest
+        secondary: '#455A64', // Blue-gray
+        disabled: '#90A4AE',
     },
 };
 
 const baseTheme = createTheme({
     palette: colors,
     typography: {
-        fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+        fontFamily: '"Outfit", "Inter", "Roboto", "Helvetica", "Arial", sans-serif',
         h1: {
             fontWeight: 800,
             fontSize: '2.25rem',
@@ -128,7 +128,7 @@ const baseTheme = createTheme({
         },
     },
     shape: {
-        borderRadius: 4,
+        borderRadius: 12,
     },
     shadows: [
         'none',
@@ -158,7 +158,7 @@ const baseTheme = createTheme({
         MuiButton: {
             styleOverrides: {
                 root: {
-                    borderRadius: 4,
+                    borderRadius: 10,
                     padding: '6px 16px',
                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     boxShadow: 'none',
@@ -210,7 +210,7 @@ const baseTheme = createTheme({
         MuiCard: {
             styleOverrides: {
                 root: {
-                    borderRadius: 8,
+                    borderRadius: 16,
                     border: '1px solid rgba(0, 0, 0, 0.06)',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -230,9 +230,9 @@ const baseTheme = createTheme({
                     backgroundImage: 'none',
                 },
                 rounded: {
-                    borderRadius: 8,
+                    borderRadius: 16,
                     '@media (max-width:600px)': {
-                        borderRadius: 6,
+                        borderRadius: 12,
                     },
                 },
             },
@@ -241,11 +241,11 @@ const baseTheme = createTheme({
             styleOverrides: {
                 root: {
                     '& .MuiOutlinedInput-root': {
-                        borderRadius: 4,
+                        borderRadius: 10,
                         backgroundColor: '#ffffff',
                         transition: 'all 0.2s ease',
                         '@media (max-width:600px)': {
-                            borderRadius: 4,
+                            borderRadius: 8,
                             fontSize: '0.85rem',
                         },
                         '& input': {
@@ -337,9 +337,9 @@ const baseTheme = createTheme({
         MuiDialog: {
             styleOverrides: {
                 paper: {
-                    borderRadius: 8,
+                    borderRadius: 20,
                     '@media (max-width:600px)': {
-                        borderRadius: 6,
+                        borderRadius: 16,
                         margin: 16,
                     },
                 },
