@@ -563,7 +563,7 @@ class ResendVerificationView(APIView):
     """
     permission_classes = [permissions.AllowAny]
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         

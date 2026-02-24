@@ -12,6 +12,20 @@ from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from .health_views import HealthCheckView
 
+
+    
+# API v1 Endpoints (grouped for NamespaceVersioning)
+v1_api_patterns = [
+    path('accounts/', include('accounts.urls')),
+    path('cases/', include('case_management.urls')),
+    path('shelters/', include('shelter_homes.urls')),
+    path('donations/', include('donations.urls')),
+    path('volunteers/', include('volunteers.urls')),
+    path('reporting/', include('reporting.urls')),
+    path('blog/', include('blog.urls')),
+    path('chat/', include('social_chat.urls')),
+]
+
 urlpatterns = [
     # Admin panel
     path('admin/', admin.site.urls),
@@ -20,15 +34,8 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     
-    # API v1 Endpoints
-    path('api/v1/accounts/', include('accounts.urls')),
-    path('api/v1/cases/', include('case_management.urls')),
-    path('api/v1/shelters/', include('shelter_homes.urls')),
-    path('api/v1/donations/', include('donations.urls')),
-    path('api/v1/volunteers/', include('volunteers.urls')),
-    path('api/v1/reporting/', include('reporting.urls')),
-    path('api/v1/blog/', include('blog.urls')),
-    path('api/v1/chat/', include('social_chat.urls')),
+    # API v1 Endpoints with Namespace
+    path('api/v1/', include((v1_api_patterns, 'v1'), namespace='v1')),
     
     # Health check
     path('health/', HealthCheckView.as_view(), name='health_check'),
