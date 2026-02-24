@@ -97,6 +97,30 @@ export const approveUser = createAsyncThunk(
     }
 );
 
+export const fetchBugReports = createAsyncThunk(
+    'admin/fetchBugReports',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get('/accounts/bug-reports/');
+            return response.data.results || response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch bug reports');
+        }
+    }
+);
+
+export const updateBugReport = createAsyncThunk(
+    'admin/updateBugReport',
+    async ({ id, data }: { id: string, data: any }, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.patch(`/accounts/bug-reports/${id}/`, data);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update bug report');
+        }
+    }
+);
+
 interface AdminState {
     users: any[];
     pendingUsers: any[];
@@ -104,6 +128,7 @@ interface AdminState {
     error: string | null;
     lastCleanupResults: any | null;
     auditLogs: any[];
+    bugReports: any[];
     periodicTasks: any[];
     taskResults: any[];
 }
@@ -115,6 +140,7 @@ const initialState: AdminState = {
     error: null,
     lastCleanupResults: null,
     auditLogs: [],
+    bugReports: [],
     periodicTasks: [],
     taskResults: [],
 };
@@ -168,6 +194,15 @@ const adminSlice = createSlice({
             })
             .addCase(fetchTaskResults.fulfilled, (state, action) => {
                 state.taskResults = action.payload;
+            })
+            .addCase(fetchBugReports.fulfilled, (state, action) => {
+                state.bugReports = action.payload;
+            })
+            .addCase(updateBugReport.fulfilled, (state, action) => {
+                const index = state.bugReports.findIndex(b => b.id === action.payload.id);
+                if (index !== -1) {
+                    state.bugReports[index] = action.payload;
+                }
             });
     },
 });

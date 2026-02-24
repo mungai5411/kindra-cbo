@@ -35,6 +35,7 @@ import { updateDonor } from '../../features/donations/donationsSlice';
 import { RootState, AppDispatch } from '../../store';
 import { fetchDonors } from '../../features/donations/donationsSlice';
 import { ImageUploader } from '../common/ImageUploader';
+import apiClient, { endpoints } from '../../api/client';
 import axios from 'axios';
 
 interface SettingsDrawerProps {
@@ -437,11 +438,12 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
             </Typography>
             <Stack spacing={2}>
                 {[
-                    { q: "How do I donate?", a: "You can donate by clicking 'Donate' on the home page or dashboard. We accept M-Pesa, Card payments, and Direct Bank Transfers. All donations are secure and encrypted." },
-                    { q: "How do I become a volunteer?", a: "Register as a volunteer via the 'Register' link. Once your application is submitted, our management team will review your skills and availability. You'll receive an email notification within 48 hours." },
-                    { q: "Can I get a tax-deductible receipt?", a: "Yes, Kindra CBO is a registered non-profit. Once your donation is verified, a PDF receipt is automatically generated and can be downloaded from your 'Giving History' section." },
-                    { q: "How is my data protected?", a: "We use industry-standard encryption and follow strict data protection regulations. Your personal information is only used for communication and service delivery purposes. See our Privacy Policy for more." },
-                    { q: "Contact Support", a: "Need more help? Email us at support@kindra.org, call +254 700 000000, or visit our headquarters at Westlands Office Park, Nairobi." }
+                    { q: "How do I report a child welfare concern?", a: "If you are a Case Worker or Partner, use the 'Cases' module to create a new report. For emergency interventions, contact our 24/7 Rapid Response team at +254 700 000000 immediately." },
+                    { q: "How are shelter placements determined?", a: "Placements are based on child vulnerability scores, age-appropriate gender policies (Male, Female, or Co-Ed), and the specific support facilities (Medical, Educational, or Counseling) available at our partner homes." },
+                    { q: "Can I choose which campaign my donation supports?", a: "Yes. You can browse active 'Campaigns' in the Donations module. Each campaign is tagged with a priority level (Medium to Critical) and a specific category like Education, Healthcare, or Food Security." },
+                    { q: "How do I get my Volunteer Training Certificate?", a: "Upon completing required training modules, your 'Training' status is updated in the system. Authorized certificates are automatically generated and can be downloaded from your 'Trainings' sub-tab." },
+                    { q: "What is the 'Vulnerability Score'?", a: "It's a calculated metric (0-100) based on periodic family assessments. We analyze economic stability, housing quality, health, education, and safety to prioritize interventions for those in most critical need." },
+                    { q: "Can I contact families or children directly?", a: "To ensure child protection, all interactions must be coordinated through assigned Case Workers. Direct contact is only permitted following strict vetting and in compliance with our Child Safeguarding Policy." }
                 ].map((item, idx) => (
                     <Paper key={idx} elevation={0} sx={{ p: 2, borderRadius: 3, bgcolor: alpha(theme.palette.primary.main, 0.03), border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1) }}>
                         <Typography variant="body2" fontWeight="700" color="primary.main" gutterBottom>{item.q}</Typography>
@@ -468,31 +470,31 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
     const renderLegalSection = () => {
         const policies = {
             privacy: {
-                title: "Privacy Policy",
-                content: `At Kindra CBO, we take your privacy seriously. 
-                
-                1. Data Collection: We collect information necessary for donation processing and volunteer management.
-                2. Data Sharing: We NEVER sell your data to third parties.
-                3. Security: Your data is encrypted using SSL (Secure Sockets Layer) technology.
-                4. Rights: You have the right to request access to or deletion of your personal data at any time.`
+                title: "Privacy & Data Protection",
+                content: `Kindra CBO treats sensitive data with maximum security. 
+
+                1. Child Safeguarding: We collect sensitive child bio-data, health records, and court orders only with documented legal consent. Child photos are never displayed without explicit parental/guardian permission.
+                2. Role-Based Access: Sensitive 'Case Notes' and 'Family Vulnerability Assessments' are only accessible to assigned Case Workers and verified Management.
+                3. GPS Data: Physical addresses and GPS coordinates of vulnerable families are strictly encrypted and used only for field visit coordination.
+                4. Compliance: We comply with Kenya's Data Protection Act 2019. You have the right to request access to your logs and data at any time.`
             },
             terms: {
-                title: "Terms of Service",
-                content: `By using the Kindra platform, you agree to:
-                
-                1. Provide accurate information during registration.
-                2. Use the platform solely for charitable and non-profit purposes.
-                3. Respect the privacy of other community members.
-                4. Abide by our financial transparency guidelines when processing donations.`
+                title: "Terms of Engagement",
+                content: `By accessing Kindra's system, you agree to these operational terms:
+
+                1. Confidentiality: You must not share sensitive case details, child identities, or family locations outside the authorized Kindra context.
+                2. Volunteer Conduct: Field operatives agree to abide by the Kindra Code of Conduct, including mandatory reporting of any identified child abuse or safety incidents.
+                3. Partner Integrity: Shelter partners must maintain valid fire safety certifications and government compliance to remain active in the placement system.
+                4. Misuse: Any attempt to scrape child data or misuse donor information will result in immediate termination of access and legal action.`
             },
             donation: {
-                title: "Donation Policy",
-                content: `Kindra CBO ensures 100% transparency in funds management:
-                
-                1. Fund Allocation: Donations are channeled directly to the selected campaigns.
-                2. Administrative Costs: No more than 10% of any donation is used for operational overhead.
-                3. Refunds: Donations are generally non-refundable unless a processing error occurred.
-                4. Reporting: Donors receive quarterly impact reports detailing how their funds were used.`
+                title: "Donation Transparency Policy",
+                content: `Kindra CBO is committed to financial accountability:
+
+                1. Direct Impact: 90% of your donation goes directly to the specified campaign (Education, Health, or Shelter). Operational overhead is capped at 10%.
+                2. Verification: All M-Pesa and Bank donations are verified against our system records before receipts are issued.
+                3. Impact Tracking: Donors can track the progress of their supported campaigns in real-time. Quarterly impact reports are shared via the Dashboard.
+                4. Audit Rights: Our financial records are audited annually by independent firms to ensure full compliance with non-profit accounting standards.`
             }
         };
 
@@ -540,15 +542,33 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
 
     const renderBugReportSection = () => {
         const [bugType, setBugType] = useState('UI');
+        const [description, setDescription] = useState('');
         const [isSubmitting, setIsSubmitting] = useState(false);
+        const [error, setError] = useState<string | null>(null);
 
-        const handleSubmitBug = () => {
+        const handleSubmitBug = async () => {
+            if (!description.trim()) {
+                setError('Please provide a description');
+                return;
+            }
+
             setIsSubmitting(true);
-            setTimeout(() => {
-                setIsSubmitting(false);
+            setError(null);
+            try {
+                await apiClient.post(endpoints.auth.bugReports, {
+                    bug_type: bugType,
+                    description: description
+                });
                 setSaveSuccess(true);
-                setActiveTab(0);
-            }, 1500);
+                // Optionally clear form
+                setDescription('');
+                setTimeout(() => setActiveTab(0), 1000);
+            } catch (err: any) {
+                console.error('Failed to submit bug:', err);
+                setError(err.response?.data?.message || 'Failed to submit report. Please try again.');
+            } finally {
+                setIsSubmitting(false);
+            }
         };
 
         return (
@@ -559,17 +579,22 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
                 <Typography variant="caption" color="text.secondary" sx={{ mb: 3, display: 'block' }}>
                     Help us improve Kindra by reporting any bugs or glitches you find.
                 </Typography>
+
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>
+                )}
+
                 <Stack spacing={3}>
                     <Box>
                         <Typography variant="caption" fontWeight="bold" sx={{ mb: 1, display: 'block' }}>ISSUE TYPE</Typography>
-                        <Stack direction="row" spacing={1}>
+                        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
                             {['UI', 'Functional', 'Security', 'Other'].map(type => (
                                 <Button
                                     key={type}
                                     size="small"
                                     variant={bugType === type ? "contained" : "outlined"}
                                     onClick={() => setBugType(type)}
-                                    sx={{ borderRadius: 2, textTransform: 'none', px: 2 }}
+                                    sx={{ borderRadius: 2, textTransform: 'none', px: 2, mb: 1 }}
                                 >
                                     {type}
                                 </Button>
@@ -580,13 +605,15 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
                         fullWidth
                         multiline
                         rows={4}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
                         placeholder="What happened? Tell us the steps to reproduce..."
                         sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                     />
                     <Button
                         variant="contained"
                         fullWidth
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !description.trim()}
                         onClick={handleSubmitBug}
                         sx={{ borderRadius: 3, py: 1.5, fontWeight: 'bold' }}
                     >

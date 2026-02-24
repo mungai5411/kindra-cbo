@@ -4,6 +4,7 @@ Accounts URL Configuration
 
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework.routers import DefaultRouter
 from .views import (
     UserRegistrationView,
     LoginView,
@@ -23,8 +24,13 @@ from .views import (
     VerifyEmailView,
     MarkAllNotificationsReadView,
     ResendVerificationView,
+    BugReportViewSet
 )
 from .google_auth import google_login
+
+
+router = DefaultRouter()
+router.register(r'bug-reports', BugReportViewSet, basename='bugreport')
 
 
 app_name = 'accounts'
@@ -67,4 +73,4 @@ urlpatterns = [
     
     # Admin Tasks
     path('admin/cleanup-inactivity/', trigger_cleanup_view, name='cleanup_inactivity'),
-]
+] + router.urls

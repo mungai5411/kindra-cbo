@@ -27,7 +27,8 @@ import {
     alpha,
     useTheme,
     LinearProgress,
-    Avatar
+    Avatar,
+    Stack
 } from '@mui/material';
 import {
     AdminPanelSettings,
@@ -42,7 +43,8 @@ import {
     ErrorOutline,
     People,
     Security,
-    CheckCircle
+    CheckCircle,
+    BugReport
 } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
 import { fetchDashboardData, fetchReports } from '../../features/reporting/reportingSlice';
@@ -52,7 +54,7 @@ import {
     fetchCases,
     deleteFamily
 } from '../../features/caseManagement/caseManagementSlice';
-import { fetchUsers, deleteUser, triggerInactivityCleanup, fetchAuditLogs, fetchPendingUsers, approveUser, fetchPeriodicTasks, fetchTaskResults } from '../../features/admin/adminSlice';
+import { fetchUsers, deleteUser, triggerInactivityCleanup, fetchAuditLogs, fetchPendingUsers, approveUser, fetchPeriodicTasks, fetchTaskResults, fetchBugReports, updateBugReport } from '../../features/admin/adminSlice';
 import { fetchGroups, createGroup, deleteGroup, updateGroup } from '../../features/volunteers/groupsSlice';
 import { GroupWork, Forum, VerifiedUser, HourglassTop } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -69,7 +71,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         cases,
     } = useSelector((state: RootState) => state.caseManagement);
     const { groups } = useSelector((state: RootState) => state.groups);
-    const { auditLogs, pendingUsers, periodicTasks, taskResults } = useSelector((state: RootState) => state.admin);
+    const { auditLogs, pendingUsers, periodicTasks, taskResults, bugReports } = useSelector((state: RootState) => state.admin);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [openDialog, setOpenDialog] = useState(false);
@@ -111,6 +113,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         dispatch(fetchPendingUsers());
         dispatch(fetchPeriodicTasks());
         dispatch(fetchTaskResults());
+        dispatch(fetchBugReports());
     }, [dispatch]);
 
     // Fetch volunteers realtime when creating/editing groups
@@ -133,7 +136,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 dispatch(fetchAuditLogs()),
                 dispatch(fetchPendingUsers()),
                 dispatch(fetchPeriodicTasks()),
-                dispatch(fetchTaskResults())
+                dispatch(fetchTaskResults()),
+                dispatch(fetchBugReports())
             ]);
             setSnackbar({ open: true, message: 'System synchronization successful!', severity: 'success' });
         } catch (err) {
@@ -291,6 +295,110 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     }
 
     // --- Sub-View Renderers ---
+
+    const handleUpdateBugStatus = (id: string, status: string) => {
+        dispatch(updateBugReport({ id, data: { status } }));
+        setSnackbar({ open: true, message: `Bug report status updated to ${status}`, severity: 'success' });
+    };
+
+    const handleUpdateBugNotes = (id: string, notes: string) => {
+        dispatch(updateBugReport({ id, data: { admin_notes: notes } }));
+        setSnackbar({ open: true, message: 'Admin notes updated', severity: 'success' });
+    };
+
+    const renderBugReports = () => (
+        <Box sx={{ p: 1 }}>
+            <Paper elevation={0} sx={{
+                borderRadius: 4,
+                border: '1px solid',
+                borderColor: alpha(theme.palette.divider, 0.08),
+                overflow: 'hidden'
+            }}>
+                <TableContainer>
+                    <Table>
+                        <TableHead sx={{ bgcolor: alpha(theme.palette.background.default, 0.5) }}>
+                            <TableRow>
+                                <TableCell sx={{ fontWeight: 800 }}>Type</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Reporter</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Description</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Status</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {bugReports.map((bug: any) => (
+                                <TableRow key={bug.id} hover>
+                                    <TableCell>
+                                        <Chip
+                                            label={bug.bug_type}
+                                            size="small"
+                                            variant="outlined"
+                                            color={bug.bug_type === 'Security' ? 'error' : bug.bug_type === 'Functional' ? 'warning' : 'primary'}
+                                            sx={{ fontWeight: 700, borderRadius: 1.5 }}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{bug.reporter_name}</Typography>
+                                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>{bug.reporter_email}</Typography>
+                                    </TableCell>
+                                    <TableCell sx={{ maxWidth: 300 }}>
+                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{bug.description}</Typography>
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
+                                            Reported: {new Date(bug.created_at).toLocaleString()}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            label={bug.status_display}
+                                            size="small"
+                                            sx={{
+                                                fontWeight: 800,
+                                                bgcolor: bug.status === 'RESOLVED' ? alpha(theme.palette.success.main, 0.1) :
+                                                    bug.status === 'IN_PROGRESS' ? alpha(theme.palette.info.main, 0.1) :
+                                                        alpha(theme.palette.error.main, 0.1),
+                                                color: bug.status === 'RESOLVED' ? 'success.main' :
+                                                    bug.status === 'IN_PROGRESS' ? 'info.main' :
+                                                        'error.main'
+                                            }}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Stack direction="row" spacing={1}>
+                                            <Button
+                                                size="small"
+                                                onClick={() => handleUpdateBugStatus(bug.id, 'IN_PROGRESS')}
+                                                disabled={bug.status === 'IN_PROGRESS'}
+                                                sx={{ textTransform: 'none', fontWeight: 800 }}
+                                            >
+                                                Take Action
+                                            </Button>
+                                            <Button
+                                                size="small"
+                                                color="success"
+                                                onClick={() => handleUpdateBugStatus(bug.id, 'RESOLVED')}
+                                                disabled={bug.status === 'RESOLVED'}
+                                                sx={{ textTransform: 'none', fontWeight: 800 }}
+                                            >
+                                                Resolve
+                                            </Button>
+                                        </Stack>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            {bugReports.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={5} sx={{ py: 8, textAlign: 'center' }}>
+                                        <BugReport sx={{ fontSize: 48, mb: 1, opacity: 0.2 }} />
+                                        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>No bug reports found.</Typography>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
+        </Box>
+    );
 
     const renderDashboard = () => (
         <>
@@ -881,7 +989,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         {activeTab === 'users' ? 'User Infrastructure' :
                             activeTab === 'pending_approvals' ? 'Identity Verification' :
                                 activeTab === 'groups' ? 'Volunteer Units' :
-                                    activeTab === 'audit_logs' ? 'System Audit' : 'System Administration'}
+                                    activeTab === 'audit_logs' ? 'System Audit' :
+                                        activeTab === 'bug-reports' ? 'Bug Incident Reports' : 'System Administration'}
                     </Typography>
                     <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Security fontSize="small" /> Kindra Management Protocol
@@ -922,7 +1031,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             activeTab === 'pending_approvals' ? renderPendingApprovals() :
                                 activeTab === 'groups' ? renderGroups() :
                                     activeTab === 'audit_logs' ? renderAuditLogs() :
-                                        renderDefault()}
+                                        activeTab === 'bug-reports' ? renderBugReports() :
+                                            renderDefault()}
                 </motion.div>
             </AnimatePresence>
 

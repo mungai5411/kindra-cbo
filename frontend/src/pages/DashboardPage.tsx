@@ -316,6 +316,7 @@ export default function DashboardPage() {
             'groups': <SystemAdminView activeTab={activeTab} />,
             'audit_logs': <SystemAdminView activeTab={activeTab} />,
             'periodic_tasks': <SystemAdminView activeTab={activeTab} />,
+            'bug-reports': <SystemAdminView activeTab={activeTab} />,
 
             'blog_campaigns': <BlogManagementView initialTab={activeTab} />,
             'blog_posts': <BlogManagementView initialTab={activeTab} />,

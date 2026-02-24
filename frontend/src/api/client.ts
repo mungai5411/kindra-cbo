@@ -150,6 +150,7 @@ export const endpoints = {
         passwordResetConfirm: '/accounts/password-reset-confirm/',
         googleLogin: '/accounts/google-login/',
         notifications: '/accounts/notifications/',
+        bugReports: '/accounts/bug-reports/',
     },
 
     // Blog

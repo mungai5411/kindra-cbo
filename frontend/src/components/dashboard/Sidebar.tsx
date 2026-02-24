@@ -124,6 +124,7 @@ const NAVIGATION = [
         children: [
             { id: 'users', label: 'User Directory' },
             { id: 'pending_approvals', label: 'Approvals' },
+            { id: 'bug-reports', label: 'Bug Reports' },
             { id: 'groups', label: 'Volunteer Groups' },
             { id: 'audit_logs', label: 'Audit Logs' },
         ]

@@ -3,7 +3,7 @@ User Views
 Handles user authentication, registration, and profile management
 """
 
-from rest_framework import generics, status, permissions, exceptions
+from rest_framework import generics, status, permissions, exceptions, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,7 +20,7 @@ from django.utils.decorators import method_decorator
 from django.core.cache import cache
 import time
 import random
-from .models import User, AuditLog, Notification
+from .models import User, AuditLog, Notification, BugReport
 from .serializers import (
     UserRegistrationSerializer,
     UserSerializer,
@@ -30,9 +30,10 @@ from .serializers import (
     NotificationSerializer,
     VerificationSerializer,
     PasswordResetRequestSerializer,
-    PasswordResetConfirmSerializer
+    PasswordResetConfirmSerializer,
+    BugReportSerializer
 )
-from .models import User, AuditLog, Notification, VerificationToken
+from .models import User, AuditLog, Notification, VerificationToken, BugReport
 from .permissions import IsAdminOrManagement
 from kindra_cbo.throttling import RegistrationRateThrottle
 from reporting.utils import log_analytics_event
@@ -878,4 +879,49 @@ def delete_profile_picture_view(request):
             'success': False,
             'message': f'Failed to delete profile picture: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class BugReportViewSet(viewsets.ModelViewSet):
+    """
+    Viewset for bug reports.
+    Authenticated users can create reports.
+    Admins can manage all reports.
+    """
+    queryset = BugReport.objects.all()
+    serializer_class = BugReportSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # Save the bug report with the current user as reporter
+        bug = serializer.save(reporter=self.request.user)
+        
+        # Trigger notification to all administrators
+        from django.contrib.auth import get_user_model
+        UserModel = get_user_model()
+        admins = UserModel.objects.filter(role='ADMIN')
+        
+        for admin in admins:
+            Notification.objects.create(
+                recipient=admin,
+                title=f"New Bug: {bug.bug_type}",
+                message=f"{bug.reporter.get_full_name()} reported a {bug.bug_type} issue: {bug.description[:100]}...",
+                type=Notification.Type.ERROR,
+                category=Notification.Category.SYSTEM,
+                link="/dashboard/admin?tab=bug-reports"
+            )
+        
+        # Log analytics event
+        log_analytics_event(
+            event_type='BUG_REPORTED',
+            description=f'User {self.request.user.email} reported a {bug.bug_type} bug.',
+            user=self.request.user,
+            request=self.request,
+            event_data={'bug_id': str(bug.id), 'type': bug.bug_type}
+        )
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ['ADMIN', 'MANAGEMENT']:
+            return BugReport.objects.all()
+        return BugReport.objects.filter(reporter=user)
 

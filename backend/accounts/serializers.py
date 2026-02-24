@@ -11,10 +11,25 @@ from django.conf import settings
 from django.utils.html import strip_tags
 
 from rest_framework import serializers
-from .models import User, AuditLog, Notification, VerificationToken
+from .models import User, AuditLog, Notification, VerificationToken, BugReport
 from django.contrib.auth.password_validation import validate_password
 from django.utils import timezone
 import re
+
+class BugReportSerializer(serializers.ModelSerializer):
+    """Serializer for bug reports"""
+    reporter_name = serializers.CharField(source='reporter.get_full_name', read_only=True)
+    reporter_email = serializers.EmailField(source='reporter.email', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+
+    class Meta:
+        model = BugReport
+        fields = (
+            'id', 'reporter', 'reporter_name', 'reporter_email',
+            'bug_type', 'description', 'status', 'status_display',
+            'admin_notes', 'created_at', 'updated_at'
+        )
+        read_only_fields = ('id', 'reporter', 'created_at', 'updated_at')
 
 class NotificationSerializer(serializers.ModelSerializer):
     """Serializer for notifications"""

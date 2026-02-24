@@ -268,3 +268,45 @@ class VerificationToken(models.Model):
 
     def __str__(self):
         return f"{self.token_type} for {self.user.email}"
+
+
+class BugReport(models.Model):
+    """
+    Bug reports submitted by users for admin action
+    """
+    class Status(models.TextChoices):
+        OPEN = 'OPEN', _('Open')
+        IN_PROGRESS = 'IN_PROGRESS', _('In Progress')
+        RESOLVED = 'RESOLVED', _('Resolved')
+        CLOSED = 'CLOSED', _('Closed')
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    reporter = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        related_name='bug_reports'
+    )
+    bug_type = models.CharField(max_length=50)
+    description = models.TextField()
+    status = models.CharField(
+        max_length=20, 
+        choices=Status.choices, 
+        default=Status.OPEN
+    )
+    admin_notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('bug report')
+        verbose_name_plural = _('bug reports')
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['bug_type']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.bug_type} ({self.status}) - {self.created_at.date()}"
