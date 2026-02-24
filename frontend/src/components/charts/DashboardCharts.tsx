@@ -6,8 +6,9 @@
 import type { ReactNode } from 'react';
 import { Card, CardContent, Typography, useTheme, alpha, Box } from '@mui/material';
 import {
-    BarChart, Bar, PieChart, Pie, AreaChart, Area,
-    XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell
+    BarChart, Bar, PieChart, Pie, AreaChart, Area, Line, ComposedChart,
+    XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
+    ReferenceArea, ReferenceLine, Treemap
 } from 'recharts';
 // Modern clean palette
 const CHART_COLORS = [
@@ -450,6 +451,136 @@ export const ImpactTrendsChart = ({ data, embedded = false }: { data: any[], emb
                         fill="url(#colorDeclined)"
                     />
                 </AreaChart>
+            </ResponsiveContainer>
+        </ChartCard>
+    );
+};
+// Target Performance Chart (with Bands)
+export const TargetPerformanceChart = ({ data }: { data: any[] }) => {
+    const theme = useTheme();
+
+    return (
+        <ChartCard title="Operational Performance Targets">
+            <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={data} layout="vertical" margin={{ left: 40, right: 40, top: 10, bottom: 10 }}>
+                    <XAxis type="number" domain={[0, 100]} hide />
+                    <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} />
+
+                    {/* Performance Bands */}
+                    <ReferenceArea x1={0} x2={40} fill="#f43f5e" fillOpacity={0.05} label={{ value: 'OK 0-40%', position: 'insideRight', fill: '#f43f5e', fontSize: 10, fontWeight: 'bold' }} />
+                    <ReferenceArea x1={40} x2={70} fill="#f59e0b" fillOpacity={0.05} label={{ value: 'GOOD 40-70%', position: 'insideRight', fill: '#f59e0b', fontSize: 10, fontWeight: 'bold' }} />
+                    <ReferenceArea x1={70} x2={100} fill="#10b981" fillOpacity={0.05} label={{ value: 'GREAT 70-100%', position: 'insideRight', fill: '#10b981', fontSize: 10, fontWeight: 'bold' }} />
+
+                    <Tooltip
+                        content={<CustomTooltip formatter={(v) => `${Math.round((v / 150) * 100)}% of Target`} />}
+                        cursor={{ fill: 'transparent' }}
+                    />
+
+                    <Bar dataKey="actual" fill={theme.palette.primary.main} radius={[0, 4, 4, 0]} barSize={25}>
+                        {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.actual / entry.target > 0.8 ? '#10b981' : theme.palette.primary.main} />
+                        ))}
+                    </Bar>
+
+                    {/* Dynamic Target Marked as a line */}
+                    {data.map((entry, idx) => (
+                        <ReferenceLine key={idx} x={entry.target} stroke="#3b82f6" strokeDasharray="3 3" label={{ position: 'top', value: 'TARGET', fill: '#3b82f6', fontSize: 10 }} />
+                    ))}
+                </BarChart>
+            </ResponsiveContainer>
+        </ChartCard>
+    );
+};
+
+// Budget Treemap
+export const BudgetTreemap = ({ data }: { data: any }) => {
+    const theme = useTheme();
+
+    const TreemapContent = (props: any) => {
+        const { x, y, width, height, index, name } = props;
+        return (
+            <g>
+                <rect
+                    x={x}
+                    y={y}
+                    width={width}
+                    height={height}
+                    style={{
+                        fill: CHART_COLORS[index % CHART_COLORS.length],
+                        stroke: '#fff',
+                        strokeWidth: 2,
+                        strokeOpacity: 0.1,
+                    }}
+                />
+                {width > 50 && height > 30 && (
+                    <text
+                        x={x + width / 2}
+                        y={y + height / 2}
+                        textAnchor="middle"
+                        fill="#fff"
+                        fontSize={12}
+                        fontWeight="bold"
+                    >
+                        {name}
+                    </text>
+                )}
+            </g>
+        );
+    };
+
+    return (
+        <ChartCard title="Financial Stewardship (Fund Allocation)">
+            <ResponsiveContainer width="100%" height={300}>
+                <Treemap
+                    data={[data]}
+                    dataKey="value"
+                    aspectRatio={4 / 3}
+                    stroke="#fff"
+                    fill={theme.palette.primary.main}
+                    content={<TreemapContent />}
+                >
+                    <Tooltip content={<CustomTooltip formatter={(v) => `KES ${v.toLocaleString()}`} />} />
+                </Treemap>
+            </ResponsiveContainer>
+        </ChartCard>
+    );
+};
+
+// Composed Impact Chart (Stacked Bar + Line)
+export const ComposedImpactChart = ({ data }: { data: any[] }) => {
+    const theme = useTheme();
+
+    return (
+        <ChartCard title="Multi-Metric Impact Correlation">
+            <ResponsiveContainer width="100%" height={300}>
+                <ComposedChart data={data} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} vertical={false} />
+                    <XAxis
+                        dataKey="period"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: theme.palette.text.secondary, fontSize: 10 }}
+                    />
+                    <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: theme.palette.text.secondary, fontSize: 10 }}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+
+                    <Bar dataKey="investment" name="Operational Investment" stackId="a" fill={alpha(theme.palette.primary.main, 0.3)} barSize={30} radius={[0, 0, 0, 0]} />
+                    <Bar dataKey="donations" name="Direct Aid" stackId="a" fill={theme.palette.primary.main} barSize={30} radius={[4, 4, 0, 0]} />
+
+                    <Line
+                        type="monotone"
+                        dataKey="outcomes"
+                        name="Child Outcomes Index"
+                        stroke={theme.palette.secondary.main}
+                        strokeWidth={3}
+                        dot={{ r: 4, fill: theme.palette.secondary.main }}
+                    />
+                </ComposedChart>
             </ResponsiveContainer>
         </ChartCard>
     );

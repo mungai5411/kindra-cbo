@@ -35,15 +35,15 @@ import {
 } from '@mui/material';
 import {
     DonationTrendsChart,
-    CampaignProgressChart,
-    DonationMethodsChart
+    DonationMethodsChart,
+    TargetPerformanceChart,
+    BudgetTreemap,
+    ComposedImpactChart
 } from '../charts/DashboardCharts';
 import {
     Description,
     Timeline,
     BarChart,
-    PieChart,
-    PictureAsPdf,
     Insights,
     AutoGraph,
     Security,
@@ -57,18 +57,17 @@ import {
 } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
 import { fetchDashboardData, fetchReports, generateReport } from '../../features/reporting/reportingSlice';
-import { fetchFamilies, fetchAssessments } from '../../features/caseManagement/caseManagementSlice';
-import { SubTabView } from './SubTabView';
+import { fetchFamilies } from '../../features/caseManagement/caseManagementSlice';
 import { downloadFile } from '../../utils/downloadHelper';
 import { motion } from 'framer-motion';
-import { ImpactTrendsChart } from '../charts/DashboardCharts';
 import { MapView } from './MapView';
+import { Stack } from '@mui/material';
 
-export function ReportingView({ activeTab }: { activeTab?: string }) {
+export function ReportingView() {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
     const { dashboardData, reports, isLoading: isReportingLoading } = useSelector((state: RootState) => state.reporting);
-    const { families, assessments, isLoading: isCaseLoading } = useSelector((state: RootState) => state.caseManagement);
+    const { families, isLoading: isCaseLoading } = useSelector((state: RootState) => state.caseManagement);
     const isLoading = isReportingLoading || isCaseLoading;
     const [openDialog, setOpenDialog] = useState(false);
     const [reportType, setReportType] = useState('DONATION');
@@ -79,7 +78,6 @@ export function ReportingView({ activeTab }: { activeTab?: string }) {
         dispatch(fetchDashboardData());
         dispatch(fetchReports());
         dispatch(fetchFamilies());
-        dispatch(fetchAssessments());
 
         // Set up real-time polling every 30 seconds
         const pollInterval = setInterval(() => {
@@ -89,19 +87,6 @@ export function ReportingView({ activeTab }: { activeTab?: string }) {
         return () => clearInterval(pollInterval);
     }, [dispatch]);
 
-    const handleGenerateQuickReport = (type: string) => {
-        const now = new Date();
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(now.getDate() - 30);
-
-        dispatch(generateReport({
-            report_type: type,
-            format: 'PDF',
-            title: `Quick ${type} Report`,
-            start_date: thirtyDaysAgo.toISOString().split('T')[0],
-            end_date: now.toISOString().split('T')[0]
-        }));
-    };
 
     const handleGenerateIntelligence = () => {
         const now = new Date();
@@ -170,86 +155,6 @@ export function ReportingView({ activeTab }: { activeTab?: string }) {
         ? Object.entries(dashboardData.donations.daily_totals!).map(([date, amount]) => ({ date, amount }))
         : [];
 
-    const renderSummary = () => (
-        <Grid container spacing={2}>
-            <Grid item xs={12} md={8}>
-                <Paper sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 2, height: 'auto', minHeight: 450, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], display: 'flex', flexDirection: 'column' }}>
-                    <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="h6" fontWeight="bold">Donation Trends</Typography>
-                        <Chip label="Live Data" size="small" color="success" variant="outlined" />
-                    </Box>
-                    <Box sx={{ height: 350, width: '100%' }}>
-                        <DonationTrendsChart data={donationTrends} embedded />
-                    </Box>
-                </Paper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-                <Paper sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 2, height: '100%', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.primary.main, 0.01), boxShadow: theme.shadows[1] }}>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>Quick Reports</Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        {['Donation', 'Volunteer', 'Shelter'].map((r) => (
-                            <Button
-                                key={r}
-                                variant="outlined"
-                                size="large"
-                                startIcon={<PictureAsPdf />}
-                                sx={{
-                                    borderRadius: 1,
-                                    justifyContent: 'flex-start',
-                                    textTransform: 'none',
-                                    fontWeight: 600,
-                                    bgcolor: 'background.paper',
-                                    border: '1px solid',
-                                    borderColor: 'divider',
-                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main' }
-                                }}
-                                onClick={() => handleGenerateQuickReport(r.toUpperCase())}
-                            >
-                                {r} Data Set
-                            </Button>
-                        ))}
-                        <Divider sx={{ my: 2 }} />
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            startIcon={<Description />}
-                            onClick={() => setSnackbar({ open: true, message: 'Redirecting to report archival server...', severity: 'info' })}
-                            sx={{ fontWeight: 'bold', borderRadius: 1, py: 1.5, boxShadow: theme.shadows[4] }}
-                        >
-                            View Archive
-                        </Button>
-                        <Divider sx={{ my: 1 }} />
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            startIcon={<Download />}
-                            onClick={handleExportFamilies}
-                            sx={{ borderRadius: 1, textTransform: 'none', fontWeight: 600 }}
-                        >
-                            Download Families CSV
-                        </Button>
-                    </Box>
-                </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-                <Paper sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 1, height: 'auto', minHeight: 400, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>Donation Methods</Typography>
-                    <Box sx={{ height: 300, width: '100%' }}>
-                        <DonationMethodsChart data={dashboardData?.donation_methods || []} embedded />
-                    </Box>
-                </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-                <Paper sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: 1, height: 'auto', minHeight: 400, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>Campaign Progress</Typography>
-                    <Box sx={{ height: 300, width: '100%' }}>
-                        <CampaignProgressChart campaigns={dashboardData?.campaign_progress || []} embedded />
-                    </Box>
-                </Paper>
-            </Grid>
-        </Grid>
-    );
 
     const renderReportsList = () => (
         <Paper sx={{ borderRadius: 2, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], overflow: 'hidden' }}>
@@ -344,272 +249,42 @@ export function ReportingView({ activeTab }: { activeTab?: string }) {
         </Paper>
     );
 
-    const renderKPIs = () => (
-        <Grid container spacing={3}>
-            {[
-                { label: 'Conversion Rate', value: '12%', delta: '+2%', color: 'primary' },
-                { label: 'Retention Score', value: '88', delta: '-1%', color: 'success' },
-                { label: 'Avg Time to Placement', value: '4.2 Days', delta: '-0.5 Days', color: 'warning' },
-                { label: 'Donor Growth', value: '24%', delta: '+5%', color: 'secondary' },
-            ].map((kpi, idx) => (
-                <Grid item xs={12} sm={6} md={3} key={idx}>
-                    <Card sx={{
-                        borderRadius: 2,
-                        boxShadow: theme.shadows[1],
-                        border: '1px solid',
-                        borderColor: alpha(getColor(kpi.color), 0.1),
-                        bgcolor: alpha(getColor(kpi.color), 0.03)
-                    }}>
-                        <CardContent>
-                            <Typography variant="overline" fontWeight="700" sx={{ color: getColor(kpi.color) }}>
-                                {kpi.label}
-                            </Typography>
-                            <Typography variant="h3" fontWeight="bold" sx={{ mt: 1 }}>
-                                {kpi.value}
-                            </Typography>
-                            <Chip
-                                label={`${kpi.delta} from last month`}
-                                size="small"
-                                sx={{
-                                    borderRadius: 2,
-                                    bgcolor: 'background.paper',
-                                    fontWeight: 'bold',
-                                    color: kpi.delta.startsWith('+') ? 'success.main' : 'error.main'
-                                }}
-                            />
-                        </CardContent>
-                    </Card>
-                </Grid>
-            ))}
-            <Grid item xs={12}>
-                <Paper sx={{ p: 8, borderRadius: 4, textAlign: 'center', border: '1px dashed', borderColor: 'divider', bgcolor: 'transparent' }}>
-                    <Timeline sx={{ fontSize: 60, opacity: 0.1, mb: 2 }} />
-                    <Typography color="text.secondary" fontWeight="medium">Detailed KPI Correlation Matrix Rendering...</Typography>
-                </Paper>
-            </Grid>
-        </Grid>
-    );
-
-    const renderCompliance = () => (
-        <Grid container spacing={3}>
-            {[
-                { title: '98% Compliant', subtitle: 'System-wide Health Score', icon: <Insights />, color: 'success' },
-                { title: '12 Active Audits', subtitle: 'Ongoing regulatory reviews', icon: <AutoGraph />, color: 'primary' },
-                { title: 'Secure Access', subtitle: 'MFA enforced for all admins', icon: <Security />, color: 'warning' }
-            ].map((item, i) => (
-                <Grid item xs={12} md={4} key={i}>
-                    <Card sx={{
-                        borderRadius: 2,
-                        height: '100%',
-                        bgcolor: item.color === 'success' ? theme.palette.success.main : 'background.paper',
-                        color: item.color === 'success' ? 'white' : 'text.primary',
-                        border: item.color !== 'success' ? '1px solid' : 'none',
-                        borderColor: alpha(theme.palette.divider, 0.1),
-                        boxShadow: item.color === 'success' ? theme.shadows[4] : theme.shadows[1]
-                    }}>
-                        <CardContent sx={{ textAlign: 'center', py: 4 }}>
-                            <Box sx={{
-                                display: 'inline-flex',
-                                p: 2,
-                                borderRadius: '50%',
-                                bgcolor: item.color === 'success' ? 'rgba(255,255,255,0.2)' : alpha(getColor(item.color), 0.1),
-                                color: item.color === 'success' ? 'white' : getColor(item.color),
-                                mb: 2
-                            }}>
-                                {item.icon}
-                            </Box>
-                            <Typography variant="h5" fontWeight="bold" gutterBottom>{item.title}</Typography>
-                            <Typography variant="body2" sx={{ opacity: 0.8 }}>{item.subtitle}</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            ))}
-            <Grid item xs={12}>
-                <Paper sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
-                    <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha(theme.palette.background.default, 0.5) }}>
-                        <Typography variant="h6" fontWeight="bold">Regulatory Compliance Logs</Typography>
-                    </Box>
-                    <TableContainer>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Audit Item</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Entity</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Date</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {[
-                                    { item: 'GDPR Data Privacy Audit', entity: 'IT Dept', date: '2023-11-15', status: 'PASS' },
-                                    { item: 'Financial Transparency Review', entity: 'External Auditor', date: '2023-11-10', status: 'IN PROGRESS' },
-                                    { item: 'NGO Board Compliance', entity: 'Legal', date: '2023-10-25', status: 'PASS' },
-                                ].map((log, i) => (
-                                    <TableRow key={i} hover>
-                                        <TableCell sx={{ fontWeight: 'medium' }}>{log.item}</TableCell>
-                                        <TableCell>{log.entity}</TableCell>
-                                        <TableCell sx={{ color: 'text.secondary' }}>{log.date}</TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                label={log.status}
-                                                size="small"
-                                                color={log.status === 'PASS' ? 'success' : 'warning'}
-                                                sx={{ fontWeight: 'bold', borderRadius: 2 }}
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Paper>
-            </Grid>
-        </Grid>
-    );
-
-    const renderPredictiveInsights = () => {
-        // Group assessments by family and sort by date
-        const familyAssessments = assessments.reduce((acc: any, curr: any) => {
-            if (!acc[curr.family]) acc[curr.family] = [];
-            acc[curr.family].push(curr);
-            return acc;
-        }, {});
-
-        Object.keys(familyAssessments).forEach(fid => {
-            familyAssessments[fid].sort((a: any, b: any) => new Date(b.assessment_date).getTime() - new Date(a.assessment_date).getTime());
-        });
-
-        const criticalFamilies = families.filter(f => f.vulnerability_level === 'CRITICAL');
-        const improvingFamilies = Object.values(familyAssessments).filter((history: any) => {
-            if (history.length < 2) return false;
-            return history[0].overall_score < history[1].overall_score; // Lower is better
-        });
-        const decliningFamilies = Object.values(familyAssessments).filter((history: any) => {
-            if (history.length < 2) return false;
-            return history[0].overall_score > history[1].overall_score; // Higher is worse
-        });
-
-        // Mock data for trends chart (since we might not have enough historical data points for a smooth line)
-        // In a real scenario, we'd aggregate assessment dates
-        const impactTrendsData = [
-            { date: '2023-01', improved: 5, declined: 2 },
-            { date: '2023-02', improved: 8, declined: 3 },
-            { date: '2023-03', improved: 12, declined: 1 },
-            { date: '2023-04', improved: 10, declined: 4 },
-            { date: '2023-05', improved: 15, declined: 2 },
-            { date: '2023-06', improved: 18, declined: 1 },
-        ];
-
-        return (
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={4}>
-                    <Card sx={{ borderRadius: 4, bgcolor: alpha(theme.palette.error.main, 0.05), border: '1px solid', borderColor: alpha(theme.palette.error.main, 0.2) }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                                <Psychology color="error" />
-                                <Typography variant="h6" fontWeight="bold">Rising Risk Alerts</Typography>
-                            </Box>
-                            <Typography variant="h3" fontWeight="900" color="error.main">{decliningFamilies.length}</Typography>
-                            <Typography variant="body2" color="text.secondary">Families showing worsening vulnerability indicators in recent assessments.</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <Card sx={{ borderRadius: 4, bgcolor: alpha(theme.palette.success.main, 0.05), border: '1px solid', borderColor: alpha(theme.palette.success.main, 0.2) }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                                <AutoGraph color="success" />
-                                <Typography variant="h6" fontWeight="bold">Impact Success</Typography>
-                            </Box>
-                            <Typography variant="h3" fontWeight="900" color="success.main">{improvingFamilies.length}</Typography>
-                            <Typography variant="body2" color="text.secondary">Families with significant improvement in their well-being scores.</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <Card sx={{ borderRadius: 4, bgcolor: alpha(theme.palette.info.main, 0.05), border: '1px solid', borderColor: alpha(theme.palette.info.main, 0.2) }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                                <Insights color="info" />
-                                <Typography variant="h6" fontWeight="bold">Forecast Intelligence</Typography>
-                            </Box>
-                            <Typography variant="h3" fontWeight="900" color="info.main">94%</Typography>
-                            <Typography variant="body2" color="text.secondary">Confidence score in current preventative intervention success rate.</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-
-                <Grid item xs={12}>
-                    <ImpactTrendsChart data={impactTrendsData} />
-                </Grid>
-
-                <Grid item xs={12}>
-                    <Paper sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
-                        <Typography variant="h6" fontWeight="bold" gutterBottom>Automated Decision Support</Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                            Based on historical patterns, the system recommends the following priority actions for case management:
-                        </Typography>
-                        <List>
-                            <ListItem sx={{ bgcolor: alpha(theme.palette.warning.main, 0.1), borderRadius: 2, mb: 1 }}>
-                                <ListItemIcon><Warning color="warning" /></ListItemIcon>
-                                <ListItemText
-                                    primary="Prioritize Emergency Assessments"
-                                    secondary={`${criticalFamilies.length} families have not had an assessment in over 90 days.`}
-                                />
-                            </ListItem>
-                            <ListItem sx={{ bgcolor: alpha(theme.palette.info.main, 0.1), borderRadius: 2, mb: 1 }}>
-                                <ListItemIcon><Folder color="info" /></ListItemIcon>
-                                <ListItemText
-                                    primary="Resource Allocation Optimization"
-                                    secondary="High overlap detected in Sub-county B. Recommend consolidating volunteer outreach."
-                                />
-                            </ListItem>
-                        </List>
-                    </Paper>
-                </Grid>
-            </Grid>
-        );
-    };
-
-    const renderGeospatial = () => (
-        <Paper sx={{ borderRadius: 4, overflow: 'hidden', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), height: '600px' }}>
-            <MapView height="100%" embedded />
-        </Paper>
-    );
-
-    const tabs = [
-        { id: 'overview', label: 'General Overview', icon: <BarChart />, component: renderSummary() },
-        { id: 'predictive', label: 'Predictive Insights', icon: <Psychology />, component: renderPredictiveInsights() },
-        { id: 'geospatial', label: 'Geospatial Analysis', icon: <LocationOn />, component: renderGeospatial() },
-        { id: 'reports', label: 'Report Archive', icon: <Description />, component: renderReportsList() },
-        { id: 'kpis', label: 'Impact KPIs', icon: <Timeline />, component: renderKPIs() },
-        { id: 'compliance', label: 'Compliance & Audits', icon: <PieChart />, component: renderCompliance() },
-    ];
-
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {/* Header Area */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
                 <Box>
                     <Typography variant="h4" fontWeight="900" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
                         <BarChart sx={{ fontSize: 40, color: 'primary.main' }} />
-                        Reporting & Intelligence
+                        Unified Intelligence Hub
                     </Typography>
                     <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 800 }}>
-                        Comprehensive analytics and automated reporting for data-driven decisions.
-                        Export data across all operational verticals.
+                        Real-time operational visibility across all Kindra CBO nodes.
+                        Data-driven insights for impact optimization and financial stewardship.
                     </Typography>
                 </Box>
-                <Button
-                    variant="contained"
-                    startIcon={<TableView />}
-                    onClick={() => setOpenDialog(true)}
-                    sx={{ borderRadius: 3, px: 4, py: 1.5, fontWeight: 'bold', boxShadow: theme.shadows[4] }}
-                >
-                    Custom Report
-                </Button>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Button
+                        variant="outlined"
+                        startIcon={<Download />}
+                        onClick={handleExportFamilies}
+                        sx={{ borderRadius: 3, fontWeight: 'bold' }}
+                    >
+                        Export CSV
+                    </Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<TableView />}
+                        onClick={() => setOpenDialog(true)}
+                        sx={{ borderRadius: 3, px: 4, fontWeight: 'bold', boxShadow: theme.shadows[4] }}
+                    >
+                        Custom Report
+                    </Button>
+                </Box>
             </Box>
 
-            <Grid container spacing={2} sx={{ mb: 3 }}>
+            {/* Top-Level Quick Stats */}
+            <Grid container spacing={2} sx={{ mb: 4 }}>
                 {[
                     { label: 'TOTAL FAMILIES', value: dashboardData?.overview?.total_families || 0, color: 'primary' },
                     { label: 'ACTIVE CASES', value: dashboardData?.overview?.active_cases || 0, color: 'secondary' },
@@ -617,26 +292,91 @@ export function ReportingView({ activeTab }: { activeTab?: string }) {
                     { label: 'VOLUNTEER HOURS', value: dashboardData?.volunteers?.total_hours_this_month || 0, color: 'warning' },
                 ].map((stat, i) => (
                     <Grid item xs={12} md={3} key={i}>
-                        <Card sx={{
-                            borderRadius: 2,
-                            borderLeft: '4px solid',
-                            borderColor: getColor(stat.color),
-                            boxShadow: theme.shadows[1]
-                        }}>
-                            <CardContent>
-                                <Typography color="text.secondary" variant="caption" fontWeight="bold" sx={{ letterSpacing: 1 }}>
-                                    {stat.label}
-                                </Typography>
-                                <Typography variant="h4" fontWeight="bold" sx={{ mt: 1 }}>
-                                    {stat.value}
-                                </Typography>
+                        <Card sx={{ borderRadius: 2, borderLeft: '4px solid', borderColor: getColor(stat.color), boxShadow: theme.shadows[1] }}>
+                            <CardContent sx={{ py: 2 }}>
+                                <Typography color="text.secondary" variant="caption" fontWeight="bold" sx={{ letterSpacing: 1 }}>{stat.label}</Typography>
+                                <Typography variant="h4" fontWeight="bold" sx={{ mt: 1 }}>{stat.value}</Typography>
                             </CardContent>
                         </Card>
                     </Grid>
                 ))}
             </Grid>
 
-            <SubTabView title="Analysis Perspective" tabs={tabs} activeTab={activeTab} />
+            {/* Performance & Targets Section */}
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <AutoGraph color="primary" /> Operational Performance vs Targets
+            </Typography>
+            <Grid container spacing={3} sx={{ mb: 6 }}>
+                <Grid item xs={12} md={7}>
+                    <TargetPerformanceChart data={dashboardData?.performance_metrics || []} />
+                </Grid>
+                <Grid item xs={12} md={5}>
+                    <Paper sx={{ p: 3, borderRadius: 3, height: '100%', bgcolor: alpha(theme.palette.primary.main, 0.02), border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1) }}>
+                        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Intelligence Summary</Typography>
+                        <Stack spacing={2} sx={{ mt: 2 }}>
+                            <Alert severity="success" sx={{ borderRadius: 2 }}>
+                                <strong>High Efficiency:</strong> Child support metrics are at 93% of the quarterly target.
+                            </Alert>
+                            <Alert severity="info" sx={{ borderRadius: 2 }}>
+                                <strong>Volunteer Growth:</strong> Recruitment is trending 15% higher than last month.
+                            </Alert>
+                            <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
+                                <Typography variant="caption" color="text.secondary" fontWeight="bold">PREDICTIVE INSIGHT</Typography>
+                                <Typography variant="body2" sx={{ mt: 1 }}>
+                                    Current donation trends suggest <strong>KES 1.2M</strong> surplus by year-end if campaign momentum persists.
+                                </Typography>
+                            </Box>
+                        </Stack>
+                    </Paper>
+                </Grid>
+            </Grid>
+
+            {/* Financial Stewardship Section */}
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Insights color="primary" /> Financial Stewardship (Fund Allocation)
+            </Typography>
+            <Grid container spacing={3} sx={{ mb: 6 }}>
+                <Grid item xs={12} md={8}>
+                    <BudgetTreemap data={dashboardData?.funding_hierarchy || {}} />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                    <DonationMethodsChart data={dashboardData?.donation_methods || []} embedded />
+                </Grid>
+            </Grid>
+
+            {/* Donation Trends Section */}
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Timeline color="primary" /> Financial Trajectory (Donation Trends)
+            </Typography>
+            <Box sx={{ mb: 6 }}>
+                <DonationTrendsChart data={donationTrends} />
+            </Box>
+
+            {/* Impact Trends & Correlation */}
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <AutoGraph color="primary" /> Multi-Metric Impact Correlation
+            </Typography>
+            <Grid container spacing={3} sx={{ mb: 6 }}>
+                <Grid item xs={12}>
+                    <ComposedImpactChart data={dashboardData?.impact_correlation || []} />
+                </Grid>
+            </Grid>
+
+            {/* Geospatial Section */}
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <LocationOn color="primary" /> Geospatial Impact Analysis
+            </Typography>
+            <Box sx={{ mb: 6, height: 500, borderRadius: 4, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+                <MapView height="100%" embedded />
+            </Box>
+
+            {/* Reports & Inventory */}
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Description color="primary" /> Generated Reports Inventory
+            </Typography>
+            <Box sx={{ mb: 4 }}>
+                {renderReportsList()}
+            </Box>
 
             {/* Intelligence Dialog */}
             <Dialog

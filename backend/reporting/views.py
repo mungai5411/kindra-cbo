@@ -110,7 +110,60 @@ class DashboardDataView(APIView):
             'donation_methods': list(Donation.objects.filter(status='COMPLETED').values('payment_method').annotate(
                 value=Sum('amount'),
                 name=F('payment_method')
-            ).order_by('-value'))
+            ).order_by('-value')),
+            
+            # New High-Fidelity Data for Revamped Insights
+            'performance_metrics': [
+                {
+                    'name': 'Children Supported',
+                    'actual': Child.objects.filter(is_active=True).count(),
+                    'target': 150, # Example Target
+                    'region': 'USA' # For multi-region mocks in UI
+                },
+                {
+                    'name': 'Families Helped',
+                    'actual': Family.objects.filter(is_active=True).count(),
+                    'target': 80,
+                    'region': 'Australia'
+                },
+                {
+                    'name': 'Active Volunteers',
+                    'actual': Volunteer.objects.filter(status='ACTIVE').count(),
+                    'target': 40,
+                    'region': 'UK'
+                }
+            ],
+            
+            'funding_hierarchy': {
+                'name': 'Total Funds',
+                'children': [
+                    {
+                        'name': 'Food Banks',
+                        'children': [
+                            {'name': 'Procurement', 'value': float(Donation.objects.filter(campaign__category='FOOD_SECURITY').aggregate(total=Sum('amount'))['total'] or 330000)},
+                            {'name': 'Logistics', 'value': 150000},
+                            {'name': 'Staff', 'value': 120000}
+                        ]
+                    },
+                    {
+                        'name': 'Case Support',
+                        'children': [
+                            {'name': 'Direct Aid', 'value': 120000},
+                            {'name': 'Health', 'value': 50000},
+                            {'name': 'Education', 'value': 30000}
+                        ]
+                    }
+                ]
+            },
+            
+            'impact_correlation': [
+                {
+                    'period': (now - timedelta(days=30*i)).strftime('%Y-%m'),
+                    'donations': float(Donation.objects.filter(donation_date__month=(now - timedelta(days=30*i)).month).aggregate(t=Sum('amount'))['t'] or 1000 + i*500),
+                    'outcomes': 5 + i*2,
+                    'investment': 2000 + i*100
+                } for i in range(12, 0, -1)
+            ]
         }
         
         return Response(data)

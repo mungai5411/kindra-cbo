@@ -305,10 +305,10 @@ export default function DashboardPage() {
             'staff_creds': <ShelterView activeTab={activeTab} />,
             'resources': <ResourcesView />,
 
-            'reporting': <ReportingView activeTab={activeTab} />,
-            'reports': <ReportingView activeTab={activeTab} />,
-            'kpis': <ReportingView activeTab={activeTab} />,
-            'compliance': <ReportingView activeTab={activeTab} />,
+            'reporting': <ReportingView />,
+            'reports': <ReportingView />,
+            'kpis': <ReportingView />,
+            'compliance': <ReportingView />,
 
             'admin_sys': <SystemAdminView activeTab={activeTab} />,
             'users': <SystemAdminView activeTab={activeTab} />,
