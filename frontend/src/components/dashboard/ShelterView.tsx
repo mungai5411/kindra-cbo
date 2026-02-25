@@ -84,7 +84,6 @@ import {
 } from '../../features/shelters/shelterSlice';
 import { fetchChildren } from '../../features/caseManagement/caseManagementSlice';
 import { fetchEvents } from '../../features/volunteers/volunteersSlice';
-import { SubTabView } from './SubTabView';
 import { ConfirmationDialog } from './ConfirmationDialog';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
@@ -427,7 +426,7 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                     <Typography variant="h6" fontWeight="bold">Partner Homes</Typography>
                     <Typography variant="caption" color="text.secondary">Registered shelter homes and occupancy</Typography>
                 </Box>
-                {(!isPartner || (isPartner && shelters.length === 0)) && (
+                {(!isPartner || (isPartner && shelters.length === 0 && pendingShelters.length === 0)) && (
                     <Button
                         variant="contained"
                         color="primary"
@@ -993,37 +992,6 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
         );
     };
 
-    const tabs = [
-        { id: 'shelters', label: 'Partner Homes', icon: <Business />, component: renderShelters() },
-        { id: 'placements', label: 'Placements', icon: <AssignmentInd />, component: renderPlacements() },
-        {
-            id: 'pending',
-            label: 'Under Review',
-            icon: <Assessment />,
-            component: renderPendingReview(),
-            hidden: !isAdmin,
-            badge: pendingShelters?.length || 0
-        },
-        {
-            id: 'staff',
-            label: 'Staffing & Roles',
-            icon: <SupervisorAccount />,
-            component: renderStaffing(),
-            hidden: !canManageStaff
-        },
-        {
-            id: 'staff_creds',
-            label: 'Credentials',
-            icon: <VerifiedUser />,
-            component: renderStaffCredentials(),
-            hidden: !canManageStaff
-        },
-        { id: 'resources', label: 'Inventory', icon: <Inventory />, component: renderResources() },
-        { id: 'incidents', label: 'Incident Command', icon: <ReportProblem />, component: renderIncidents() },
-        { id: 'logistics', label: 'Supply Requests', icon: <LocalShipping />, component: renderResourceRequests() },
-        { id: 'events', label: 'Partner Events', icon: <EventIcon />, component: renderPartnerEvents() },
-    ].filter(t => !t.hidden);
-
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
@@ -1091,7 +1059,16 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                 </Grid>
             </Grid>
 
-            <SubTabView title="Coordination Infrastructure" tabs={tabs} activeTab={activeTab} />
+            {activeTab === 'shelters' && renderShelterHome()}
+            {activeTab === 'pending' && renderPendingReview()}
+            {activeTab === 'staff' && renderStaffing()}
+            {activeTab === 'staff_creds' && renderStaffCredentials()}
+            {activeTab === 'resources' && renderResources()}
+            {activeTab === 'incidents' && renderIncidents()}
+            {activeTab === 'logistics' && renderResourceRequests()}
+            {activeTab === 'events' && renderPartnerEvents()}
+            {activeTab === 'placements' && renderPlacements()}
+            {(!activeTab || activeTab === 'shelter') && renderShelterHome()}
 
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 4 } }}>
                 <DialogTitle sx={{ fontWeight: 'bold' }}>

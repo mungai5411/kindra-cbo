@@ -1363,72 +1363,6 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
         );
     };
 
-    const SubTabView = ({ title, tabs, activeTab, onTabChange }: any) => {
-        const activeItem = tabs.find((t: any) => t.id === activeTab) || tabs[0];
-
-        return (
-            <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, gap: 2 }}>
-                    <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main', display: 'flex' }}>
-                        <BusinessCenter sx={{ fontSize: '1.2rem' }} />
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>{title}</Typography>
-                </Box>
-                <Box sx={{
-                    display: 'flex',
-                    gap: 1,
-                    mb: 5,
-                    p: 0.75,
-                    bgcolor: alpha(theme.palette.background.paper, 0.4),
-                    borderRadius: 3.5,
-                    border: '1px solid',
-                    borderColor: alpha(theme.palette.divider, 0.05),
-                    width: 'fit-content',
-                    overflowX: 'auto',
-                    pb: { xs: 1.5, md: 0.75 }
-                }}>
-                    {tabs.map((tab: any) => (
-                        <Button
-                            key={tab.id}
-                            variant={activeTab === tab.id ? 'contained' : 'text'}
-                            onClick={() => onTabChange(tab.id)}
-                            startIcon={tab.icon}
-                            sx={{
-                                borderRadius: 3,
-                                textTransform: 'none',
-                                fontWeight: activeTab === tab.id ? 900 : 700,
-                                px: 3,
-                                py: 1,
-                                minWidth: 'fit-content',
-                                bgcolor: activeTab === tab.id ? 'primary.main' : 'transparent',
-                                color: activeTab === tab.id ? 'white' : 'text.secondary',
-                                boxShadow: activeTab === tab.id ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}` : 'none',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                '&:hover': {
-                                    bgcolor: activeTab === tab.id ? 'primary.dark' : alpha(theme.palette.primary.main, 0.05),
-                                    transform: activeTab === tab.id ? 'none' : 'translateY(-1px)'
-                                },
-                                '& .MuiButton-startIcon': { mr: 1, color: activeTab === tab.id ? 'white' : 'primary.main' }
-                            }}
-                        >
-                            {tab.label}
-                        </Button>
-                    ))}
-                </Box>
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={activeTab}
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        {activeItem.component}
-                    </motion.div>
-                </AnimatePresence>
-            </Box>
-        );
-    };
 
     const tabsSource = [
         { id: 'campaigns', label: 'Campaigns', component: renderCampaigns(), icon: <VolunteerActivism /> },
@@ -1482,7 +1416,20 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                 </Grid>
             </Grid>
 
-            <SubTabView title="Philanthropic Operations Hub" tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />
+            {activeTab === 'campaigns' && renderCampaigns()}
+            {activeTab === 'impact_analytics' && renderImpactAnalytics()}
+            {activeTab === 'material_donations' && renderMaterialDonations()}
+            {activeTab === 'donation_records' && renderDonations()}
+            {activeTab === 'donors' && renderDonors()}
+            {activeTab === 'receipts' && renderReceipts()}
+            {activeTab === 'community_events' && renderCommunityEvents()}
+            {activeTab === 'social_media' && (
+                <Box sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
+                    <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Nexus Protocol</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Integrated social media tracking module pending initialization.</Typography>
+                </Box>
+            )}
+            {(!activeTab || activeTab === 'donations') && renderCampaigns()}
 
             {/* Donation Status Update Dialog */}
             <Dialog open={openDonationStatusDialog} onClose={() => setOpenDonationStatusDialog(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 4, boxShadow: theme.shadows[10] } }}>

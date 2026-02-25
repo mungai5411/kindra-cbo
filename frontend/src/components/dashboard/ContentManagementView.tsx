@@ -45,7 +45,6 @@ import {
     Save
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { SubTabView } from './SubTabView';
 import { ImageUploader } from '../common/ImageUploader';
 import { glassCard } from '../../theme/glassmorphism';
 
@@ -61,6 +60,7 @@ const SOURCE_LABELS: { [key: string]: string } = {
 
 export function ContentManagementView({ initialTab = 'media' }: { initialTab?: string }) {
     const theme = useTheme();
+    const activeTab = initialTab === 'content_management' ? 'media' : initialTab;
 
     const [media, setMedia] = useState<any[]>([]);
     const [team, setTeam] = useState<any[]>([]);
@@ -598,11 +598,6 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
         </Box>
     );
 
-    const tabs = [
-        { id: 'media', label: 'Global Media Library', icon: <PermMedia />, component: renderMediaLibrary() },
-        { id: 'team', label: 'Team & Visionaries', icon: <Groups />, component: renderTeamManagement() },
-        { id: 'content', label: 'Site Content (No-Code)', icon: <Visibility />, component: renderSiteContent() },
-    ];
 
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -618,7 +613,10 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
 
             {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 3 }}>{error}</Alert>}
 
-            <SubTabView title="Content Management" tabs={tabs} activeTab={initialTab === 'content_management' ? 'media' : initialTab} />
+            {activeTab === 'media' && renderMediaLibrary()}
+            {activeTab === 'team' && renderTeamManagement()}
+            {activeTab === 'content' && renderSiteContent()}
+            {(!activeTab || activeTab === 'content_management') && renderMediaLibrary()}
 
             {/* Media Upload Dialog */}
             <Dialog open={mediaDialogOpen} onClose={() => setMediaDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>

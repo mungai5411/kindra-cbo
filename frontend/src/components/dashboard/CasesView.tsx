@@ -47,7 +47,6 @@ import {
 } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
 import { fetchFamilies, fetchChildren, fetchCases, addFamily, addChild, addCase } from '../../features/caseManagement/caseManagementSlice';
-import { SubTabView } from './SubTabView';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
 import { KENYA_COUNTIES } from '../../utils/locationData';
@@ -486,15 +485,6 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
     );
 
 
-    const tabsSource = [
-        { id: 'cases', label: 'Case Files', icon: <Assignment />, component: renderCases() },
-        { id: 'children', label: 'Registry', icon: <ChildCare />, component: renderChildren() },
-        { id: 'families', label: 'Families', icon: <FamilyRestroom />, component: renderFamilies() },
-        { id: 'assessments', label: 'Assessments', icon: <HealthAndSafety />, component: renderAssessments(), hidden: !isManagement },
-        { id: 'case_notes', label: 'Interventions', icon: <HistoryEdu />, component: renderCaseNotes(), hidden: !isManagement },
-    ];
-
-    const tabs = tabsSource.filter(tab => !tab.hidden);
 
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -541,7 +531,12 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                 </Button>
             </Paper>
 
-            <SubTabView title="Case Management Operations" tabs={tabs} activeTab={activeTab} />
+            {activeTab === 'cases' && renderCases()}
+            {activeTab === 'children' && renderChildren()}
+            {activeTab === 'families' && renderFamilies()}
+            {activeTab === 'assessments' && renderAssessments()}
+            {activeTab === 'case_notes' && renderCaseNotes()}
+            {(!activeTab || activeTab === 'case_management') && renderCases()}
 
             {/* Add Family Dialog */}
             <Dialog open={openDialog.type === 'family'} onClose={() => setOpenDialog({ type: null, data: null })} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>

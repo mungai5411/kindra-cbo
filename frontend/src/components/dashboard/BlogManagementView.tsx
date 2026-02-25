@@ -46,7 +46,6 @@ import {
 import { Avatar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { SubTabView } from './SubTabView';
 import { ImageUploader } from '../common/ImageUploader';
 
 // Status Chip Component
@@ -627,15 +626,9 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
         </Paper>
     );
 
-    const tabs = [
-        { id: 'blog_posts', label: 'Stories & Updates', icon: <Article />, component: renderPosts() },
-        { id: 'categories', label: 'Categories', icon: <Category />, component: renderCategories() },
-        { id: 'tags', label: 'Meta Tags', icon: <Label />, component: renderTags() },
-        { id: 'comments', label: 'Comments', icon: <Forum />, component: renderComments() },
-        { id: 'newsletter', label: 'Newsletter', icon: <Email />, component: renderNewsletter() },
-    ];
 
-    const normalizedTab = initialTab === 'blog_campaigns' ? 'blog_posts' : initialTab;
+    const activeTab = initialTab === 'blog_campaigns' ? 'blog_posts' : initialTab;
+    const normalizedTab = activeTab; // kept for compatibility if used elsewhere
 
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -649,7 +642,12 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                 </Typography>
             </Box>
 
-            <SubTabView title="Content Management System" tabs={tabs} activeTab={normalizedTab} />
+            {activeTab === 'blog_posts' && renderPosts()}
+            {activeTab === 'categories' && renderCategories()}
+            {activeTab === 'tags' && renderTags()}
+            {activeTab === 'comments' && renderComments()}
+            {activeTab === 'newsletter' && renderNewsletter()}
+            {(!activeTab || activeTab === 'blog_campaigns') && renderPosts()}
 
             {/* Create/Edit Dialog */}
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>

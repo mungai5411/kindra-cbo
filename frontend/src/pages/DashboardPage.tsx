@@ -163,12 +163,12 @@ export default function DashboardPage() {
 
         // Donors ONLY see donation-related content
         if (user.role === 'DONOR') {
-            return ['overview', 'donations', 'campaigns', 'my_giving', 'receipts', 'material_donations'].includes(itemId);
+            return ['overview', 'donations', 'campaigns', 'donation_records', 'receipts', 'material_donations', 'impact_analytics', 'community_events'].includes(itemId);
         }
 
         // Shelter Partners ONLY see shelter-related content
         if (user.role === 'SHELTER_PARTNER') {
-            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'map', 'media', 'impact', 'donations', 'content_management'].includes(itemId);
+            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'staff', 'media', 'donations', 'impact_analytics', 'content_management'].includes(itemId);
         }
 
         // Case Workers see case management and shelter content
@@ -178,7 +178,7 @@ export default function DashboardPage() {
 
         // Social Media see blog and donation content
         if (user.role === 'SOCIAL_MEDIA') {
-            return ['overview', 'blog_campaigns', 'blog_posts', 'categories', 'comments', 'newsletter', 'tags', 'donations', 'campaigns', 'donation_records', 'donors', 'social_media', 'map'].includes(itemId);
+            return ['overview', 'blog_campaigns', 'blog_posts', 'categories', 'comments', 'newsletter', 'tags', 'donations', 'campaigns', 'donation_records', 'donors', 'social_media', 'map', 'impact_analytics', 'community_events'].includes(itemId);
         }
 
         // Default: deny access
@@ -278,7 +278,6 @@ export default function DashboardPage() {
             ),
             'map': <MapView />,
             'volunteers': <VolunteersView setOpenDialog={setOpenVolunteerDialog} activeTab={activeTab} />,
-            'volunteer_list': <VolunteersView setOpenDialog={setOpenVolunteerDialog} activeTab={activeTab} />,
             'tasks': <VolunteersView setOpenDialog={setOpenVolunteerDialog} activeTab={activeTab} />,
             'events': <VolunteersView setOpenDialog={setOpenVolunteerDialog} activeTab={activeTab} />,
             'time_logs': <VolunteersView setOpenDialog={setOpenVolunteerDialog} activeTab={activeTab} />,
@@ -292,6 +291,8 @@ export default function DashboardPage() {
             'receipts': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
             'social_media': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
             'material_donations': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'impact_analytics': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'community_events': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
 
             'case_management': <CasesView activeTab={activeTab} />,
             'cases': <CasesView activeTab={activeTab} />,
@@ -304,8 +305,9 @@ export default function DashboardPage() {
             'shelter': <ShelterView activeTab={activeTab} />,
             'shelters': <ShelterView activeTab={activeTab} />,
             'placements': <ShelterView activeTab={activeTab} />,
-            'staff_creds': <ShelterView activeTab={activeTab} />,
-            'resources': <ResourcesView />,
+            'resources': <ShelterView activeTab={activeTab} />,
+            'staff': <ShelterView activeTab={activeTab} />,
+            'media': <MediaLibraryView />,
 
             'reporting': <ReportingView />,
             'reports': <ReportingView />,

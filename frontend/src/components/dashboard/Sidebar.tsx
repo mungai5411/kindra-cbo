@@ -72,27 +72,29 @@ const NAVIGATION = [
     },
     {
         id: 'donations',
-        label: 'Donations',
+        label: 'Donations & Impact',
         icon: <Campaign />,
         children: [
             { id: 'campaigns', label: 'Campaigns' },
             { id: 'donation_records', label: 'Donations' },
+            { id: 'material_donations', label: 'Material Giving' },
             { id: 'donors', label: 'Donors' },
             { id: 'receipts', label: 'Receipts' },
+            { id: 'impact_analytics', label: 'Impact Tracker' },
+            { id: 'community_events', label: 'Community Hub' },
             { id: 'social_media', label: 'Social Media' },
-            { id: 'impact', label: 'Impact Tracker' },
         ]
     },
     {
         id: 'shelter',
-        label: 'Shelter Coordination',
+        label: 'Shelter Hub',
         icon: <Home />,
         children: [
             { id: 'shelters', label: 'Shelter Homes' },
             { id: 'placements', label: 'Placements' },
             { id: 'resources', label: 'Resources' },
+            { id: 'staff', label: 'Staff registry' },
             { id: 'media', label: 'Media Library' },
-            { id: 'staff_creds', label: 'Staff Credentials', adminOnly: true },
         ]
     },
     {
@@ -100,12 +102,12 @@ const NAVIGATION = [
         label: 'Volunteers',
         icon: <VolunteerActivism />,
         children: [
-            { id: 'volunteer_list', label: 'Volunteers' },
-            { id: 'volunteer_groups', label: 'Unit Hub' },
+            { id: 'volunteers', label: 'Registry' },
+            { id: 'tasks', label: 'Operations' },
             { id: 'events', label: 'Events' },
-            { id: 'tasks', label: 'Tasks' },
             { id: 'time_logs', label: 'Time Logs' },
             { id: 'trainings', label: 'Trainings' },
+            { id: 'volunteer_groups', label: 'Unit Groups' },
         ]
     },
     {

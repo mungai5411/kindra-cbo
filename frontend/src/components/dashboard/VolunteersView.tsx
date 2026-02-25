@@ -44,7 +44,6 @@ import {
 import { Person, Assignment, Event as EventIcon, Schedule, School, Verified, Add, AccessTime, Email, Phone, AdminPanelSettings, OpenInNew, Delete, People, Edit, Check, Close } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
 import { fetchVolunteers, fetchTasks, fetchEvents, logTimeEntry, addTask, addEvent, updateEvent, deleteEvent, registerForEvent, unregisterFromEvent, fetchTimeLogs, fetchShelters, createTaskApplication, deleteTask, fetchEventParticipants, updateTimeLogStatus } from '../../features/volunteers/volunteersSlice';
-import { SubTabView } from './SubTabView';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
 import { ImageGallery, ImageItem } from '../common/ImageGallery';
@@ -1236,15 +1235,6 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
     }
 
 
-    const tabsSource = [
-        { id: 'volunteers', label: 'Registry', icon: <Person sx={{ fontSize: '1.2rem' }} />, component: renderVolunteerList(), hidden: !isManagement },
-        { id: 'tasks', label: 'Tasks', icon: <Assignment sx={{ fontSize: '1.2rem' }} />, component: renderTasks() },
-        { id: 'events', label: 'Events', icon: <EventIcon sx={{ fontSize: '1.2rem' }} />, component: renderEvents() },
-        { id: 'time_logs', label: 'Time Logs', icon: <Schedule sx={{ fontSize: '1.2rem' }} />, component: renderTimeLogs() },
-        { id: 'trainings', label: 'Trainings', icon: <School sx={{ fontSize: '1.2rem' }} />, component: renderTrainings() },
-    ];
-
-    const tabs = tabsSource.filter(tab => !tab.hidden);
 
     return (
         <Box component={motion.div} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -1278,7 +1268,17 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 </Grid>
             </Grid>
 
-            <SubTabView title="Personnel Management" tabs={tabs} activeTab={activeTab} />
+            {activeTab === 'volunteers' && renderVolunteerList()}
+            {activeTab === 'tasks' && renderTasks()}
+            {activeTab === 'events' && renderEvents()}
+            {activeTab === 'time_logs' && renderTimeLogs()}
+            {activeTab === 'trainings' && renderTrainings()}
+            {(!activeTab || activeTab === 'overview') && (
+                <Box>
+                    {/* Fallback or default view if needed, but usually dashboard handles this */}
+                    {renderVolunteerList()}
+                </Box>
+            )}
 
             {/* Time Log Dialog */}
             <Dialog
