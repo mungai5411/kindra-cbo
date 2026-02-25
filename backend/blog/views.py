@@ -437,7 +437,11 @@ class MediaAssetViewSet(viewsets.ModelViewSet):
         user = self.request.user
         queryset = MediaAsset.objects.all().select_related('uploaded_by')
         
-        if user.is_staff or user.role in ['ADMIN', 'MANAGEMENT', 'SOCIAL_MEDIA']:
+        if not user.is_authenticated:
+            return queryset
+            
+        role = getattr(user, 'role', None)
+        if user.is_staff or role in ['ADMIN', 'MANAGEMENT', 'SOCIAL_MEDIA']:
             return queryset
             
         # Partners only see their own uploads
