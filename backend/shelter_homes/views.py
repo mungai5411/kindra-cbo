@@ -136,7 +136,7 @@ class StaffCredentialListCreateView(generics.ListCreateAPIView):
     serializer_class = StaffCredentialSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['shelter_home', 'is_verified', 'is_active']
+    filterset_fields = ['shelter_home', 'is_verified']
 
     def get_queryset(self):
         user = self.request.user

@@ -168,7 +168,7 @@ export default function DashboardPage() {
 
         // Shelter Partners ONLY see shelter-related content
         if (user.role === 'SHELTER_PARTNER') {
-            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'map', 'media', 'impact'].includes(itemId);
+            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'map', 'media', 'impact', 'donations', 'content_management'].includes(itemId);
         }
 
         // Case Workers see case management and shelter content
