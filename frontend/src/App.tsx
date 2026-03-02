@@ -64,7 +64,23 @@ const RegisterRedirect = () => {
     return null;
 };
 
+// Component to toggle body class for chatbot visibility
+const RouteObserver = () => {
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.pathname.startsWith('/dashboard')) {
+            document.body.classList.add('dashboard-page');
+        } else {
+            document.body.classList.remove('dashboard-page');
+        }
+    }, [location]);
+
+    return null;
+};
+
 function App() {
+
     const dispatch = useDispatch<AppDispatch>();
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
@@ -81,7 +97,9 @@ function App() {
                 <AuthModalProvider>
                     <CssBaseline />
                     <Router>
+                        <RouteObserver />
                         <Routes>
+
                             {/* Public routes */}
                             <Route path="/" element={<HomePage />} />
                             <Route path="/about" element={<AboutPage />} />
