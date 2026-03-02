@@ -1,0 +1,65 @@
+Kindra CBO Knowledge Base
+===========================
+
+Overview
+--------
+Kindra CBO (Community Based Organization) is a grassroots movement dedicated to restoring dignity and building a sustainable future where every child in Kenya can thrive. Established in 2023 and headquartered in Nairobi, Kindra CBO focuses on community-driven transformation through social, health, and economic support systems.
+
+Mission & Vision
+----------------
+- Mission: To empower vulnerable communities through sustainable social, health, and economic support systems.
+- Vision: A world where every family has the resources, dignity, and opportunity to build their own prosperous future.
+- Core Values: Transparency, Inclusivity, Sustainability, and Integrity.
+
+Key Impact Areas
+----------------
+1. Education Support: Ensuring every child has access to quality learning, materials, and support through partner schools.
+2. Healthcare Access: Providing vital medical care, health education, and support to families in need.
+3. Community Programs: Building sustainable infrastructure, support networks, and community-centric solutions.
+4. Family Welfare & Case Management: Direct intervention through a structured welfare system including family registration, assessment, and long-term support plans.
+
+Operational Model (Case Management)
+-----------------------------------
+Kindra CBO employs a data-driven approach to social welfare:
+- Vulnerability Assessment: Families are assessed across five key pillars: Economic Status, Housing, Health, Education, and Safety.
+- Assessment Scoring: Uses a 0-100 scale to determine risk levels (Low, Medium, High, Critical) and prioritize interventions.
+- Intervention Plans: Case workers develop personalized intervention plans for each family, focusing on sustainable outcomes.
+- Child Welfare: Specialized tracking for orphans, abandoned children, and those in high-risk environments, ensuring they stay in school and receive medical care.
+
+Services & Support
+------------------
+
+1. Donations
+Kindra CBO accepts various forms of support:
+- Financial Donations: Secure payments via M-Pesa, PayPal, Stripe, and Bank Transfer.
+- Material Donations:
+    * Clothes: Professional and casual wear for families and children.
+    * Food: Perishables and non-perishables for food security programs.
+    * Stationery: School supplies, books, and educational materials.
+    * Electronics: Computers and devices for educational and operational use.
+- Transparency: Every donation is tracked, and donors can view impact stories and real-time progress on specific campaigns.
+
+2. Volunteering
+Volunteers are a core part of the Kindra movement.
+- Roles: Shelter assistance, community service, event support, and more.
+- Requirements: Volunteers go through a review/approval process, including skills-based matching and background checks.
+- Events: Regular training, fundraisers, and community action days.
+
+3. Shelter Partnerships
+Shelter homes can partner with Kindra CBO to receive support.
+- Requirements: Valid registration, safety compliance audits, and commitment to child protection policies.
+- Application: Shelter owners can apply through the Kindra portal.
+
+Frequently Asked Questions (FAQ)
+--------------------------------
+- How can I donate material items? Log in to your donor account, visit 'Donate Materials', and fill out the form for pickup or drop-off coordination.
+- Is my financial donation secure? Yes, we use industry-standard secure payment processors.
+- How do I become a volunteer? Sign up on the 'Volunteer' page. After review, you can join teams and view events.
+- Can I track my donation? Yes, we prioritize transparency. Impact stories and real-time progress are available in our Community Hub.
+
+Contact Information
+-------------------
+- Organization: Kindra CBO
+- Location: Nairobi, Kenya
+- Email Address:  kindra-cbo@zohomail.com
+- Website: https://kindra-cbo.vercel.app/
