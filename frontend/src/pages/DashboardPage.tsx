@@ -29,7 +29,7 @@ import {
 
 import { logout, fetchProfile } from '../features/auth/authSlice';
 import { addVolunteer } from '../features/volunteers/volunteersSlice';
-import { addCampaign } from '../features/donations/donationsSlice';
+import { addCampaign, updateCampaign } from '../features/donations/donationsSlice';
 import type { RootState, AppDispatch } from '../store';
 
 // Modular Components
@@ -108,6 +108,7 @@ export default function DashboardPage() {
     // Form/Dialog State
     const [openVolunteerDialog, setOpenVolunteerDialog] = useState(false);
     const [openCampaignDialog, setOpenCampaignDialog] = useState(false);
+    const [selectedCampaignForEdit, setSelectedCampaignForEdit] = useState<any>(null);
 
     const [volunteerForm, setVolunteerForm] = useState({ full_name: '', email: '', phone: '', role: 'VOLUNTEER' });
     const [campaignForm, setCampaignForm] = useState({
@@ -137,6 +138,40 @@ export default function DashboardPage() {
             newState[id] = !isCurrentlyOpen;
             return newState;
         });
+    };
+
+    const handleOpenCampaignDialog = (open: boolean, campaign?: any) => {
+        if (open && campaign) {
+            setSelectedCampaignForEdit(campaign);
+            setCampaignForm({
+                title: campaign.title || '',
+                target_amount: String(campaign.target_amount || ''),
+                description: campaign.description || '',
+                category: campaign.category || 'OTHER',
+                urgency: campaign.urgency || 'MEDIUM',
+                start_date: new Date(campaign.start_date || Date.now()).toISOString().split('T')[0],
+                end_date: new Date(campaign.end_date || Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                image: null,
+                gallery_images: (campaign.gallery_images || []).map((img: any) => ({
+                    id: img.id,
+                    url: img.file || img.url
+                }))
+            });
+        } else if (open && !campaign) {
+            setSelectedCampaignForEdit(null);
+            setCampaignForm({
+                title: '',
+                target_amount: '',
+                description: '',
+                category: 'OTHER',
+                urgency: 'MEDIUM',
+                start_date: new Date().toISOString().split('T')[0],
+                end_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                image: null,
+                gallery_images: []
+            });
+        }
+        setOpenCampaignDialog(open);
     };
 
     const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
@@ -248,8 +283,15 @@ export default function DashboardPage() {
                 formData.append('featured_image', campaignForm.image);
             }
 
-            const res = await dispatch(addCampaign(formData)).unwrap();
-            const savedCampaignId = res.id;
+            let savedCampaignId = null;
+
+            if (selectedCampaignForEdit) {
+                const res = await dispatch(updateCampaign({ id: selectedCampaignForEdit.slug || selectedCampaignForEdit.id, data: formData })).unwrap();
+                savedCampaignId = res.id;
+            } else {
+                const res = await dispatch(addCampaign(formData)).unwrap();
+                savedCampaignId = res.id;
+            }
 
             for (const item of campaignForm.gallery_images) {
                 if (item.file && savedCampaignId) {
@@ -303,15 +345,15 @@ export default function DashboardPage() {
             'trainings': <VolunteersView setOpenDialog={setOpenVolunteerDialog} activeTab={activeTab} />,
             'volunteer_groups': <VolunteerGroupsView />,
 
-            'donations': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
-            'campaigns': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
-            'donation_records': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
-            'donors': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
-            'receipts': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
-            'social_media': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
-            'material_donations': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
-            'impact_analytics': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
-            'community_events': <DonationsView setOpenDialog={setOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'donations': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'campaigns': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'donation_records': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'donors': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'receipts': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'social_media': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'material_donations': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'impact_analytics': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'community_events': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
 
             'case_management': <CasesView activeTab={activeTab} />,
             'cases': <CasesView activeTab={activeTab} />,
@@ -540,7 +582,7 @@ export default function DashboardPage() {
                     borderBottom: '1px solid',
                     borderColor: 'divider',
                     background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)}, ${alpha(theme.palette.secondary.main, 0.05)})`
-                }}>Create New Campaign</DialogTitle>
+                }}>{selectedCampaignForEdit ? 'Edit Campaign' : 'Create New Campaign'}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <TextField
@@ -642,13 +684,18 @@ export default function DashboardPage() {
                                 helperText="Upload supplementary images"
                                 values={campaignForm.gallery_images}
                                 onChange={(files) => setCampaignForm({ ...campaignForm, gallery_images: files })}
+                                onDelete={async (id) => {
+                                    await apiClient.delete(`/blog/admin/media/${id}/`);
+                                }}
                             />
                         </Box>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>
-                    <Button onClick={() => setOpenCampaignDialog(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleCreateCampaign}>Create Campaign</Button>
+                    <Button onClick={() => handleOpenCampaignDialog(false)}>Cancel</Button>
+                    <Button variant="contained" onClick={handleCreateCampaign}>
+                        {selectedCampaignForEdit ? 'Save Changes' : 'Create Campaign'}
+                    </Button>
                 </DialogActions>
             </Dialog>
 

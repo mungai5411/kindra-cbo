@@ -70,7 +70,7 @@ import { ConfirmationDialog } from './ConfirmationDialog';
 import { downloadFile } from '../../utils/downloadHelper';
 
 interface DonationsViewProps {
-    setOpenDialog?: (open: boolean) => void;
+    setOpenDialog?: (open: boolean, data?: any) => void;
     activeTab?: string;
     onTabChange?: (tabId: string) => void;
 }
@@ -521,24 +521,44 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                                 </Box>
                                 <Box sx={{ display: 'flex', gap: 1 }}>
                                     {isManagement && (
-                                        <Button
-                                            variant="outlined"
-                                            size="small"
-                                            onClick={() => handleOpenStatusDialog(camp)}
-                                            sx={{
-                                                flex: 1,
-                                                borderRadius: 2,
-                                                textTransform: 'none',
-                                                fontWeight: 800,
-                                                fontSize: '0.7rem',
-                                                py: 0.75,
-                                                borderColor: 'divider',
-                                                color: 'text.secondary',
-                                                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main', color: 'primary.main' }
-                                            }}
-                                        >
-                                            Metadata
-                                        </Button>
+                                        <>
+                                            <Button
+                                                variant="outlined"
+                                                size="small"
+                                                onClick={() => handleOpenStatusDialog(camp)}
+                                                sx={{
+                                                    flex: 1,
+                                                    borderRadius: 2,
+                                                    textTransform: 'none',
+                                                    fontWeight: 800,
+                                                    fontSize: '0.7rem',
+                                                    py: 0.75,
+                                                    borderColor: 'divider',
+                                                    color: 'text.secondary',
+                                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main', color: 'primary.main' }
+                                                }}
+                                            >
+                                                Metadata
+                                            </Button>
+                                            <Button
+                                                variant="outlined"
+                                                size="small"
+                                                onClick={() => setOpenDialog?.(true, camp)}
+                                                sx={{
+                                                    flex: 1,
+                                                    borderRadius: 2,
+                                                    textTransform: 'none',
+                                                    fontWeight: 800,
+                                                    fontSize: '0.7rem',
+                                                    py: 0.75,
+                                                    borderColor: 'divider',
+                                                    color: 'primary.main',
+                                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main' }
+                                                }}
+                                            >
+                                                Edit
+                                            </Button>
+                                        </>
                                     )}
                                     <Button
                                         variant="contained"
