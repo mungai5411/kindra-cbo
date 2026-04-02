@@ -18,6 +18,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.lib import colors
+from .daraja_service import DarajaService
 
 logger = logging.getLogger('kindra_cbo')
 
@@ -134,11 +135,14 @@ class PaymentService:
         if not data.get('amount') or not data.get('phone_number'):
             raise ValueError('Amount and phone number are required')
         
+        # Set unique transaction_id for local DB integrity, we will update it or keep it unique
+        temp_tx_id = f"MPESA-{uuid.uuid4().hex[:10].upper()}"
+
         # Create donation in PENDING status
         donation = DonationService.create_donation({
             'amount': data.get('amount'),
             'payment_method': Donation.PaymentMethod.MPESA,
-            'transaction_id': f"MPESA-{uuid.uuid4().hex[:10].upper()}",
+            'transaction_id': temp_tx_id,
             'donor_name': data.get('donor_name', ''),
             'donor_email': data.get('donor_email', ''),
             'is_anonymous': data.get('is_anonymous', False),
@@ -147,15 +151,92 @@ class PaymentService:
             'status': Donation.Status.PENDING
         })
         
-        # Simulation: Auto-finalize for immediate receipt generation
-        # In production, this would happen in a callback
-        logger.info(f"Auto-finalizing M-Pesa payment for simulation: {donation.transaction_id}")
-        receipt = DonationService.finalize_donation(donation)
+        # Initiate Real Daraja STK Push
+        account_ref = f"KINDRA-{donation.id.hex[:6]}"
+        transaction_desc = f"Donation to Kindra CBO"
         
-        # Notify admins
-        NotificationService.notify_pending_donation(donation, f"M-Pesa from {data.get('phone_number')}")
-        
-        return donation, receipt
+        try:
+            checkout_request_id = DarajaService.initiate_stk_push(
+                phone_number=data.get('phone_number'),
+                amount=donation.amount,
+                account_reference=account_ref,
+                transaction_desc=transaction_desc
+            )
+            
+            # Save the CheckoutRequestID aspayment_reference for mapping in the callback
+            donation.payment_reference = checkout_request_id
+            donation.save(update_fields=['payment_reference'])
+            
+            logger.info(f"Successfully initiated STK Push for {donation.transaction_id}. CheckoutRequestID: {checkout_request_id}")
+            
+            # Notify admins of pending
+            NotificationService.notify_pending_donation(donation, f"M-Pesa STK (Phone: {data.get('phone_number')})")
+            
+            # Note: Receipt is generated only AFTER successful callback
+            return donation, None
+            
+        except Exception as e:
+            logger.error(f"Failed to initiate STK Push: {str(e)}")
+            donation.status = Donation.Status.FAILED
+            donation.save()
+            raise ValueError(f"Failed to initiate M-Pesa payment: {str(e)}")
+
+    @staticmethod
+    def handle_mpesa_callback(data):
+        """
+        Handle M-Pesa STK Push Callback Webhook
+        """
+        try:
+            stk_callback = data.get('Body', {}).get('stkCallback', {})
+            result_code = stk_callback.get('ResultCode')
+            result_desc = stk_callback.get('ResultDesc')
+            checkout_request_id = stk_callback.get('CheckoutRequestID')
+
+            if not checkout_request_id:
+                logger.error("Callback received without CheckoutRequestID")
+                return False
+
+            # Find the pending donation
+            try:
+                donation = Donation.objects.get(payment_reference=checkout_request_id, payment_method=Donation.PaymentMethod.MPESA)
+            except Donation.DoesNotExist:
+                logger.error(f"Donation not found for CheckoutRequestID {checkout_request_id}")
+                return False
+
+            if donation.status != Donation.Status.PENDING:
+                logger.info(f"Donation {donation.id} already processed. Current status: {donation.status}")
+                return True
+
+            if result_code == 0:
+                # Payment Successful
+                callback_metadata = stk_callback.get('CallbackMetadata', {}).get('Item', [])
+                
+                # Extract the actual M-Pesa Receipt Number
+                mpesa_receipt_num = None
+                for item in callback_metadata:
+                    if item.get('Name') == 'MpesaReceiptNumber':
+                        mpesa_receipt_num = item.get('Value')
+                        break
+                        
+                if mpesa_receipt_num:
+                    # Update transaction_id to real M-Pesa code
+                    donation.transaction_id = mpesa_receipt_num
+                    donation.save(update_fields=['transaction_id'])
+                    
+                logger.info(f"STK Push successful for donation {donation.id}. M-Pesa Ref: {mpesa_receipt_num}")
+                DonationService.finalize_donation(donation)
+            else:
+                # Failed STK Push (cancelled by user, insufficient funds, etc)
+                logger.warning(f"STK Push failed/cancelled for {donation.id}. Code: {result_code}, Desc: {result_desc}")
+                donation.status = Donation.Status.FAILED
+                donation.message = f"{donation.message} | Payment failed: {result_desc}"[:199]
+                donation.save(update_fields=['status', 'message'])
+
+            return True
+
+        except Exception as e:
+            logger.error(f"Error handling M-Pesa callback: {str(e)}", exc_info=True)
+            return False
     
     @staticmethod
     def process_paypal_payment(data):

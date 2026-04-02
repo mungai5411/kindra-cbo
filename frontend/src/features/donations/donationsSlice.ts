@@ -203,6 +203,18 @@ export const processPayment = createAsyncThunk(
     }
 );
 
+export const checkMpesaStatus = createAsyncThunk(
+    'donations/checkMpesaStatus',
+    async (checkoutRequestId: string, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get(`${endpoints.donations.mpesaStatus}?checkout_request_id=${checkoutRequestId}`);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to check M-Pesa status');
+        }
+    }
+);
+
 export const fetchMaterialDonations = createAsyncThunk(
     'donations/fetchMaterialDonations',
     async (_, { rejectWithValue }) => {

@@ -614,3 +614,24 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+# ==================================
+# DARAJA M-PESA CONFIGURATION
+# ==================================
+
+# Support both DARAJA_* and MPESA_* env var naming conventions for compatibility
+DARAJA_ENVIRONMENT = config('DARAJA_ENVIRONMENT', default=config('MPESA_ENVIRONMENT', default='sandbox'))
+DARAJA_CONSUMER_KEY = config('DARAJA_CONSUMER_KEY', default=config('MPESA_CONSUMER_KEY', default=''))
+DARAJA_CONSUMER_SECRET = config('DARAJA_CONSUMER_SECRET', default=config('MPESA_CONSUMER_SECRET', default=''))
+DARAJA_SHORTCODE = config('DARAJA_SHORTCODE', default=config('MPESA_SHORTCODE', default=''))
+DARAJA_PASSKEY = config('DARAJA_PASSKEY', default=config('MPESA_PASSKEY', default=''))
+
+# Backend URL for Daraja Callback
+BACKEND_URL = config('BACKEND_URL', default='http://localhost:8000')
+DARAJA_CALLBACK_URL = config(
+    'DARAJA_CALLBACK_URL',
+    default=config(
+        'MPESA_CALLBACK_URL',
+        default=f'{BACKEND_URL}/api/v1/donations/payments/mpesa/callback/'
+    )
+)
+

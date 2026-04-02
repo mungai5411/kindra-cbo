@@ -9,7 +9,7 @@ from .views import (
     DonationListCreateView, DonationDetailView, ReceiptListView, ReceiptDetailView,
     MaterialDonationListCreateView, MaterialDonationDetailView,
     DonationImpactListCreateView, DonationImpactDetailView, submit_impact_summary,
-    process_mpesa_payment, process_paypal_payment, process_stripe_payment,
+    process_mpesa_payment, mpesa_callback, check_payment_status, process_paypal_payment, process_stripe_payment,
     approve_donation, reject_donation,
     approve_material_donation, reject_material_donation,
     download_material_acknowledgment, download_receipt,
@@ -40,6 +40,8 @@ urlpatterns = [
     
     # Payment processing endpoints
     path('payments/mpesa/', process_mpesa_payment, name='mpesa-payment'),
+    path('payments/mpesa/callback/', mpesa_callback, name='mpesa-callback'),
+    path('payments/mpesa/status/', check_payment_status, name='mpesa-status'),
     path('payments/paypal/', process_paypal_payment, name='paypal-payment'),
     path('payments/stripe/', process_stripe_payment, name='stripe-payment'),
     

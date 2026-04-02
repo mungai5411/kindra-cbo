@@ -191,14 +191,14 @@ class ReceiptDetailView(generics.RetrieveAPIView):
 @permission_classes([permissions.AllowAny])
 @throttle_classes([PaymentRateThrottle])
 def process_mpesa_payment(request):
-    """Process M-Pesa payment (simulated)"""
+    """Initiate M-Pesa STK Push payment"""
     try:
-        donation, receipt = PaymentService.process_mpesa_payment(request.data)
+        donation, receipt_ignored = PaymentService.process_mpesa_payment(request.data)
         return Response({
             'status': 'success',
-            'message': 'Donation received and pending admin approval',
+            'message': 'M-Pesa STK Push initiated. Please check your phone to complete the payment.',
             'transaction_id': donation.transaction_id,
-            'receipt_id': receipt.id if receipt else None
+            'checkout_request_id': donation.payment_reference  # Send back so frontend can track if needed
         }, status=status.HTTP_200_OK)
     except ValueError as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -208,6 +208,58 @@ def process_mpesa_payment(request):
             {'error': 'Something went wrong. Please try again later.'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def mpesa_callback(request):
+    """
+    Webhook for Daraja API STK Push Callback.
+    Receives JSON payload from Safaricom.
+    """
+    try:
+        # Safaricom sends JSON data
+        success = PaymentService.handle_mpesa_callback(request.data)
+        if success:
+            # Safaricom expects a success response regardless of payment success/fail
+            # so long as we received the payload correctly
+            return Response(
+                {"ResultCode": 0, "ResultDesc": "Success"}, 
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {"ResultCode": 1, "ResultDesc": "Failed to process"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    except Exception as e:
+        logger.error(f"Unhandled error in M-Pesa callback: {str(e)}")
+        return Response(
+            {"ResultCode": 1, "ResultDesc": "Server Error"}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def check_payment_status(request):
+    """
+    Check the status of an M-Pesa STK Push payment by CheckoutRequestID
+    Used by frontend for lightweight polling
+    """
+    checkout_request_id = request.query_params.get('checkout_request_id')
+    if not checkout_request_id:
+        return Response({'error': 'checkout_request_id parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        donation = Donation.objects.get(payment_reference=checkout_request_id)
+        return Response({
+            'status': donation.status,
+            'transaction_id': donation.transaction_id,
+            'message': donation.message
+        }, status=status.HTTP_200_OK)
+    except Donation.DoesNotExist:
+        return Response({'error': 'Transaction not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(['POST'])

@@ -3,9 +3,10 @@
  * Multi-payment method donation form supporting M-Pesa, PayPal, and Stripe
  */
 
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../../store';
+import { checkMpesaStatus } from '../../features/donations/donationsSlice';
 import {
     Dialog,
     DialogTitle,
@@ -46,7 +47,9 @@ const PRESET_AMOUNTS = [500, 1000, 2500, 5000, 10000];
 
 export default function DonationDialog({ open, onClose, campaign }: DonationDialogProps) {
     const theme = useTheme();
+    const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: RootState) => state.auth);
+    const { donations } = useSelector((state: RootState) => state.donations);
 
     const [paymentMethod, setPaymentMethod] = useState<'MPESA' | 'PAYPAL' | 'STRIPE'>('MPESA');
     const [amount, setAmount] = useState('');
@@ -60,6 +63,33 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
     const [error, setError] = useState('');
     const [transactionId, setTransactionId] = useState('');
     const [receiptId, setReceiptId] = useState<string | null>(null);
+    const [checkoutRequestId, setCheckoutRequestId] = useState('');
+    const [mpesaStatus, setMpesaStatus] = useState<'pending' | 'success' | 'failed'>('pending');
+
+    // Poll for M-Pesa STK Push completion
+    useEffect(() => {
+        let interval: any;
+        if (success && paymentMethod === 'MPESA' && mpesaStatus === 'pending' && checkoutRequestId) {
+            interval = setInterval(async () => {
+                try {
+                    const resultAction = await dispatch(checkMpesaStatus(checkoutRequestId));
+                    if (checkMpesaStatus.fulfilled.match(resultAction)) {
+                        const data = resultAction.payload;
+                        if (data.status === 'COMPLETED') {
+                            setMpesaStatus('success');
+                            setTransactionId(data.transaction_id);
+                        } else if (data.status === 'FAILED') {
+                            setMpesaStatus('failed');
+                            setError(data.message || 'Payment failed or was cancelled by user.');
+                        }
+                    }
+                } catch (err) {
+                    console.error("Polling error", err);
+                }
+            }, 3000); // Poll every 3 seconds for snappy feedback
+        }
+        return () => clearInterval(interval);
+    }, [success, paymentMethod, mpesaStatus, checkoutRequestId, dispatch]);
 
     const handleAmountSelect = (value: number) => {
         setAmount(value.toString());
@@ -108,8 +138,10 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
 
             const response = await apiClient.post(endpoint, payload);
 
-            setTransactionId(response.data.transaction_id);
-            setReceiptId(response.data.receipt_id);
+            setTransactionId(response.data.transaction_id || '');
+            setReceiptId(response.data.receipt_id || null);
+            setCheckoutRequestId(response.data.checkout_request_id || '');
+            setMpesaStatus('pending');
             setSuccess(true);
         } catch (err: any) {
             setError(err.response?.data?.error || 'Payment failed. Please try again.');
@@ -126,6 +158,8 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
             setSuccess(false);
             setError('');
             setTransactionId('');
+            setCheckoutRequestId('');
+            setMpesaStatus('pending');
             setReceiptId(null);
             onClose();
         }
@@ -173,20 +207,43 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                             exit={{ opacity: 0 }}
                         >
                             <Box sx={{ textAlign: 'center', py: 4 }}>
-                                <CheckCircle sx={{ fontSize: 80, color: 'success.main', mb: 2 }} />
-                                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                                    Thank You! 🎉
-                                </Typography>
-                                <Typography variant="body1" color="text.secondary" paragraph>
-                                    Your donation of <strong>{campaign.currency} {amount}</strong> has been received and is pending approval.
-                                </Typography>
-                                <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
-                                    Transaction ID: <strong>{transactionId}</strong>
-                                </Alert>
-                                <Typography variant="caption" color="text.secondary">
-                                    Your donation will be reflected in the campaign progress once approved by our admin team.
-                                    You'll receive a confirmation email shortly.
-                                </Typography>
+                                {paymentMethod === 'MPESA' && mpesaStatus === 'pending' ? (
+                                    <>
+                                        <CircularProgress size={80} sx={{ color: 'primary.main', mb: 2 }} />
+                                        <Typography variant="h5" fontWeight="bold" gutterBottom>
+                                            Check Your Phone! 📱
+                                        </Typography>
+                                        <Typography variant="body1" color="text.secondary" paragraph>
+                                            An M-Pesa prompt has been sent to your phone. Please enter your M-Pesa PIN to complete the donation of <strong>{campaign.currency} {amount}</strong>. Waiting for completion...
+                                        </Typography>
+                                    </>
+                                ) : paymentMethod === 'MPESA' && mpesaStatus === 'failed' ? (
+                                    <>
+                                        <Close sx={{ fontSize: 80, color: 'error.main', mb: 2 }} />
+                                        <Typography variant="h5" fontWeight="bold" color="error.main" gutterBottom>
+                                            Payment Failed
+                                        </Typography>
+                                        <Typography variant="body1" color="text.secondary" paragraph>
+                                            {error || 'The M-Pesa STK push failed or was cancelled.'}
+                                        </Typography>
+                                    </>
+                                ) : (
+                                    <>
+                                        <CheckCircle sx={{ fontSize: 80, color: 'success.main', mb: 2 }} />
+                                        <Typography variant="h5" fontWeight="bold" gutterBottom>
+                                            Thank You! 🎉
+                                        </Typography>
+                                        <Typography variant="body1" color="text.secondary" paragraph>
+                                            Your donation of <strong>{campaign.currency} {amount}</strong> has been received successfully.
+                                        </Typography>
+                                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
+                                            Transaction ID: <strong>{transactionId}</strong>
+                                        </Alert>
+                                        <Typography variant="caption" color="text.secondary">
+                                            Your donation will be reflected in the campaign progress. You'll receive a confirmation email shortly.
+                                        </Typography>
+                                    </>
+                                )}
                             </Box>
                         </motion.div>
                     ) : (

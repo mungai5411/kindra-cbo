@@ -628,13 +628,13 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                 </DialogActions>
             </Dialog>
 
-            {/* Donation Simulation Dialog */}
+            {/* Gateway Payment Dialog */}
             <Dialog open={openDonationDialog} onClose={() => setOpenDonationDialog(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 4, boxShadow: theme.shadows[10] } }}>
-                <DialogTitle sx={{ fontWeight: 'bold' }}>Simulate Gateway Payment</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Initiate Payment</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
                         <Typography variant="body2" color="text.secondary">
-                            Testing payment for: <strong>{selectedCampaign?.title}</strong>
+                            Processing payment for: <strong>{selectedCampaign?.title}</strong>
                         </Typography>
 
                         <TextField
@@ -687,7 +687,7 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                         )}
 
                         <Alert severity="info" sx={{ borderRadius: 2 }}>
-                            This will trigger the backend simulation loop, updating campaign totals and generating a receipt.
+                            For M-Pesa, this will trigger a real STK Push to the donor's phone. The donation will be marked pending until the webhook callback is received from Safaricom Daraja API.
                         </Alert>
                     </Box>
                 </DialogContent>

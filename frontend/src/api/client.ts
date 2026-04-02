@@ -175,6 +175,7 @@ export const endpoints = {
         donors: '/donations/donors/',
         receipts: '/donations/receipts/',
         mpesa: '/donations/payments/mpesa/',
+        mpesaStatus: '/donations/payments/mpesa/status/',
         paypal: '/donations/payments/paypal/',
         stripe: '/donations/payments/stripe/',
         materialDonations: '/donations/material-donations/',
