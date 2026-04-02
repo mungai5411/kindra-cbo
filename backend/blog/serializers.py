@@ -152,6 +152,7 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
     comment_count = serializers.SerializerMethodField()
     likes_count = serializers.SerializerMethodField()
     has_liked = serializers.SerializerMethodField()
+    gallery_images = serializers.SerializerMethodField()
     
     class Meta:
         model = BlogPost
@@ -161,9 +162,9 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
             'meta_description', 'meta_keywords', 'og_image', 'status', 
             'is_featured', 'allow_comments', 'view_count', 'author', 'author_name',
             'published_at', 'created_at', 'updated_at', 'has_liked',
-            'comment_count', 'likes_count'
+            'comment_count', 'likes_count', 'gallery_images'
         ]
-        read_only_fields = ('id', 'slug', 'view_count', 'author', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'slug', 'view_count', 'author', 'created_at', 'updated_at', 'gallery_images')
         extra_kwargs = {
             'featured_image': {'required': False, 'allow_null': True},
             'excerpt': {'required': False, 'allow_blank': True, 'allow_null': True},
@@ -186,6 +187,11 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
         
         ip_address = request.META.get('REMOTE_ADDR')
         return obj.likes.filter(ip_address=ip_address, user__isnull=True).exists()
+
+    def get_gallery_images(self, obj):
+        # Fetch associated media assets
+        assets = MediaAsset.objects.filter(source_id=obj.id, source_type='STORY')
+        return MediaAssetSerializer(assets, many=True, context=self.context).data
 
 
 class CommentSerializer(serializers.ModelSerializer):

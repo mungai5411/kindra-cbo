@@ -75,6 +75,9 @@ const USER_ROLES = [
 ];
 
 import { ImageUploader } from '../components/common/ImageUploader';
+import CustomRichTextEditor from '../components/common/CustomRichTextEditor';
+import { MultipleImageUploader, MediaItem } from '../components/common/MultipleImageUploader';
+import apiClient from '../api/client';
 
 export default function DashboardPage() {
     const dispatch = useDispatch<AppDispatch>();
@@ -115,7 +118,8 @@ export default function DashboardPage() {
         urgency: 'MEDIUM',
         start_date: new Date().toISOString().split('T')[0],
         end_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        image: null as File | null
+        image: null as File | null,
+        gallery_images: [] as MediaItem[]
     });
 
     const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
@@ -244,7 +248,21 @@ export default function DashboardPage() {
                 formData.append('featured_image', campaignForm.image);
             }
 
-            await dispatch(addCampaign(formData)).unwrap();
+            const res = await dispatch(addCampaign(formData)).unwrap();
+            const savedCampaignId = res.id;
+
+            for (const item of campaignForm.gallery_images) {
+                if (item.file && savedCampaignId) {
+                    const mediaForm = new FormData();
+                    mediaForm.append('file', item.file);
+                    mediaForm.append('source_type', 'CAMPAIGN');
+                    mediaForm.append('source_id', savedCampaignId);
+                    await apiClient.post('/blog/admin/media/', mediaForm, {
+                        headers: { 'Content-Type': 'multipart/form-data' }
+                    });
+                }
+            }
+
             setOpenCampaignDialog(false);
             setCampaignForm({
                 title: '',
@@ -254,7 +272,8 @@ export default function DashboardPage() {
                 urgency: 'MEDIUM',
                 start_date: new Date().toISOString().split('T')[0],
                 end_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                image: null
+                image: null,
+                gallery_images: []
             });
         } catch (error) {
             console.error('Failed to create campaign:', error);
@@ -594,14 +613,18 @@ export default function DashboardPage() {
                                 />
                             </Grid>
                         </Grid>
-                        <TextField
-                            fullWidth
-                            label="Description"
-                            multiline
-                            rows={3}
-                            value={campaignForm.description}
-                            onChange={(e) => setCampaignForm({ ...campaignForm, description: e.target.value })}
-                        />
+                        
+                        <Box sx={{ mt: 1 }}>
+                            <Typography variant="body2" color="text.secondary" gutterBottom fontWeight="600">
+                                Campaign Description
+                            </Typography>
+                            <CustomRichTextEditor
+                                value={campaignForm.description}
+                                onChange={(val) => setCampaignForm({ ...campaignForm, description: val })}
+                                placeholder="Describe the campaign mission and impact..."
+                            />
+                        </Box>
+
                         <Box sx={{ mt: 1 }}>
                             <ImageUploader
                                 label="Campaign Image"
@@ -610,6 +633,15 @@ export default function DashboardPage() {
                                 onChange={(file) => setCampaignForm({ ...campaignForm, image: file })}
                                 maxSizeMB={5}
                                 showPreview={true}
+                            />
+                        </Box>
+                        
+                        <Box sx={{ mt: 1 }}>
+                            <MultipleImageUploader
+                                label="Campaign Media Gallery"
+                                helperText="Upload supplementary images"
+                                values={campaignForm.gallery_images}
+                                onChange={(files) => setCampaignForm({ ...campaignForm, gallery_images: files })}
                             />
                         </Box>
                     </Box>

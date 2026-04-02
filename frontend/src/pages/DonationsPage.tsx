@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Container, Grid, Card, CardContent, Typography, Box, Button,
@@ -21,6 +22,7 @@ import MaterialDonationDialog from '../components/campaigns/MaterialDonationDial
 
 export default function DonationsPage() {
     const theme = useTheme();
+    const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const { campaigns, isLoading } = useSelector((state: RootState) => state.donations);
 
@@ -324,6 +326,7 @@ export default function DonationsPage() {
                                                     {/* Card Media Header */}
                                                     <Box sx={{ position: 'relative', height: 240, overflow: 'hidden' }}>
                                                         <Box
+                                                            onClick={() => navigate(`/campaigns/${campaign.slug || campaign.id}`)}
                                                             sx={{
                                                                 width: '100%',
                                                                 height: '100%',
@@ -331,6 +334,7 @@ export default function DonationsPage() {
                                                                 backgroundImage: campaign.featured_image ? `url(${campaign.featured_image})` : 'none',
                                                                 backgroundSize: 'cover',
                                                                 backgroundPosition: 'center',
+                                                                cursor: 'pointer',
                                                                 transition: 'transform 0.6s ease',
                                                                 '&:hover': { transform: 'scale(1.05)' }
                                                             }}
@@ -358,11 +362,20 @@ export default function DonationsPage() {
                                                     </Box>
 
                                                     <CardContent sx={{ flexGrow: 1, p: 4 }}>
-                                                        <Typography variant="h4" sx={{ mb: 2, fontSize: '1.4rem', fontWeight: 800 }}>
+                                                        <Typography 
+                                                            variant="h4" 
+                                                            onClick={() => navigate(`/campaigns/${campaign.slug || campaign.id}`)}
+                                                            sx={{ 
+                                                                mb: 2, 
+                                                                fontSize: '1.4rem', 
+                                                                fontWeight: 800,
+                                                                cursor: 'pointer',
+                                                                '&:hover': { color: 'primary.main' }
+                                                            }}>
                                                             {campaign.title}
                                                         </Typography>
                                                         <Typography variant="body2" color="text.secondary" sx={{ mb: 4, height: 60, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
-                                                            {campaign.description}
+                                                            {campaign.description?.replace(/<[^>]+>/g, '') || ''}
                                                         </Typography>
 
                                                         <Box sx={{ mt: 'auto' }}>

@@ -181,19 +181,60 @@ export default function BlogPostPage() {
                     bgcolor: 'background.paper',
                     mb: 4
                 }}>
-                    <Typography
-                        variant="body1"
+                    <Box
                         sx={{
                             fontSize: '1.2rem',
                             lineHeight: 1.8,
                             color: 'text.primary',
                             fontFamily: '"Outfit", sans-serif',
-                            whiteSpace: 'pre-wrap',
-                            '& p': { mb: 3 }
+                            padding: 0,
+                            '& p': { mb: 3 },
+                            '& img': { maxWidth: '100%', borderRadius: 2, my: 4, display: 'block' },
+                            '& blockquote': { borderLeft: '4px solid', borderColor: 'primary.main', pl: 3, fontStyle: 'italic', color: 'text.secondary', bgcolor: alpha(theme.palette.primary.main, 0.05), py: 2, borderRadius: 1 }
                         }}
-                    >
-                        {currentPost.content}
-                    </Typography>
+                        dangerouslySetInnerHTML={{ __html: currentPost.content }}
+                    />
+
+                    {/* Media Carousel */}
+                    {currentPost.gallery_images && currentPost.gallery_images.length > 0 && (
+                        <Box sx={{ mt: 6, mb: 4 }}>
+                            <Typography variant="h5" fontWeight="900" gutterBottom sx={{ letterSpacing: -0.5 }}>
+                                Media Gallery
+                            </Typography>
+                            <Box sx={{
+                                display: 'flex',
+                                gap: 2,
+                                overflowX: 'auto',
+                                pb: 2,
+                                pt: 1,
+                                px: 1,
+                                ml: -1,
+                                scrollSnapType: 'x mandatory',
+                                '&::-webkit-scrollbar': { height: 8 },
+                                '&::-webkit-scrollbar-thumb': { bgcolor: alpha(theme.palette.primary.main, 0.3), borderRadius: 4 },
+                                '&::-webkit-scrollbar-track': { bgcolor: alpha(theme.palette.divider, 0.1), borderRadius: 4 }
+                            }}>
+                                {currentPost.gallery_images.map((img: any) => (
+                                    <Box
+                                        key={img.id}
+                                        component="img"
+                                        src={img.file}
+                                        alt={img.alt_text || 'Gallery Media'}
+                                        sx={{
+                                            height: { xs: 200, md: 300 },
+                                            minWidth: { xs: 250, md: 350 },
+                                            objectFit: 'cover',
+                                            borderRadius: 3,
+                                            scrollSnapAlign: 'start',
+                                            boxShadow: theme.shadows[4],
+                                            transition: 'transform 0.3s ease',
+                                            '&:hover': { transform: 'scale(1.02)' }
+                                        }}
+                                    />
+                                ))}
+                            </Box>
+                        </Box>
+                    )}
 
                     <Divider sx={{ my: 4 }} />
 

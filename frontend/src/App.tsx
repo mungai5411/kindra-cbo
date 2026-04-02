@@ -23,6 +23,7 @@ import AboutPage from './pages/AboutPage';
 import StoriesPage from './pages/StoriesPage';
 import BlogPostPage from './pages/BlogPostPage';
 import DonationsPage from './pages/DonationsPage';
+import CampaignPage from './pages/CampaignPage';
 // RegisterPage removed
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -114,6 +115,8 @@ function App() {
                             <Route path="/stories/:slug" element={<BlogPostPage />} />
 
                             <Route path="/donate" element={<DonationsPage />} />
+                            <Route path="/campaigns" element={<DonationsPage />} />
+                            <Route path="/campaigns/:slug" element={<CampaignPage />} />
                             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                             <Route path="/reset-password" element={<ResetPasswordPage />} />
                             <Route path="/verify" element={<VerifyEmailPage />} />

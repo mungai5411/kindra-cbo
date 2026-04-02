@@ -47,6 +47,8 @@ import { Avatar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ImageUploader } from '../common/ImageUploader';
+import CustomRichTextEditor from '../common/CustomRichTextEditor';
+import { MultipleImageUploader, MediaItem } from '../common/MultipleImageUploader';
 
 // Status Chip Component
 const StatusChip = ({ status }: { status: string }) => {
@@ -106,7 +108,8 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
         status: 'DRAFT',
         category: '',
         tag_ids: [] as string[],
-        featured_image: null as File | null
+        featured_image: null as File | null,
+        gallery_images: [] as MediaItem[]
     });
 
     const [metaFormData, setMetaFormData] = useState({
@@ -124,7 +127,7 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
     // Handlers
     const handleOpenCreate = () => {
         setSelectedPost(null);
-        setFormData({ title: '', content: '', excerpt: '', status: 'DRAFT', category: '', tag_ids: [], featured_image: null });
+        setFormData({ title: '', content: '', excerpt: '', status: 'DRAFT', category: '', tag_ids: [], featured_image: null, gallery_images: [] });
         setOpenDialog(true);
     };
 
@@ -137,7 +140,11 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
             status: post.status,
             category: post.category?.id || '',
             tag_ids: post.tags?.map((t: any) => t.id) || [],
-            featured_image: null
+            featured_image: null,
+            gallery_images: (post.gallery_images || []).map((img: any) => ({
+                id: img.id,
+                url: img.file
+            }))
         });
         setOpenDialog(true);
     };
@@ -231,11 +238,29 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                 formDataToSubmit.append('featured_image', formData.featured_image);
             }
 
+            let savedPostId = null;
+
             if (selectedPost) {
-                await dispatch(updatePost({ id: selectedPost.id, data: formDataToSubmit })).unwrap();
+                const res = await dispatch(updatePost({ id: selectedPost.id, data: formDataToSubmit })).unwrap();
+                savedPostId = res.id;
             } else {
-                await dispatch(createPost(formDataToSubmit)).unwrap();
+                const res = await dispatch(createPost(formDataToSubmit)).unwrap();
+                savedPostId = res.id;
             }
+
+            // Upload gallery images
+            for (const item of formData.gallery_images) {
+                if (item.file && savedPostId) {
+                    const mediaForm = new FormData();
+                    mediaForm.append('file', item.file);
+                    mediaForm.append('source_type', 'STORY');
+                    mediaForm.append('source_id', savedPostId);
+                    await apiClient.post('/blog/admin/media/', mediaForm, {
+                        headers: { 'Content-Type': 'multipart/form-data' }
+                    });
+                }
+            }
+
             setOpenDialog(false);
             dispatch(fetchAdminPosts()); // Refresh list
         } catch (error) {
@@ -746,16 +771,16 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                             </Grid>
                         </Grid>
 
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={6}
-                            label="Story Content"
-                            placeholder="Write the impact story here..."
-                            value={formData.content}
-                            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
-                        />
+                        <Box sx={{ mt: 2 }}>
+                            <Typography variant="body2" color="text.secondary" gutterBottom fontWeight="600">
+                                Story Content
+                            </Typography>
+                            <CustomRichTextEditor
+                                value={formData.content}
+                                onChange={(val) => setFormData({ ...formData, content: val })}
+                                placeholder="Write the impact story here..."
+                            />
+                        </Box>
 
                         <Box sx={{ mt: 0 }}>
                             <ImageUploader
@@ -780,6 +805,18 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                                 }}
                                 maxSizeMB={5}
                                 showPreview={true}
+                            />
+                        </Box>
+
+                        <Box sx={{ mt: 1 }}>
+                            <MultipleImageUploader
+                                label="Story Media Gallery"
+                                helperText="Upload supplementary images (carousel format)"
+                                values={formData.gallery_images}
+                                onChange={(files) => setFormData({ ...formData, gallery_images: files })}
+                                onDelete={async (id) => {
+                                    await apiClient.delete(`/blog/admin/media/${id}/`);
+                                }}
                             />
                         </Box>
 

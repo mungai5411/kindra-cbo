@@ -18,11 +18,16 @@ class DonorSerializer(serializers.ModelSerializer):
 
 class CampaignSerializer(serializers.ModelSerializer):
     progress_percentage = serializers.ReadOnlyField()
+    gallery_images = serializers.SerializerMethodField()
     
     class Meta:
         model = Campaign
         fields = '__all__'
-        read_only_fields = ('id', 'slug', 'raised_amount', 'created_by', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'slug', 'raised_amount', 'created_by', 'created_at', 'updated_at', 'gallery_images')
+
+    def get_gallery_images(self, obj):
+        assets = MediaAsset.objects.filter(source_id=obj.id, source_type='CAMPAIGN')
+        return MediaAssetSerializer(assets, many=True, context=self.context).data
 
 
 class DonationSerializer(serializers.ModelSerializer):
