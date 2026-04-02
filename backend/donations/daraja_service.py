@@ -40,8 +40,8 @@ class DarajaService:
         if response.status_code == 200:
             return response.json().get('access_token')
         else:
-            logger.error(f"Failed to get Daraja access token: {response.text}")
-            raise Exception("Could not authenticate with M-Pesa API")
+            logger.error(f"Failed to get Daraja access token. Status: {response.status_code} | Body: {response.text} | Consumer Key used: {consumer_key[:6]}...{consumer_key[-4:]}")
+            raise Exception(f"Could not authenticate with M-Pesa API (HTTP {response.status_code}): {response.text}")
 
     @classmethod
     def initiate_stk_push(cls, phone_number, amount, account_reference, transaction_desc):
