@@ -419,7 +419,7 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
         }
     };
 
-    const renderShelters = () => (
+    const renderShelterHome = () => (
         <Paper sx={{ p: 0, borderRadius: 4, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
             <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
                 <Box>

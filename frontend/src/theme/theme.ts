@@ -45,7 +45,7 @@ const darkPalette = {
 export const getTheme = (mode: 'light' | 'dark'): Theme => {
     const palette = mode === 'light' ? lightPalette : darkPalette;
 
-    let theme = createTheme({
+    const theme = createTheme({
         palette,
         typography: {
             fontFamily: '"Outfit", "Inter", "Roboto", "Helvetica", "Arial", sans-serif',

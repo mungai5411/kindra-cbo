@@ -59,6 +59,7 @@ const ImpactTrackingView: React.FC = () => {
     const { assets } = useAppSelector((state) => state.media);
     const { user } = useAppSelector((state) => state.auth);
     const { shelters } = useAppSelector((state) => state.shelters);
+    const isAdmin = user?.is_superuser || user?.role === 'ADMIN' || user?.role === 'MANAGEMENT';
 
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,16 +77,21 @@ const ImpactTrackingView: React.FC = () => {
     useEffect(() => {
         dispatch(fetchImpacts());
         dispatch(fetchMedia());
+    }, [dispatch]);
 
-        // Auto-select shelter if user is a partner
-        if (shelters && shelters.length > 0) {
+    // Auto-select shelter if user is a partner or once shelters load
+    useEffect(() => {
+        if (shelters && shelters.length > 0 && !formData.shelter_home) {
             setFormData(prev => ({ ...prev, shelter_home: shelters[0].id }));
         }
-    }, [dispatch, shelters]);
+    }, [shelters, formData.shelter_home]);
 
     const handleFormChange = (e: any) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type } = e.target;
+        setFormData(prev => ({ 
+            ...prev, 
+            [name]: type === 'number' ? Number(value) : value 
+        }));
     };
 
     const handleMediaChange = (event: any) => {
@@ -271,9 +277,9 @@ const ImpactTrackingView: React.FC = () => {
                                             ) : (
                                                 <Typography variant="caption" color="text.disabled">No media</Typography>
                                             )}
-                                            {impact.media_assets && impact.media_assets.length > 1 && (
-                                                <Typography variant="caption" sx={{ ml: 0.5, display: 'flex', alignItems: 'center' }}>
-                                                    +{impact.media_assets.length}
+                                            {impact.media_assets && impact.media_assets.length > 3 && (
+                                                <Typography variant="caption" sx={{ ml: 0.5, display: 'flex', alignItems: 'center', color: 'text.secondary', fontWeight: 'bold' }}>
+                                                    +{impact.media_assets.length - 3}
                                                 </Typography>
                                             )}
                                         </Box>
@@ -345,6 +351,23 @@ const ImpactTrackingView: React.FC = () => {
                                 }}
                             />
                         </Grid>
+                        {isAdmin && (
+                            <Grid item xs={12}>
+                                <FormControl fullWidth required>
+                                    <InputLabel>Target Shelter Home</InputLabel>
+                                    <Select
+                                        name="shelter_home"
+                                        value={formData.shelter_home}
+                                        label="Target Shelter Home"
+                                        onChange={handleFormChange}
+                                    >
+                                        {shelters.map((s: any) => (
+                                            <MenuItem key={s.id} value={s.id}>{s.name} ({s.location || s.county})</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        )}
                         <Grid item xs={12}>
                             <FormControl fullWidth>
                                 <InputLabel>Attach Proof (from Library)</InputLabel>
