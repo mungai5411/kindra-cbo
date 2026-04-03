@@ -1,13 +1,13 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import {
     Box, IconButton, Paper, Tooltip, Divider, CircularProgress,
-    MenuItem, Select, FormControl, ToggleButton, ToggleButtonGroup, alpha, useTheme
+    MenuItem, Select, ToggleButton, ToggleButtonGroup, alpha, useTheme
 } from '@mui/material';
 import {
     FormatBold, FormatItalic, FormatUnderlined, FormatListBulleted,
     FormatListNumbered, FormatQuote, Image, Code,
     FormatAlignLeft, FormatAlignCenter, FormatAlignRight, FormatAlignJustify,
-    Link, HorizontalRule, Undo, Redo, Title, FormatSize, TextFields
+    Link, HorizontalRule, Undo, Redo, TextFields
 } from '@mui/icons-material';
 
 interface CustomRichTextEditorProps {
@@ -311,7 +311,7 @@ export default function CustomRichTextEditor({ value, onChange, placeholder, min
                 <Tooltip title="Dropcap Paragraph">
                     <ToggleButton
                         size="small"
-                        val="dropcap"
+                        value="dropcap"
                         selected={activeFormats.isDropcap}
                         onClick={handleDropcap}
                         sx={{ border: 'none', borderRadius: 1 }}
