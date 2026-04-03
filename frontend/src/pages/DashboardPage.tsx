@@ -268,6 +268,21 @@ export default function DashboardPage() {
         }
     };
 
+    const handleCampaignRichTextImageUpload = async (file: File) => {
+        const mediaForm = new FormData();
+        mediaForm.append('file', file);
+        mediaForm.append('source_type', 'CAMPAIGN');
+        if (selectedCampaignForEdit?.id) {
+            mediaForm.append('source_id', selectedCampaignForEdit.id);
+        }
+        
+        const response = await apiClient.post('/blog/admin/media/', mediaForm, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        
+        return response.data.file;
+    };
+
     const handleCreateCampaign = async () => {
         try {
             const formData = new FormData();
@@ -661,6 +676,7 @@ export default function DashboardPage() {
                             <CustomRichTextEditor
                                 value={campaignForm.description}
                                 onChange={(val) => setCampaignForm({ ...campaignForm, description: val })}
+                                onImageUpload={handleCampaignRichTextImageUpload}
                                 placeholder="Describe the campaign mission and impact..."
                             />
                         </Box>
