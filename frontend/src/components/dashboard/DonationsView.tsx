@@ -36,11 +36,9 @@ import {
     Refresh,
     PhoneAndroid,
     CreditCard,
-    DonutLarge,
     LocationOn,
     Schedule,
     Event as EventIcon,
-    BusinessCenter,
     Verified,
     InfoOutlined
 } from '@mui/icons-material';
@@ -64,7 +62,7 @@ import {
 } from '../../features/donations/donationsSlice';
 import { fetchEvents } from '../../features/volunteers/volunteersSlice';
 import { getRandomMessage } from '../../utils/heartwarmingMessages';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
 import { ConfirmationDialog } from './ConfirmationDialog';
 import { downloadFile } from '../../utils/downloadHelper';
@@ -75,7 +73,7 @@ interface DonationsViewProps {
     onTabChange?: (tabId: string) => void;
 }
 
-export function DonationsView({ setOpenDialog, activeTab, onTabChange }: DonationsViewProps) {
+export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
     const { campaigns, donations, donors, receipts, materialDonations } = useSelector((state: RootState) => state.donations);
@@ -1251,7 +1249,7 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
                             borderColor: alpha(theme.palette.divider, 0.08),
                             bgcolor: alpha(theme.palette.background.paper, 0.6),
                             backdropFilter: 'blur(10px)',
-                            height: '100%'
+                            minHeight: 450
                         }}>
                             <Typography variant="h6" sx={{ fontWeight: 900, mb: 4, letterSpacing: -0.5 }}>Strategic Fund Allocation</Typography>
                             <FundAllocationChart data={allocationData} />
@@ -1384,18 +1382,18 @@ export function DonationsView({ setOpenDialog, activeTab, onTabChange }: Donatio
     };
 
 
-    const tabsSource = [
-        { id: 'campaigns', label: 'Campaigns', component: renderCampaigns(), icon: <VolunteerActivism /> },
-        { id: 'impact_analytics', label: 'Analytics', component: renderImpactAnalytics(), icon: <DonutLarge />, hidden: !isDonor },
-        { id: 'material_donations', label: 'Material', component: renderMaterialDonations(), icon: <Box sx={{ fontSize: 20 }}>📦</Box> },
-        { id: 'donation_records', label: 'History', component: renderDonations(), icon: <MonetizationOn /> },
-        { id: 'donors', label: 'Partners', component: renderDonors(), icon: <Box sx={{ fontSize: 20 }}>🤝</Box>, hidden: !isManagement },
-        { id: 'receipts', label: 'Receipts', component: renderReceipts(), icon: <Receipt /> },
-        { id: 'community_events', label: 'Hub', component: renderCommunityEvents(), icon: <EventIcon /> },
-        { id: 'social_media', label: 'Social', component: <Box sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}><Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Nexus Protocol</Typography><Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Integrated social media tracking module pending initialization.</Typography></Box>, icon: <Box sx={{ fontSize: 20 }}>📱</Box>, hidden: !isManagement },
-    ];
+    // const tabsSource = [
+    //     { id: 'campaigns', label: 'Campaigns', component: renderCampaigns(), icon: <VolunteerActivism /> },
+    //     { id: 'impact_analytics', label: 'Analytics', component: renderImpactAnalytics(), icon: <DonutLarge />, hidden: !isDonor },
+    //     { id: 'material_donations', label: 'Material', component: renderMaterialDonations(), icon: <Box sx={{ fontSize: 20 }}>📦</Box> },
+    //     { id: 'donation_records', label: 'History', component: renderDonations(), icon: <MonetizationOn /> },
+    //     { id: 'donors', label: 'Partners', component: renderDonors(), icon: <Box sx={{ fontSize: 20 }}>🤝</Box>, hidden: !isManagement },
+    //     { id: 'receipts', label: 'Receipts', component: renderReceipts(), icon: <Receipt /> },
+    //     { id: 'community_events', label: 'Hub', component: renderCommunityEvents(), icon: <EventIcon /> },
+    //     { id: 'social_media', label: 'Social', component: <Box sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}><Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Nexus Protocol</Typography><Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Integrated social media tracking module pending initialization.</Typography></Box>, icon: <Box sx={{ fontSize: 20 }}>📱</Box>, hidden: !isManagement },
+    // ];
 
-    const tabs = tabsSource.filter(tab => !tab.hidden);
+    // const tabs = tabsSource.filter(tab => !tab.hidden);
 
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>

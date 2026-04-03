@@ -112,7 +112,7 @@ export const DonationTrendsChart = ({ data, embedded = false }: { data: any[], e
 
     return (
         <ChartCard title={embedded ? undefined : "Donation Trends"} hideCard={embedded}>
-            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+            <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={data} margin={{ left: -20, right: 0, top: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} vertical={false} />
                     <XAxis
@@ -150,7 +150,7 @@ export const CampaignProgressChart = ({ campaigns, embedded = false }: { campaig
 
     return (
         <ChartCard title={embedded ? undefined : "Campaign Goals"} hideCard={embedded}>
-            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+            <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={campaigns} layout="vertical" margin={{ left: 0, right: 20, top: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} horizontal={false} />
                     <XAxis type="number" hide />
@@ -181,7 +181,7 @@ export const VolunteerHoursChart = ({ data, embedded = false }: { data: any[], e
 
     return (
         <ChartCard title={embedded ? undefined : "Volunteer Contributions"} hideCard={embedded}>
-            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+            <ResponsiveContainer width="100%" height={300}>
                 <AreaChart data={data} margin={{ left: -20, right: 0, top: 10, bottom: 0 }}>
                     <defs>
                         <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
@@ -221,7 +221,7 @@ export const VolunteerHoursChart = ({ data, embedded = false }: { data: any[], e
 export const ChildrenDistributionChart = ({ data, embedded = false }: { data: any[], embedded?: boolean }) => {
     return (
         <ChartCard title={embedded ? undefined : "Child Demographics"} hideCard={embedded}>
-            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+            <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                     <Pie
                         data={data}
@@ -254,7 +254,7 @@ export const ChildrenDistributionChart = ({ data, embedded = false }: { data: an
 export const DonationMethodsChart = ({ data, embedded = false }: { data: any[], embedded?: boolean }) => {
     return (
         <ChartCard title={embedded ? undefined : "Donation Sources"} hideCard={embedded}>
-            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+            <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                     <Pie
                         data={data}
@@ -287,7 +287,7 @@ export const DonationMethodsChart = ({ data, embedded = false }: { data: any[], 
 export const FundAllocationChart = ({ data, title, hideCard = false }: { data: any[], title?: string, hideCard?: boolean }) => {
     return (
         <ChartCard title={title || "Impact Allocation"} hideCard={hideCard}>
-            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+            <ResponsiveContainer width="100%" height={350}>
                 <PieChart>
                     <Pie
                         data={data}
@@ -322,7 +322,7 @@ export const ShelterCapacityChart = ({ shelters, embedded = false }: { shelters:
 
     return (
         <ChartCard title={embedded ? undefined : "Shelter Occupancy"} hideCard={embedded}>
-            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+            <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={shelters} margin={{ left: -20, right: 0, top: 0, bottom: 0 }} barGap={2}>
                     <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.1)} vertical={false} />
                     <XAxis
@@ -405,7 +405,7 @@ export const ImpactTrendsChart = ({ data, embedded = false }: { data: any[], emb
 
     return (
         <ChartCard title={embedded ? undefined : "Impact Trends"} hideCard={embedded}>
-            <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+            <ResponsiveContainer width="100%" height={300}>
                 <AreaChart data={data} margin={{ left: -20, right: 0, top: 10, bottom: 0 }}>
                     <defs>
                         <linearGradient id="colorImproved" x1="0" y1="0" x2="0" y2="1">
