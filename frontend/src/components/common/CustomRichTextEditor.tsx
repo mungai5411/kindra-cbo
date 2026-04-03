@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Box, IconButton, Paper, Tooltip, Divider } from '@mui/material';
+import { Box, IconButton, Paper, Tooltip, Divider, CircularProgress } from '@mui/material';
 import {
     FormatBold, FormatItalic, FormatUnderlined, FormatListBulleted,
     FormatListNumbered, FormatQuote, Image, Code
@@ -10,11 +10,14 @@ interface CustomRichTextEditorProps {
     onChange: (value: string) => void;
     placeholder?: string;
     minHeight?: number;
+    onImageUpload?: (file: File) => Promise<string>;
 }
 
-export default function CustomRichTextEditor({ value, onChange, placeholder, minHeight = 200 }: CustomRichTextEditorProps) {
+export default function CustomRichTextEditor({ value, onChange, placeholder, minHeight = 200, onImageUpload }: CustomRichTextEditorProps) {
     const editorRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [isFocused, setIsFocused] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     // Sync external value to internal content editable if not focused
     useEffect(() => {
@@ -32,9 +35,30 @@ export default function CustomRichTextEditor({ value, onChange, placeholder, min
     };
 
     const handleImageInsert = () => {
-        const url = prompt('Enter Image URL:');
-        if (url) {
+        if (onImageUpload) {
+            fileInputRef.current?.click();
+        } else {
+            const url = prompt('Enter Image URL:');
+            if (url) {
+                execCmd('insertImage', url);
+            }
+        }
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !onImageUpload) return;
+
+        setIsUploading(true);
+        try {
+            const url = await onImageUpload(file);
             execCmd('insertImage', url);
+        } catch (error) {
+            console.error('Image upload failed:', error);
+            alert('Failed to upload image. Please try again.');
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
         }
     };
 
@@ -65,7 +89,20 @@ export default function CustomRichTextEditor({ value, onChange, placeholder, min
                 <Tooltip title="Blockquote"><IconButton size="small" onClick={() => execCmd('formatBlock', 'BLOCKQUOTE')}><FormatQuote fontSize="small" /></IconButton></Tooltip>
                 <Tooltip title="Code snippet"><IconButton size="small" onClick={() => execCmd('formatBlock', 'PRE')}><Code fontSize="small" /></IconButton></Tooltip>
                 <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-                <Tooltip title="Insert Image"><IconButton size="small" onClick={handleImageInsert}><Image fontSize="small" /></IconButton></Tooltip>
+                <Tooltip title="Insert Image">
+                    <IconButton size="small" onClick={handleImageInsert} disabled={isUploading}>
+                        {isUploading ? <CircularProgress size={16} color="primary" /> : <Image fontSize="small" />}
+                    </IconButton>
+                </Tooltip>
+                
+                {/* Hidden File Input */}
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                />
             </Box>
             <Box
                 ref={editorRef}

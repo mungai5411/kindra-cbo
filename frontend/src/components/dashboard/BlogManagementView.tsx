@@ -218,6 +218,21 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
         }
     };
 
+    const handleRichTextImageUpload = async (file: File) => {
+        const mediaForm = new FormData();
+        mediaForm.append('file', file);
+        mediaForm.append('source_type', 'STORY');
+        if (selectedPost?.id) {
+            mediaForm.append('source_id', selectedPost.id);
+        }
+        
+        const response = await apiClient.post('/blog/admin/media/', mediaForm, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        
+        return response.data.file;
+    };
+
     const handleSubmit = async () => {
         try {
             const formDataToSubmit = new FormData();
@@ -778,6 +793,7 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                             <CustomRichTextEditor
                                 value={formData.content}
                                 onChange={(val) => setFormData({ ...formData, content: val })}
+                                onImageUpload={handleRichTextImageUpload}
                                 placeholder="Write the impact story here..."
                             />
                         </Box>
