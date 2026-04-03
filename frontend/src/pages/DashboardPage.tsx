@@ -24,7 +24,8 @@ import {
     InputLabel,
     CircularProgress,
     Grid,
-    alpha
+    alpha,
+    Typography
 } from '@mui/material';
 
 import { logout, fetchProfile } from '../features/auth/authSlice';
@@ -41,7 +42,6 @@ import { VolunteersView } from '../components/dashboard/VolunteersView';
 import { DonationsView } from '../components/dashboard/DonationsView';
 import { CasesView } from '../components/dashboard/CasesView';
 import { ShelterView } from '../components/dashboard/ShelterView';
-import { ResourcesView } from '../components/dashboard/ResourcesView';
 import { ReportingView } from '../components/dashboard/ReportingView';
 import { SystemAdminView } from '../components/dashboard/SystemAdminView';
 import { BlogManagementView } from '../components/dashboard/BlogManagementView';
@@ -361,14 +361,12 @@ export default function DashboardPage() {
             'families': <CasesView activeTab={activeTab} />,
             'assessments': <CasesView activeTab={activeTab} />,
             'case_notes': <CasesView activeTab={activeTab} />,
-            'documents': <CasesView activeTab={activeTab} />,
-
             'shelter': <ShelterView activeTab={activeTab} />,
             'shelters': <ShelterView activeTab={activeTab} />,
+            'staff': <ShelterView activeTab={activeTab} />,
             'placements': <ShelterView activeTab={activeTab} />,
             'resources': <ShelterView activeTab={activeTab} />,
-            'staff': <ShelterView activeTab={activeTab} />,
-            'media': <MediaLibraryView />,
+            'media_lib': <MediaLibraryView />,
 
             'reporting': <ReportingView />,
             'reports': <ReportingView />,
