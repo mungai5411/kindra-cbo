@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Box, Container, Typography, Chip, Button, Skeleton, Divider, Paper, useTheme, alpha, LinearProgress, Grid, Stack
 } from '@mui/material';
-import { ArrowBack, Favorite, Event, Share, Campaign, InfoOutlined } from '@mui/icons-material';
+import { ArrowBack, Favorite, Share, Campaign, InfoOutlined } from '@mui/icons-material';
 import { AppDispatch, RootState } from '../store';
 import { fetchCampaigns } from '../features/donations/donationsSlice';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -71,7 +71,7 @@ export default function CampaignPage() {
     if (!campaign) return null;
 
     const progress = campaign.target_amount > 0 ? Math.min((campaign.raised_amount / campaign.target_amount) * 100, 100) : 0;
-    
+
     // Media list for dynamic hero: [Featured, ...Gallery]
     const heroMedia = [
         { url: campaign.featured_image, title: 'Featured' },
@@ -80,7 +80,7 @@ export default function CampaignPage() {
 
     return (
         <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 12 }}>
-            
+
             {/* Dynamic Hero Section */}
             <Box sx={{
                 position: 'relative',
@@ -106,7 +106,7 @@ export default function CampaignPage() {
                         }}
                     />
                 </AnimatePresence>
-                
+
                 {/* Visual Overlay for contrast */}
                 <Box sx={{
                     position: 'absolute', inset: 0,
@@ -119,11 +119,11 @@ export default function CampaignPage() {
                             <Button
                                 startIcon={<ArrowBack />}
                                 onClick={() => navigate('/donate')}
-                                sx={{ 
-                                    width: 'fit-content', color: 'white', 
-                                    backdropFilter: 'blur(10px)', 
-                                    bgcolor: alpha('#fff', 0.1), 
-                                    '&:hover': { bgcolor: alpha('#fff', 0.2) } 
+                                sx={{
+                                    width: 'fit-content', color: 'white',
+                                    backdropFilter: 'blur(10px)',
+                                    bgcolor: alpha('#fff', 0.1),
+                                    '&:hover': { bgcolor: alpha('#fff', 0.2) }
                                 }}
                             >
                                 Back to All Campaigns
@@ -148,7 +148,7 @@ export default function CampaignPage() {
             {/* Content Layout: 2-Columns */}
             <Container maxWidth="lg" sx={{ mt: -6, position: 'relative', zIndex: 10 }}>
                 <Grid container spacing={5}>
-                    
+
                     {/* Left Column: Visual Story (Images) */}
                     <Grid item xs={12} md={6}>
                         <Stack spacing={4}>
@@ -192,7 +192,7 @@ export default function CampaignPage() {
                                     <Campaign sx={{ fontSize: 40, color: 'primary.main' }} />
                                     The Mission
                                 </Typography>
-                                
+
                                 <Box
                                     sx={{
                                         fontSize: '1.15rem',
@@ -200,11 +200,11 @@ export default function CampaignPage() {
                                         color: 'text.primary',
                                         mb: 4,
                                         '& p': { mb: 2.5 },
-                                        '& blockquote': { 
-                                            borderLeft: '5px solid', 
-                                            borderColor: 'secondary.main', 
+                                        '& blockquote': {
+                                            borderLeft: '5px solid',
+                                            borderColor: 'secondary.main',
                                             pl: 3, my: 4,
-                                            fontStyle: 'italic', 
+                                            fontStyle: 'italic',
                                             color: 'text.secondary',
                                             bgcolor: alpha(theme.palette.secondary.main, 0.05),
                                             py: 1, px: 2, borderRadius: 2
@@ -226,14 +226,14 @@ export default function CampaignPage() {
                                     <Typography variant="h6" color="text.secondary" fontWeight={500} sx={{ mb: 2 }}>
                                         raised of KES {Number(campaign.target_amount).toLocaleString()}
                                     </Typography>
-                                    <LinearProgress 
-                                        variant="determinate" 
-                                        value={progress} 
-                                        sx={{ 
-                                            height: 14, borderRadius: 7, mb: 3, 
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={progress}
+                                        sx={{
+                                            height: 14, borderRadius: 7, mb: 3,
                                             bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                            '& .MuiLinearProgress-bar': { borderRadius: 7, background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})` } 
-                                        }} 
+                                            '& .MuiLinearProgress-bar': { borderRadius: 7, background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})` }
+                                        }}
                                     />
                                     <Grid container spacing={2}>
                                         <Grid item xs={6}>
@@ -250,16 +250,16 @@ export default function CampaignPage() {
                                 </Box>
 
                                 <Stack spacing={2}>
-                                    <Button 
-                                        fullWidth variant="contained" color="primary" size="large" 
-                                        startIcon={<Favorite />} 
+                                    <Button
+                                        fullWidth variant="contained" color="primary" size="large"
+                                        startIcon={<Favorite />}
                                         sx={{ py: 2, borderRadius: 4, fontWeight: 900, fontSize: '1.2rem', boxShadow: theme.shadows[8] }}
                                     >
                                         Donate Now
                                     </Button>
-                                    <Button 
-                                        fullWidth variant="outlined" size="large" 
-                                        startIcon={<Share />} 
+                                    <Button
+                                        fullWidth variant="outlined" size="large"
+                                        startIcon={<Share />}
                                         sx={{ py: 1.5, borderRadius: 4, fontWeight: 700 }}
                                     >
                                         Share Campaign
