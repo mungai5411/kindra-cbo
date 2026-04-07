@@ -312,7 +312,7 @@ class MediaAsset(models.Model):
     class SourceType(models.TextChoices):
         CAMPAIGN = 'CAMPAIGN', _('Campaign')
         STORY = 'STORY', _('Story/Blog')
-        SHELTER = 'SHELTER', _('Shelter')
+        SHELTER = 'SHELTER', _('Shelter (Displayed on Landing Page Hero/Partner sections)')
         TEAM = 'TEAM', _('Team Member')
         USER = 'USER', _('User Profile')
         IMPACT = 'IMPACT', _('Donation Impact')

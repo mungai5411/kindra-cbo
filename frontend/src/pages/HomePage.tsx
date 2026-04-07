@@ -41,7 +41,7 @@ import {
     AccordionDetails,
 } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Navbar } from '../components/public/Navbar';
 
 const MotionBox = motion(Box);
@@ -106,6 +106,8 @@ export default function HomePage() {
     const dispatch = useDispatch<AppDispatch>();
     const { dashboardData } = useSelector((state: RootState) => state.reporting);
     const [mediaAssets, setMediaAssets] = useState<any[]>([]);
+    const [heroIndex, setHeroIndex] = useState(0);
+    const [partnerIndex, setPartnerIndex] = useState(1);
 
     useEffect(() => {
         dispatch(fetchPublicStats());
@@ -123,6 +125,17 @@ export default function HomePage() {
         fetchMedia();
     }, [dispatch]);
 
+    // Handle 15s Auto-Rotation
+    useEffect(() => {
+        if (mediaAssets.length > 0) {
+            const timer = setInterval(() => {
+                setHeroIndex(prev => (prev + 1) % mediaAssets.length);
+                setPartnerIndex(prev => (prev + 1) % mediaAssets.length);
+            }, 15000); // 15 seconds as requested
+            return () => clearInterval(timer);
+        }
+    }, [mediaAssets.length]);
+
     // Handle hash scrolling
     useEffect(() => {
         if (location.hash) {
@@ -138,8 +151,8 @@ export default function HomePage() {
     const statsData = dashboardData?.public || {};
 
     // Get specific media for sections
-    const heroMedia = mediaAssets[0]; // First shelter media for hero
-    const partnerMedia = mediaAssets[1]; // Second shelter media for partner section
+    const activeHero = mediaAssets[heroIndex % mediaAssets.length];
+    const activePartner = mediaAssets[(partnerIndex) % mediaAssets.length] || activeHero;
 
     const STATS = [
         { value: statsData.children_supported ?? 0, label: 'Children Supported', icon: <School />, color: '#6366f1' },
@@ -317,46 +330,60 @@ export default function HomePage() {
                                     boxShadow: `0 32px 64px ${alpha(theme.palette.text.primary, 0.1)}`,
                                     position: 'relative',
                                     zIndex: 1,
+                                    height: 350,
+                                    width: '100%',
                                     border: '1px solid',
                                     borderColor: alpha(theme.palette.divider, 0.5)
                                 }}>
-                                    {heroMedia?.file ? (
-                                        <>
-                                            <Box
-                                                component="img"
-                                                src={heroMedia.file}
-                                                sx={{ width: '100%', height: 350, objectFit: 'cover' }}
-                                            />
+                                    <AnimatePresence mode="wait">
+                                        {activeHero?.file ? (
+                                            <MotionBox
+                                                key={activeHero.id}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                transition={{ duration: 1 }}
+                                                sx={{ position: 'relative', height: '100%' }}
+                                            >
+                                                <Box
+                                                    component={motion.img}
+                                                    initial={{ scale: 1 }}
+                                                    animate={{ scale: 1.1 }}
+                                                    transition={{ duration: 15, ease: "linear" }}
+                                                    src={activeHero.file}
+                                                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
+                                                <Box sx={{
+                                                    position: 'absolute',
+                                                    bottom: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    p: 4,
+                                                    background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%)',
+                                                    color: 'common.white'
+                                                }}>
+                                                    <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'white', mb: 0.2 }}>
+                                                        {activeHero.shelter_name || 'Impact Center'}
+                                                    </Typography>
+                                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.9)', display: 'block' }}>
+                                                        {activeHero.title || 'Supporting communities across Kenya'}
+                                                    </Typography>
+                                                </Box>
+                                            </MotionBox>
+                                        ) : (
                                             <Box sx={{
-                                                position: 'absolute',
-                                                bottom: 0,
-                                                left: 0,
-                                                right: 0,
-                                                p: 4,
-                                                background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%)',
-                                                color: 'common.white'
+                                                width: '100%',
+                                                height: '100%',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                                color: 'text.secondary'
                                             }}>
-                                                <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'white', mb: 0.2 }}>
-                                                    {heroMedia.shelter_name || 'Community Center'}
-                                                </Typography>
-                                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.9)', display: 'block' }}>
-                                                    {heroMedia.title || 'Supporting communities across Kenya'}
-                                                </Typography>
+                                                <Typography variant="body2">Upload shelter images to feature here</Typography>
                                             </Box>
-                                        </>
-                                    ) : (
-                                        <Box sx={{
-                                            width: '100%',
-                                            height: 350,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                            color: 'text.secondary'
-                                        }}>
-                                            <Typography variant="body2">Upload shelter images to feature here</Typography>
-                                        </Box>
-                                    )}
+                                        )}
+                                    </AnimatePresence>
                                 </Card>
 
                                 {/* Floating Stat Card */}
@@ -524,36 +551,53 @@ export default function HomePage() {
                                     borderRadius: 3,
                                     zIndex: 0
                                 }} />
-                                {partnerMedia?.file ? (
-                                    <Box
-                                        component="img"
-                                        src={partnerMedia.file}
-                                        sx={{
-                                            width: '100%',
-                                            height: 350,
-                                            objectFit: 'cover',
-                                            borderRadius: 8,
-                                            position: 'relative',
-                                            zIndex: 1,
-                                            boxShadow: theme.shadows[20]
-                                        }}
-                                    />
-                                ) : (
-                                    <Box sx={{
-                                        width: '100%',
-                                        height: 350,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                        borderRadius: 8,
-                                        position: 'relative',
-                                        zIndex: 1,
-                                        color: 'text.secondary'
-                                    }}>
-                                        <Typography variant="body2">Upload second shelter image</Typography>
-                                    </Box>
-                                )}
+                                <Box sx={{
+                                    height: 350,
+                                    width: '100%',
+                                    borderRadius: 8,
+                                    overflow: 'hidden',
+                                    position: 'relative',
+                                    zIndex: 1,
+                                    boxShadow: theme.shadows[20]
+                                }}>
+                                    <AnimatePresence mode="wait">
+                                        {activePartner?.file ? (
+                                            <MotionBox
+                                                key={activePartner.id}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                transition={{ duration: 1 }}
+                                                sx={{ position: 'relative', height: '100%', width: '100%' }}
+                                            >
+                                                <Box
+                                                    component={motion.img}
+                                                    initial={{ scale: 1 }}
+                                                    animate={{ scale: 1.1 }}
+                                                    transition={{ duration: 15, ease: "linear" }}
+                                                    src={activePartner.file}
+                                                    sx={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        objectFit: 'cover'
+                                                    }}
+                                                />
+                                            </MotionBox>
+                                        ) : (
+                                            <Box sx={{
+                                                width: '100%',
+                                                height: '100%',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                                color: 'text.secondary'
+                                            }}>
+                                                <Typography variant="body2">Upload second shelter image</Typography>
+                                            </Box>
+                                        )}
+                                    </AnimatePresence>
+                                </Box>
                             </Box>
                         </Grid>
                         <Grid item xs={12} md={6}>
