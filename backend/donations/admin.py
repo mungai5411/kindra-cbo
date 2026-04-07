@@ -31,8 +31,18 @@ class DonationAdmin(admin.ModelAdmin):
 
     @admin.action(description='Approve selected donations')
     def approve_donations(self, request, queryset):
-        count = queryset.filter(status='PENDING').update(status='COMPLETED')
-        self.message_user(request, f'{count} donations were successfully approved.')
+        # Only pending donations need approval. Completed ones are already finalized.
+        pending = queryset.filter(status='PENDING')
+        count = 0
+        for donation in pending:
+            from .services import DonationService
+            DonationService.finalize_donation(donation)
+            count += 1
+            
+        if count > 0:
+            self.message_user(request, f'{count} pending donations were successfully approved and finalized.')
+        else:
+            self.message_user(request, 'No pending donations were found in the selection. M-Pesa donations are automated and don\'t require manual approval.', level='warning')
 
     @admin.action(description='Reject selected donations')
     def reject_donations(self, request, queryset):

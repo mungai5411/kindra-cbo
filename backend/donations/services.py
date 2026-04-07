@@ -81,6 +81,21 @@ class DonationService:
             # Generate PDF File
             ReceiptService.generate_pdf_receipt(receipt)
             
+            # Automated Audit Logging
+            AuditLog.objects.create(
+                user=None, # System automated
+                action=AuditLog.Action.UPDATE,
+                resource_type='Donation',
+                resource_id=str(donation.id),
+                description=f"Automated completion of donation {donation.transaction_id} (KES {donation.amount}). All related records updated."
+            )
+            
+            # Campaign Goal Synchronization
+            if donation.campaign and donation.campaign.raised_amount >= donation.campaign.target_amount:
+                logger.info(f"Campaign {donation.campaign.id} goal reached! Total: {donation.campaign.raised_amount}")
+                # We keep status as ACTIVE to allow over-funding, but could notify admins of the milestone
+                NotificationService.notify_campaign_goal_reached(donation.campaign)
+            
             # Send notifications
             NotificationService.notify_donation_completed(donation)
             
@@ -273,20 +288,17 @@ class PaymentService:
                 # Finalize (updates campaign, donor, and generates receipt)
                 DonationService.finalize_donation(donation)
             else:
-                # Failed STK Push (cancelled by user, insufficient funds, etc)
-                # Map codes to user-friendly messages
-                error_mapping = {
-                    1: "Insufficient balance in your M-Pesa account.",
-                    1032: "Payment was cancelled by the user.",
-                    1037: "Request timed out. Please clear any pending prompts on your phone.",
-                    2001: "Invalid PIN entered.",
-                }
                 friendly_message = error_mapping.get(result_code, result_desc)
                 
                 logger.warning(f"STK Push failed for {donation.id}. Code: {result_code}, Desc: {result_desc}")
+                
+                # Update donation status and message for donor feedback
                 donation.status = Donation.Status.FAILED
                 donation.message = friendly_message[:200]
                 donation.save(update_fields=['status', 'message', 'last_mpesa_result_code'])
+                
+                # Notify admin of the failure with reason
+                NotificationService.notify_donation_failed(donation, friendly_message)
 
             return True
 
@@ -518,26 +530,69 @@ class NotificationService:
         logger.info(f"Sent donation completion notifications for donation {donation.id}")
     
     @staticmethod
-    def notify_pending_donation(donation, source_info):
+    def notify_campaign_goal_reached(campaign):
         """
-        Send notifications for pending donations
-        
-        Args:
-            donation: Donation instance
-            source_info: String describing payment source
+        Send milestone notifications when a campaign reaches its target.
         """
         admins = User.objects.filter(role__in=['ADMIN', 'MANAGEMENT'])
+        
         for admin in admins:
             Notification.objects.create(
                 recipient=admin,
-                title="Pending Donation",
-                message=f"A donation of KES {donation.amount} from {source_info} is pending approval.",
-                type=Notification.Type.INFO,
+                title="Goal Reached!",
+                message=f"Success! The campaign '{campaign.title}' has reached its target of {campaign.currency} {campaign.target_amount}.",
+                type=Notification.Type.SUCCESS,
+                category=Notification.Category.CAMPAIGN,
+                link=f"/dashboard/campaigns/{campaign.id}"
+            )
+            
+        logger.info(f"Sent campaign milestone notifications for campaign {campaign.id}")
+
+    @staticmethod
+    def notify_pending_donation(donation, source_info):
+        admins = User.objects.filter(role__in=['ADMIN', 'MANAGEMENT'])
+        is_automated = donation.payment_method == Donation.PaymentMethod.MPESA
+        
+        title = "Pending Donation"
+        message = f"A donation of KES {donation.amount} from {source_info} is pending approval."
+        notif_type = Notification.Type.WARNING # Higher urgency for manual
+        
+        if is_automated:
+            title = "M-Pesa Payment Initiated"
+            message = f"STK Push sent to {donation.donor_name or 'Donor'} (KES {donation.amount}). Waiting for PIN."
+            notif_type = Notification.Type.INFO # Just informative for automated
+            
+        for admin in admins:
+            Notification.objects.create(
+                recipient=admin,
+                title=title,
+                message=message,
+                type=notif_type,
                 category=Notification.Category.DONATION,
                 link=f"/dashboard/donations/{donation.id}"
             )
         
-        logger.info(f"Sent pending donation notifications for donation {donation.id}")
+        logger.info(f"Sent pending notification for donation {donation.id} (Automated: {is_automated})")
+
+    @staticmethod
+    def notify_donation_failed(donation, reason):
+        """
+        Send notifications for failed automated donations.
+        Informative only, no admin action required.
+        """
+        admins = User.objects.filter(role__in=['ADMIN', 'MANAGEMENT'])
+        
+        for admin in admins:
+            Notification.objects.create(
+                recipient=admin,
+                title="M-Pesa Payment Failed",
+                message=f"Donation of KES {donation.amount} from {donation.donor_name or 'Donor'} failed: {reason}.",
+                type=Notification.Type.ERROR,
+                category=Notification.Category.DONATION,
+                link=f"/dashboard/donations/{donation.id}"
+            )
+            
+        logger.info(f"Sent failure notifications for donation {donation.id}")
     
     @staticmethod
     def notify_material_donation(material_donation, user):
