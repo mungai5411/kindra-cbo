@@ -112,7 +112,7 @@ export default function HomePage() {
         // Fetch shelter media for landing page from public gallery
         const fetchMedia = async () => {
             try {
-                const response = await apiClient.get('/blog/admin/media/gallery/', {
+                const response = await apiClient.get('/blog/media/gallery/', {
                     params: { source_type: 'SHELTER' }
                 });
                 setMediaAssets(response.data.results || response.data || []);

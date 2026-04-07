@@ -217,8 +217,9 @@ def mpesa_callback(request):
     Receives JSON payload from Safaricom.
     """
     try:
-        # Safaricom sends JSON data
-        success = PaymentService.handle_mpesa_callback(request.data)
+        # Safaricom sends JSON data, but we append the token to the URL query string
+        token = request.query_params.get('token')
+        success = PaymentService.handle_mpesa_callback(request.data, request_token=token)
         if success:
             # Safaricom expects a success response regardless of payment success/fail
             # so long as we received the payload correctly

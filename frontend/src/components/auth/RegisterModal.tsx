@@ -264,6 +264,7 @@ export const RegisterModal = () => {
                                     fullWidth
                                     name="password"
                                     type={showPassword ? 'text' : 'password'}
+                                    autoComplete="new-password"
                                     placeholder="••••••••"
                                     value={formData.password}
                                     onChange={handleChange}
@@ -290,6 +291,7 @@ export const RegisterModal = () => {
                                     fullWidth
                                     name="password_confirm"
                                     type={showPassword ? 'text' : 'password'}
+                                    autoComplete="new-password"
                                     placeholder="••••••••"
                                     value={formData.password_confirm}
                                     onChange={handleChange}

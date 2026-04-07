@@ -278,6 +278,7 @@ export const LoginModal = () => {
                                         fullWidth
                                         variant="outlined"
                                         type={showPassword ? 'text' : 'password'}
+                                        autoComplete="current-password"
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}

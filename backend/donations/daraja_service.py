@@ -44,7 +44,7 @@ class DarajaService:
             raise Exception(f"Could not authenticate with M-Pesa API (HTTP {response.status_code}): {response.text}")
 
     @classmethod
-    def initiate_stk_push(cls, phone_number, amount, account_reference, transaction_desc):
+    def initiate_stk_push(cls, phone_number, amount, account_reference, transaction_desc, callback_token=None):
         """
         Initiates an M-Pesa Express (STK Push) request
         Returns: CheckoutRequestID if successful
@@ -80,6 +80,11 @@ class DarajaService:
         account_reference = account_reference[:12]
         transaction_desc = transaction_desc[:13]
 
+        callback_url = settings.DARAJA_CALLBACK_URL
+        if callback_token:
+            separator = '&' if '?' in callback_url else '?'
+            callback_url = f"{callback_url}{separator}token={callback_token}"
+
         payload = {
             "BusinessShortCode": shortcode,
             "Password": password,
@@ -89,7 +94,7 @@ class DarajaService:
             "PartyA": phone_number,
             "PartyB": shortcode, # Use same shortcode in sandbox unless specified
             "PhoneNumber": phone_number,
-            "CallBackURL": settings.DARAJA_CALLBACK_URL,
+            "CallBackURL": callback_url,
             "AccountReference": account_reference,
             "TransactionDesc": transaction_desc
         }

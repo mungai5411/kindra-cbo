@@ -4,6 +4,7 @@ Business logic for donation processing, separated from views
 """
 
 import uuid
+import secrets
 import logging
 from django.utils import timezone
 from django.db import transaction
@@ -131,12 +132,25 @@ class PaymentService:
         Returns:
             Donation instance
         """
-        # Validate required fields
-        if not data.get('amount') or not data.get('phone_number'):
-            raise ValueError('Amount and phone number are required')
-        
-        # Set unique transaction_id for local DB integrity, we will update it or keep it unique
+        # Spam Protection: Check for recent pending donations for this phone
+        phone_number = data.get('phone_number')
+        two_minutes_ago = timezone.now() - timezone.timedelta(minutes=2)
+        recent_pending = Donation.objects.filter(
+            payment_method=Donation.PaymentMethod.MPESA,
+            status=Donation.Status.PENDING,
+            updated_at__gte=two_minutes_ago,
+            donor_email=data.get('donor_email', '') # Adding email as secondary check
+        ).exists()
+
+        if recent_pending:
+            logger.warning(f"Spam protection triggered for phone {phone_number}")
+            raise ValueError('A payment request is already in progress for this account. Please wait a moment before trying again.')
+
+        # Set unique transaction_id for local DB integrity
         temp_tx_id = f"MPESA-{uuid.uuid4().hex[:10].upper()}"
+
+        # Generate secure callback token
+        callback_token = secrets.token_hex(16)
 
         # Create donation in PENDING status
         donation = DonationService.create_donation({
@@ -151,26 +165,30 @@ class PaymentService:
             'status': Donation.Status.PENDING
         })
         
+        donation.callback_token = callback_token
+        donation.save(update_fields=['callback_token'])
+        
         # Initiate Real Daraja STK Push
         account_ref = f"KINDRA-{donation.id.hex[:6]}"
         transaction_desc = f"Donation to Kindra CBO"
         
         try:
             checkout_request_id = DarajaService.initiate_stk_push(
-                phone_number=data.get('phone_number'),
+                phone_number=phone_number,
                 amount=donation.amount,
                 account_reference=account_ref,
-                transaction_desc=transaction_desc
+                transaction_desc=transaction_desc,
+                callback_token=callback_token
             )
             
-            # Save the CheckoutRequestID aspayment_reference for mapping in the callback
+            # Save the CheckoutRequestID as payment_reference for mapping in the callback
             donation.payment_reference = checkout_request_id
             donation.save(update_fields=['payment_reference'])
             
             logger.info(f"Successfully initiated STK Push for {donation.transaction_id}. CheckoutRequestID: {checkout_request_id}")
             
             # Notify admins of pending
-            NotificationService.notify_pending_donation(donation, f"M-Pesa STK (Phone: {data.get('phone_number')})")
+            NotificationService.notify_pending_donation(donation, f"M-Pesa STK (Phone: {phone_number})")
             
             # Note: Receipt is generated only AFTER successful callback
             return donation, None
@@ -182,7 +200,7 @@ class PaymentService:
             raise ValueError(f"Failed to initiate M-Pesa payment: {str(e)}")
 
     @staticmethod
-    def handle_mpesa_callback(data):
+    def handle_mpesa_callback(data, request_token=None):
         """
         Handle M-Pesa STK Push Callback Webhook
         """
@@ -203,9 +221,17 @@ class PaymentService:
                 logger.error(f"Donation not found for CheckoutRequestID {checkout_request_id}")
                 return False
 
+            # Security Token Verification
+            if donation.callback_token and donation.callback_token != request_token:
+                logger.warning(f"Security Alert: Invalid callback token for donation {donation.id}. Expected {donation.callback_token}, got {request_token}")
+                return False
+
             if donation.status != Donation.Status.PENDING:
                 logger.info(f"Donation {donation.id} already processed. Current status: {donation.status}")
                 return True
+
+            # Save the raw result code for auditing
+            donation.last_mpesa_result_code = str(result_code)
 
             if result_code == 0:
                 # Payment Successful
@@ -221,16 +247,25 @@ class PaymentService:
                 if mpesa_receipt_num:
                     # Update transaction_id to real M-Pesa code
                     donation.transaction_id = mpesa_receipt_num
-                    donation.save(update_fields=['transaction_id'])
                     
                 logger.info(f"STK Push successful for donation {donation.id}. M-Pesa Ref: {mpesa_receipt_num}")
+                donation.save(update_fields=['transaction_id', 'last_mpesa_result_code'])
                 DonationService.finalize_donation(donation)
             else:
                 # Failed STK Push (cancelled by user, insufficient funds, etc)
-                logger.warning(f"STK Push failed/cancelled for {donation.id}. Code: {result_code}, Desc: {result_desc}")
+                # Map codes to user-friendly messages
+                error_mapping = {
+                    1: "Insufficient balance in your M-Pesa account.",
+                    1032: "Payment was cancelled by the user.",
+                    1037: "Request timed out. Please clear any pending prompts on your phone.",
+                    2001: "Invalid PIN entered.",
+                }
+                friendly_message = error_mapping.get(result_code, result_desc)
+                
+                logger.warning(f"STK Push failed for {donation.id}. Code: {result_code}, Desc: {result_desc}")
                 donation.status = Donation.Status.FAILED
-                donation.message = f"{donation.message} | Payment failed: {result_desc}"[:199]
-                donation.save(update_fields=['status', 'message'])
+                donation.message = friendly_message[:200]
+                donation.save(update_fields=['status', 'message', 'last_mpesa_result_code'])
 
             return True
 

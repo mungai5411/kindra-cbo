@@ -38,7 +38,7 @@ const apiClient = axios.create({
         // Removing this allows Axios to automatically set the correct 
         // Content-Type (with boundary) when sending FormData.
     },
-    timeout: 30000, // 30 seconds
+    timeout: 60000, // 60 seconds
 });
 
 // Request interceptor - add auth token
