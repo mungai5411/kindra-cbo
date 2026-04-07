@@ -340,6 +340,33 @@ class MediaAsset(models.Model):
         return self.title or self.file.name
 
 
+class LandingPageMediaManager(models.Manager):
+    """
+    Manager to only show media intended for the landing page
+    """
+    def get_queryset(self):
+        return super().get_queryset().filter(source_type='SHELTER')
+
+
+class LandingPageMedia(MediaAsset):
+    """
+    Proxy model for managing Landing Page specific media
+    with a simplified interface.
+    """
+    objects = LandingPageMediaManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = _('landing page media')
+        verbose_name_plural = _('landing page media')
+        ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        # Force source_type to SHELTER for this proxy model
+        self.source_type = 'SHELTER'
+        super().save(*args, **kwargs)
+
+
 class SiteContent(models.Model):
     """
     Dynamic site-wide content (e.g. About page text, Mission/Vision)

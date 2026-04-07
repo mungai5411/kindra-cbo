@@ -4,7 +4,7 @@ Blog & Public Campaigns Admin Configuration
 
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Category, Tag, BlogPost, Comment, Newsletter, TeamMember, MediaAsset, SiteContent
+from .models import Category, Tag, BlogPost, Comment, Newsletter, TeamMember, MediaAsset, SiteContent, LandingPageMedia
 
 
 @admin.register(Category)
@@ -202,3 +202,23 @@ class SiteContentAdmin(admin.ModelAdmin):
     list_filter = ('section', 'is_active')
     search_fields = ('key', 'title', 'content')
     ordering = ('section', 'key')
+
+
+@admin.register(LandingPageMedia)
+class LandingPageMediaAdmin(admin.ModelAdmin):
+    list_display = ('shelter_name', 'title', 'image_preview', 'created_at')
+    search_fields = ('title', 'shelter_name')
+    ordering = ('-created_at',)
+    
+    fieldsets = (
+        ('Landing Page Media', {
+            'fields': ('file', 'shelter_name', 'title', 'alt_text'),
+            'description': 'Images uploaded here will automatically appear in the landing page carousel.'
+        }),
+    )
+
+    def image_preview(self, obj):
+        if obj.file:
+            return format_html('<img src="{}" style="width: 80px; height: auto; border-radius: 4px;" />', obj.file.url)
+        return "No file"
+    image_preview.short_description = 'Preview'
