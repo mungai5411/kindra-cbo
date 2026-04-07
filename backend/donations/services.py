@@ -63,9 +63,17 @@ class DonationService:
                 logger.info(f"Updated donor {donation.donor.id} total donated by {donation.amount}")
             
             # Create receipt
+            # Use M-Pesa transaction ID in the receipt number if available
+            prefix = "REC"
+            txn_id = donation.transaction_id
+            if donation.payment_method == 'MPESA' and txn_id and not txn_id.startswith('MPESA-'):
+                receipt_no = f"MP-{txn_id}"
+            else:
+                receipt_no = f"{prefix}-{uuid.uuid4().hex[:8].upper()}"
+
             receipt = Receipt.objects.create(
                 donation=donation,
-                receipt_number=f"REC-{uuid.uuid4().hex[:8].upper()}",
+                receipt_number=receipt_no,
                 tax_year=timezone.now().year
             )
             logger.info(f"Created receipt {receipt.receipt_number} for donation {donation.id}")
@@ -237,19 +245,32 @@ class PaymentService:
                 # Payment Successful
                 callback_metadata = stk_callback.get('CallbackMetadata', {}).get('Item', [])
                 
-                # Extract the actual M-Pesa Receipt Number
+                # Extract details from metadata
                 mpesa_receipt_num = None
+                mpesa_name = None
+                
                 for item in callback_metadata:
-                    if item.get('Name') == 'MpesaReceiptNumber':
-                        mpesa_receipt_num = item.get('Value')
-                        break
-                        
-                if mpesa_receipt_num:
-                    # Update transaction_id to real M-Pesa code
-                    donation.transaction_id = mpesa_receipt_num
+                    name = item.get('Name')
+                    value = item.get('Value')
                     
-                logger.info(f"STK Push successful for donation {donation.id}. M-Pesa Ref: {mpesa_receipt_num}")
-                donation.save(update_fields=['transaction_id', 'last_mpesa_result_code'])
+                    if name == 'MpesaReceiptNumber':
+                        mpesa_receipt_num = value
+                    elif name in ['CustomerName', 'ExternalReference', 'Name']:
+                        mpesa_name = value
+                
+                # Update transaction_id to real M-Pesa code for official records/receipts
+                if mpesa_receipt_num:
+                    donation.transaction_id = mpesa_receipt_num
+                
+                if mpesa_name:
+                    donation.mpesa_name = mpesa_name
+                    
+                logger.info(f"STK Push successful for donation {donation.id}. M-Pesa Ref: {mpesa_receipt_num}, Name: {mpesa_name}")
+                
+                # Ensure all new fields are saved
+                donation.save(update_fields=['transaction_id', 'mpesa_name', 'last_mpesa_result_code'])
+                
+                # Finalize (updates campaign, donor, and generates receipt)
                 DonationService.finalize_donation(donation)
             else:
                 # Failed STK Push (cancelled by user, insufficient funds, etc)

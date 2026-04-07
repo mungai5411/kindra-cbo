@@ -23,9 +23,10 @@ class CampaignAdmin(admin.ModelAdmin):
 
 @admin.register(Donation)
 class DonationAdmin(admin.ModelAdmin):
-    list_display = ('donor_name', 'amount', 'currency', 'payment_method', 'status', 'donation_date')
+    list_display = ('donor_name', 'mpesa_name', 'amount', 'currency', 'payment_method', 'status', 'donation_date')
     list_filter = ('status', 'payment_method', 'donation_date')
-    search_fields = ('transaction_id', 'donor_name', 'donor_email')
+    search_fields = ('transaction_id', 'donor_name', 'mpesa_name', 'donor_email')
+    readonly_fields = ('callback_token', 'mpesa_name')
     actions = ['approve_donations', 'reject_donations']
 
     @admin.action(description='Approve selected donations')

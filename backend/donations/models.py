@@ -202,6 +202,7 @@ class Donation(models.Model):
     # Callback security & tracking
     callback_token = models.CharField(max_length=100, blank=True, null=True)
     last_mpesa_result_code = models.CharField(max_length=10, blank=True, null=True)
+    mpesa_name = models.CharField(max_length=200, blank=True, null=True)
     
     # Status
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
