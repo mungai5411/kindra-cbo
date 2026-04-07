@@ -28,8 +28,9 @@
 
     <div class="field-row">
         <span class="field-label">Received From:</span>
-        <strong class="field-value readable-bold">{{
-            donation.donor_name|default:donation.donor.full_name|default:"Valued Supporter" }}</strong>
+        <strong class="field-value readable-bold">
+            {{ donation.mpesa_name|default:donation.donor_name|default:donation.donor.get_full_name|default:"Valued Supporter" }}
+        </strong>
     </div>
 
     <div class="field-row">
@@ -38,13 +39,20 @@
     </div>
 
     <div class="field-row">
-        <div style="width: 55%; float: left;">
-            <span class="field-label">Pymt:</span>
-            <span class="field-value">{{ donation.payment_method }} - {{ donation.transaction_id }}</span>
+        <div style="width: 60%; float: left;">
+            <span class="field-label">Reference:</span>
+            <span class="field-value">{{ receipt.receipt_number }}</span>
         </div>
         <div style="width: 40%; float: right;">
             <span class="field-label">Date:</span>
             <span class="field-value">{{ date }}</span>
+        </div>
+    </div>
+
+    <div class="field-row">
+        <div style="width: 100%;">
+            <span class="field-label">Transaction ID:</span>
+            <span class="field-value">{{ donation.transaction_id }}</span>
         </div>
     </div>
 

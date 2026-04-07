@@ -53,12 +53,17 @@ def amount_to_words(amount, currency='KES'):
     
     words = words.strip()
     
+    if currency == 'KES':
+        unit = "Shilling" if int_part == 1 else "Shillings"
+        words = f"{words} {unit}"
+    elif currency == 'USD':
+        unit = "Dollar" if int_part == 1 else "Dollars"
+        words = f"{words} {unit}"
+    
     if dec_part > 0:
         words += f" and {dec_part:02d} Cents"
-    else:
-        words += " Only"
-        
-    return words
+    
+    return words + " Only"
 
 def get_date_digits(date_obj):
     """
