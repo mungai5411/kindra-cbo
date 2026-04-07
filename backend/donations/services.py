@@ -399,9 +399,17 @@ class ReceiptService:
             if not os.path.exists(bg_path):
                 bg_path = ""
             
+            # Resolve name safely for the template
+            donor_display_name = donation.mpesa_name or donation.donor_name
+            if not donor_display_name and donation.donor:
+                donor_display_name = donation.donor.full_name
+            if not donor_display_name:
+                donor_display_name = "Valued Supporter"
+
             context = {
                 'receipt': receipt,
                 'donation': donation,
+                'donor_display_name': donor_display_name,
                 'date': donation.donation_date.strftime('%d %b %Y'),
                 'date_digits': get_date_digits(donation.donation_date),
                 'amount_in_words': amount_to_words(donation.amount, donation.currency),
