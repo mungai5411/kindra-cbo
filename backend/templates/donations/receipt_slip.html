@@ -29,7 +29,7 @@
     <div class="field-row">
         <span class="field-label">Received From:</span>
         <strong class="field-value readable-bold">
-            {{ donation.mpesa_name|default:donation.donor_name|default:donation.donor.get_full_name|default:"Valued Supporter" }}
+            {{ donation.mpesa_name|default:donation.donor_name|default:donation.donor.full_name|default:"Valued Supporter" }}
         </strong>
     </div>
 
