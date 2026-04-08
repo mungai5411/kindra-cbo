@@ -207,7 +207,7 @@ export default function DashboardPage() {
 
         // Shelter Partners ONLY see shelter-related content
         if (user.role === 'SHELTER_PARTNER') {
-            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'staff', 'media', 'donations', 'impact_analytics', 'content_management'].includes(itemId);
+            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'staff', 'media', 'donations', 'impact_analytics', 'content_management', 'landing_page_gallery'].includes(itemId);
         }
 
         // Case Workers see case management and shelter content
@@ -217,7 +217,7 @@ export default function DashboardPage() {
 
         // Social Media see blog and donation content
         if (user.role === 'SOCIAL_MEDIA') {
-            return ['overview', 'blog_campaigns', 'blog_posts', 'categories', 'comments', 'newsletter', 'tags', 'donations', 'campaigns', 'donation_records', 'donors', 'social_media', 'map', 'impact_analytics', 'community_events'].includes(itemId);
+            return ['overview', 'blog_campaigns', 'blog_posts', 'categories', 'comments', 'newsletter', 'tags', 'donations', 'campaigns', 'donation_records', 'donors', 'social_media', 'map', 'impact_analytics', 'community_events', 'landing_page_gallery'].includes(itemId);
         }
 
         // Default: deny access
@@ -405,6 +405,7 @@ export default function DashboardPage() {
 
             'content_management': <ContentManagementView initialTab={activeTab} />,
             'media': <MediaLibraryView />,
+            'landing_page_gallery': <MediaLibraryView mode="landing_page" />,
             'impact': <ImpactTrackingView />,
             'team': <ContentManagementView initialTab={activeTab} />,
 

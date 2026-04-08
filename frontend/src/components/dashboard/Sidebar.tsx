@@ -54,6 +54,7 @@ const NAVIGATION = [
         icon: <PermMedia />,
         children: [
             { id: 'media', label: 'Media Library' },
+            { id: 'landing_page_gallery', label: 'Landing Page Gallery' },
             { id: 'team', label: 'Visionaries' },
         ]
     },

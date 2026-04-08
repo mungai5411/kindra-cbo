@@ -37,7 +37,11 @@ import {
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { fetchMedia, uploadMedia, deleteMedia, MediaAsset } from './mediaSlice';
 
-const MediaLibraryView: React.FC = () => {
+interface MediaLibraryViewProps {
+    mode?: 'general' | 'landing_page';
+}
+
+const MediaLibraryView: React.FC<MediaLibraryViewProps> = ({ mode = 'general' }) => {
     const theme = useTheme();
     const dispatch = useAppDispatch();
     const { assets, isLoading, error } = useAppSelector((state) => state.media);
@@ -48,10 +52,22 @@ const MediaLibraryView: React.FC = () => {
     const [filePreview, setFilePreview] = useState<string | null>(null);
     const [title, setTitle] = useState('');
     const [altText, setAltText] = useState('');
+    const [shelterName, setShelterName] = useState('');
     const [isUploading, setIsUploading] = useState(false);
 
     const [viewDialogOpen, setViewDialogOpen] = useState(false);
     const [currentAsset, setCurrentAsset] = useState<MediaAsset | null>(null);
+
+    // Dynamic configuration based on mode
+    const isLandingPageMode = mode === 'landing_page';
+    const displayTitle = isLandingPageMode ? 'Landing Page Gallery' : 'Media Library';
+    const displaySubtitle = isLandingPageMode 
+        ? 'Manage photos and labels featured on the home page carousel.' 
+        : "Manage your shelter's photos, documents, and other digital assets.";
+
+    const filteredAssets = isLandingPageMode 
+        ? assets.filter(a => a.source_type === 'SHELTER')
+        : assets;
 
     useEffect(() => {
         dispatch(fetchMedia());
@@ -73,7 +89,13 @@ const MediaLibraryView: React.FC = () => {
         formData.append('file', selectedFile);
         formData.append('title', title);
         formData.append('alt_text', altText);
-        formData.append('source_type', 'GENERAL'); // Default for now
+        
+        if (isLandingPageMode) {
+            formData.append('source_type', 'SHELTER');
+            formData.append('shelter_name', shelterName);
+        } else {
+            formData.append('source_type', 'GENERAL');
+        }
 
         try {
             await dispatch(uploadMedia(formData)).unwrap();
@@ -91,6 +113,7 @@ const MediaLibraryView: React.FC = () => {
         setFilePreview(null);
         setTitle('');
         setAltText('');
+        setShelterName('');
     };
 
     const handleDelete = async (id: string) => {
@@ -126,10 +149,10 @@ const MediaLibraryView: React.FC = () => {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 2 }}>
                     <Box>
                         <Typography variant="h4" fontWeight="bold" gutterBottom>
-                            Media Library
+                            {displayTitle}
                         </Typography>
                         <Typography variant="body1" color="text.secondary">
-                            Manage your shelter's photos, documents, and other digital assets.
+                            {displaySubtitle}
                         </Typography>
                     </Box>
                     <Button
@@ -156,27 +179,29 @@ const MediaLibraryView: React.FC = () => {
             <Paper sx={{ p: 2, mb: 4, borderRadius: 3, display: 'flex', alignItems: 'center', bgcolor: alpha(theme.palette.primary.main, 0.03), border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
                 <InfoIcon color="primary" sx={{ mr: 2 }} />
                 <Typography variant="body2" color="text.secondary">
-                    You have <Box component="span" sx={{ fontWeight: 'bold', color: 'primary.main' }}>{assets.length}</Box> assets in your library. These can be used when reporting donation impact or updating your shelter profile.
+                    You have <Box component="span" sx={{ fontWeight: 'bold', color: 'primary.main' }}>{filteredAssets.length}</Box> assets in this view. {isLandingPageMode ? 'These are rotating on your landing page carousel.' : 'These can be used for reporting impact.'}
                 </Typography>
             </Paper>
 
             {/* Media Grid */}
-            {isLoading && assets.length === 0 ? (
+            {isLoading && filteredAssets.length === 0 ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', p: 10 }}>
                     <CircularProgress />
                 </Box>
-            ) : assets.length === 0 ? (
+            ) : filteredAssets.length === 0 ? (
                 <Paper sx={{ p: 10, textAlign: 'center', borderRadius: 4, bgcolor: alpha(theme.palette.background.paper, 0.5), border: '2px dashed', borderColor: 'divider' }}>
                     <ImageIcon sx={{ fontSize: 80, color: 'text.disabled', mb: 2 }} />
-                    <Typography variant="h6" color="text.secondary" gutterBottom>Your library is empty</Typography>
-                    <Typography variant="body2" color="text.disabled" sx={{ mb: 3 }}>Upload photos of your shelter, activities, or donation distributions.</Typography>
+                    <Typography variant="h6" color="text.secondary" gutterBottom>{isLandingPageMode ? 'No landing page images' : 'Your library is empty'}</Typography>
+                    <Typography variant="body2" color="text.disabled" sx={{ mb: 3 }}>
+                        {isLandingPageMode ? 'Upload photos of your center or activities to feature them on the home page.' : 'Upload photos of your shelter, activities, or donation distributions.'}
+                    </Typography>
                     <Button variant="outlined" startIcon={<UploadIcon />} onClick={() => setUploadDialogOpen(true)}>
                         Start Uploading
                     </Button>
                 </Paper>
             ) : (
                 <Grid container spacing={3}>
-                    {assets.map((asset) => (
+                    {filteredAssets.map((asset) => (
                         <Grid item xs={12} sm={6} md={4} lg={3} key={asset.id}>
                             <Card sx={{
                                 height: '100%',
@@ -308,6 +333,19 @@ const MediaLibraryView: React.FC = () => {
                             value={altText}
                             onChange={(e) => setAltText(e.target.value)}
                         />
+
+                        {isLandingPageMode && (
+                            <TextField
+                                fullWidth
+                                label="Shelter Name (Labels Home Page Photo)"
+                                placeholder="e.g. Nairobi Grace Center"
+                                variant="outlined"
+                                margin="normal"
+                                value={shelterName}
+                                onChange={(e) => setShelterName(e.target.value)}
+                                helperText="This will appear as an overlay on the home page carousel photo."
+                            />
+                        )}
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 3 }}>
