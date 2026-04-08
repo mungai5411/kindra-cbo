@@ -7,20 +7,25 @@ import App from './App';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import './index.css';
 
+// Only log errors in development
+const isDev = import.meta.env.DEV;
+
 // Set up error logging for unhandled promise rejections
 window.addEventListener('error', (event) => {
-    console.error('Global error caught:', event.error);
+    if (isDev) console.error('Global error caught:', event.error);
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-    console.error('Unhandled promise rejection:', event.reason);
+    if (isDev) console.error('Unhandled promise rejection:', event.reason);
 });
 
-console.log('Mounting Kindra App...');
-console.log('Environment:', {
-    mode: import.meta.env.MODE,
-    viteEnv: Object.keys(import.meta.env).filter(key => key.startsWith('VITE_'))
-});
+if (isDev) {
+    console.log('Mounting Kindra App in DEVELOPMENT mode');
+    console.log('Environment:', {
+        mode: import.meta.env.MODE,
+        apiUrl: import.meta.env.VITE_API_URL,
+    });
+}
 
 const rootElement = document.getElementById('root');
 
@@ -37,10 +42,10 @@ if (rootElement) {
                 </Provider>
             </React.StrictMode>
         );
-        console.log('Render call successful');
+        if (isDev) console.log('Render call successful');
     } catch (error: any) {
         console.error('Mount error:', error);
-        console.error('Stack trace:', error?.stack);
+        if (isDev) console.error('Stack trace:', error?.stack);
         rootElement.innerHTML = `<div style="padding: 20px; border: 2px solid red; background: #fee;"><h1>Mount Error</h1><pre style="overflow: auto; max-height: 400px;">${error?.stack || error?.message || 'Unknown error'}</pre></div>`;
     }
 } else {
