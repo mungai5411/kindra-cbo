@@ -95,8 +95,8 @@ function App() {
     return (
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
             <ThemeProvider>
+                <CssBaseline />
                 <AuthModalProvider>
-                    <CssBaseline />
                     <Router>
                         <RouteObserver />
                         <Routes>
