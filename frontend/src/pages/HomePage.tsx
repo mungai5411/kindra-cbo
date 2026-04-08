@@ -5,10 +5,11 @@
  */
 
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Box } from '@mui/material';
-import { AppDispatch } from '../store';
+import { AppDispatch, RootState } from '../store';
 import { fetchPublicStats } from '../features/reporting/reportingSlice';
+import { fetchMedia } from '../features/media/mediaSlice';
 import { Navbar } from '../components/public/Navbar';
 import { HeroSection } from '../components/home/HeroSection';
 import { ImpactMetrics } from '../components/home/ImpactMetrics';
@@ -21,10 +22,15 @@ import { NewsletterSection } from '../components/home/NewsletterSection';
 
 export default function HomePage() {
   const dispatch = useDispatch<AppDispatch>();
+  const { assets: landingPageImages } = useSelector((state: RootState) => state.media);
+  
+  // Filter landing page images
+  const heroImages = landingPageImages.filter(asset => asset.source_type === 'SHELTER');
 
-  // Fetch public statistics on component mount
+  // Fetch public statistics and media on component mount
   useEffect(() => {
     dispatch(fetchPublicStats());
+    dispatch(fetchMedia());
   }, [dispatch]);
 
   return (
@@ -33,7 +39,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section - First Impression */}
-      <HeroSection />
+      <HeroSection images={heroImages} />
 
       {/* Impact Metrics - Show Scale */}
       <ImpactMetrics />
@@ -54,7 +60,7 @@ export default function HomePage() {
       <FAQSection />
 
       {/* Newsletter Signup - Build Community */}
-      <NewsletterSection />
+      <NewsletterSection backgroundImage={heroImages[0]?.file} />
     </Box>
   );
 }

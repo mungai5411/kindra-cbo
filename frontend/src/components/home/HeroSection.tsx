@@ -1,25 +1,40 @@
 /**
  * Hero Section Component
- * Modern, mobile-first hero with gradient background and CTAs
- * Inspired by Higherlife Foundation's impact messaging
+ * Modern, mobile-first hero with real images from landing page gallery
+ * No AI gradients - authentic images showcase
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Container, Typography, Button, alpha, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Favorite, ArrowForward } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { colorPsychology } from '../../theme/colorPsychology';
+import { MediaAsset } from '../../features/media/mediaSlice';
 
 const MotionBox = motion(Box);
 const MotionTypography = motion(Typography);
 
 interface HeroSectionProps {
-  heroImage?: string;
+  images?: MediaAsset[];
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ heroImage }) => {
+export const HeroSection: React.FC<HeroSectionProps> = ({ images = [] }) => {
   const theme = useTheme();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Rotate through images every 8 seconds
+  useEffect(() => {
+    if (images.length === 0) return;
+    
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 8000);
+    
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  const currentImage = images.length > 0 ? images[currentImageIndex].file : null;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -50,18 +65,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ heroImage }) => {
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
-        background: heroImage
-          ? `linear-gradient(135deg, ${alpha(colorPsychology.programs.cases.primary, 0.85)}, ${alpha(colorPsychology.programs.donations.primary, 0.85)}), url(${heroImage})`
-          : `linear-gradient(135deg, ${colorPsychology.programs.cases.primary} 0%, ${colorPsychology.programs.donations.primary} 50%, ${colorPsychology.programs.volunteers.primary} 100%)`,
+        backgroundImage: currentImage ? `url(${currentImage})` : 'none',
+        backgroundColor: colorPsychology.programs.cases.primary,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: { xs: 'scroll', md: 'fixed' },
+        transition: 'background-image 1s ease-in-out',
         '&::before': {
           content: '""',
           position: 'absolute',
           inset: 0,
-          background: `radial-gradient(circle at 20% 50%, ${alpha(theme.palette.common.white, 0.1)} 0%, transparent 50%),
-                       radial-gradient(circle at 80% 80%, ${alpha(theme.palette.common.black, 0.1)} 0%, transparent 50%)`,
+          background: `linear-gradient(135deg, ${alpha(theme.palette.common.black, 0.45)} 0%, ${alpha(theme.palette.common.black, 0.3)} 100%)`,
           pointerEvents: 'none'
         }
       }}
@@ -103,12 +117,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ heroImage }) => {
               lineHeight: 1.15,
               mb: 2,
               color: 'white',
-              textShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.3)}`
+              textShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.5)}`
             }}
           >
             <h1 style={{ margin: 0, font: 'inherit', display: 'block' }}>
               Empowering Lives,<br />
-              <Box component="span" sx={{ background: `linear-gradient(90deg, #FFD700, #FFA500)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <Box component="span" sx={{ color: '#FFD700' }}>
                 Building Futures
               </Box>
             </h1>
@@ -196,6 +210,40 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ heroImage }) => {
               ↓ Scroll to explore more
             </Typography>
           </MotionBox>
+
+          {/* Image Carousel Indicators */}
+          {images.length > 0 && (
+            <MotionBox 
+              variants={itemVariants}
+              sx={{ 
+                display: 'flex', 
+                gap: 1, 
+                justifyContent: { xs: 'center', md: 'flex-start' },
+                mt: 4 
+              }}
+            >
+              {images.map((_, index) => (
+                <Box
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    backgroundColor: index === currentImageIndex 
+                      ? 'white' 
+                      : 'rgba(255, 255, 255, 0.4)',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      transform: 'scale(1.2)'
+                    }
+                  }}
+                />
+              ))}
+            </MotionBox>
+          )}
         </MotionBox>
       </Container>
     </Box>

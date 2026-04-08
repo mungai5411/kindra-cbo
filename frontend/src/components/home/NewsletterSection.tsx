@@ -1,6 +1,6 @@
 /**
  * Newsletter Signup Section Component
- * Encourage email list building with value proposition
+ * Uses real background image instead of AI gradients
  * Mobile-first design with form validation
  */
 
@@ -12,7 +12,11 @@ import { colorPsychology } from '../../theme/colorPsychology';
 
 const MotionBox = motion(Box);
 
-export const NewsletterSection: React.FC = () => {
+interface NewsletterSectionProps {
+  backgroundImage?: string;
+}
+
+export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ backgroundImage }) => {
   const theme = useTheme();
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -43,15 +47,17 @@ export const NewsletterSection: React.FC = () => {
     <Box
       sx={{
         py: { xs: 6, md: 10 },
-        background: `linear-gradient(135deg, ${colorPsychology.programs.cases.primary} 0%, ${colorPsychology.programs.donations.primary} 50%, ${colorPsychology.programs.volunteers.primary} 100%)`,
+        backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none',
+        backgroundColor: colorPsychology.programs.cases.primary,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         position: 'relative',
         overflow: 'hidden',
         '&::before': {
           content: '""',
           position: 'absolute',
           inset: 0,
-          background: `radial-gradient(circle at 20% 50%, ${alpha(theme.palette.common.white, 0.1)}, transparent),
-                       radial-gradient(circle at 80% 80%, ${alpha(theme.palette.common.black, 0.1)}, transparent)`,
+          background: `linear-gradient(135deg, ${alpha(theme.palette.common.black, 0.55)} 0%, ${alpha(theme.palette.common.black, 0.45)} 100%)`,
           pointerEvents: 'none'
         }
       }}
