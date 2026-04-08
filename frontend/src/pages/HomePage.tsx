@@ -4,7 +4,7 @@
  * Uses Higherlife-inspired color psychology and animations
  */
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box } from '@mui/material';
 import { AppDispatch, RootState } from '../store';
@@ -24,8 +24,11 @@ export default function HomePage() {
   const dispatch = useDispatch<AppDispatch>();
   const { assets: landingPageImages } = useSelector((state: RootState) => state.media);
   
-  // Filter landing page images
-  const heroImages = landingPageImages.filter(asset => asset.source_type === 'SHELTER');
+  // Memoize filtered images to prevent infinite re-renders
+  const heroImages = useMemo(
+    () => landingPageImages.filter(asset => asset.source_type === 'SHELTER'),
+    [landingPageImages]
+  );
 
   // Fetch public statistics and media on component mount
   useEffect(() => {
