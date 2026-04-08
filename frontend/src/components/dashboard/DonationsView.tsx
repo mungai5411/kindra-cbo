@@ -419,167 +419,322 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 )}
             </Box>
             <Grid container spacing={3}>
-                {campaigns.filter((c: any) => isManagement || c.status !== 'DRAFT').map((camp: any) => (
+                {campaigns.filter((c: any) => isManagement || c.status !== 'DRAFT').map((camp: any, idx: number) => (
                     <Grid item xs={12} md={4} key={camp.id}>
-                        <Paper sx={{
-                            p: 3,
+                        <Paper component={motion.div} 
+                            initial={{ opacity: 0, y: 20 }} 
+                            animate={{ opacity: 1, y: 0 }} 
+                            transition={{ duration: 0.4, delay: idx * 0.1 }}
+                            sx={{
                             height: '100%',
                             display: 'flex',
                             flexDirection: 'column',
+                            padding: 0,
                             borderRadius: 4,
+                            overflow: 'hidden',
                             border: '1px solid',
                             borderColor: alpha(theme.palette.divider, 0.08),
-                            bgcolor: alpha(theme.palette.background.paper, 0.6),
-                            backdropFilter: 'blur(10px)',
+                            background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.95)} 0%, ${alpha(theme.palette.primary.main, 0.03)} 100%)`,
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            '&::before': {
+                                content: '""',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                height: '4px',
+                                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                                opacity: camp.status === 'ACTIVE' ? 1 : 0.3
+                            },
                             '&:hover': {
-                                transform: 'translateY(-4px)',
-                                borderColor: alpha(theme.palette.primary.main, 0.2),
-                                boxShadow: '0 12px 40px rgba(0,0,0,0.08)'
+                                transform: 'translateY(-8px)',
+                                borderColor: alpha(theme.palette.primary.main, 0.3),
+                                boxShadow: `0 20px 40px ${alpha(theme.palette.primary.main, 0.15)}`
                             }
                         }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5, lineHeight: 1.2 }}>
-                                    {camp.title}
+                            {/* Header Section with Gradient Background */}
+                            <Box sx={{ 
+                                background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
+                                p: 3,
+                                pb: 2
+                            }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                    <Box sx={{ flex: 1 }}>
+                                        <Typography variant="h6" sx={{ 
+                                            fontWeight: 900, 
+                                            letterSpacing: -0.5, 
+                                            lineHeight: 1.2,
+                                            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                                            WebkitBackgroundClip: 'text',
+                                            WebkitTextFillColor: 'transparent',
+                                            backgroundClip: 'text'
+                                        }}>
+                                            {camp.title}
+                                        </Typography>
+                                    </Box>
+                                    <StatusChip status={camp.status} />
+                                </Box>
+                                <Typography variant="body2" sx={{ 
+                                    color: 'text.secondary', 
+                                    fontWeight: 500, 
+                                    lineHeight: 1.5,
+                                    fontSize: '0.875rem'
+                                }}>
+                                    {camp.description || 'Supporting vulnerable communities through sustainable initiatives.'}
                                 </Typography>
-                                <StatusChip status={camp.status} />
                             </Box>
-                            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3, flexGrow: 1, fontWeight: 500, lineHeight: 1.6 }}>
-                                {camp.description || 'System initialization pending for campaign narrative.'}
-                            </Typography>
 
-                            <Box sx={{ mb: 3, bgcolor: alpha(theme.palette.background.default, 0.3), p: 2, borderRadius: 3 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5, alignItems: 'center' }}>
-                                    <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', letterSpacing: 0.5 }}>
-                                        TARGET: KES {(camp.target_amount || 0).toLocaleString()}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.1), px: 1, py: 0.25, borderRadius: 1 }}>
-                                        {camp.target_amount > 0 ? Math.round(((camp.raised_amount || 0) / camp.target_amount) * 100) : 0}%
-                                    </Typography>
-                                </Box>
-                                <LinearProgress
-                                    variant="determinate"
-                                    value={camp.target_amount > 0 ? Math.min(((camp.raised_amount || 0) / camp.target_amount) * 100, 100) : 0}
-                                    sx={{
-                                        height: 6,
+                            {/* Progress & Funding Section */}
+                            <Box sx={{ p: 3, pb: 2, flex: 1 }}>
+                                {/* Progress Header */}
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ 
+                                            fontWeight: 800, 
+                                            color: 'text.secondary', 
+                                            letterSpacing: 0.5,
+                                            display: 'block',
+                                            mb: 0.5
+                                        }}>
+                                            FUNDRAISING TARGET
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ 
+                                            fontWeight: 900,
+                                            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.info.main} 100%)`,
+                                            WebkitBackgroundClip: 'text',
+                                            WebkitTextFillColor: 'transparent',
+                                            backgroundClip: 'text'
+                                        }}>
+                                            KES {(camp.target_amount || 0).toLocaleString()}
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={{ 
+                                        textAlign: 'center',
+                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
                                         borderRadius: 3,
-                                        bgcolor: alpha(theme.palette.primary.main, 0.05),
-                                        '& .MuiLinearProgress-bar': { borderRadius: 3 }
-                                    }}
-                                />
-                                <Box sx={{ mt: 1.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 600 }}>SECURED FUNDING</Typography>
-                                    <Typography variant="caption" sx={{ color: 'success.main', fontWeight: 900 }}>KES {(camp.raised_amount || 0).toLocaleString()}</Typography>
+                                        px: 2,
+                                        py: 1.5,
+                                        border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`
+                                    }}>
+                                        <Typography variant="caption" sx={{ 
+                                            fontWeight: 600, 
+                                            color: 'text.secondary',
+                                            display: 'block',
+                                            fontSize: '0.7rem',
+                                            mb: 0.3
+                                        }}>
+                                            FUNDED
+                                        </Typography>
+                                        <Typography variant="h5" sx={{ 
+                                            fontWeight: 900,
+                                            color: 'primary.main'
+                                        }}>
+                                            {camp.target_amount > 0 ? Math.round(((camp.raised_amount || 0) / camp.target_amount) * 100) : 0}%
+                                        </Typography>
+                                    </Box>
+                                </Box>
+
+                                {/* Enhanced Progress Bar */}
+                                <Box sx={{ my: 2.5 }}>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={camp.target_amount > 0 ? Math.min(((camp.raised_amount || 0) / camp.target_amount) * 100, 100) : 0}
+                                        sx={{
+                                            height: 10,
+                                            borderRadius: 10,
+                                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                            '& .MuiLinearProgress-bar': { 
+                                                borderRadius: 10,
+                                                background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`
+                                            }
+                                        }}
+                                    />
+                                </Box>
+
+                                {/* Funding Info */}
+                                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
+                                    <Box sx={{ 
+                                        bgcolor: alpha(theme.palette.success.main, 0.08),
+                                        p: 1.5,
+                                        borderRadius: 2,
+                                        border: `1px solid ${alpha(theme.palette.success.main, 0.15)}`
+                                    }}>
+                                        <Typography variant="caption" sx={{ 
+                                            color: 'text.secondary', 
+                                            fontWeight: 600,
+                                            display: 'block',
+                                            mb: 0.5
+                                        }}>
+                                            SECURED
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ 
+                                            color: 'success.main', 
+                                            fontWeight: 900
+                                        }}>
+                                            KES {(camp.raised_amount || 0).toLocaleString()}
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={{ 
+                                        bgcolor: alpha(theme.palette.warning.main, 0.08),
+                                        p: 1.5,
+                                        borderRadius: 2,
+                                        border: `1px solid ${alpha(theme.palette.warning.main, 0.15)}`
+                                    }}>
+                                        <Typography variant="caption" sx={{ 
+                                            color: 'text.secondary', 
+                                            fontWeight: 600,
+                                            display: 'block',
+                                            mb: 0.5
+                                        }}>
+                                            REMAINING
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ 
+                                            color: 'warning.main', 
+                                            fontWeight: 900
+                                        }}>
+                                            KES {((camp.target_amount || 0) - (camp.raised_amount || 0)).toLocaleString()}
+                                        </Typography>
+                                    </Box>
                                 </Box>
                             </Box>
 
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 'auto' }}>
-                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                    {isManagement && (
-                                        <>
+                            {/* Action Buttons Section */}
+                            <Box sx={{ 
+                                p: 3, 
+                                pt: 2,
+                                background: alpha(theme.palette.background.default, 0.3),
+                                borderTop: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 1.5
+                            }}>
+                                {/* Primary Action */}
+                                <Button
+                                    variant="contained"
+                                    fullWidth
+                                    startIcon={<Payment sx={{ fontSize: '1rem' }} />}
+                                    onClick={() => handleOpenDonationDialog(camp)}
+                                    sx={{
+                                        borderRadius: 2.5,
+                                        textTransform: 'none',
+                                        fontWeight: 900,
+                                        fontSize: '0.875rem',
+                                        py: 1.2,
+                                        background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                                        boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.3)}`,
+                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        '&:hover': {
+                                            boxShadow: `0 12px 28px ${alpha(theme.palette.primary.main, 0.4)}`,
+                                            transform: 'translateY(-2px)'
+                                        },
+                                        '&:active': {
+                                            transform: 'translateY(0)'
+                                        }
+                                    }}
+                                >
+                                    {isDonor ? 'Make Contribution' : 'Initiate Contributors'}
+                                </Button>
+
+                                {/* Management Actions */}
+                                {isManagement && (
+                                    <>
+                                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
                                             <Button
                                                 variant="outlined"
                                                 size="small"
-                                                color="success"
                                                 disabled={camp.status === 'COMPLETED'}
                                                 onClick={() => handleCompleteCampaign(camp.slug)}
                                                 sx={{
-                                                    flex: 1,
                                                     borderRadius: 2,
                                                     textTransform: 'none',
                                                     fontWeight: 800,
-                                                    fontSize: '0.7rem',
-                                                    py: 0.75,
-                                                    borderColor: alpha(theme.palette.success.main, 0.3),
-                                                    '&:hover': { bgcolor: alpha(theme.palette.success.main, 0.05), borderColor: 'success.main' }
+                                                    fontSize: '0.8rem',
+                                                    py: 1,
+                                                    borderColor: alpha(theme.palette.success.main, 0.4),
+                                                    color: 'success.main',
+                                                    transition: 'all 0.2s ease',
+                                                    '&:hover': { 
+                                                        bgcolor: alpha(theme.palette.success.main, 0.08),
+                                                        borderColor: 'success.main',
+                                                        transform: 'translateY(-1px)'
+                                                    }
                                                 }}
                                             >
-                                                Finalize
+                                                ✓ Finalize
                                             </Button>
                                             <Button
                                                 variant="outlined"
                                                 size="small"
-                                                color="error"
                                                 onClick={() => handleDeleteCampaign(camp.slug)}
                                                 sx={{
-                                                    flex: 1,
                                                     borderRadius: 2,
                                                     textTransform: 'none',
                                                     fontWeight: 800,
-                                                    fontSize: '0.7rem',
-                                                    py: 0.75,
-                                                    borderColor: alpha(theme.palette.error.main, 0.3),
-                                                    '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.05), borderColor: 'error.main' }
+                                                    fontSize: '0.8rem',
+                                                    py: 1,
+                                                    borderColor: alpha(theme.palette.error.main, 0.4),
+                                                    color: 'error.main',
+                                                    transition: 'all 0.2s ease',
+                                                    '&:hover': { 
+                                                        bgcolor: alpha(theme.palette.error.main, 0.08),
+                                                        borderColor: 'error.main',
+                                                        transform: 'translateY(-1px)'
+                                                    }
                                                 }}
                                             >
-                                                Delete
+                                                🗑 Remove
                                             </Button>
-                                        </>
-                                    )}
-                                </Box>
-                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                    {isManagement && (
-                                        <>
+                                        </Box>
+                                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
                                             <Button
                                                 variant="outlined"
                                                 size="small"
                                                 onClick={() => handleOpenStatusDialog(camp)}
                                                 sx={{
-                                                    flex: 1,
                                                     borderRadius: 2,
                                                     textTransform: 'none',
                                                     fontWeight: 800,
-                                                    fontSize: '0.7rem',
-                                                    py: 0.75,
-                                                    borderColor: 'divider',
-                                                    color: 'text.secondary',
-                                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main', color: 'primary.main' }
+                                                    fontSize: '0.8rem',
+                                                    py: 1,
+                                                    borderColor: alpha(theme.palette.info.main, 0.4),
+                                                    color: 'info.main',
+                                                    transition: 'all 0.2s ease',
+                                                    '&:hover': { 
+                                                        bgcolor: alpha(theme.palette.info.main, 0.08),
+                                                        borderColor: 'info.main',
+                                                        transform: 'translateY(-1px)'
+                                                    }
                                                 }}
                                             >
-                                                Metadata
+                                                ⚙ Details
                                             </Button>
                                             <Button
                                                 variant="outlined"
                                                 size="small"
                                                 onClick={() => setOpenDialog?.(true, camp)}
                                                 sx={{
-                                                    flex: 1,
                                                     borderRadius: 2,
                                                     textTransform: 'none',
                                                     fontWeight: 800,
-                                                    fontSize: '0.7rem',
-                                                    py: 0.75,
-                                                    borderColor: 'divider',
+                                                    fontSize: '0.8rem',
+                                                    py: 1,
+                                                    borderColor: alpha(theme.palette.primary.main, 0.4),
                                                     color: 'primary.main',
-                                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main' }
+                                                    transition: 'all 0.2s ease',
+                                                    '&:hover': { 
+                                                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                                        borderColor: 'primary.main',
+                                                        transform: 'translateY(-1px)'
+                                                    }
                                                 }}
                                             >
-                                                Edit
+                                                ✏ Edit
                                             </Button>
-                                        </>
-                                    )}
-                                    <Button
-                                        variant="contained"
-                                        size="small"
-                                        startIcon={<Payment sx={{ fontSize: '0.9rem' }} />}
-                                        onClick={() => handleOpenDonationDialog(camp)}
-                                        sx={{
-                                            flex: 1,
-                                            borderRadius: 2,
-                                            textTransform: 'none',
-                                            fontWeight: 900,
-                                            fontSize: '0.75rem',
-                                            py: 0.75,
-                                            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
-                                            '&:hover': {
-                                                boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
-                                                transform: 'translateY(-1px)'
-                                            }
-                                        }}
-                                    >
-                                        Initiate Contribution
-                                    </Button>
-                                </Box>
+                                        </Box>
+                                    </>
+                                )}
                             </Box>
                         </Paper>
                     </Grid>
