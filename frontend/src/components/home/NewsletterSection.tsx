@@ -111,6 +111,7 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ background
                 <TextField
                   type="email"
                   placeholder="Your email address"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);

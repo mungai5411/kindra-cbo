@@ -345,6 +345,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                                             required
                                             label="Email Address"
                                             type="email"
+                                            autoComplete="email"
                                             placeholder="your@email.com"
                                             value={donorEmail}
                                             onChange={(e) => setDonorEmail(e.target.value)}

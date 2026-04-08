@@ -159,6 +159,7 @@ export default function ForgotPasswordPage() {
                                     fullWidth
                                     label="Enter your email"
                                     type="email"
+                                    autoComplete="email"
                                     variant="outlined"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}

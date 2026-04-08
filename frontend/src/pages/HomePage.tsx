@@ -22,7 +22,7 @@ import { NewsletterSection } from '../components/home/NewsletterSection';
 
 export default function HomePage() {
   const dispatch = useDispatch<AppDispatch>();
-  const { assets: landingPageImages } = useSelector((state: RootState) => state.media);
+  const { assets: landingPageImages, authChecked } = useSelector((state: RootState) => state.media);
   
   // Memoize filtered images to prevent infinite re-renders
   const heroImages = useMemo(
@@ -33,8 +33,11 @@ export default function HomePage() {
   // Fetch public statistics and media on component mount
   useEffect(() => {
     dispatch(fetchPublicStats());
-    dispatch(fetchMedia());
-  }, [dispatch]);
+    // Only fetch media once (authChecked prevents infinite retries on public pages)
+    if (!authChecked) {
+      dispatch(fetchMedia());
+    }
+  }, [dispatch, authChecked]);
 
   return (
     <Box sx={{ bgcolor: 'background.default', overflow: 'hidden' }}>

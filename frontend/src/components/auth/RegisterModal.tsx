@@ -211,6 +211,7 @@ export const RegisterModal = () => {
                                     fullWidth
                                     name="email"
                                     type="email"
+                                    autoComplete="email"
                                     placeholder="jane@example.com"
                                     value={formData.email}
                                     onChange={handleChange}

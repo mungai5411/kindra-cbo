@@ -21,12 +21,14 @@ interface MediaState {
     assets: MediaAsset[];
     isLoading: boolean;
     error: string | null;
+    authChecked: boolean; // Prevent infinite retries on public pages
 }
 
 const initialState: MediaState = {
     assets: [],
     isLoading: false,
     error: null,
+    authChecked: false,
 };
 
 export const fetchMedia = createAsyncThunk(
@@ -83,10 +85,12 @@ const mediaSlice = createSlice({
             .addCase(fetchMedia.fulfilled, (state, action: PayloadAction<MediaAsset[]>) => {
                 state.isLoading = false;
                 state.assets = action.payload;
+                state.authChecked = true; // Mark that we've completed auth check
             })
             .addCase(fetchMedia.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
+                state.authChecked = true; // Mark that we've completed auth check (even if failed)
             })
             .addCase(uploadMedia.fulfilled, (state, action: PayloadAction<MediaAsset>) => {
                 state.assets.unshift(action.payload);

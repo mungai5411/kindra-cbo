@@ -343,6 +343,7 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit, initialData
                                 fullWidth
                                 required
                                 type="email"
+                                autoComplete="email"
                                 label="Email Address"
                                 value={formData.email}
                                 onChange={(e) => handleChange('email', e.target.value)}

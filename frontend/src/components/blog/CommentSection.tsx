@@ -118,6 +118,7 @@ export const CommentSection = ({ postSlug, postId }: CommentSectionProps) => {
                             fullWidth
                             placeholder="Email Address"
                             type="email"
+                            autoComplete="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             variant="outlined"
