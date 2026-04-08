@@ -107,7 +107,7 @@ export default function HomePage() {
     const { dashboardData } = useSelector((state: RootState) => state.reporting);
     const [mediaAssets, setMediaAssets] = useState<any[]>([]);
     const [heroIndex, setHeroIndex] = useState(0);
-    const [partnerIndex, setPartnerIndex] = useState(1);
+    const [partnerIndex, setPartnerIndex] = useState(0);
 
     useEffect(() => {
         dispatch(fetchPublicStats());
@@ -117,7 +117,23 @@ export default function HomePage() {
                 const response = await apiClient.get('/blog/media/gallery/', {
                     params: { source_type: 'SHELTER' }
                 });
-                setMediaAssets(response.data.results || response.data || []);
+                const fetchedAssets = response.data.results || response.data || [];
+                setMediaAssets(fetchedAssets);
+                
+                // Initialize with unique random indices
+                if (fetchedAssets.length > 1) {
+                    const hIndex = Math.floor(Math.random() * fetchedAssets.length);
+                    let pIndex;
+                    do {
+                        pIndex = Math.floor(Math.random() * fetchedAssets.length);
+                    } while (pIndex === hIndex);
+                    
+                    setHeroIndex(hIndex);
+                    setPartnerIndex(pIndex);
+                } else if (fetchedAssets.length === 1) {
+                    setHeroIndex(0);
+                    setPartnerIndex(0);
+                }
             } catch (error) {
                 console.error('Failed to fetch media assets:', error);
             }
@@ -125,13 +141,27 @@ export default function HomePage() {
         fetchMedia();
     }, [dispatch]);
 
-    // Handle 15s Auto-Rotation
+    // Handle 15s Randomized Unique Auto-Rotation
     useEffect(() => {
-        if (mediaAssets.length > 0) {
+        if (mediaAssets.length > 1) {
             const timer = setInterval(() => {
-                setHeroIndex(prev => (prev + 1) % mediaAssets.length);
-                setPartnerIndex(prev => (prev + 1) % mediaAssets.length);
-            }, 15000); // 15 seconds as requested
+                setHeroIndex(prevHero => {
+                    let nextHero;
+                    do {
+                        nextHero = Math.floor(Math.random() * mediaAssets.length);
+                    } while (nextHero === prevHero);
+
+                    setPartnerIndex(prevPartner => {
+                        let nextPartner;
+                        do {
+                            nextPartner = Math.floor(Math.random() * mediaAssets.length);
+                        } while (nextPartner === nextHero || (mediaAssets.length > 2 && nextPartner === prevPartner));
+                        return nextPartner;
+                    });
+
+                    return nextHero;
+                });
+            }, 15000);
             return () => clearInterval(timer);
         }
     }, [mediaAssets.length]);
@@ -330,8 +360,9 @@ export default function HomePage() {
                                     boxShadow: `0 32px 64px ${alpha(theme.palette.text.primary, 0.1)}`,
                                     position: 'relative',
                                     zIndex: 1,
-                                    height: 350,
+                                    height: { xs: 400, md: 550 },
                                     width: '100%',
+                                    maxWidth: '100%',
                                     border: '1px solid',
                                     borderColor: alpha(theme.palette.divider, 0.5)
                                 }}>
@@ -351,7 +382,7 @@ export default function HomePage() {
                                                     animate={{ scale: 1.1 }}
                                                     transition={{ duration: 15, ease: "linear" }}
                                                     src={activeHero.file}
-                                                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    sx={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'auto' }}
                                                 />
                                                 <Box sx={{
                                                     position: 'absolute',
@@ -552,8 +583,9 @@ export default function HomePage() {
                                     zIndex: 0
                                 }} />
                                 <Box sx={{
-                                    height: 350,
+                                    height: { xs: 400, md: 500 },
                                     width: '100%',
+                                    maxWidth: '100%',
                                     borderRadius: 8,
                                     overflow: 'hidden',
                                     position: 'relative',
@@ -579,7 +611,8 @@ export default function HomePage() {
                                                     sx={{
                                                         width: '100%',
                                                         height: '100%',
-                                                        objectFit: 'cover'
+                                                        objectFit: 'cover',
+                                                        imageRendering: 'auto'
                                                     }}
                                                 />
                                             </MotionBox>
