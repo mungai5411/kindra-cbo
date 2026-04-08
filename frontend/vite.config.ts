@@ -34,7 +34,7 @@ export default defineConfig({
     build: {
         outDir: 'dist',
         sourcemap: true,
-        minify: 'esbuild',
+        minify: false,
         reportCompressedSize: false,
         chunkSizeWarningLimit: 1500,
         rollupOptions: {
