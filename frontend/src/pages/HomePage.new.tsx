@@ -6,7 +6,7 @@
 
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { Box } from '@mui/material';
+import { Box, Divider } from '@mui/material';
 import { AppDispatch } from '../store';
 import { fetchPublicStats } from '../features/reporting/reportingSlice';
 import { Navbar } from '../components/public/Navbar';
@@ -15,9 +15,10 @@ import { ImpactMetrics } from '../components/home/ImpactMetrics';
 import { MissionAndValues } from '../components/home/MissionAndValues';
 import { ProgramsShowcase } from '../components/home/ProgramsShowcase';
 import { CallToAction } from '../components/home/CallToAction';
-import { FAQSection } from '../components/home/FAQSection';
 import { TestimonialsSection } from '../components/home/TestimonialsSection';
+import { FAQSection } from '../components/home/FAQSection';
 import { NewsletterSection } from '../components/home/NewsletterSection';
+import { Footer } from '../components/public/Footer';
 
 export default function HomePage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -38,6 +39,9 @@ export default function HomePage() {
       {/* Impact Metrics - Show Scale */}
       <ImpactMetrics />
 
+      {/* Divider */}
+      <Divider sx={{ my: { xs: 2, md: 4 } }} />
+
       {/* Mission & Values - Build Trust */}
       <MissionAndValues />
 
@@ -55,6 +59,9 @@ export default function HomePage() {
 
       {/* Newsletter Signup - Build Community */}
       <NewsletterSection />
+
+      {/* Footer */}
+      <Footer />
     </Box>
   );
 }
