@@ -34,7 +34,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ images = [] }) => {
     return () => clearInterval(interval);
   }, [images.length]);
 
-  const currentImage = images.length > 0 ? images[currentImageIndex].file : null;
+  // Construct absolute URL for image
+  const getImageUrl = (filePath: string) => {
+    if (!filePath) return null;
+    // If already absolute URL, return as-is
+    if (filePath.startsWith('http')) return filePath;
+    // Otherwise, prepend API base URL
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    return `${apiUrl}/${filePath}`.replace(/\/+/g, '/').replace(':/', '://');
+  };
+
+  const currentImage = images.length > 0 ? getImageUrl(images[currentImageIndex]?.file) : null;
 
   const containerVariants = {
     hidden: { opacity: 0 },

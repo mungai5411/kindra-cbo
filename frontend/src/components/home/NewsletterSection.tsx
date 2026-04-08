@@ -23,6 +23,16 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ background
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Construct absolute URL for image
+  const getImageUrl = (filePath?: string) => {
+    if (!filePath) return null;
+    // If already absolute URL, return as-is
+    if (filePath.startsWith('http')) return filePath;
+    // Otherwise, prepend API base URL
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    return `${apiUrl}/${filePath}`.replace(/\/+/g, '/').replace(':/', '://');
+  };
+
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -43,11 +53,13 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ background
     }, 1000);
   };
 
+  const bgImage = getImageUrl(backgroundImage);
+
   return (
     <Box
       sx={{
         py: { xs: 6, md: 10 },
-        backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none',
+        backgroundImage: bgImage ? `url(${bgImage})` : 'none',
         backgroundColor: colorPsychology.programs.cases.primary,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
