@@ -4,6 +4,7 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import apiClient, { endpoints } from '../../api/client';
+import { fetchDashboardData } from '../reporting/reportingSlice';
 
 export const fetchCampaigns = createAsyncThunk(
     'donations/fetchCampaigns',
@@ -169,7 +170,6 @@ export const processPayment = createAsyncThunk(
             dispatch(fetchDonors());
 
             // Sync high-level stats
-            const { fetchDashboardData } = await import('../reporting/reportingSlice');
             dispatch(fetchDashboardData());
 
             // Generate system-wide notification for ALL users

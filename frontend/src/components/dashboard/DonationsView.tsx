@@ -437,7 +437,6 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                             background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.95)} 0%, ${alpha(theme.palette.primary.main, 0.03)} 100%)`,
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             position: 'relative',
-                            overflow: 'hidden',
                             '&::before': {
                                 content: '""',
                                 position: 'absolute',
