@@ -33,46 +33,16 @@ export default defineConfig({
     },
     build: {
         outDir: 'dist',
-        sourcemap: false,
-        minify: 'terser',
-        terserOptions: {
-            compress: {
-                drop_console: true,
-                drop_debugger: true
-            }
-        },
+        sourcemap: true,
+        minify: 'esbuild',
         reportCompressedSize: false,
-        chunkSizeWarningLimit: 1000,
+        chunkSizeWarningLimit: 1500,
         rollupOptions: {
             output: {
-                manualChunks: (id) => {
-                    if (id.includes('node_modules')) {
-                        if (id.includes('@mui')) {
-                            return 'mui-vendor';
-                        }
-                        if (id.includes('react')) {
-                            return 'react-vendor';
-                        }
-                        if (id.includes('@reduxjs') || id.includes('react-redux')) {
-                            return 'redux-vendor';
-                        }
-                        if (id.includes('framer-motion')) {
-                            return 'animation-vendor';
-                        }
-                        if (id.includes('recharts') || id.includes('chart')) {
-                            return 'chart-vendor';
-                        }
-                        return 'vendor';
-                    }
-                    if (id.includes('src/components')) {
-                        return 'components';
-                    }
-                    if (id.includes('src/features')) {
-                        return 'features';
-                    }
-                    if (id.includes('src/pages')) {
-                        return 'pages';
-                    }
+                manualChunks: {
+                    'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+                    'mui-vendor': ['@mui/material', '@mui/icons-material'],
+                    'redux-vendor': ['@reduxjs/toolkit', 'react-redux']
                 }
             }
         }
