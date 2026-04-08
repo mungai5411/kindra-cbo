@@ -32,7 +32,8 @@ import {
     Tooltip,
     Divider,
     Snackbar,
-    useTheme
+    useTheme,
+    Menu
 } from '@mui/material';
 import {
     Search,
@@ -43,15 +44,22 @@ import {
     NoteAdd,
     HistoryEdu,
     Refresh,
-    HealthAndSafety
+    HealthAndSafety,
+    Edit,
+    MoreVert,
+    WarningAmber
 } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
 import { fetchFamilies, fetchChildren, fetchCases, addFamily, addChild, addCase } from '../../features/caseManagement/caseManagementSlice';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
+import { SummaryHeader } from './SummaryHeader';
+import { CaseCard } from './CaseCard';
+import { CaseFilterBar } from './CaseFilterBar';
 import { KENYA_COUNTIES } from '../../utils/locationData';
 import { downloadFile } from '../../utils/downloadHelper';
 import { Select, FormControl, InputLabel } from '@mui/material';
+import { colorPsychology } from '../../theme/colorPsychology';
 
 // Reusable Status Chip for consistency
 const StatusChip = ({ status, type = 'status' }: { status: string, type?: 'status' | 'priority' }) => {
@@ -117,6 +125,11 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
     const userRole = useSelector((state: RootState) => state.auth.user?.role);
     const isManagement = ['ADMIN', 'MANAGEMENT'].includes(userRole || '');
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' as 'info' | 'success' | 'error' });
+
+    // Filter & Search State
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filters, setFilters] = useState<Record<string, string[]>>({});
+    const [menuAnchor, setMenuAnchor] = useState<{ el: HTMLElement | null; caseId: string }>({ el: null, caseId: '' });
 
     // New Data Entry State
     const [openDialog, setOpenDialog] = useState<{ type: string | null, data: any }>({ type: null, data: null });
@@ -204,81 +217,207 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
         return <Box sx={{ display: 'flex', justifyContent: 'center', p: 8 }}><CircularProgress /></Box>;
     }
 
-    const renderCases = () => (
-        <Paper sx={{
-            p: 0,
-            borderRadius: 4,
-            border: '1px solid',
-            borderColor: 'divider',
-            overflow: 'hidden',
-        }}>
-            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" fontWeight="bold">Active Case Management</Typography>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    sx={{ borderRadius: 3, boxShadow: theme.shadows[2], textTransform: 'none', fontWeight: 600 }}
-                    startIcon={<NoteAdd />}
-                    onClick={() => setOpenDialog({ type: 'case', data: null })}
-                >
-                    Add New Case
-                </Button>
-                <IconButton onClick={handleRefresh} color="primary" sx={{ ml: 1, bgcolor: alpha(theme.palette.primary.main, 0.05) }}>
-                    <Refresh />
-                </IconButton>
-            </Box>
-            <TableContainer>
-                <Table>
-                    <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
-                        <TableRow>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Case Reference</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Subject</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Service Type</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Current Status</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Priority</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {cases.map((c: any) => (
-                            <TableRow key={c.id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'primary.main' }}>{c.case_number}</TableCell>
-                                <TableCell sx={{ fontWeight: 500 }}>{c.child_name}</TableCell>
-                                <TableCell>{c.case_type}</TableCell>
-                                <TableCell>
-                                    <StatusChip status={c.status} type="status" />
-                                </TableCell>
-                                <TableCell>
-                                    <Tooltip title={`${c.priority} Priority Content`}>
-                                        <Box component="span">
-                                            <StatusChip status={c.priority} type="priority" />
-                                        </Box>
-                                    </Tooltip>
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Button
-                                        size="small"
-                                        variant="outlined"
-                                        color="primary"
-                                        onClick={async () => {
-                                            try {
-                                                const url = `/cases/cases/${c.id}/export-summary/`;
-                                                await downloadFile(url, `CaseSummary_${c.case_number}.pdf`);
-                                            } catch (err) {
-                                                setSnackbar({ open: true, message: 'Failed to download case summary.', severity: 'error' });
-                                            }
-                                        }}
-                                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
-                                    >
-                                        Summary
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
+    const renderCases = () => {
+        // Apply filters and search
+        let filteredCases = cases.filter((c: any) => {
+            // Search query
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                const matches = 
+                    c.case_number?.toLowerCase().includes(q) ||
+                    c.child_name?.toLowerCase().includes(q) ||
+                    c.family_name?.toLowerCase().includes(q);
+                if (!matches) return false;
+            }
+
+            // Status filter
+            if (filters.status?.length && !filters.status.includes(c.status)) return false;
+            
+            // Priority filter
+            if (filters.priority?.length && !filters.priority.includes(c.priority)) return false;
+
+            return true;
+        });
+
+        // Calculate metrics
+        const urgentCount = filteredCases.filter((c: any) => c.priority === 'CRITICAL' || c.priority === 'HIGH').length;
+        const overdueCount = filteredCases.filter((c: any) => {
+            const createdDate = new Date(c.created_at);
+            const daysPending = Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+            return daysPending > 14;
+        }).length;
+
+        return (
+            <Box>
+                {/* Summary Header with Key Metrics */}
+                <SummaryHeader
+                    title="Case Management Summary"
+                    color={colorPsychology.programs.cases.primary}
+                    metrics={[
+                        {
+                            label: 'Total Cases',
+                            value: cases.length,
+                            icon: <Assignment />,
+                            color: colorPsychology.programs.cases.primary
+                        },
+                        {
+                            label: 'Active Cases',
+                            value: cases.filter((c: any) => c.status !== 'RESOLVED').length,
+                            icon: <ChildCare />,
+                            isGood: true,
+                            color: colorPsychology.status.success.primary
+                        },
+                        {
+                            label: 'Urgent Priority',
+                            value: urgentCount,
+                            isBad: urgentCount > 0,
+                            icon: <WarningAmber />,
+                            color: colorPsychology.status.critical.primary
+                        },
+                        {
+                            label: 'Resolution Rate',
+                            value: `${cases.length > 0 ? Math.round((cases.filter((c: any) => c.status === 'RESOLVED').length / cases.length) * 100) : 0}%`,
+                            isGood: true,
+                            color: colorPsychology.status.success.primary
+                        }
+                    ]}
+                />
+
+                {/* Advanced Filter Bar */}
+                <CaseFilterBar
+                    onFilterChange={setFilters}
+                    onSearch={setSearchQuery}
+                    totalResults={cases.length}
+                    filteredResults={filteredCases.length}
+                    urgentCount={urgentCount}
+                    overdueCount={overdueCount}
+                    filterGroups={[
+                        {
+                            name: 'Status',
+                            key: 'status',
+                            options: [
+                                { label: 'Open', value: 'OPEN', count: cases.filter((c: any) => c.status === 'OPEN').length },
+                                { label: 'In Progress', value: 'IN_PROGRESS', count: cases.filter((c: any) => c.status === 'IN_PROGRESS').length },
+                                { label: 'Resolved', value: 'RESOLVED', count: cases.filter((c: any) => c.status === 'RESOLVED').length },
+                                { label: 'Closed', value: 'CLOSED', count: cases.filter((c: any) => c.status === 'CLOSED').length }
+                            ],
+                            color: colorPsychology.programs.cases.primary
+                        },
+                        {
+                            name: 'Priority',
+                            key: 'priority',
+                            options: [
+                                { label: 'Critical', value: 'CRITICAL', count: cases.filter((c: any) => c.priority === 'CRITICAL').length },
+                                { label: 'High', value: 'HIGH', count: cases.filter((c: any) => c.priority === 'HIGH').length },
+                                { label: 'Medium', value: 'MEDIUM', count: cases.filter((c: any) => c.priority === 'MEDIUM').length },
+                                { label: 'Low', value: 'LOW', count: cases.filter((c: any) => c.priority === 'LOW').length }
+                            ],
+                            color: colorPsychology.priority.critical.primary
+                        }
+                    ]}
+                />
+
+                {/* Add Case Button */}
+                <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box sx={{
+                            width: 4,
+                            height: 24,
+                            borderRadius: 2,
+                            background: `linear-gradient(180deg, ${colorPsychology.programs.cases.primary}, ${alpha(colorPsychology.programs.cases.primary, 0.4)})`
+                        }} />
+                        Cases
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        startIcon={<NoteAdd />}
+                        onClick={() => setOpenDialog({ type: 'case', data: null })}
+                        sx={{
+                            background: `linear-gradient(135deg, ${colorPsychology.programs.cases.primary}, ${colorPsychology.programs.cases.light})`,
+                            borderRadius: 2
+                        }}
+                    >
+                        Add New Case
+                    </Button>
+                </Box>
+
+                {/* Cases Grid - Card Layout */}
+                {filteredCases.length > 0 ? (
+                    <Grid container spacing={2.5}>
+                        {filteredCases.map((caseData: any, index: number) => (
+                            <Grid item xs={12} sm={6} lg={4} key={caseData.id}>
+                                <CaseCard
+                                    case={{
+                                        id: caseData.id,
+                                        case_number: caseData.case_number,
+                                        child_name: caseData.child_name,
+                                        family_name: caseData.family_name,
+                                        status: caseData.status,
+                                        priority: caseData.priority,
+                                        description: caseData.description,
+                                        created_at: caseData.created_at,
+                                        assigned_worker: caseData.assigned_to,
+                                        milestones_completed: caseData.milestones_completed,
+                                        milestones_total: caseData.milestones_total,
+                                        days_pending: Math.floor((Date.now() - new Date(caseData.created_at).getTime()) / (1000 * 60 * 60 * 24)),
+                                        next_action: caseData.next_action,
+                                        next_action_date: caseData.next_action_date
+                                    }}
+                                    onEdit={(id) => console.log('Edit case:', id)}
+                                    onAssignVolunteer={(id) => console.log('Assign volunteer:', id)}
+                                    onAllocateFunds={(id) => console.log('Allocate funds:', id)}
+                                    onMenuClick={(e, id) => setMenuAnchor({ el: e.currentTarget, caseId: id })}
+                                    isOverdue={overdueCount > 0}
+                                />
+                            </Grid>
                         ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </Paper>
-    );
+                    </Grid>
+                ) : (
+                    <Paper sx={{
+                        p: 6,
+                        textAlign: 'center',
+                        borderRadius: 3,
+                        border: `2px dashed ${alpha(colorPsychology.programs.cases.primary, 0.2)}`
+                    }}>
+                        <ChildCare sx={{ fontSize: 48, color: alpha(colorPsychology.programs.cases.primary, 0.4), mb: 1 }} />
+                        <Typography color="text.secondary" sx={{ mb: 2 }}>
+                            {searchQuery ? 'No cases match your search' : 'No cases found. Start by adding one!'}
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            onClick={() => setOpenDialog({ type: 'case', data: null })}
+                            sx={{
+                                background: `linear-gradient(135deg, ${colorPsychology.programs.cases.primary}, ${colorPsychology.programs.cases.light})`
+                            }}
+                        >
+                            Create First Case
+                        </Button>
+                    </Paper>
+                )}
+
+                {/* Case Menu */}
+                <Menu
+                    anchorEl={menuAnchor.el}
+                    open={Boolean(menuAnchor.el)}
+                    onClose={() => setMenuAnchor({ el: null, caseId: '' })}
+                >
+                    <MenuItem onClick={() => {
+                        console.log('Edit case:', menuAnchor.caseId);
+                        setMenuAnchor({ el: null, caseId: '' });
+                    }}>
+                        <Edit sx={{ mr: 1, fontSize: '1.25rem' }} />
+                        Edit Case
+                    </MenuItem>
+                    <MenuItem onClick={() => {
+                        console.log('View details:', menuAnchor.caseId);
+                        setMenuAnchor({ el: null, caseId: '' });
+                    }}>
+                        View Details
+                    </MenuItem>
+                </Menu>
+            </Box>
+        );
+    };
 
     const renderChildren = () => (
         <Paper sx={{
@@ -488,49 +627,6 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
 
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Grid container spacing={{ xs: 1.5, sm: 3 }} sx={{ mb: 4 }}>
-                {[
-                    { label: 'Active Case Load', value: cases.length, icon: <Assignment />, color: theme.palette.info.main, delay: 0 },
-                    { label: 'Children Protected', value: children.length, icon: <ChildCare />, color: theme.palette.secondary.main, delay: 0.1 },
-                    { label: 'Families Supported', value: families.length, icon: <FamilyRestroom />, color: theme.palette.success.main, delay: 0.2 },
-                ].map((item, i) => (
-                    <Grid item xs={12} md={4} key={i}>
-                        <StatsCard
-                            title={item.label}
-                            value={String(item.value)}
-                            icon={item.icon}
-                            color={item.color}
-                            delay={item.delay}
-                        />
-                    </Grid>
-                ))}
-            </Grid>
-
-            {/* Premium Search Filter Bar */}
-            <Paper sx={{
-                p: 1,
-                mb: 4,
-                borderRadius: 4,
-                display: 'flex',
-                alignItems: 'center',
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: theme.shadows[1]
-            }}>
-                <IconButton sx={{ p: 1.5 }}><Search /></IconButton>
-                <InputBase
-                    sx={{ ml: 2, flex: 1, fontWeight: 'medium' }}
-                    placeholder="Search master registry (Cases, Names, Locations)..."
-                />
-                <Divider sx={{ height: 32, m: 0.5 }} orientation="vertical" />
-                <Button
-                    startIcon={<FilterList />}
-                    sx={{ ml: 1, px: 3, borderRadius: 3, fontWeight: 'bold', color: 'text.secondary' }}
-                >
-                    Filter System
-                </Button>
-            </Paper>
-
             {activeTab === 'cases' && renderCases()}
             {activeTab === 'children' && renderChildren()}
             {activeTab === 'families' && renderFamilies()}

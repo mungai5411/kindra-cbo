@@ -333,7 +333,7 @@ export default function HomePage() {
                             </MotionBox>
                         </Grid>
 
-                        <Grid item xs={12} lg={5} sx={{ display: { xs: 'none', lg: 'block' } }}>
+                        <Grid item xs={12} lg={5}>
                             <MotionBox
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -433,7 +433,7 @@ export default function HomePage() {
                                         border: '1px solid',
                                         borderColor: alpha(theme.palette.primary.main, 0.2),
                                         zIndex: 2,
-                                        display: 'flex',
+                                        display: { xs: 'none', md: 'flex' },
                                         alignItems: 'center',
                                         gap: 2
                                     }}
