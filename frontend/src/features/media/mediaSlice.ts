@@ -36,6 +36,11 @@ export const fetchMedia = createAsyncThunk(
             const response = await apiClient.get(endpoints.blog.media);
             return response.data.results || response.data;
         } catch (error: any) {
+            // If unauthorized (401), return empty array instead of error
+            // This allows public pages to work without requiring login
+            if (error.response?.status === 401) {
+                return [];
+            }
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch media');
         }
     }
