@@ -48,6 +48,33 @@ export const fetchMedia = createAsyncThunk(
     }
 );
 
+// Separate thunk for public media (landing page gallery) - doesn't require auth
+export const fetchPublicLandingPageMedia = createAsyncThunk(
+    'media/fetchPublicLandingPageMedia',
+    async (_, { rejectWithValue }) => {
+        try {
+            // Try to fetch media without Authorization header
+            // The backend may allow public access to gallery images
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/blog/media/?source_type=SHELTER`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'omit' // Don't send credentials for public fetch
+            });
+            
+            if (!response.ok) {
+                // If fails, return empty array to avoid infinite loops
+                return [];
+            }
+            
+            const data = await response.json();
+            return data.results || data;
+        } catch (error) {
+            // Network error, return empty array
+            return [];
+        }
+    }
+);
+
 export const uploadMedia = createAsyncThunk(
     'media/uploadMedia',
     async (formData: FormData, { rejectWithValue }) => {
@@ -91,6 +118,15 @@ const mediaSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload as string;
                 state.authChecked = true; // Mark that we've completed auth check (even if failed)
+            })
+            .addCase(fetchPublicLandingPageMedia.fulfilled, (state, action: PayloadAction<MediaAsset[]>) => {
+                // For public pages, merge or replace with public media
+                state.assets = action.payload;
+                state.authChecked = true;
+            })
+            .addCase(fetchPublicLandingPageMedia.rejected, (state) => {
+                // Public fetch failed, keep empty array
+                state.authChecked = true;
             })
             .addCase(uploadMedia.fulfilled, (state, action: PayloadAction<MediaAsset>) => {
                 state.assets.unshift(action.payload);

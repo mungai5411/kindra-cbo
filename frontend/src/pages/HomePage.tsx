@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Box } from '@mui/material';
 import { AppDispatch, RootState } from '../store';
 import { fetchPublicStats } from '../features/reporting/reportingSlice';
-import { fetchMedia } from '../features/media/mediaSlice';
+import { fetchPublicLandingPageMedia } from '../features/media/mediaSlice';
 import { Navbar } from '../components/public/Navbar';
 import { HeroSection } from '../components/home/HeroSection';
 import { ImpactMetrics } from '../components/home/ImpactMetrics';
@@ -30,12 +30,12 @@ export default function HomePage() {
     [landingPageImages]
   );
 
-  // Fetch public statistics and media on component mount
+  // Fetch public statistics and landing page media on component mount
   useEffect(() => {
     dispatch(fetchPublicStats());
-    // Only fetch media once (authChecked prevents infinite retries on public pages)
+    // Fetch landing page gallery images (public access, no auth required)
     if (!authChecked) {
-      dispatch(fetchMedia());
+      dispatch(fetchPublicLandingPageMedia());
     }
   }, [dispatch, authChecked]);
 
