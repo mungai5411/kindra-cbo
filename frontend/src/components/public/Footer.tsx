@@ -32,7 +32,7 @@ const FooterSection: React.FC<FooterSectionProps> = ({ title, links }) => (
           component={Link}
           to={link.href}
           sx={{
-            color: alpha('white', 0.8),
+            color: 'rgba(255, 255, 255, 0.8)',
             textDecoration: 'none',
             fontWeight: 500,
             transition: 'all 0.3s ease',
@@ -125,7 +125,7 @@ export const Footer: React.FC = () => {
               <Typography variant="h5" sx={{ fontWeight: 900, mb: 1 }}>
                 <Box component="span" sx={{ color: colorPsychology.programs.cases.primary }}>K</Box>indra
               </Typography>
-              <Typography variant="body2" sx={{ color: alpha('white', 0.7), lineHeight: 1.6 }}>
+              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', lineHeight: 1.6 }}>
                 Transforming lives and building futures for vulnerable children and families across Kenya.
               </Typography>
             </Box>
@@ -143,7 +143,7 @@ export const Footer: React.FC = () => {
                       display: 'flex',
                       alignItems: 'center',
                       gap: 1,
-                      color: alpha('white', 0.8),
+                      color: 'rgba(255, 255, 255, 0.8)',
                       transition: 'all 0.3s ease',
                       '&:hover': {
                         color: colorPsychology.programs.cases.primary
@@ -182,7 +182,7 @@ export const Footer: React.FC = () => {
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: 'white' }}>
               Stay Updated
             </Typography>
-            <Typography variant="body2" sx={{ color: alpha('white', 0.7), mb: 2, lineHeight: 1.6 }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 2, lineHeight: 1.6 }}>
               Subscribe to our newsletter for impact stories and updates.
             </Typography>
             <Stack spacing={1} direction={{ xs: 'column', sm: 'row', md: 'column' }}>
@@ -192,12 +192,12 @@ export const Footer: React.FC = () => {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     color: 'white',
-                    bgcolor: alpha('white', 0.1),
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
                     '& fieldset': {
-                      borderColor: alpha('white', 0.2)
+                      borderColor: 'rgba(255, 255, 255, 0.2)'
                     },
                     '&:hover fieldset': {
-                      borderColor: alpha('white', 0.3)
+                      borderColor: 'rgba(255, 255, 255, 0.3)'
                     },
                     '&.Mui-focused fieldset': {
                       borderColor: colorPsychology.programs.cases.primary
@@ -223,12 +223,12 @@ export const Footer: React.FC = () => {
         </Grid>
 
         {/* Divider */}
-        <Divider sx={{ bgcolor: alpha('white', 0.1), my: 4 }} />
+        <Divider sx={{ bgcolor: 'rgba(255, 255, 255, 0.1)', my: 4 }} />
 
         {/* Bottom Section */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3 }}>
           {/* Copyright */}
-          <Typography variant="body2" sx={{ color: alpha('white', 0.6) }}>
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
             © 2023-{new Date().getFullYear()} Kindra CBO. All rights reserved.
           </Typography>
 
@@ -245,7 +245,7 @@ export const Footer: React.FC = () => {
                   rel="noopener noreferrer"
                   size="small"
                   sx={{
-                    color: alpha('white', 0.7),
+                    color: 'rgba(255, 255, 255, 0.7)',
                     transition: 'all 0.3s ease',
                     '&:hover': {
                       color: colorPsychology.programs.cases.primary,
@@ -260,7 +260,7 @@ export const Footer: React.FC = () => {
           </Stack>
 
           {/* Trust Badges */}
-          <Typography variant="caption" sx={{ color: alpha('white', 0.6) }}>
+          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
             ✓ Registered NGO • ✓ Transparent & Verified
           </Typography>
         </Box>

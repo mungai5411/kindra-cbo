@@ -119,7 +119,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ heroImage }) => {
             variants={itemVariants}
             sx={{
               fontSize: { xs: '1rem', md: '1.2rem' },
-              color: alpha('white', 0.95),
+              color: 'rgba(255, 255, 255, 0.95)',
               mb: 4,
               maxWidth: { xs: '100%', md: '600px' },
               lineHeight: 1.7,
@@ -171,12 +171,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ heroImage }) => {
                 borderRadius: 3,
                 textTransform: 'none',
                 color: 'white',
-                borderColor: alpha('white', 0.5),
+                borderColor: 'rgba(255, 255, 255, 0.5)',
                 borderWidth: 2,
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   borderColor: 'white',
-                  bgcolor: alpha('white', 0.1),
+                  bgcolor: 'rgba(255, 255, 255, 0.1)',
                   transform: 'translateY(-4px)'
                 }
               }}
@@ -192,7 +192,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ heroImage }) => {
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <Typography sx={{ color: alpha('white', 0.7), fontSize: '0.875rem', fontWeight: 600 }}>
+            <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.875rem', fontWeight: 600 }}>
               ↓ Scroll to explore more
             </Typography>
           </MotionBox>

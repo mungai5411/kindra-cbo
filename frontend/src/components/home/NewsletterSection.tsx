@@ -80,7 +80,7 @@ export const NewsletterSection: React.FC = () => {
           <Typography
             variant="h6"
             sx={{
-              color: alpha('white', 0.95),
+              color: 'rgba(255, 255, 255, 0.95)',
               fontWeight: 500,
               mb: 4,
               lineHeight: 1.7
@@ -160,7 +160,7 @@ export const NewsletterSection: React.FC = () => {
               <Typography
                 variant="caption"
                 sx={{
-                  color: alpha('white', 0.8),
+                  color: 'rgba(255, 255, 255, 0.8)',
                   fontWeight: 500
                 }}
               >
@@ -195,7 +195,7 @@ export const NewsletterSection: React.FC = () => {
                 <Typography
                   variant="body2"
                   sx={{
-                    color: alpha('white', 0.9)
+                    color: 'rgba(255, 255, 255, 0.9)'
                   }}
                 >
                   Check your email for a welcome message from our team.
