@@ -167,6 +167,27 @@ export const updateShelter = createAsyncThunk(
             if (data instanceof FormData) {
                 payload = data;
                 headers['Content-Type'] = 'multipart/form-data';
+            } else {
+                // Ensure coordinates are proper numbers for PATCH requests
+                if (payload.latitude) {
+                    payload.latitude = parseFloat(payload.latitude);
+                }
+                if (payload.longitude) {
+                    payload.longitude = parseFloat(payload.longitude);
+                }
+                // Ensure numeric fields are parsed
+                if (payload.total_capacity) {
+                    payload.total_capacity = parseInt(payload.total_capacity);
+                }
+                if (payload.disability_capacity) {
+                    payload.disability_capacity = parseInt(payload.disability_capacity);
+                }
+                if (payload.age_range_min) {
+                    payload.age_range_min = parseInt(payload.age_range_min);
+                }
+                if (payload.age_range_max) {
+                    payload.age_range_max = parseInt(payload.age_range_max);
+                }
             }
 
             const response = await apiClient.patch(`${endpoints.shelters.shelters}${id}/`, payload, {
@@ -176,7 +197,7 @@ export const updateShelter = createAsyncThunk(
             dispatch(fetchShelters());
             return response.data;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to update shelter');
+            return rejectWithValue(error.response?.data?.message || error.response?.data || 'Failed to update shelter');
         }
     }
 );

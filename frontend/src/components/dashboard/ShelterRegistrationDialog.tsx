@@ -262,10 +262,42 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit, initialData
         }
 
         const submissionData = {
-            ...formData,
-            photos: newPhotos, // Only used for new registration
-            id: initialData?.id // Pass ID if editing
+            name: formData.name,
+            registration_number: formData.registration_number,
+            contact_person: formData.contact_person,
+            phone_number: formData.phone_number,
+            emergency_contact: formData.emergency_contact,
+            email: formData.email,
+            county: formData.county,
+            sub_county: formData.sub_county,
+            physical_address: formData.physical_address,
+            latitude: parseFloat(formData.latitude as any),
+            longitude: parseFloat(formData.longitude as any),
+            total_capacity: parseInt(formData.total_capacity as any),
+            age_range_min: parseInt(formData.age_range_min as any),
+            age_range_max: parseInt(formData.age_range_max as any),
+            gender_policy: formData.gender_policy,
+            disability_accommodations: formData.disability_accommodations,
+            disability_capacity: parseInt(formData.disability_capacity as any) || 0,
+            disability_types_supported: formData.disability_types_supported,
+            fire_safety_certified: formData.fire_safety_certified,
+            security_measures: formData.security_measures,
+            has_medical_facility: formData.has_medical_facility,
+            has_education_facility: formData.has_education_facility,
+            has_counseling_services: formData.has_counseling_services,
+            license_number: formData.license_number,
         };
+
+        // Only add photos for new registrations
+        if (!initialData) {
+            (submissionData as any).photos = newPhotos;
+        }
+
+        // Add ID for editing
+        if (initialData?.id) {
+            (submissionData as any).id = initialData.id;
+        }
+
         onSubmit(submissionData);
     };
 

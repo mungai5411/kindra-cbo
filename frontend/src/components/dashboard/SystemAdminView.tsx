@@ -558,7 +558,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                                     e.stopPropagation();
                                                     handleDeleteUser(u);
                                                 }}
-                                                sx={{ color: 'error.main', '&:hover': { bgcolor: alpha('error.main', 0.1) } }}
+                                                sx={{ color: 'error.main', '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.1) } }}
                                             >
                                                 <Delete fontSize="small" />
                                             </IconButton>
