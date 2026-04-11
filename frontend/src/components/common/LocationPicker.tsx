@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import React, { useState, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import {
     Box,
@@ -16,9 +16,10 @@ import {
     Chip,
     Stack,
     InputAdornment,
-    Autocomplete
+    Autocomplete,
+    Alert
 } from '@mui/material';
-import { LocationOn, Clear } from '@mui/icons-material';
+import { LocationOn, Clear, CheckCircle } from '@mui/icons-material';
 import { KENYA_COUNTIES, getCountyCenter, searchCounties } from '../../utils/locationData';
 
 // Fix for Leaflet default icon issues in React
@@ -63,6 +64,23 @@ const MapClickHandler: React.FC<{
     ) : null;
 };
 
+// Component to automatically center map on marker
+const MapCenterHandler: React.FC<{ center: [number, number] | null }> = ({ center }) => {
+    const map = useMap();
+
+    useEffect(() => {
+        if (center) {
+            // Fly to location with animation
+            map.flyTo(center, 15, {
+                duration: 1.5,
+                easeLinearity: 0.25
+            });
+        }
+    }, [center, map]);
+
+    return null;
+};
+
 export const LocationPicker: React.FC<LocationPickerProps> = ({
     latitude,
     longitude,
@@ -81,10 +99,22 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     const [latInput, setLatInput] = useState(latitude?.toString() || '');
     const [lngInput, setLngInput] = useState(longitude?.toString() || '');
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchSuccess, setSearchSuccess] = useState(false);
+    const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
+
+    // Auto-open map dialog and center on search result
+    useEffect(() => {
+        if (markerPos && searchSuccess) {
+            setOpen(true);
+            setMapCenter([markerPos.lat, markerPos.lng]);
+            // Reset search success flag after animation
+            setTimeout(() => setSearchSuccess(false), 1500);
+        }
+    }, [markerPos, searchSuccess]);
 
     // Default center: Nairobi, Kenya
     const defaultCenter: [number, number] = [-1.286389, 36.817223];
-    const mapCenter = markerPos ? [markerPos.lat, markerPos.lng] as [number, number] : defaultCenter;
+    const displayMapCenter = mapCenter || (markerPos ? [markerPos.lat, markerPos.lng] as [number, number] : defaultCenter);
 
     const handleMapClick = (lat: number, lng: number) => {
         setMarkerPos({ lat, lng });
@@ -126,6 +156,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
             setMarkerPos({ lat, lng });
             setLatInput(lat.toFixed(6));
             setLngInput(lng.toFixed(6));
+            setSearchSuccess(true);
             return;
         }
 
@@ -143,6 +174,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
                 setMarkerPos({ lat, lng });
                 setLatInput(lat.toFixed(6));
                 setLngInput(lng.toFixed(6));
+                setSearchSuccess(true);
             }
         } catch (err) {
             console.error('Search failed:', err);
@@ -173,8 +205,9 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                label="Search county or location"
-                                placeholder="e.g., 'Nairobi', 'Mombasa', 'Kisumu'"
+                                label="Search location"
+                                placeholder="e.g., 'Nairobi', 'Westlands', 'Kisumu', 'Maiduguri St'"
+                                helperText="Search by county, town, street, or area name"
                                 sx={{ flex: 1, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                             />
                         )}
@@ -188,6 +221,17 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
                         Search
                     </Button>
                 </Box>
+
+                {searchSuccess && (
+                    <Alert
+                        severity="success"
+                        icon={<CheckCircle />}
+                        sx={{ mb: 2, borderRadius: 2 }}
+                        onClose={() => setSearchSuccess(false)}
+                    >
+                        Location found! The map has moved to this location. You can click to adjust if needed.
+                    </Alert>
+                )}
 
                 {markerPos && (
                     <Paper
@@ -290,11 +334,11 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
                 }}
             >
                 <DialogTitle sx={{ fontWeight: 'bold', nb: 1 }}>
-                    Select Shelter Location on Map
+                    Locate Your Shelter
                 </DialogTitle>
                 <DialogContent sx={{ p: 2 }}>
                     <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                        Click on the map to pin your shelter location. Use the search or manual input to refine the location.
+                        Search for your county, town, street, or area above. The map will center on the location. Click on the map to pin the exact shelter location.
                     </Typography>
                     <Paper
                         sx={{
@@ -306,7 +350,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
                         }}
                     >
                         <MapContainer
-                            center={mapCenter}
+                            center={displayMapCenter}
                             zoom={13}
                             style={{ height: '100%', width: '100%' }}
                         >
@@ -314,6 +358,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             />
+                            <MapCenterHandler center={mapCenter} />
                             <MapClickHandler
                                 onLocationSelect={handleMapClick}
                                 markerPos={markerPos}
