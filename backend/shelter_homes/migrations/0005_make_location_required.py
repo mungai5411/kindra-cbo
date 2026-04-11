@@ -1,17 +1,24 @@
 # Migration to populate NULL latitude/longitude and make them required
 
-from django.db import migrations, models
+from django.db import migrations, models, connection
 
 def populate_null_coordinates(apps, schema_editor):
     """Populate NULL latitude/longitude with Kenya center coordinates"""
-    ShelterHome = apps.get_model('shelter_homes', 'ShelterHome')
-    # Nairobi, Kenya center point
-    default_latitude = -1.286389
-    default_longitude = 36.817223
-    
-    # Update all shelters with NULL coordinates
-    ShelterHome.objects.filter(latitude__isnull=True).update(latitude=default_latitude)
-    ShelterHome.objects.filter(longitude__isnull=True).update(longitude=default_longitude)
+    # Use raw SQL to avoid trigger issues
+    with connection.cursor() as cursor:
+        # Populate latitude
+        cursor.execute("""
+            UPDATE shelter_homes_shelterhome 
+            SET latitude = -1.286389 
+            WHERE latitude IS NULL;
+        """)
+        
+        # Populate longitude
+        cursor.execute("""
+            UPDATE shelter_homes_shelterhome 
+            SET longitude = 36.817223 
+            WHERE longitude IS NULL;
+        """)
 
 class Migration(migrations.Migration):
 
@@ -20,7 +27,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # First, populate NULL values with defaults
+        # First, populate NULL values with defaults using raw SQL
         migrations.RunPython(populate_null_coordinates),
         
         # Then make the fields NOT NULL
