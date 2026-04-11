@@ -34,22 +34,29 @@ class ShelterHomeSerializer(serializers.ModelSerializer):
         max_length=10,
         help_text='Upload 3-10 photos of the shelter'
     )
-    registration_number = serializers.CharField(
-        required=True,
-        help_text='Unique shelter registration number'
-    )
     
     class Meta:
         model = ShelterHome
         fields = '__all__'
         read_only_fields = ('id', 'created_at', 'updated_at', 'approval_status', 'approved_by', 'approval_date')
         extra_kwargs = {
-            'registration_number': {'required': True}
+            'registration_number': {'required': False}  # Will be required by validate() for POST only
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # For partial updates (PATCH), don't require all fields
+        if self.instance is not None:
+            # This is an update, make fields not required
+            for field_name, field in self.fields.items():
+                if field_name not in self.Meta.read_only_fields:
+                    field.required = False
     
     def validate_registration_number(self, value):
         """Validate registration number is unique, excluding current instance on update"""
-        request = self.context.get('request')
+        if not value:  # Allow empty/None on updates
+            return value
+            
         queryset = ShelterHome.objects.filter(registration_number=value)
         
         # Exclude current instance if updating

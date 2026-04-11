@@ -201,6 +201,11 @@ export const updateShelter = createAsyncThunk(
             dispatch(fetchShelters());
             return response.data;
         } catch (error: any) {
+            console.error('Shelter update error details:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message
+            });
             return rejectWithValue(error.response?.data?.message || error.response?.data || 'Failed to update shelter');
         }
     }
