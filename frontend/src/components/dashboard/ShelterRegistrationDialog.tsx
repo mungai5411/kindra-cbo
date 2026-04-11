@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import { KENYA_COUNTIES } from '../../utils/locationData';
 import { ImageGallery, ImageItem } from '../common/ImageGallery';
+import { LocationPicker } from '../common/LocationPicker';
 import apiClient, { endpoints } from '../../api/client';
 
 interface ShelterRegistrationDialogProps {
@@ -55,6 +56,8 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit, initialData
         county: '',
         sub_county: '',
         physical_address: '',
+        latitude: '' as string | number,
+        longitude: '' as string | number,
         total_capacity: '',
         age_range_min: '0',
         age_range_max: '18',
@@ -91,6 +94,8 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit, initialData
                 county: initialData.county || '',
                 sub_county: initialData.sub_county || '',
                 physical_address: initialData.physical_address || '',
+                latitude: initialData.latitude || '',
+                longitude: initialData.longitude || '',
                 total_capacity: initialData.total_capacity || '',
                 age_range_min: initialData.age_range_min || '0',
                 age_range_max: initialData.age_range_max || '18',
@@ -131,6 +136,8 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit, initialData
                 county: '',
                 sub_county: '',
                 physical_address: '',
+                latitude: '',
+                longitude: '',
                 total_capacity: '',
                 age_range_min: '0',
                 age_range_max: '18',
@@ -245,7 +252,7 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit, initialData
         const requiredFields = [
             'name', 'registration_number', 'contact_person', 'phone_number', 'email',
             'county', 'physical_address', 'total_capacity',
-            'emergency_contact', 'security_measures'
+            'emergency_contact', 'security_measures', 'latitude', 'longitude'
         ];
 
         const missing = requiredFields.filter(field => !formData[field as keyof typeof formData]);
@@ -397,6 +404,19 @@ export function ShelterRegistrationDialog({ open, onClose, onSubmit, initialData
                                 label="Physical Address"
                                 value={formData.physical_address}
                                 onChange={(e) => handleChange('physical_address', e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <LocationPicker
+                                latitude={formData.latitude}
+                                longitude={formData.longitude}
+                                onLocationChange={(lat, lng) => {
+                                    handleChange('latitude', lat);
+                                    handleChange('longitude', lng);
+                                }}
+                                label="Exact Shelter Location (Required for Map Pinning)"
+                                error={false}
+                                helperText="Click the button below to select your shelter location on the map, or search for an address. This location will be displayed on our Geospatial Resource Hub map."
                             />
                         </Grid>
                     </Grid>

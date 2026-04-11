@@ -497,12 +497,14 @@ export default function DashboardPage() {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    p: isMobile ? 1.5 : (isTablet ? 2 : 2.5),
+                    p: { xs: 1, sm: 2, md: 2.5 },
+                    pt: { xs: 0.5, sm: 1 },
                     width: isDesktop ? `calc(100% - ${DRAWER_WIDTH}px)` : '100%',
-                    pb: isMobile ? 8 : 2, // Space for bottom nav on mobile
+                    pb: { xs: 10, md: 3 }, // Space for bottom nav on mobile
+                    overflowX: 'hidden',
                 }}
             >
-                <Toolbar />
+                <Toolbar sx={{ minHeight: { xs: '56px !important', md: '64px !important' } }} />
                 {renderContent()}
             </Box>
 

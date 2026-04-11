@@ -66,6 +66,7 @@ import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
 import { ConfirmationDialog } from './ConfirmationDialog';
 import { downloadFile } from '../../utils/downloadHelper';
+import { SocialChatView } from './SocialChatView';
 
 interface DonationsViewProps {
     setOpenDialog?: (open: boolean, data?: any) => void;
@@ -607,14 +608,14 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                             </Box>
 
                             {/* Action Buttons Section */}
-                            <Box sx={{ 
-                                p: 3, 
-                                pt: 2,
+                            <Box sx={{
+                                p: { xs: 2, md: 3 },
+                                pt: 1.5,
                                 background: alpha(theme.palette.background.default, 0.3),
                                 borderTop: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
                                 display: 'flex',
                                 flexDirection: 'column',
-                                gap: 1.5
+                                gap: 1
                             }}>
                                 {/* Primary Action */}
                                 <Button
@@ -623,116 +624,112 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                                     startIcon={<Payment sx={{ fontSize: '1rem' }} />}
                                     onClick={() => handleOpenDonationDialog(camp)}
                                     sx={{
-                                        borderRadius: 2.5,
+                                        borderRadius: 1,
                                         textTransform: 'none',
                                         fontWeight: 900,
-                                        fontSize: '0.875rem',
-                                        py: 1.2,
+                                        fontSize: { xs: '0.8rem', md: '0.875rem' },
+                                        py: { xs: 0.9, md: 1.2 },
                                         background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                                        boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.3)}`,
+                                        boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
                                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                         '&:hover': {
-                                            boxShadow: `0 12px 28px ${alpha(theme.palette.primary.main, 0.4)}`,
-                                            transform: 'translateY(-2px)'
-                                        },
-                                        '&:active': {
-                                            transform: 'translateY(0)'
+                                            boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                                            transform: 'translateY(-1px)'
                                         }
                                     }}
                                 >
-                                    {isDonor ? 'Make Contribution' : 'Add Contribution'}
+                                    {isDonor ? 'Contribute' : 'Add Contribution'}
                                 </Button>
 
-                                {/* Management Actions */}
+                                {/* Management Actions — compact on mobile */}
                                 {isManagement && (
                                     <>
-                                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
+                                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
                                             <Button
                                                 variant="outlined"
                                                 size="small"
                                                 disabled={camp.status === 'COMPLETED'}
                                                 onClick={() => handleCompleteCampaign(camp.slug)}
                                                 sx={{
-                                                    borderRadius: 2,
+                                                    borderRadius: 1,
                                                     textTransform: 'none',
-                                                    fontWeight: 800,
-                                                    fontSize: '0.8rem',
-                                                    py: 1,
+                                                    fontWeight: 700,
+                                                    fontSize: { xs: '0.7rem', md: '0.8rem' },
+                                                    py: { xs: 0.6, md: 1 },
+                                                    minWidth: 0,
                                                     borderColor: alpha(theme.palette.success.main, 0.4),
                                                     color: 'success.main',
-                                                    transition: 'all 0.2s ease',
-                                                    '&:hover': { 
+                                                    '&:hover': {
                                                         bgcolor: alpha(theme.palette.success.main, 0.08),
-                                                        borderColor: 'success.main',
-                                                        transform: 'translateY(-1px)'
+                                                        borderColor: 'success.main'
                                                     }
                                                 }}
                                             >
-                                                ✓ Finalize
+                                                ✓ <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Finalize</Box>
+                                                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Done</Box>
                                             </Button>
                                             <Button
                                                 variant="outlined"
                                                 size="small"
                                                 onClick={() => handleDeleteCampaign(camp.slug)}
                                                 sx={{
-                                                    borderRadius: 2,
+                                                    borderRadius: 1,
                                                     textTransform: 'none',
-                                                    fontWeight: 800,
-                                                    fontSize: '0.8rem',
-                                                    py: 1,
+                                                    fontWeight: 700,
+                                                    fontSize: { xs: '0.7rem', md: '0.8rem' },
+                                                    py: { xs: 0.6, md: 1 },
+                                                    minWidth: 0,
                                                     borderColor: alpha(theme.palette.error.main, 0.4),
                                                     color: 'error.main',
-                                                    transition: 'all 0.2s ease',
-                                                    '&:hover': { 
+                                                    '&:hover': {
                                                         bgcolor: alpha(theme.palette.error.main, 0.08),
-                                                        borderColor: 'error.main',
-                                                        transform: 'translateY(-1px)'
+                                                        borderColor: 'error.main'
                                                     }
                                                 }}
                                             >
-                                                🗑 Remove
+                                                🗑 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Remove</Box>
+                                                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Del</Box>
                                             </Button>
                                         </Box>
-                                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
+                                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
                                             <Button
                                                 variant="outlined"
                                                 size="small"
                                                 onClick={() => handleOpenStatusDialog(camp)}
                                                 sx={{
-                                                    borderRadius: 2,
+                                                    borderRadius: 1,
                                                     textTransform: 'none',
-                                                    fontWeight: 800,
-                                                    fontSize: '0.8rem',
-                                                    py: 1,
+                                                    fontWeight: 700,
+                                                    fontSize: { xs: '0.7rem', md: '0.8rem' },
+                                                    py: { xs: 0.6, md: 1 },
+                                                    minWidth: 0,
                                                     borderColor: alpha(theme.palette.info.main, 0.4),
                                                     color: 'info.main',
-                                                    transition: 'all 0.2s ease',
-                                                    '&:hover': { 
+                                                    '&:hover': {
                                                         bgcolor: alpha(theme.palette.info.main, 0.08),
-                                                        borderColor: 'info.main',
-                                                        transform: 'translateY(-1px)'
+                                                        borderColor: 'info.main'
                                                     }
                                                 }}
                                             >
-                                                ⚙ Details
+                                                ⚙ <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Details</Box>
+                                                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Info</Box>
                                             </Button>
                                             <Button
                                                 variant="outlined"
                                                 size="small"
                                                 onClick={() => setOpenDialog?.(true, camp)}
                                                 sx={{
-                                                    borderRadius: 2,
+                                                    borderRadius: 1,
                                                     textTransform: 'none',
-                                                    fontWeight: 800,
-                                                    fontSize: '0.8rem',
-                                                    py: 1,
+                                                    fontWeight: 700,
+                                                    fontSize: { xs: '0.7rem', md: '0.8rem' },
+                                                    py: { xs: 0.6, md: 1 },
+                                                    minWidth: 0,
                                                     borderColor: alpha(theme.palette.primary.main, 0.4),
                                                     color: 'primary.main',
-                                                    transition: 'all 0.2s ease',
-                                                    '&:hover': { 
+                                                    '&:hover': {
                                                         bgcolor: alpha(theme.palette.primary.main, 0.08),
-                                                        borderColor: 'primary.main',
-                                                        transform: 'translateY(-1px)'
+                                                        borderColor: 'primary.main'
                                                     }
                                                 }}
                                             >
@@ -1590,12 +1587,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
             {activeTab === 'donors' && renderDonors()}
             {activeTab === 'receipts' && renderReceipts()}
             {activeTab === 'community_events' && renderCommunityEvents()}
-            {activeTab === 'social_media' && (
-                <Box sx={{ p: 8, textAlign: 'center', borderRadius: 1.5, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
-                    <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Media Integration</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Integrated social media tracking module pending initialization.</Typography>
-                </Box>
-            )}
+            {activeTab === 'social_media' && <SocialChatView />}
             {(!activeTab || activeTab === 'donations') && renderCampaigns()}
 
             {/* Donation Status Update Dialog */}

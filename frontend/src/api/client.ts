@@ -221,4 +221,10 @@ export const endpoints = {
         kpis: '/reporting/kpis/',
         analytics: '/reporting/activity/',
     },
+
+    // Social Chat
+    socialChat: {
+        messages: '/social-chat/messages/',
+        users: '/social-chat/messages/users/',
+    },
 };

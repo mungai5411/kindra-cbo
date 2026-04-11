@@ -38,8 +38,10 @@ body {
   background: #94a3b8;
 }
 
-/* Hide GetButton widget on dashboard/admin pages */
-body.dashboard-page #wh-widget-send-button {
+/* Hide GetButton / Tawk widgets on dashboard pages */
+body.dashboard-page #wh-widget-send-button,
+body.dashboard-page .tawk-min-container,
+body.dashboard-page #tawk-bubble-container {
   display: none !important;
 }
 
@@ -48,4 +50,67 @@ body.dashboard-page #wh-widget-send-button {
   0%   { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.45); }
   70%  { box-shadow: 0 0 0 6px rgba(76, 175, 80, 0); }
   100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+}
+
+/* ── Responsive Dashboard ── */
+
+/* Prevent horizontal overflow on every device */
+body, #root {
+  overflow-x: hidden;
+}
+
+/* Tighter card padding on very small screens */
+@media (max-width: 600px) {
+  /* MUI Paper / Card inner padding reduction */
+  .MuiCardContent-root {
+    padding: 12px !important;
+  }
+
+  /* Shrink MUI contained & outlined buttons on xs */
+  .MuiButton-root {
+    font-size: 0.75rem !important;
+    padding: 5px 10px !important;
+    min-width: 0 !important;
+  }
+
+  /* Compact chip badges */
+  .MuiChip-root {
+    height: 22px !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* Make typography headings tighter */
+  h1.MuiTypography-root,
+  h2.MuiTypography-root {
+    font-size: 1.4rem !important;
+  }
+
+  h3.MuiTypography-root,
+  h4.MuiTypography-root {
+    font-size: 1.1rem !important;
+  }
+
+  /* Table cells more compact */
+  .MuiTableCell-root {
+    padding: 6px 8px !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Inputs more compact */
+  .MuiOutlinedInput-input {
+    padding: 8px 10px !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Tablet: mid-size adjustments */
+@media (min-width: 601px) and (max-width: 900px) {
+  .MuiButton-root {
+    font-size: 0.8rem !important;
+    padding: 6px 12px !important;
+  }
+
+  .MuiTableCell-root {
+    padding: 8px 10px !important;
+  }
 }

@@ -15,6 +15,7 @@ import adminReducer from './features/admin/adminSlice';
 import groupsReducer from './features/volunteers/groupsSlice';
 import mediaReducer from './features/media/mediaSlice';
 import impactReducer from './features/donations/impactSlice';
+import socialChatReducer from './features/socialChat/socialChatSlice';
 
 export const store = configureStore({
     reducer: {
@@ -30,6 +31,7 @@ export const store = configureStore({
         admin: adminReducer,
         media: mediaReducer,
         impact: impactReducer,
+        socialChat: socialChatReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

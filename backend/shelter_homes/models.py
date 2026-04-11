@@ -48,9 +48,9 @@ class ShelterHome(models.Model):
     sub_county = models.CharField(max_length=100, blank=True)
     physical_address = models.TextField()
     
-    # GPS coordinates (optional)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    # GPS coordinates (required - must provide exact location for mapping)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=False, blank=False, help_text=_('Exact latitude coordinate (required for map pinning)'))
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=False, blank=False, help_text=_('Exact longitude coordinate (required for map pinning)'))
     
     # Capacity
     total_capacity = models.IntegerField(validators=[MinValueValidator(1)])

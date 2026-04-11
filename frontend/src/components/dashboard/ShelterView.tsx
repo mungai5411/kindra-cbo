@@ -1028,31 +1028,31 @@ export function ShelterView({ activeTab }: { activeTab?: string }) {
                 </Alert>
             )}
 
-            <Grid container spacing={{ xs: 1.5, sm: 3 }} sx={{ mb: 4 }}>
-                <Grid item xs={12} md={4}>
+            <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mb: 4 }}>
+                <Grid item xs={4} md={4}>
                     <StatsCard
-                        title="Verified Homes"
+                        title="Homes"
                         value={String(shelters.length)}
-                        icon={<Business />}
+                        icon={<Business fontSize="small" />}
                         color={theme.palette.primary.main}
                         delay={0}
                     />
                 </Grid>
-                <Grid item xs={12} md={4}>
+                <Grid item xs={4} md={4}>
                     <StatsCard
-                        title="Field Personnel"
+                        title="Personnel"
                         value={String(staff.length)}
-                        icon={<People />}
+                        icon={<People fontSize="small" />}
                         color={theme.palette.secondary.main}
                         delay={0.1}
                     />
                 </Grid>
-                <Grid item xs={12} md={4}>
+                <Grid item xs={4} md={4}>
                     <StatsCard
-                        title="Operational Load"
+                        title="Load %"
                         value={`${Math.round((shelters.reduce((acc: number, curr: any) => acc + (curr.current_occupancy || 0), 0) /
                             (shelters.reduce((acc: number, curr: any) => acc + (curr.total_capacity || 1), 0) || 1)) * 100)}%`}
-                        icon={<Assessment />}
+                        icon={<Assessment fontSize="small" />}
                         color={theme.palette.success.main}
                         delay={0.2}
                     />

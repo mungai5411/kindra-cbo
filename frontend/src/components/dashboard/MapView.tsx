@@ -115,20 +115,58 @@ export const MapView: React.FC<{ height?: string | number, embedded?: boolean }>
                                     icon={shelterIcon}
                                 >
                                     <Popup>
-                                        <Box sx={{ minWidth: 200, p: 1 }}>
-                                            <Typography variant="subtitle1" fontWeight="bold" color="secondary">
-                                                Shelter: {shelter.name}
+                                        <Box sx={{ minWidth: 250, p: 1.5 }}>
+                                            <Typography variant="subtitle1" fontWeight="bold" color="secondary" sx={{ mb: 0.5 }}>
+                                                🏠 {shelter.name}
                                             </Typography>
-                                            <Typography variant="body2">
-                                                <strong>Capacity:</strong> {shelter.current_occupancy}/{shelter.total_capacity}
-                                            </Typography>
-                                            <Box sx={{ mt: 1, display: 'flex', gap: 0.5 }}>
-                                                <Chip label={`${shelter.available_beds} beds free`} size="small" color="success" />
+                                            {shelter.contact_person && (
+                                                <Typography variant="caption" color="text.secondary">
+                                                    <strong>Contact:</strong> {shelter.contact_person}
+                                                </Typography>
+                                            )}
+                                            <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                <Chip 
+                                                    label={`${shelter.available_beds || 0} beds available`} 
+                                                    size="small" 
+                                                    color={shelter.available_beds > 0 ? 'success' : 'error'} 
+                                                    variant="outlined"
+                                                />
+                                                <Chip 
+                                                    label={`${shelter.current_occupancy}/${shelter.total_capacity} capacity`} 
+                                                    size="small"
+                                                    variant="outlined"
+                                                />
                                             </Box>
+                                            {shelter.gender_policy && (
+                                                <Box sx={{ mt: 1 }}>
+                                                    <Chip 
+                                                        label={`👥 ${shelter.gender_policy}`} 
+                                                        size="small"
+                                                        variant="outlined"
+                                                    />
+                                                </Box>
+                                            )}
+                                            {(shelter.has_medical_facility || shelter.has_education_facility || shelter.has_counseling_services) && (
+                                                <Box sx={{ mt: 1 }}>
+                                                    <Typography variant="caption" fontWeight="bold" display="block" sx={{ mb: 0.5 }}>
+                                                        Facilities:
+                                                    </Typography>
+                                                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                                                        {shelter.has_medical_facility && <Chip label="🏥 Medical" size="small" />}
+                                                        {shelter.has_education_facility && <Chip label="📚 Education" size="small" />}
+                                                        {shelter.has_counseling_services && <Chip label="💬 Counseling" size="small" />}
+                                                    </Box>
+                                                </Box>
+                                            )}
                                             <Divider sx={{ my: 1 }} />
-                                            <Typography variant="caption" color="text.secondary">
-                                                {shelter.physical_address}
+                                            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+                                                📍 {shelter.physical_address}
                                             </Typography>
+                                            {shelter.phone_number && (
+                                                <Typography variant="caption" color="text.secondary" display="block">
+                                                    📞 {shelter.phone_number}
+                                                </Typography>
+                                            )}
                                         </Box>
                                     </Popup>
                                 </Marker>

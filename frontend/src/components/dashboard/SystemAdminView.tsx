@@ -459,172 +459,279 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         </>
     );
 
-    const renderUsers = () => (
-        <Box>
-            <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3 }}>
-                <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>User Accounts</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Administrative access and role management</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                    <TextField
-                        size="small"
-                        placeholder="Search users..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start"><Search fontSize="small" sx={{ color: 'text.disabled' }} /></InputAdornment>,
-                            sx: {
-                                borderRadius: 1,
-                                width: { xs: '100%', sm: 300 },
-                                bgcolor: alpha(theme.palette.background.paper, 0.8),
-                                border: '1px solid',
-                                borderColor: alpha(theme.palette.divider, 0.1),
-                                '& fieldset': { border: 'none' },
-                            }
-                        }}
-                    />
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'success.main' }}>
-                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' }} />
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>Auto-syncing</Typography>
+    const renderUsers = () => {
+        // Color mapping for user roles
+        const getRoleColor = (role: string) => {
+            const colors: Record<string, { bg: string; color: string; avatar: string }> = {
+                'ADMIN': { bg: '#fce4ec', color: '#c2185b', avatar: '#e91e63' },
+                'MANAGEMENT': { bg: '#f3e5f5', color: '#7b1fa2', avatar: '#9c27b0' },
+                'SOCIAL_MEDIA': { bg: '#ffeaa7', color: '#d63031', avatar: '#ff7675' },
+                'CASE_WORKER': { bg: '#e0f2f1', color: '#00695c', avatar: '#26a69a' },
+                'SHELTER_PARTNER': { bg: '#e3f2fd', color: '#1565c0', avatar: '#42a5f5' },
+                'VOLUNTEER': { bg: '#e8f5e9', color: '#2e7d32', avatar: '#66bb6a' },
+                'DONOR': { bg: '#fff3e0', color: '#e65100', avatar: '#ffb74d' }
+            };
+            return colors[role] || { bg: '#f5f5f5', color: '#616161', avatar: '#bdbdbd' };
+        };
+
+        const [selectedUser, setSelectedUser] = useState<any>(null);
+        const [openDetails, setOpenDetails] = useState(false);
+
+        return (
+            <Box>
+                <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                    <Box>
+                        <Typography variant="h5" sx={{ fontWeight: 900 }}>Team Members</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <TextField
+                            size="small"
+                            placeholder="Search users..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            InputProps={{
+                                startAdornment: <InputAdornment position="start"><Search fontSize="small" sx={{ color: 'text.disabled' }} /></InputAdornment>,
+                            }}
+                            sx={{
+                                width: { xs: '100%', sm: 250 },
+                                '& .MuiOutlinedInput-root': { borderRadius: 2 }
+                            }}
+                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'success.main' }}>
+                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' }} />
+                            <Typography variant="caption" sx={{ fontWeight: 700 }}>Auto-syncing</Typography>
+                        </Box>
                     </Box>
                 </Box>
-            </Box>
 
-            <Grid container spacing={4}>
-                {filteredUsers.map((u: any) => (
-                    <Grid item xs={12} md={6} lg={4} key={u.id}>
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                p: 0,
-                                borderRadius: 1.5,
-                                border: '1px solid',
-                                borderColor: alpha(theme.palette.divider, 0.08),
-                                overflow: 'hidden',
-                                transition: 'all 0.3s ease',
-                                bgcolor: 'background.paper',
-                                '&:hover': {
-                                    borderColor: alpha(theme.palette.primary.main, 0.3),
-                                    boxShadow: '0 12px 32px rgba(0,0,0,0.06)',
-                                    transform: 'translateY(-4px)'
-                                }
-                            }}
-                        >
-                            <Box sx={{ p: 3, display: 'flex', alignItems: 'flex-start', gap: 2.5 }}>
-                                <Avatar
+                <Grid container spacing={2}>
+                    {filteredUsers.map((u: any) => {
+                        const roleStyle = getRoleColor(u.role);
+                        return (
+                            <Grid item xs={12} sm={6} md={4} key={u.id}>
+                                <Paper
+                                    onClick={() => {
+                                        setSelectedUser(u);
+                                        setOpenDetails(true);
+                                    }}
                                     sx={{
-                                        width: 56,
-                                        height: 56,
-                                        borderRadius: 1,
-                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                        color: 'primary.main',
-                                        fontWeight: 900,
-                                        fontSize: '1.25rem'
+                                        p: 2.5,
+                                        borderRadius: 2.5,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        border: '1px solid',
+                                        borderColor: 'transparent',
+                                        background: `linear-gradient(135deg, ${roleStyle.bg} 0%, ${alpha(roleStyle.color, 0.05)} 100%)`,
+                                        '&:hover': {
+                                            transform: 'translateY(-6px)',
+                                            boxShadow: `0 12px 24px ${alpha(roleStyle.color, 0.15)}`,
+                                            borderColor: roleStyle.color,
+                                        }
                                     }}
                                 >
-                                    {(u.full_name || u.email)?.[0]?.toUpperCase()}
-                                </Avatar>
-                                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                        <Box sx={{ pr: 1, minWidth: 0 }}>
-                                            <Typography variant="subtitle1" noWrap sx={{ fontWeight: 900, lineHeight: 1.2, mb: 0.5 }}>
-                                                {u.full_name || 'Anonymous User'}
-                                            </Typography>
-                                            <Typography variant="caption" noWrap sx={{ color: 'text.secondary', display: 'block', mb: 1, fontWeight: 600 }}>
-                                                {u.email}
-                                            </Typography>
-                                            <Chip
-                                                label={u.role || 'GUEST'}
+                                    {/* Header with Avatar & Actions */}
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                        <Avatar
+                                            sx={{
+                                                width: 48,
+                                                height: 48,
+                                                bgcolor: roleStyle.avatar,
+                                                color: 'white',
+                                                fontWeight: 900,
+                                                fontSize: '1rem'
+                                            }}
+                                        >
+                                            {(u.full_name || u.email)?.[0]?.toUpperCase()}
+                                        </Avatar>
+                                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                            <IconButton
                                                 size="small"
-                                                sx={{
-                                                    borderRadius: 1.5,
-                                                    fontWeight: 800,
-                                                    fontSize: '0.6rem',
-                                                    height: 22,
-                                                    bgcolor: alpha(theme.palette.primary.main, 0.08),
-                                                    color: 'primary.main',
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleEditUser(u);
                                                 }}
-                                            />
-                                        </Box>
-                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                            <IconButton size="small" onClick={() => handleEditUser(u)} sx={{ '&:hover': { color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.1) } }}>
+                                                sx={{ color: roleStyle.color, '&:hover': { bgcolor: roleStyle.bg } }}
+                                            >
                                                 <Edit fontSize="small" />
                                             </IconButton>
-                                            <IconButton size="small" onClick={() => handleDeleteUser(u)} sx={{ '&:hover': { color: 'error.main', bgcolor: alpha(theme.palette.error.main, 0.1) } }}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteUser(u);
+                                                }}
+                                                sx={{ color: 'error.main', '&:hover': { bgcolor: alpha('error.main', 0.1) } }}
+                                            >
                                                 <Delete fontSize="small" />
                                             </IconButton>
                                         </Box>
                                     </Box>
-                                </Box>
-                            </Box>
 
-                            <Box sx={{
-                                px: 3, py: 2,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                borderTop: '1px solid',
-                                borderColor: alpha(theme.palette.divider, 0.04),
-                                bgcolor: alpha(theme.palette.background.default, 0.5)
-                            }}>
-                                <Box>
-                                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, display: 'block', letterSpacing: 0.5, mb: 0.2 }}>STATUS</Typography>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: u.is_active ? '#519755' : 'error.main', boxShadow: u.is_active ? '0 0 10px rgba(81, 151, 85, 0.3)' : 'none' }} />
-                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary' }}>{u.is_active ? 'ACTIVE' : 'SUSPENDED'}</Typography>
-                                    </Box>
-                                </Box>
-                                <Box sx={{ textAlign: 'right' }}>
-                                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, display: 'block', letterSpacing: 0.5, mb: 0.2 }}>MEMBER SINCE</Typography>
-                                    <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                                        {u.date_joined ? new Date(u.date_joined).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : 'N/A'}
+                                    {/* Name & Email */}
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 0.3, color: 'text.primary' }} noWrap>
+                                        {u.full_name || 'Anonymous'}
                                     </Typography>
-                                </Box>
-                            </Box>
+                                    <Typography variant="caption" sx={{ color: 'text.secondary', mb: 1.5, display: 'block' }} noWrap>
+                                        {u.email}
+                                    </Typography>
 
-                            <Box sx={{ p: 2, display: 'flex', gap: 1 }}>
+                                    {/* Role Badge */}
+                                    <Chip
+                                        label={u.role || 'GUEST'}
+                                        size="small"
+                                        sx={{
+                                            fontWeight: 700,
+                                            fontSize: '0.65rem',
+                                            bgcolor: roleStyle.color,
+                                            color: 'white',
+                                            borderRadius: 1,
+                                            height: 20
+                                        }}
+                                    />
+
+                                    {/* Status & Member Info */}
+                                    <Box sx={{ mt: 2, pt: 2, borderTop: `1px solid ${alpha(roleStyle.color, 0.2)}`, display: 'flex', justifyContent: 'space-between' }}>
+                                        <Box>
+                                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.65rem' }}>
+                                                STATUS
+                                            </Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.3 }}>
+                                                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: u.is_active ? 'success.main' : 'error.main' }} />
+                                                <Typography variant="caption" sx={{ fontWeight: 700, color: u.is_active ? 'success.main' : 'error.main' }}>
+                                                    {u.is_active ? 'Active' : 'Inactive'}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                        <Box sx={{ textAlign: 'right' }}>
+                                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.65rem' }}>
+                                                JOINED
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary', display: 'block', mt: 0.3 }}>
+                                                {u.date_joined ? new Date(u.date_joined).toLocaleDateString(undefined, { month: 'short', year: '2-digit' }) : 'N/A'}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                        );
+                    })}
+                </Grid>
+
+                {/* User Details Modal */}
+                <Dialog
+                    open={openDetails}
+                    onClose={() => setOpenDetails(false)}
+                    maxWidth="sm"
+                    fullWidth
+                    PaperProps={{
+                        sx: {
+                            borderRadius: 3,
+                            backgroundImage: 'none'
+                        }
+                    }}
+                >
+                    {selectedUser && (
+                        <>
+                            <DialogTitle sx={{ fontWeight: 900, pb: 1 }}>
+                                {selectedUser.full_name || 'User'}
+                            </DialogTitle>
+                            <DialogContent dividers sx={{ pt: 2 }}>
+                                <Stack spacing={2}>
+                                    {/* Avatar & Role */}
+                                    <Box sx={{ textAlign: 'center', mb: 1 }}>
+                                        <Avatar
+                                            sx={{
+                                                width: 80,
+                                                height: 80,
+                                                margin: '0 auto',
+                                                mb: 2,
+                                                bgcolor: getRoleColor(selectedUser.role).avatar,
+                                                color: 'white',
+                                                fontWeight: 900,
+                                                fontSize: '2rem'
+                                            }}
+                                        >
+                                            {(selectedUser.full_name || selectedUser.email)?.[0]?.toUpperCase()}
+                                        </Avatar>
+                                        <Chip
+                                            label={selectedUser.role || 'GUEST'}
+                                            sx={{
+                                                fontWeight: 700,
+                                                bgcolor: getRoleColor(selectedUser.role).color,
+                                                color: 'white'
+                                            }}
+                                        />
+                                    </Box>
+
+                                    <Divider />
+
+                                    {/* Info */}
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                                            EMAIL
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                            {selectedUser.email}
+                                        </Typography>
+                                    </Box>
+
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                                            STATUS
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: selectedUser.is_active ? 'success.main' : 'error.main' }} />
+                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                {selectedUser.is_active ? 'Active' : 'Inactive'}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                                            MEMBER SINCE
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                            {selectedUser.date_joined ? new Date(selectedUser.date_joined).toLocaleDateString() : 'N/A'}
+                                        </Typography>
+                                    </Box>
+
+                                    {selectedUser.phone_number && (
+                                        <Box>
+                                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                                                PHONE
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                {selectedUser.phone_number}
+                                            </Typography>
+                                        </Box>
+                                    )}
+
+                                    {selectedUser.is_approved === false && (
+                                        <Alert severity="warning">
+                                            This account is pending approval
+                                        </Alert>
+                                    )}
+                                </Stack>
+                            </DialogContent>
+                            <DialogActions sx={{ p: 2 }}>
+                                <Button onClick={() => setOpenDetails(false)}>Close</Button>
                                 <Button
-                                    fullWidth
-                                    size="small"
-                                    variant="text"
-                                    onClick={() => { setSnackbar({ open: true, message: 'Fetching activity logs...', severity: 'info' }) }}
-                                    sx={{
-                                        borderRadius: 2,
-                                        color: 'text.secondary',
-                                        textTransform: 'none',
-                                        fontWeight: 800,
-                                        fontSize: '0.7rem',
-                                        py: 1,
-                                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), color: 'primary.main' }
+                                    variant="contained"
+                                    onClick={() => {
+                                        handleEditUser(selectedUser);
+                                        setOpenDetails(false);
                                     }}
                                 >
-                                    Activity Logs
+                                    Edit
                                 </Button>
-                                <Button
-                                    fullWidth
-                                    size="small"
-                                    variant="text"
-                                    onClick={() => { setSnackbar({ open: true, message: 'Opening permissions...', severity: 'info' }) }}
-                                    sx={{
-                                        borderRadius: 2,
-                                        color: 'text.secondary',
-                                        textTransform: 'none',
-                                        fontWeight: 800,
-                                        fontSize: '0.7rem',
-                                        py: 1,
-                                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), color: 'primary.main' }
-                                    }}
-                                >
-                                    Permissions
-                                </Button>
-                            </Box>
-                        </Paper>
-                    </Grid>
-                ))}
-            </Grid>
-        </Box>
-    );
+                            </DialogActions>
+                        </>
+                    )}
+                </Dialog>
+            </Box>
+        );
+    };
 
     const renderPendingApprovals = () => (
         <Box>
