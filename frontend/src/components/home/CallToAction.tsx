@@ -89,7 +89,7 @@ const CTACard: React.FC<CTACardProps> = ({ title, description, icon, buttonText,
             color: 'white',
             fontWeight: 700,
             textTransform: 'none',
-            borderRadius: 2,
+            borderRadius: 1,
             py: 1,
             transition: 'all 0.3s ease',
             '&:hover': {

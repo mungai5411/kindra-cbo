@@ -106,6 +106,7 @@ function App() {
                             <Route path="/about" element={<AboutPage />} />
                             <Route path="/login" element={<LoginRedirect />} />
                             <Route path="/register" element={<RegisterRedirect />} />
+                            <Route path="/volunteer" element={<Navigate to="/register?role=VOLUNTEER" replace />} />
                             <Route path="/pending-approval" element={<PendingApprovalView />} />
 
                             {/* Consolidated Blog & Stories */}

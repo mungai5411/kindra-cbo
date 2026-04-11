@@ -113,54 +113,44 @@ const ProgramCard: React.FC<ProgramProps> = ({ title, description, color, icon, 
           {description}
         </Typography>
 
-        {/* Stats Badge */}
-        <Box
+        {/* Action Button (Formerly Stats Badge) */}
+        <Button
+          component={Link}
+          to={link}
           sx={{
             px: 2,
             py: 1,
             bgcolor: alpha(color, 0.1),
             border: `1px solid ${alpha(color, 0.2)}`,
-            borderRadius: 2,
+            borderRadius: 1.5,
             mb: 2,
-            display: 'inline-block',
-            width: 'fit-content'
+            display: 'inline-flex',
+            width: 'fit-content',
+            textTransform: 'none',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              bgcolor: alpha(color, 0.2),
+              transform: 'translateY(-2px)',
+              boxShadow: `0 4px 12px ${alpha(color, 0.1)}`
+            }
           }}
         >
           <Typography
             variant="caption"
             sx={{
-              fontWeight: 700,
+              fontWeight: 800,
               color,
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
-              fontSize: '0.75rem'
+              fontSize: '0.75rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
             }}
           >
             {stats}
+            <ArrowForward sx={{ fontSize: '0.9rem' }} />
           </Typography>
-        </Box>
-
-        {/* CTA Button */}
-        <Button
-          component={Link}
-          to={link}
-          variant="text"
-          endIcon={<ArrowForward sx={{ fontSize: '1rem' }} />}
-          className="program-cta"
-          sx={{
-            justifyContent: 'flex-start',
-            pl: 0,
-            color,
-            fontWeight: 700,
-            textTransform: 'none',
-            fontSize: '0.95rem',
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              background: 'transparent'
-            }
-          }}
-        >
-          {cta}
         </Button>
       </CardContent>
     </MotionCard>
