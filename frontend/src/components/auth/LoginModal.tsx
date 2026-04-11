@@ -49,9 +49,6 @@ export const LoginModal = () => {
     const [rateLimitError, setRateLimitError] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
 
-
-    const [isGoogleFlow, setIsGoogleFlow] = useState(false);
-
     // Clear errors when user starts typing
     useEffect(() => {
         setLocalError('');
@@ -66,7 +63,6 @@ export const LoginModal = () => {
             setLocalError('');
             setRateLimitError('');
             setLocalLoading(false);
-            setIsGoogleFlow(false);
         }
     }, [isLoginOpen]);
 
@@ -158,94 +154,54 @@ export const LoginModal = () => {
                 <DialogContent sx={{ p: isMobile ? 3 : 5, pt: isMobile ? 5 : 6 }}>
                     <Box sx={{ mb: 4 }}>
                         <Typography variant="h4" fontWeight="700" sx={{ mb: 1, letterSpacing: '-0.02em' }}>
-                            {isGoogleFlow ? "Sign in with Google" : "Welcome back"}
+                            Welcome back
                         </Typography>
                         <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 400 }}>
-                            {isGoogleFlow ? "Access your account securely" : "Please enter your details"}
+                            Please enter your details
                         </Typography>
                     </Box>
 
-                    {isGoogleFlow ? (
-                        <>
-                            <GoogleSignInButton
-                                selectedRole={null} // No role for login flow
-                                onSuccess={(data: any) => {
-                                    dispatch({
-                                        type: 'auth/login/fulfilled',
-                                        payload: { access: data.access, refresh: data.refresh, user: data.user }
-                                    });
-                                    closeLoginModal();
-                                    const from = (location.state as any)?.from?.pathname || '/dashboard/overview';
-                                    navigate(from, { replace: true });
-                                }}
-                                onError={(msg) => {
-                                    if (msg.includes('not found') || msg.includes('sign up')) {
-                                        switchToRegister();
-                                    } else {
-                                        setLocalError(msg); // Will be displayed in Alert
-                                    }
-                                }}
-                            />
-                            <Button
-                                fullWidth
-                                variant="text"
-                                onClick={() => setIsGoogleFlow(false)}
-                                sx={{
-                                    color: 'text.secondary',
-                                    textTransform: 'none',
-                                    fontWeight: 700,
-                                    fontSize: '0.85rem',
-                                    '&:hover': { bgcolor: 'transparent', color: 'primary.main', textDecoration: 'underline' }
-                                }}
-                            >
-                                Back to email login
-                            </Button>
-                        </>
-                    ) : (
-                        <>
-                            <Button
-                                fullWidth
-                                variant="outlined"
-                                onClick={() => setIsGoogleFlow(true)}
-                                sx={{
-                                    mb: 3,
-                                    py: 1.5,
-                                    borderRadius: 3,
-                                    borderColor: 'divider',
-                                    color: 'text.primary',
-                                    textTransform: 'none',
-                                    fontWeight: '600',
-                                    fontSize: '15px',
-                                    '&:hover': {
-                                        borderColor: '#bbb',
-                                        bgcolor: '#f9f9f9'
-                                    }
-                                }}
-                            >
-                                Continue with Google
-                            </Button>
+                    <GoogleSignInButton
+                        selectedRole={null}
+                        onSuccess={(data: any) => {
+                            dispatch({
+                                type: 'auth/login/fulfilled',
+                                payload: { access: data.access, refresh: data.refresh, user: data.user }
+                            });
+                            closeLoginModal();
+                            const from = (location.state as any)?.from?.pathname || '/dashboard/overview';
+                            navigate(from, { replace: true });
+                        }}
+                        onError={(msg) => {
+                            if (msg.includes('not found') || msg.includes('sign up')) {
+                                switchToRegister();
+                            } else {
+                                setLocalError(msg);
+                            }
+                        }}
+                    />
 
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                                <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
-                                <Typography variant="body2" sx={{ px: 2, color: '#999', fontWeight: 500 }}>
-                                    or
-                                </Typography>
-                                <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
-                            </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
+                        <Typography variant="body2" sx={{ px: 2, color: '#999', fontWeight: 500 }}>
+                            or
+                        </Typography>
+                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
+                    </Box>
 
-                            {(reduxError || localError) && !rateLimitError && (
-                                <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
-                                    {localError || reduxError}
-                                </Alert>
-                            )}
+                    {(reduxError || localError) && !rateLimitError && (
+                        <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
+                            {localError || reduxError}
+                        </Alert>
+                    )}
 
-                            {rateLimitError && (
-                                <Alert severity="warning" sx={{ mb: 3, borderRadius: '8px' }}>
-                                    {rateLimitError}
-                                </Alert>
-                            )}
+                    {rateLimitError && (
+                        <Alert severity="warning" sx={{ mb: 3, borderRadius: '8px' }}>
+                            {rateLimitError}
+                        </Alert>
+                    )}
 
-                            <Box component="form" onSubmit={handleSubmit}>
+                    <Box component="form" onSubmit={handleSubmit}>
                                 <Box sx={{ mb: 3 }}>
                                     <Typography variant="body2" fontWeight="600" sx={{ mb: 1, color: '#333' }}>
                                         Email address
@@ -387,8 +343,6 @@ export const LoginModal = () => {
                                     </Typography>
                                 </Box>
                             </Box>
-                        </>
-                    )}
                 </DialogContent>
             )}
         </Dialog>
