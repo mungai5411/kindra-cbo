@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Box, Container, Grid, Card, Typography, alpha, Stack } from '@mui/material';
+import { Box, Container, Grid, Card, Typography, alpha, Stack, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
 import { CheckCircle, Public, Insights, VerifiedUser, Handshake } from '@mui/icons-material';
 
@@ -56,6 +56,7 @@ const ValueCard: React.FC<ValueProps> = ({ title, description, delay }) => {
 };
 
 export const MissionAndValues: React.FC = () => {
+  const theme = useTheme();
   const values = [
     {
       title: 'Community-Driven',

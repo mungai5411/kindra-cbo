@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { Box, Container, Typography, Accordion, AccordionSummary, AccordionDetails, alpha } from '@mui/material';
+import { Box, Container, Typography, Accordion, AccordionSummary, AccordionDetails, alpha, useTheme } from '@mui/material';
 import { ExpandMore, HelpOutline } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
@@ -51,6 +51,7 @@ interface FAQItemComponentProps {
 }
 
 const FAQItemComponent: React.FC<FAQItemComponentProps> = ({ faq, index, expanded, onChange }) => {
+  const theme = useTheme();
   const panelId = `panel-${index}`;
 
   return (
@@ -102,6 +103,7 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({ faq, index, expande
 };
 
 export const FAQSection: React.FC = () => {
+  const theme = useTheme();
   const [expanded, setExpanded] = useState<string | false>('panel-0');
 
   return (

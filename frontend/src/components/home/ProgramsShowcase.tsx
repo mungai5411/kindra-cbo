@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Box, Container, Grid, Card, CardContent, Typography, Button, alpha } from '@mui/material';
+import { Box, Container, Grid, Card, CardContent, Typography, Button, alpha, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowForward, VolunteerActivism, Groups, Savings, HomeWork } from '@mui/icons-material';
@@ -168,6 +168,7 @@ const ProgramCard: React.FC<ProgramProps> = ({ title, description, color, icon, 
 };
 
 export const ProgramsShowcase: React.FC = () => {
+  const theme = useTheme();
 
   const programs: ProgramProps[] = [
     {
