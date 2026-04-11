@@ -219,7 +219,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
     const handleAddTask = () => {
         // Validate required fields
         if (!taskForm.title || !taskForm.description) {
-            setSnackbar({ open: true, message: 'Please fill in Title and Description', severity: 'warning' });
+            setSnackbar({ open: true, message: 'Add title and description', severity: 'warning' });
             return;
         }
 
@@ -254,13 +254,13 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
             setSnackbar({ open: true, message: 'Task assigned successfully', severity: 'success' });
         }).catch((err) => {
             console.error(err);
-            setSnackbar({ open: true, message: 'Failed to assign task. Please fill all required fields.', severity: 'error' });
+            setSnackbar({ open: true, message: 'Fill all required fields', severity: 'error' });
         });
     };
 
     const handleAddEvent = async () => {
         if (!eventForm.title || !eventForm.start_datetime) {
-            setSnackbar({ open: true, message: 'Required fields missing', severity: 'error' });
+            setSnackbar({ open: true, message: 'Missing required fields', severity: 'error' });
             return;
         }
 

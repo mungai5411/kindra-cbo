@@ -12,6 +12,9 @@ from .models import (
 )
 
 
+"""Serializer for shelter photos"""
+
+
 class ShelterPhotoSerializer(serializers.ModelSerializer):
     """Serializer for shelter photos"""
     class Meta:
@@ -31,15 +34,36 @@ class ShelterHomeSerializer(serializers.ModelSerializer):
         max_length=10,
         help_text='Upload 3-10 photos of the shelter'
     )
+    registration_number = serializers.CharField(
+        required=True,
+        help_text='Unique shelter registration number'
+    )
     
     class Meta:
         model = ShelterHome
         fields = '__all__'
         read_only_fields = ('id', 'created_at', 'updated_at', 'approval_status', 'approved_by', 'approval_date')
+        extra_kwargs = {
+            'registration_number': {'required': True}
+        }
+    
+    def validate_registration_number(self, value):
+        """Validate registration number is unique, excluding current instance on update"""
+        request = self.context.get('request')
+        queryset = ShelterHome.objects.filter(registration_number=value)
+        
+        # Exclude current instance if updating
+        if self.instance:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        
+        if queryset.exists():
+            raise serializers.ValidationError("A shelter with this registration number already exists.")
+        
+        return value
     
     def validate(self, data):
         """Validate required fields for shelter registration"""
-        # Only validate on creation
+        # Only validate required fields strictly on creation
         if not self.instance:
             required_fields = [
                 'name', 'contact_person', 'phone_number', 'email',
@@ -84,7 +108,43 @@ class ShelterHomeSerializer(serializers.ModelSerializer):
             data['physical_address'] = strip_tags(data.get('physical_address', ''))
             data['security_measures'] = strip_tags(data.get('security_measures', ''))
 
+        # On updates, sanitize text fields if provided
+        else:
+            text_fields = ['name', 'contact_person', 'emergency_contact', 'physical_address', 'security_measures']
+            for field in text_fields:
+                if field in data:
+                    data[field] = strip_tags(data[field]) if data[field] else data[field]
+
         return data
+    
+    def to_internal_value(self, data):
+        """Convert incoming float coordinates to proper Decimal format"""
+        result = super().to_internal_value(data)
+        
+        # Ensure latitude and longitude are properly formatted as Decimals
+        if 'latitude' in result:
+            try:
+                result['latitude'] = float(result['latitude'])
+            except (TypeError, ValueError):
+                raise serializers.ValidationError({'latitude': 'Must be a valid number'})
+        
+        if 'longitude' in result:
+            try:
+                result['longitude'] = float(result['longitude'])
+            except (TypeError, ValueError):
+                raise serializers.ValidationError({'longitude': 'Must be a valid number'})
+        
+        return result
+    
+    def to_representation(self, instance):
+        """Ensure decimal fields are properly serialized"""
+        ret = super().to_representation(instance)
+        # Ensure coordinates are serialized as floats for frontend
+        if 'latitude' in ret and ret['latitude'] is not None:
+            ret['latitude'] = float(ret['latitude'])
+        if 'longitude' in ret and ret['longitude'] is not None:
+            ret['longitude'] = float(ret['longitude'])
+        return ret
     
     def create(self, validated_data):
         """Create shelter and associated photos"""
@@ -123,6 +183,24 @@ class ShelterHomeSerializer(serializers.ModelSerializer):
             )
         
         return shelter
+
+    
+    def update(self, instance, validated_data):
+        """Update shelter - handles PATCH requests"""
+        # Remove fields that shouldn't be updated
+        validated_data.pop('uploaded_photos', None)
+        validated_data.pop('photos', None)  # In case frontend sends this
+        
+        # Get all valid field names from the model
+        valid_fields = {f.name for f in instance._meta.get_fields()}
+        
+        # Update only valid fields that exist on the model
+        for attr, value in validated_data.items():
+            if attr in valid_fields and hasattr(instance, attr):
+                setattr(instance, attr, value)
+        
+        instance.save()
+        return instance
 
 
 class PlacementSerializer(serializers.ModelSerializer):

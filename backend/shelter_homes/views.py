@@ -75,6 +75,16 @@ class ShelterHomeDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ShelterHomeSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    def perform_update(self, serializer):
+        """Handle updates with better error reporting"""
+        try:
+            serializer.save()
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Shelter update error: {str(e)}", exc_info=True)
+            raise
+
     def perform_destroy(self, instance):
         name = instance.name
         instance.delete()

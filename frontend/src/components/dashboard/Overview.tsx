@@ -55,27 +55,26 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
     const donationMethods = getDonationMethodBreakdown(donationRecords);
     const shelterCapacity = getShelterCapacityData(shelters);
 
-    // Activity aggregation (Enhanced for all roles)
     const activities: any[] = [
         ...donationRecords.map((d: any) => ({
             id: `don-${d.id}`,
             type: 'donation' as const,
-            title: 'New Donation Received',
-            description: `${d.donor_name || 'Anonymous'} donated KES ${(d.amount || 0).toLocaleString()} to ${d.campaign_title || 'General Fund'}`,
+            title: 'Donation',
+            description: `KES ${(d.amount || 0).toLocaleString()} — ${d.campaign_title || 'General'}`,
             timestamp: d.donation_date
         })),
         ...volunteers.slice(0, 5).map((v: any) => ({
             id: `vol-${v.id}`,
             type: 'volunteer' as const,
-            title: 'Volunteer Update',
-            description: `${v.full_name} status: ${v.status}`,
+            title: 'Volunteer',
+            description: `${v.full_name} — ${v.status}`,
             timestamp: v.created_at || new Date().toISOString()
         })),
         ...cases.slice(0, 5).map((c: any) => ({
             id: `case-${c.id}`,
             type: 'case' as const,
-            title: 'New Case Added',
-            description: `Case ${c.case_number} for ${c.child_name}`,
+            title: 'Case',
+            description: `${c.case_number}: ${c.child_name}`,
             timestamp: c.created_at || new Date().toISOString()
         }))
     ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());

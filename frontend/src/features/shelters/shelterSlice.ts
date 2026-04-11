@@ -168,6 +168,10 @@ export const updateShelter = createAsyncThunk(
                 payload = data;
                 headers['Content-Type'] = 'multipart/form-data';
             } else {
+                // Remove id and photos from payload - these shouldn't be sent in PATCH
+                const { id: _, photos, ...cleanData } = payload;
+                payload = cleanData;
+
                 // Ensure coordinates are proper numbers for PATCH requests
                 if (payload.latitude) {
                     payload.latitude = parseFloat(payload.latitude);

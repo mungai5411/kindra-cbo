@@ -496,10 +496,6 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                 '& .MuiOutlinedInput-root': { borderRadius: 2 }
                             }}
                         />
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'success.main' }}>
-                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' }} />
-                            <Typography variant="caption" sx={{ fontWeight: 700 }}>Auto-syncing</Typography>
-                        </Box>
                     </Box>
                 </Box>
 
@@ -837,10 +833,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     const renderGroups = () => (
         <Paper elevation={0} sx={{ borderRadius: 1.5, overflow: 'hidden', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.08), bgcolor: alpha(theme.palette.background.paper, 0.6), backdropFilter: 'blur(20px)' }}>
             <Box sx={{ p: 4, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05), display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-                <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Groups</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Volunteer groups and teams</Typography>
-                </Box>
+                <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Groups</Typography>
                 <Button
                     variant="contained"
                     startIcon={<GroupWork />}
@@ -877,9 +870,11 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                 </Box>
                             </Box>
                             <Typography variant="h6" sx={{ fontWeight: 900, mb: 1.5, letterSpacing: -0.2 }}>{group.name}</Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3, minHeight: 48, lineHeight: 1.5, fontWeight: 500 }}>
-                                {group.description || 'No operational mandate defined for this unit.'}
-                            </Typography>
+                            {group.description && (
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3, minHeight: 48, lineHeight: 1.5, fontWeight: 500 }}>
+                                    {group.description}
+                                </Typography>
+                            )}
 
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -1061,10 +1056,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         <Security fontSize="small" /> Management Console
                     </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: 'success.main', boxShadow: '0 0 0 3px rgba(76,175,80,0.2)', animation: 'pulse 2s infinite' }} />
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'success.main', textTransform: 'uppercase', letterSpacing: 1 }}>Live · Auto-syncing</Typography>
-                </Box>
+
             </Box>
 
             <AnimatePresence mode="wait">
@@ -1138,21 +1130,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             <MenuItem value="SUSPENDED">Security Suspension</MenuItem>
                         </TextField>
 
-                        <Alert
-                            severity="info"
-                            icon={<Security />}
-                            sx={{
-                                borderRadius: 1,
-                                fontWeight: 600,
-                                fontSize: '0.8rem',
-                                bgcolor: alpha(theme.palette.info.main, 0.05),
-                                color: 'info.main',
-                                border: '1px solid',
-                                borderColor: alpha(theme.palette.info.main, 0.1)
-                            }}
-                        >
-                            Changes will be applied immediately.
-                        </Alert>
+
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 1 }}>

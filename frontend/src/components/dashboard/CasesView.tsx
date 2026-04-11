@@ -175,7 +175,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
 
     const handleAddCase = () => {
         if (!caseForm.title || !caseForm.family) {
-            setSnackbar({ open: true, message: 'Please fill in required fields', severity: 'error' });
+            setSnackbar({ open: true, message: 'Fill all required fields', severity: 'error' });
             return;
         }
 
