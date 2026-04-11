@@ -162,17 +162,16 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
     });
 
     useEffect(() => {
-        dispatch(fetchFamilies());
-        dispatch(fetchChildren());
-        dispatch(fetchCases());
-        // Load initial assessments and notes if possible, or lazy load in tabs
+        const fetchAll = () => {
+            dispatch(fetchFamilies());
+            dispatch(fetchChildren());
+            dispatch(fetchCases());
+        };
+        fetchAll();
+        // Automated background sync every 60s — no manual button required
+        const autoSyncInterval = setInterval(fetchAll, 60000);
+        return () => clearInterval(autoSyncInterval);
     }, [dispatch]);
-
-    const handleRefresh = () => {
-        dispatch(fetchFamilies());
-        dispatch(fetchChildren());
-        dispatch(fetchCases());
-    };
 
     const handleAddCase = () => {
         if (!caseForm.title || !caseForm.family) {

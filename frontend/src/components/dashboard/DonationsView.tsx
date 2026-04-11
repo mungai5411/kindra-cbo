@@ -158,14 +158,18 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
         return 'Bronze Partner';
     };
 
-    // Initial mounting fetch
+    // Initial mounting fetch + automated background sync every 60s
     useEffect(() => {
-        dispatch(fetchCampaigns());
-        dispatch(fetchDonations());
-        dispatch(fetchDonors());
-        dispatch(fetchReceipts());
-        dispatch(fetchMaterialDonations());
-        dispatch(fetchEvents());
+        const fetchAll = () => {
+            dispatch(fetchCampaigns());
+            dispatch(fetchDonations());
+            dispatch(fetchDonors());
+            dispatch(fetchReceipts());
+            dispatch(fetchMaterialDonations());
+            dispatch(fetchEvents());
+        };
+        fetchAll();
+        const autoSyncInterval = setInterval(fetchAll, 60000);
 
         const handleOpenExternalDonation = (e: any) => {
             if (e.detail) {
@@ -174,7 +178,10 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
         };
 
         window.addEventListener('open-donation-dialog', handleOpenExternalDonation);
-        return () => window.removeEventListener('open-donation-dialog', handleOpenExternalDonation);
+        return () => {
+            clearInterval(autoSyncInterval);
+            window.removeEventListener('open-donation-dialog', handleOpenExternalDonation);
+        };
     }, [dispatch]);
 
     // Update local donor state when user or donors list changes
@@ -903,21 +910,11 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                     </Typography>
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Verified record of contributions</Typography>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Button
-                        variant="outlined"
-                        startIcon={<Refresh />}
-                        onClick={() => dispatch(fetchDonations())}
-                        sx={{
-                            borderRadius: 2.5,
-                            textTransform: 'none',
-                            fontWeight: 800,
-                            borderColor: alpha(theme.palette.primary.main, 0.2),
-                            '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main' }
-                        }}
-                    >
-                        Sync Records
-                    </Button>
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                        <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' }} />
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.disabled' }}>Live</Typography>
+                    </Box>
                     {isManagement && (
                         <Button
                             variant="contained"

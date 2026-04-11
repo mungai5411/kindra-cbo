@@ -518,15 +518,10 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                         <Typography variant="h6" fontWeight="800" sx={{ letterSpacing: -0.5 }}>Community Voices</Typography>
                         <Typography variant="body2" color="text.secondary">Review and moderate reader engagement</Typography>
                     </Box>
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => dispatch(fetchAllComments())}
-                        startIcon={<Forum />}
-                        sx={{ borderRadius: 3, textTransform: 'none', px: 2, border: 'none', bgcolor: alpha(theme.palette.primary.main, 0.08), color: 'primary.main', fontWeight: 600, '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15), border: 'none' } }}
-                    >
-                        Refresh
-                    </Button>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                        <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' }} />
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.disabled' }}>Live</Typography>
+                    </Box>
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>

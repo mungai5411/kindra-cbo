@@ -102,18 +102,24 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
 
     useEffect(() => {
-        dispatch(fetchUsers());
-        dispatch(fetchVolunteers());
-        dispatch(fetchDashboardData());
-        dispatch(fetchReports());
-        dispatch(fetchFamilies());
-        dispatch(fetchCases());
-        dispatch(fetchGroups());
-        dispatch(fetchAuditLogs());
-        dispatch(fetchPendingUsers());
-        dispatch(fetchPeriodicTasks());
-        dispatch(fetchTaskResults());
-        dispatch(fetchBugReports());
+        const fetchAll = () => {
+            dispatch(fetchUsers());
+            dispatch(fetchVolunteers());
+            dispatch(fetchDashboardData());
+            dispatch(fetchReports());
+            dispatch(fetchFamilies());
+            dispatch(fetchCases());
+            dispatch(fetchGroups());
+            dispatch(fetchAuditLogs());
+            dispatch(fetchPendingUsers());
+            dispatch(fetchPeriodicTasks());
+            dispatch(fetchTaskResults());
+            dispatch(fetchBugReports());
+        };
+        fetchAll();
+        // Automated background sync every 60 seconds — no manual button required
+        const autoSyncInterval = setInterval(fetchAll, 60000);
+        return () => clearInterval(autoSyncInterval);
     }, [dispatch]);
 
     // Fetch volunteers realtime when creating/editing groups
@@ -122,28 +128,6 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             dispatch(fetchVolunteers());
         }
     }, [openGroupDialog, dispatch]);
-
-    const handleSync = async () => {
-        setSnackbar({ open: true, message: 'Syncing system data...', severity: 'info' });
-        try {
-            await Promise.all([
-                dispatch(fetchUsers()),
-                dispatch(fetchDashboardData()),
-                dispatch(fetchVolunteers()),
-                dispatch(fetchFamilies()),
-                dispatch(fetchCases()),
-                dispatch(fetchGroups()),
-                dispatch(fetchAuditLogs()),
-                dispatch(fetchPendingUsers()),
-                dispatch(fetchPeriodicTasks()),
-                dispatch(fetchTaskResults()),
-                dispatch(fetchBugReports())
-            ]);
-            setSnackbar({ open: true, message: 'Sync complete!', severity: 'success' });
-        } catch (err) {
-            setSnackbar({ open: true, message: 'Sync partially failed. Check network.', severity: 'error' });
-        }
-    };
 
     const userList = Array.isArray(allUsers) ? allUsers : [];
 
@@ -500,21 +484,10 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             }
                         }}
                     />
-                    <Button
-                        variant="contained"
-                        startIcon={<Refresh />}
-                        onClick={() => dispatch(fetchUsers())}
-                        sx={{
-                            borderRadius: 1,
-                            boxShadow: 'none',
-                            textTransform: 'none',
-                            fontWeight: 800,
-                            px: 3,
-                            '&:hover': { transform: 'translateY(-2px)' }
-                        }}
-                    >
-                        Sync Users
-                    </Button>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'success.main' }}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main', animation: 'pulse 2s infinite' }} />
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>Auto-syncing</Typography>
+                    </Box>
                 </Box>
             </Box>
 
@@ -660,14 +633,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Pending Approvals</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Partner approval requests</Typography>
                 </Box>
-                <Button
-                    variant="outlined"
-                    startIcon={<Refresh />}
-                    onClick={() => dispatch(fetchPendingUsers())}
-                    sx={{ borderRadius: 1, fontWeight: 800, textTransform: 'none' }}
-                >
-                    Update Queue
-                </Button>
+
             </Box>
 
             {!pendingUsers || pendingUsers.length === 0 ? (
@@ -875,14 +841,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             sx: { borderRadius: 1, width: 300, bgcolor: 'background.paper', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), '& fieldset': { border: 'none' } }
                         }}
                     />
-                    <Button
-                        variant="contained"
-                        startIcon={<Refresh />}
-                        onClick={() => dispatch(fetchAuditLogs())}
-                        sx={{ borderRadius: 1, fontWeight: 900, textTransform: 'none', px: 3 }}
-                    >
-                        Sync Logs
-                    </Button>
+
                 </Box>
             </Box>
 
@@ -996,26 +955,10 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         <Security fontSize="small" /> Management Console
                     </Typography>
                 </Box>
-                <Button
-                    variant="contained"
-                    onClick={handleSync}
-                    startIcon={adminLoading ? <CircularProgress size={18} color="inherit" /> : <Refresh />}
-                    disabled={adminLoading}
-                    sx={{
-                        borderRadius: 1,
-                        fontWeight: 800,
-                        px: 3,
-                        py: 1.2,
-                        textTransform: 'none',
-                        boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.25)}`,
-                        '&:hover': {
-                            boxShadow: `0 12px 28px ${alpha(theme.palette.primary.main, 0.4)}`,
-                            transform: 'translateY(-2px)'
-                        }
-                    }}
-                >
-                    Sync System
-                </Button>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: 'success.main', boxShadow: '0 0 0 3px rgba(76,175,80,0.2)', animation: 'pulse 2s infinite' }} />
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'success.main', textTransform: 'uppercase', letterSpacing: 1 }}>Live · Auto-syncing</Typography>
+                </Box>
             </Box>
 
             <AnimatePresence mode="wait">
