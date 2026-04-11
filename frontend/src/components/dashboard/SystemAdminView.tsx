@@ -28,7 +28,8 @@ import {
     useTheme,
     LinearProgress,
     Avatar,
-    Stack
+    Stack,
+    Divider
 } from '@mui/material';
 import {
     AdminPanelSettings,
