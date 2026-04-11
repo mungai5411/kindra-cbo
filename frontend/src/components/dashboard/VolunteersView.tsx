@@ -662,12 +662,12 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 backdropFilter: 'blur(10px)',
                 overflow: 'hidden'
             }}>
-                <Box sx={{ p: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
+                <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
                     <Box>
                         <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>
-                            {isVolunteer ? 'Mission Control' : 'Operations Management'}
+                            {isVolunteer ? 'Volunteer Hub' : 'Volunteer Management'}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>{isVolunteer ? 'MY ACTIVE DEPLOYMENTS' : 'SYSTEM-WIDE TASK ARCHITECTURE'}</Typography>
+                        <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>{isVolunteer ? 'ACTIVE ASSIGNMENTS' : 'SYSTEM OPERATIONS'}</Typography>
                     </Box>
                     {(isManagement || isShelter) && (
                         <Button
@@ -682,7 +682,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
                             }}
                         >
-                            {isShelter ? 'Request Deployment' : 'New Deployment'}
+                            {isShelter ? 'Request Task' : 'New Task'}
                         </Button>
                     )}
                 </Box>
@@ -697,7 +697,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 <Table size="small">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1, pl: 4 }}>TASK PROTOCOL</TableCell>
+                                            <TableCell sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1, pl: 4 }}>TASK RECORD</TableCell>
                                             <TableCell sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1 }}>LOCATION</TableCell>
                                             <TableCell align="right" sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1, pr: 4 }}>ACTION</TableCell>
                                         </TableRow>
@@ -718,7 +718,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                                         onClick={() => handleApply(task.id)}
                                                         sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 800 }}
                                                     >
-                                                        {task.has_applied ? "FILED" : "ENLIST"}
+                                                        {task.has_applied ? "APPLIED" : "APPLY"}
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
@@ -729,19 +729,19 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         </Box>
                     )}
 
-                    <Box sx={{ px: 4, py: 2, bgcolor: alpha(theme.palette.primary.main, 0.03) }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'primary.main', letterSpacing: 1 }}>{isVolunteer ? 'MY ASSIGNMENTS' : 'FULL OPERATIONS LEDGER'}</Typography>
+                    <Box sx={{ px: 4, py: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.03) }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'primary.main', letterSpacing: 1 }}>{isVolunteer ? 'MY ASSIGNMENTS' : 'SYSTEM OPERATIONS LOG'}</Typography>
                     </Box>
                     <TableContainer>
-                        <Table>
+                        <Table size="small">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1, pl: 4 }}>PROTOCOL</TableCell>
+                                    <TableCell sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1, pl: 4 }}>TASK</TableCell>
                                     <TableCell sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1 }}>TEAM</TableCell>
                                     <TableCell sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1 }}>DEADLINE</TableCell>
                                     <TableCell sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1 }}>PRIORITY</TableCell>
                                     <TableCell sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1 }}>STATUS</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1, pr: 4 }}>{isManagement ? 'CONTROL' : 'LOCATION'}</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 900, fontSize: '0.7rem', color: 'text.disabled', letterSpacing: 1, pr: 4 }}>{isManagement ? 'MANAGEMENT' : 'LOCATION'}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -788,7 +788,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                     <TableRow>
                                         <TableCell colSpan={6} align="center" sx={{ py: 10 }}>
                                             <Assignment sx={{ fontSize: 48, color: 'text.disabled', mb: 2, opacity: 0.2 }} />
-                                            <Typography variant="body1" sx={{ color: 'text.disabled', fontWeight: 700 }}>No active operations logs found.</Typography>
+                                            <Typography variant="body1" sx={{ color: 'text.disabled', fontWeight: 700 }}>No active tasks found.</Typography>
                                         </TableCell>
                                     </TableRow>
                                 )}
@@ -819,10 +819,10 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
             backdropFilter: 'blur(10px)',
             overflow: 'hidden'
         }}>
-            <Box sx={{ p: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
+            <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
                 <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Community Hub</Typography>
-                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>ENGAGEMENT & OUTREACH EVENTS</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Community Engagement</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>OUTREACH & VOLUNTEER EVENTS</Typography>
                 </Box>
                 {isManagement && (
                     <Button
@@ -837,20 +837,20 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
                         }}
                     >
-                        Provision Event
+                        Create Event
                     </Button>
                 )}
             </Box>
             <TableContainer>
-                <Table>
+                <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pl: 4 }}>Engagement Protocol</TableCell>
+                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pl: 4 }}>Event Name</TableCell>
                             <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Classification</TableCell>
                             <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Location</TableCell>
-                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Activation</TableCell>
-                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Personnel</TableCell>
-                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pr: 4 }} align="right">Control</TableCell>
+                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Date</TableCell>
+                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Volunteers</TableCell>
+                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pr: 4 }} align="right">Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -908,7 +908,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                                     onClick={() => handleUnregister(event.id)}
                                                     sx={{ textTransform: 'none', fontWeight: 900, fontSize: '0.75rem' }}
                                                 >
-                                                    ABORT
+                                                    CANCEL
                                                 </Button>
                                             ) : (
                                                 <Button
@@ -919,7 +919,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                                     disabled={event.is_full}
                                                     sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 900, fontSize: '0.75rem' }}
                                                 >
-                                                    ENLIST
+                                                    APPLY
                                                 </Button>
                                             )
                                         )}
@@ -956,7 +956,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             <TableRow>
                                 <TableCell colSpan={6} align="center" sx={{ py: 10 }}>
                                     <EventIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2, opacity: 0.2 }} />
-                                    <Typography variant="body1" sx={{ color: 'text.disabled', fontWeight: 700 }}>No community operations scheduled.</Typography>
+                                    <Typography variant="body1" sx={{ color: 'text.disabled', fontWeight: 700 }}>No community events scheduled.</Typography>
                                 </TableCell>
                             </TableRow>
                         )}
@@ -998,10 +998,10 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 backdropFilter: 'blur(10px)',
                 overflow: 'hidden'
             }}>
-                <Box sx={{ p: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
+                <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
                     <Box>
-                        <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Service Chronometry</Typography>
-                        <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>{isVolunteer ? 'MY PERSONAL SERVICE LOGS' : 'SYSTEM-WIDE ACTIVITY AUDIT'}</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Service Logs</Typography>
+                        <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>{isVolunteer ? 'MY ACTIVITY RECORD' : 'SYSTEM-WIDE ACTIVITY LOGS'}</Typography>
                     </Box>
                     {isManagement && (
                         <Button
@@ -1019,18 +1019,18 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
                             }}
                         >
-                            Log Instance
+                            Log Hours
                         </Button>
                     )}
                 </Box>
                 <TableContainer>
-                    <Table>
+                    <Table size="small">
                         <TableHead>
                             <TableRow>
                                 {!isVolunteer && <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pl: 4 }}>Volunteer</TableCell>}
-                                <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pl: isVolunteer ? 4 : 2 }}>Timestamp</TableCell>
-                                <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Magnitude</TableCell>
-                                <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Mission Log</TableCell>
+                                <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pl: isVolunteer ? 4 : 2 }}>Date</TableCell>
+                                <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Duration</TableCell>
+                                <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Activity Details</TableCell>
                                 <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pr: 4 }}>Verification</TableCell>
                             </TableRow>
                         </TableHead>
@@ -1081,7 +1081,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 <TableRow>
                                     <TableCell colSpan={isVolunteer ? 4 : 5} align="center" sx={{ py: 10 }}>
                                         <AccessTime sx={{ fontSize: 48, color: 'text.disabled', mb: 2, opacity: 0.2 }} />
-                                        <Typography variant="body1" sx={{ color: 'text.disabled', fontWeight: 700 }}>No chronometric data recorded.</Typography>
+                                        <Typography variant="body1" sx={{ color: 'text.disabled', fontWeight: 700 }}>No service logs found.</Typography>
                                     </TableCell>
                                 </TableRow>
                             )}
@@ -1104,7 +1104,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
 
     const renderTrainings = () => (
         <Paper sx={{
-            p: 4,
+            p: 2.5,
             borderRadius: 4,
             border: '1px solid',
             borderColor: alpha(theme.palette.divider, 0.08),
@@ -1112,10 +1112,10 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
             backdropFilter: 'blur(10px)',
             overflow: 'hidden'
         }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Training Academy</Typography>
-                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>VOLUNTEER READINESS & CERTIFICATION</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Training Programs</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>VOLUNTEER SKILLS & CERTIFICATION</Typography>
                 </Box>
                 {isManagement && (
                     <Button
@@ -1132,7 +1132,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
                         }}
                     >
-                        Provision Module
+                        Add Module
                     </Button>
                 )}
             </Box>
@@ -1157,7 +1157,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                     <Verified sx={{ color: t.is_active ? 'primary.main' : 'text.disabled', fontSize: '1.2rem' }} />
                                 </Box>
                                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 3 }}>
-                                    {new Date(t.start_datetime).toLocaleDateString()} • {t.registered_count || 0} Recruits
+                                    {new Date(t.start_datetime).toLocaleDateString()} • {t.registered_count || 0} Participants
                                 </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <StatusChip status={t.is_active ? 'ACTIVE' : 'INACTIVE'} />
@@ -1172,7 +1172,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                                     onClick={() => handleUnregister(t.id)}
                                                     sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 800, fontSize: '0.7rem' }}
                                                 >
-                                                    ABORT
+                                                    CANCEL
                                                 </Button>
                                             ) : (
                                                 <Button
@@ -1188,7 +1188,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
 
                                         {isManagement && (
                                             <>
-                                                <Tooltip title="View Recruits">
+                                                <Tooltip title="View Participants">
                                                     <IconButton
                                                         size="small"
                                                         onClick={() => handleViewParticipants(t)}
@@ -1304,7 +1304,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             {selectedVolunteer ? (
                                 <>LOGGING HOURS FOR: <Box component="span" sx={{ color: 'primary.main' }}>{selectedVolunteer?.full_name.toUpperCase()}</Box></>
                             ) : (
-                                "RECORD VOLUNTEER SERVICE DATA"
+                                "RECORD VOLUNTEER SERVICE HOURS"
                             )}
                         </Typography>
                         {!selectedVolunteer && (
@@ -1409,7 +1409,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                     >
                                         <MenuItem value="OTHER">Other</MenuItem>
                                         <MenuItem value="SHELTER">Shelter Support</MenuItem>
-                                        <MenuItem value="COMMUNITY">Community Ops</MenuItem>
+                                        <MenuItem value="COMMUNITY">Community Projects</MenuItem>
                                         <MenuItem value="EVENT">Event Support</MenuItem>
                                     </TextField>
                                 </Grid>

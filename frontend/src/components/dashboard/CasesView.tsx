@@ -214,7 +214,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
     };
 
     if (isLoading && families.length === 0) {
-        return <Box sx={{ display: 'flex', justifyContent: 'center', p: 8 }}><CircularProgress /></Box>;
+        return <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>;
     }
 
     const renderCases = () => {
@@ -251,7 +251,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
             <Box>
                 {/* Summary Header with Key Metrics */}
                 <SummaryHeader
-                    title="Case Management Summary"
+                    title="Case Summary"
                     color={theme.palette.primary.main}
                     metrics={[
                         {
@@ -337,7 +337,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                             borderRadius: 2
                         }}
                     >
-                        Add New Case
+                        Create Case
                     </Button>
                 </Box>
 
@@ -390,7 +390,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                 background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
                             }}
                         >
-                            Create First Case
+                            Create New Case
                         </Button>
                     </Paper>
                 )}
@@ -427,8 +427,8 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
             borderColor: 'divider',
             overflow: 'hidden'
         }}>
-            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" fontWeight="bold">Protected Children Registry</Typography>
+            <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="h6" fontWeight="bold">Child Registry</Typography>
                 <Button
                     variant="outlined"
                     color="primary"
@@ -439,7 +439,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                 </Button>
             </Box>
             <TableContainer>
-                <Table>
+                <Table size="small">
                     <TableHead sx={{ bgcolor: alpha(theme.palette.secondary.main, 0.04) }}>
                         <TableRow>
                             <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Full Name</TableCell>
@@ -471,19 +471,19 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
             borderColor: 'divider',
             overflow: 'hidden'
         }}>
-            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" fontWeight="bold">Household Support Units</Typography>
+            <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="h6" fontWeight="bold">Family Registry</Typography>
                 <Button
                     variant="outlined"
                     color="primary"
                     sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600, borderWidth: 2 }}
                     onClick={() => setOpenDialog({ type: 'family', data: null })}
                 >
-                    Add Family Case
+                    Add Family
                 </Button>
             </Box>
             <TableContainer>
-                <Table>
+                <Table size="small">
                     <TableHead sx={{ bgcolor: alpha(theme.palette.success.main, 0.04) }}>
                         <TableRow>
                             <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Head of Household</TableCell>
@@ -519,8 +519,8 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
             borderColor: 'divider',
             overflow: 'hidden'
         }}>
-            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" fontWeight="bold">Psychosocial Assessments</Typography>
+            <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="h6" fontWeight="bold">Assessments</Typography>
                 <Button
                     variant="contained"
                     size="medium"
@@ -531,13 +531,13 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                 </Button>
             </Box>
             <TableContainer>
-                <Table>
+                <Table size="small">
                     <TableHead sx={{ bgcolor: alpha(theme.palette.warning.main, 0.04) }}>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Subject</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Assessment Date</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Core Needs</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Risk Profile</TableCell>
+                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Case</TableCell>
+                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Date</TableCell>
+                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Needs</TableCell>
+                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Risk Level</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 600, color: 'text.secondary' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
@@ -595,9 +595,9 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
             borderColor: 'divider',
             overflow: 'hidden'
         }}>
-            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" fontWeight="bold">Clinical Intervention Notes</Typography>
-                <Button variant="text" size="small" sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}>Filter by Origin</Button>
+            <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="h6" fontWeight="bold">Intervention Notes</Typography>
+                <Button variant="text" size="small" sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}>Filter Notes</Button>
             </Box>
             <List sx={{ p: 0 }}>
                 {notes.map((note: any, i: number) => (
@@ -636,7 +636,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
 
             {/* Add Family Dialog */}
             <Dialog open={openDialog.type === 'family'} onClose={() => setOpenDialog({ type: null, data: null })} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
-                <DialogTitle sx={{ fontWeight: 'bold' }}>Register Family Unit</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Register Family</DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
                         <TextField
@@ -706,7 +706,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
 
             {/* Add Child Dialog */}
             <Dialog open={openDialog.type === 'child'} onClose={() => setOpenDialog({ type: null, data: null })} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
-                <DialogTitle sx={{ fontWeight: 'bold' }}>Register Protected Child</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Register Child</DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
                         <Grid container spacing={2}>
@@ -822,7 +822,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                 <TextField
                                     fullWidth
                                     select
-                                    label="Assigned Worker"
+                                    label="Case Worker"
                                     value={caseForm.assigned_to}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCaseForm({ ...caseForm, assigned_to: e.target.value })}
                                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -845,7 +845,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                             fullWidth
                             multiline
                             rows={2}
-                            label="Initial Intervention Plan"
+                            label="Intervention Plan"
                             value={caseForm.intervention_plan}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCaseForm({ ...caseForm, intervention_plan: e.target.value })}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -854,7 +854,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>
                     <Button onClick={() => setOpenDialog({ type: null, data: null })}>Cancel</Button>
-                    <Button variant="contained" onClick={handleAddCase} sx={{ borderRadius: 2, px: 3 }}>Deploy Case</Button>
+                    <Button variant="contained" onClick={handleAddCase} sx={{ borderRadius: 2, px: 3 }}>Create Case</Button>
                 </DialogActions>
             </Dialog>
 

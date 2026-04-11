@@ -124,7 +124,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     }, [openGroupDialog, dispatch]);
 
     const handleSync = async () => {
-        setSnackbar({ open: true, message: 'Initiating global system synchronization...', severity: 'info' });
+        setSnackbar({ open: true, message: 'Syncing system data...', severity: 'info' });
         try {
             await Promise.all([
                 dispatch(fetchUsers()),
@@ -139,9 +139,9 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 dispatch(fetchTaskResults()),
                 dispatch(fetchBugReports())
             ]);
-            setSnackbar({ open: true, message: 'System synchronization successful!', severity: 'success' });
+            setSnackbar({ open: true, message: 'Sync complete!', severity: 'success' });
         } catch (err) {
-            setSnackbar({ open: true, message: 'Synchronization partially failed. Check network.', severity: 'error' });
+            setSnackbar({ open: true, message: 'Sync partially failed. Check network.', severity: 'error' });
         }
     };
 
@@ -188,7 +188,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     const handleDeleteUser = (user: any) => {
         setConfirmDialog({
             open: true,
-            title: 'Permanent Deletion',
+            title: 'Delete Account',
             message: `Are you sure you want to PERMANENTLY delete the account for ${user.full_name || user.email}? This will remove all personal data and profiles across the entire system. This action is irreversible.`,
             severity: 'error',
             onConfirm: async () => {
@@ -206,13 +206,13 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     const handleDeleteGroup = (group: any) => {
         setConfirmDialog({
             open: true,
-            title: 'Delete Volunteer Group',
-            message: `Are you sure you want to dissolve the group "${group.name}"? This will not delete the volunteers, but will permanently remove the group and all its private messages.`,
+            title: 'Permanently remove this group',
+            message: `Are you sure you want to delete the group "${group.name}"? This will not delete the volunteers, but will permanently remove the group and all its messages.`,
             severity: 'error',
             onConfirm: async () => {
                 try {
                     await dispatch(deleteGroup(group.id)).unwrap();
-                    setSnackbar({ open: true, message: 'Group successfully dissolved', severity: 'success' });
+                    setSnackbar({ open: true, message: 'Group deleted', severity: 'success' });
                 } catch (error: any) {
                     setSnackbar({ open: true, message: error || 'Failed to delete group', severity: 'error' });
                 }
@@ -238,7 +238,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             setNewGroupDesc('');
             setSelectedVolunteers([]);
         } catch (error: any) {
-            setSnackbar({ open: true, message: error || 'Failed to establish unit', severity: 'error' });
+            setSnackbar({ open: true, message: error || 'Failed to create group', severity: 'error' });
         }
     };
 
@@ -268,7 +268,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             setNewGroupDesc('');
             setSelectedVolunteers([]);
         } catch (error: any) {
-            setSnackbar({ open: true, message: error || 'Failed to reconfigure unit', severity: 'error' });
+            setSnackbar({ open: true, message: error || 'Failed to update group', severity: 'error' });
         }
     };
 
@@ -315,7 +315,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 overflow: 'hidden'
             }}>
                 <TableContainer>
-                    <Table>
+                    <Table size="small">
                         <TableHead sx={{ bgcolor: alpha(theme.palette.background.default, 0.5) }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 800 }}>Type</TableCell>
@@ -370,7 +370,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                                 disabled={bug.status === 'IN_PROGRESS'}
                                                 sx={{ textTransform: 'none', fontWeight: 800 }}
                                             >
-                                                Take Action
+                                                In Progress
                                             </Button>
                                             <Button
                                                 size="small"
@@ -404,7 +404,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         <>
             <Grid container spacing={3} sx={{ mb: 6 }}>
                 {[
-                    { title: 'Registered Accounts', value: userList.length, color: theme.palette.primary.main, icon: <People /> },
+                    { title: 'Users', value: userList.length, color: theme.palette.primary.main, icon: <People /> },
                     { title: 'System Status', value: 'Online', color: '#519755', sub: 'HEALTHY', icon: <Security /> },
                     { title: 'Inactive Users', value: userList.filter(u => !u.is_active).length, color: '#FF708B', icon: <ErrorOutline /> },
                     { title: 'Volunteer Groups', value: groups.length, color: '#5D5FEF', icon: <GroupWork /> }
@@ -439,7 +439,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                 <Box sx={{
                                     color: stat.color,
                                     bgcolor: alpha(stat.color, 0.1),
-                                    p: 1,
+                                    p: 0.75,
                                     borderRadius: 1.5,
                                     display: 'flex',
                                     alignItems: 'center',
@@ -658,7 +658,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Pending Approvals</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Shelter Partner approval requests</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Partner approval requests</Typography>
                 </Box>
                 <Button
                     variant="outlined"
@@ -681,7 +681,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 }}>
                     <VerifiedUser sx={{ fontSize: 64, color: 'success.main', mb: 2, opacity: 0.2 }} />
                     <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>No Pending Approvals</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', opacity: 0.6 }}>No pending account authorizations.</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', opacity: 0.6 }}>No pending accounts.</Typography>
                 </Paper>
             ) : (
                 <Grid container spacing={4}>
@@ -719,7 +719,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                             {u.organization || 'Independent Partner'}
                                         </Typography>
                                         <Typography variant="caption" sx={{ color: 'warning.dark', fontWeight: 900, textTransform: 'uppercase', fontSize: '0.6rem' }}>
-                                            SHELTER PARTNER
+                                            PARTNER
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -766,7 +766,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         <Paper elevation={0} sx={{ borderRadius: 4, overflow: 'hidden', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.08), bgcolor: alpha(theme.palette.background.paper, 0.6), backdropFilter: 'blur(20px)' }}>
             <Box sx={{ p: 4, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05), display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                 <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Group Management</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Groups</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Volunteer groups and teams</Typography>
                 </Box>
                 <Button
@@ -848,8 +848,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 ))}
                 {groups.length === 0 && (
                     <Grid item xs={12}>
-                        <Box sx={{ py: 10, textAlign: 'center', bgcolor: alpha(theme.palette.background.paper, 0.3), borderRadius: 4, border: '1px dashed', borderColor: alpha(theme.palette.divider, 0.1) }}>
-                            <Typography sx={{ color: 'text.secondary', fontWeight: 600 }}>No active field units found. Deploy one to begin operations.</Typography>
+                        <Box sx={{ py: 6, textAlign: 'center', bgcolor: alpha(theme.palette.background.paper, 0.3), borderRadius: 4, border: '1px dashed', borderColor: alpha(theme.palette.divider, 0.1) }}>
+                            <Typography sx={{ color: 'text.secondary', fontWeight: 600 }}>No active groups found. Create one to begin.</Typography>
                         </Box>
                     </Grid>
                 )}
@@ -962,7 +962,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
 
     const renderDefault = () => (
         <Box sx={{
-            py: 16,
+            py: 12,
             textAlign: 'center',
             bgcolor: alpha(theme.palette.background.paper, 0.3),
             borderRadius: 4,
@@ -970,8 +970,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             borderColor: alpha(theme.palette.divider, 0.1)
         }}>
             <AdminPanelSettings sx={{ fontSize: 80, mb: 3, opacity: 0.1 }} />
-            <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Module Connection Required</Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', opacity: 0.6, fontWeight: 600 }}>Select a system control node to initialize the administrative interface.</Typography>
+            <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Section Required</Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', opacity: 0.6, fontWeight: 600 }}>Select a section to manage.</Typography>
         </Box>
     );
 
@@ -993,7 +993,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                         activeTab === 'bug-reports' ? 'Bug Incident Reports' : 'System Administration'}
                     </Typography>
                     <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Security fontSize="small" /> Kindra Management Protocol
+                        <Security fontSize="small" /> Management Console
                     </Typography>
                 </Box>
                 <Button
@@ -1014,7 +1014,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         }
                     }}
                 >
-                    Synchronize Hub
+                    Sync System
                 </Button>
             </Box>
 
@@ -1054,18 +1054,18 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     }
                 }}
             >
-                <DialogTitle sx={{ fontWeight: 900, fontSize: '1.75rem', letterSpacing: -1 }}>Identity Override</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 900, fontSize: '1.75rem', letterSpacing: -1 }}>Update Account</DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, pt: 3 }}>
-                        <Box sx={{ p: 2.5, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
-                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled', letterSpacing: 1, display: 'block', mb: 0.5 }}>TARGET SUBJECT</Typography>
+                        <Box sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled', letterSpacing: 1, display: 'block', mb: 0.5 }}>USER</Typography>
                             <Typography variant="body1" sx={{ fontWeight: 900, color: 'primary.main' }}>{(selectedUser?.full_name || selectedUser?.email)}</Typography>
                         </Box>
 
                         <TextField
                             fullWidth
                             select
-                            label="Clearance Level"
+                            label="Account Role"
                             value={editRole}
                             onChange={(e) => setEditRole(e.target.value)}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, fontWeight: 700 } }}
@@ -1080,7 +1080,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         <TextField
                             fullWidth
                             select
-                            label="Account Integrity"
+                            label="Account Status"
                             value={editStatus}
                             onChange={(e) => setEditStatus(e.target.value)}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, fontWeight: 700 } }}
@@ -1102,18 +1102,18 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                 borderColor: alpha(theme.palette.info.main, 0.1)
                             }}
                         >
-                            Changes will synchronize across allKindra field nodes immediately.
+                            Changes will be applied immediately.
                         </Alert>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 1 }}>
-                    <Button onClick={() => setOpenDialog(false)} sx={{ fontWeight: 900, color: 'text.disabled', textTransform: 'none' }}>Abort</Button>
+                    <Button onClick={() => setOpenDialog(false)} sx={{ fontWeight: 900, color: 'text.disabled', textTransform: 'none' }}>Cancel</Button>
                     <Button
                         variant="contained"
                         onClick={handleUpdateClearance}
                         sx={{ borderRadius: 2.5, px: 4, fontWeight: 900, textTransform: 'none', boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.25)}` }}
                     >
-                        Commit Override
+                        Update Account
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -1143,13 +1143,13 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 }}
             >
                 <DialogTitle sx={{ fontWeight: 900, fontSize: '1.75rem', letterSpacing: -1 }}>
-                    {editingGroupId ? 'Unit Reconfiguration' : 'Unit Deployment'}
+                    {editingGroupId ? 'Update Group' : 'Create Group'}
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, pt: 3 }}>
                         <TextField
                             fullWidth
-                            label="Unit Designation"
+                            label="Group Name"
                             value={newGroupName}
                             onChange={(e) => setNewGroupName(e.target.value)}
                             placeholder="e.g. Rapid Response Team A"
@@ -1159,7 +1159,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             fullWidth
                             multiline
                             rows={3}
-                            label="Operational Mandate"
+                            label="Group Description"
                             value={newGroupDesc}
                             onChange={(e) => setNewGroupDesc(e.target.value)}
                             placeholder="Describe the primary objectives of this unit..."
@@ -1167,7 +1167,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         />
                         <Box>
                             <Typography variant="subtitle2" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1, fontWeight: 900, letterSpacing: 0.5 }}>
-                                <People fontSize="small" color="primary" /> ATTACH FIELD AGENTS
+                                <People fontSize="small" color="primary" /> ASSIGN VOLUNTEERS
                             </Typography>
                             <Box sx={{
                                 maxHeight: 240,
@@ -1229,13 +1229,13 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         setNewGroupName('');
                         setNewGroupDesc('');
                         setSelectedVolunteers([]);
-                    }} sx={{ fontWeight: 900, color: 'text.disabled', textTransform: 'none' }}>Abort</Button>
+                    }} sx={{ fontWeight: 900, color: 'text.disabled', textTransform: 'none' }}>Cancel</Button>
                     <Button
                         variant="contained"
                         onClick={editingGroupId ? handleUpdateGroup : handleCreateGroup}
                         sx={{ borderRadius: 2.5, px: 4, fontWeight: 900, textTransform: 'none', boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.25)}` }}
                     >
-                        {editingGroupId ? 'Commit Reconfig' : 'Deploy Unit'}
+                        {editingGroupId ? 'Update Group' : 'Create Group'}
                     </Button>
                 </DialogActions>
             </Dialog>

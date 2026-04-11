@@ -633,7 +633,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                                         }
                                     }}
                                 >
-                                    {isDonor ? 'Make Contribution' : 'Initiate Contributors'}
+                                    {isDonor ? 'Make Contribution' : 'Add Contribution'}
                                 </Button>
 
                                 {/* Management Actions */}
@@ -740,10 +740,10 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 ))}
                 {campaigns.filter((c: any) => isManagement || c.status !== 'DRAFT').length === 0 && (
                     <Grid item xs={12}>
-                        <Paper sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
+                        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
                             <VolunteerActivism sx={{ fontSize: 60, color: 'primary.main', opacity: 0.2, mb: 2 }} />
-                            <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>No Active Protocols Found</Typography>
-                            <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Start a new campaign mission to initialize the donation engine.</Typography>
+                            <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>No Active Campaigns Found</Typography>
+                            <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Start a new fundraising campaign to begin receiving contributions.</Typography>
                         </Paper>
                     </Grid>
                 )}
@@ -802,7 +802,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
 
             {/* Gateway Payment Dialog */}
             <Dialog open={openDonationDialog} onClose={() => setOpenDonationDialog(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 4, boxShadow: theme.shadows[10] } }}>
-                <DialogTitle sx={{ fontWeight: 'bold' }}>Initiate Payment</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Process Payment</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
                         <Typography variant="body2" color="text.secondary">
@@ -896,12 +896,12 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
             boxShadow: '0 8px 32px rgba(0,0,0,0.05)',
             overflow: 'hidden'
         }}>
-            <Box sx={{ p: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
+            <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
                 <Box>
                     <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>
-                        {isDonor ? 'My Donation History' : 'Recent Donation Registry'}
+                        {isDonor ? 'My Donation History' : 'Donation History'}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Immutable ledger of financial contributions</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Verified record of contributions</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
@@ -946,14 +946,14 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 </Box>
             </Box>
             <TableContainer>
-                <Table>
+                <Table size="small">
                     <TableHead>
                         <TableRow>
                             <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Donor</TableCell>
                             <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Amount</TableCell>
                             <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Method</TableCell>
                             <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Status</TableCell>
-                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Impact Verification</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Impact Status</TableCell>
                             <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Date</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Actions</TableCell>
                         </TableRow>
@@ -1023,7 +1023,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                                                 '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main' }
                                             }}
                                         >
-                                            Metadata
+                                            View Log
                                         </Button>
                                     )}
                                 </TableCell>
@@ -1033,7 +1033,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                             <TableRow>
                                 <TableCell colSpan={6} align="center" sx={{ py: 12 }}>
                                     <MonetizationOn sx={{ fontSize: 48, opacity: 0.1, mb: 1, color: 'primary.main' }} />
-                                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>System registry is currently idle.</Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>No donation records found.</Typography>
                                 </TableCell>
                             </TableRow>
                         )}
@@ -1047,7 +1047,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                         onClick={() => setShowAllDonations(!showAllDonations)}
                         sx={{ textTransform: 'none', fontWeight: 900, color: 'primary.main', '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05) } }}
                     >
-                        {showAllDonations ? 'Collapse Records' : `Expand Registry (${(displayDonations || []).length} items)`}
+                        {showAllDonations ? 'Collapse Records' : `View All History (${(displayDonations || []).length} items)`}
                     </Button>
                 </Box>
             )}
@@ -1065,19 +1065,19 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
             boxShadow: '0 8px 32px rgba(0,0,0,0.05)',
             overflow: 'hidden'
         }}>
-            <Box sx={{ p: 4, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
-                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Philanthropic Partner Registry</Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Active network of systemic change agents</Typography>
+            <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
+                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Partner Registry</Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Active network of donors and partners</Typography>
             </Box>
             <TableContainer>
-                <Table>
+                <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Partner Identity</TableCell>
-                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Contact Array</TableCell>
-                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Lifetime Impact</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Partner Name</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Contact Info</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Total Donated</TableCell>
                             <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Frequency</TableCell>
-                            {isManagement && <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Protocol</TableCell>}
+                            {isManagement && <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Management</TableCell>}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -1121,7 +1121,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                                                 '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main' }
                                             }}
                                         >
-                                            Override
+                                            Edit Partner
                                         </Button>
                                     </TableCell>
                                 )}
@@ -1144,17 +1144,17 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
             boxShadow: '0 8px 32px rgba(0,0,0,0.05)',
             overflow: 'hidden'
         }}>
-            <Box sx={{ p: 4, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
-                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Official Donation Records</Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Verified financial documentation array</Typography>
+            <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
+                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Receipt Database</Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Verified donation receipt records</Typography>
             </Box>
             <TableContainer>
-                <Table>
+                <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Record Hash</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Receipt Reference</TableCell>
                             <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Partner</TableCell>
-                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Timestamp</TableCell>
+                            <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Date</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 1 }}>Action</TableCell>
                         </TableRow>
                     </TableHead>
@@ -1195,7 +1195,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                                             }
                                         }}
                                     >
-                                        Extract PDF
+                                        Download Receipt
                                     </Button>
                                 </TableCell>
                             </TableRow>
@@ -1204,7 +1204,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                             <TableRow>
                                 <TableCell colSpan={4} align="center" sx={{ py: 12 }}>
                                     <Receipt sx={{ fontSize: 48, opacity: 0.1, mb: 1, color: 'primary.main' }} />
-                                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>No record hashes available in this cycle.</Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>No receipts found in this cycle.</Typography>
                                 </TableCell>
                             </TableRow>
                         )}
@@ -1360,11 +1360,11 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 ))}
                 {materialDonations.length === 0 && (
                     <Grid item xs={12}>
-                        <Paper sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
+                        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
                             <Box sx={{ fontSize: 60, opacity: 0.2, mb: 2 }}>📦</Box>
-                            <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>No Material Protocols</Typography>
+                            <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>No Material Donations</Typography>
                             <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>
-                                {isManagement ? 'System registry of physical contributions is empty.' : 'Initialize your first material contribution by scheduling a pickup.'}
+                                {isManagement ? 'Registry of physical donations is currently empty.' : 'Start by scheduling a pickup for your first material contribution.'}
                             </Typography>
                         </Paper>
                     </Grid>
@@ -1403,7 +1403,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                             backdropFilter: 'blur(10px)',
                             minHeight: 450
                         }}>
-                            <Typography variant="h6" sx={{ fontWeight: 900, mb: 4, letterSpacing: -0.5 }}>Strategic Fund Allocation</Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 900, mb: 3, letterSpacing: -0.5 }}>Strategic Fund Allocation</Typography>
                             <FundAllocationChart data={allocationData} />
                         </Paper>
                     </Grid>
@@ -1419,7 +1419,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                         }}>
                             <Typography variant="h6" sx={{ fontWeight: 900, mb: 2, color: 'success.main', letterSpacing: -0.5 }}>Impact Statement</Typography>
                             <Typography variant="body1" sx={{ mb: 4, lineHeight: 1.8, color: 'text.secondary', fontWeight: 500 }}>
-                                Your systemic contribution of <Box component="span" sx={{ color: 'success.main', fontWeight: 900 }}>KES {totalImpact.toLocaleString()}</Box> has been strategically distributed across our core operational nodes to maximize humanitarian output.
+                                Your contribution of <Box component="span" sx={{ color: 'success.main', fontWeight: 900 }}>KES {totalImpact.toLocaleString()}</Box> has been strategically distributed across our core operational programs to maximize humanitarian output.
                             </Typography>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                 {[
@@ -1468,9 +1468,9 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
 
         return (
             <Box component={motion.div} initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }}>
-                <Box sx={{ p: 4, mb: 4, borderRadius: 4, bgcolor: alpha(theme.palette.primary.main, 0.03), border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
-                    <Typography variant="h6" sx={{ fontWeight: 900, mb: 1, letterSpacing: -0.5 }}>Community Impact Hub</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Synchronized network of localized humanitarian activations.</Typography>
+                <Box sx={{ p: 2.5, mb: 3, borderRadius: 4, bgcolor: alpha(theme.palette.primary.main, 0.03), border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
+                    <Typography variant="h6" sx={{ fontWeight: 900, mb: 1, letterSpacing: -0.5 }}>Engagement Hub</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Synchronized network of localized community events.</Typography>
                 </Box>
                 <Grid container spacing={3}>
                     {donorEvents.map((event: any) => (
@@ -1524,7 +1524,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                         <Grid item xs={12}>
                             <Paper sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
                                 <EventIcon sx={{ fontSize: 48, opacity: 0.1, mb: 1, color: 'primary.main' }} />
-                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>No community protocols found in current cycle.</Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>No community events found in current cycle.</Typography>
                             </Paper>
                         </Grid>
                     )}
@@ -1552,7 +1552,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
             <Grid container spacing={3} sx={{ mb: 6 }}>
                 <Grid item xs={12} md={4}>
                     <StatsCard
-                        title={isDonor ? "PERSONAL IMPACT SCORE" : "TOTAL CAPITAL SECURED"}
+                        title={isDonor ? "PERSONAL CONTRIBUTION" : "TOTAL CAPITAL SECURED"}
                         value={`KES ${((displayDonations || []).reduce((acc: number, curr: any) => {
                             if (['COMPLETED', 'VERIFIED', 'SUCCESS'].includes(curr?.status)) {
                                 return acc + Number(curr?.amount || 0);
@@ -1565,7 +1565,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 </Grid>
                 <Grid item xs={12} md={4}>
                     <StatsCard
-                        title="ACTIVE PROTOCOLS"
+                        title="ACTIVE CAMPAIGNS"
                         value={campaigns.filter((c: any) => c.status === 'ACTIVE').length}
                         icon={<VolunteerActivism />}
                         color={theme.palette.primary.main}
@@ -1573,7 +1573,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 </Grid>
                 <Grid item xs={12} md={4}>
                     <StatsCard
-                        title={isDonor ? "PHILANTHROPIC RANK" : "ACTIVE PARTNERS"}
+                        title={isDonor ? "CONTRIBUTION LEVEL" : "TOTAL PARTNERS"}
                         value={isDonor ? getImpactRank((displayDonations || []).reduce((acc: number, curr: any) => {
                             if (['COMPLETED', 'VERIFIED', 'SUCCESS'].includes(curr?.status)) {
                                 return acc + Number(curr?.amount || 0);
