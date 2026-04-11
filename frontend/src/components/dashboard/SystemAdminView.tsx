@@ -79,6 +79,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     const [editRole, setEditRole] = useState('');
     const [editStatus, setEditStatus] = useState('');
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'info' | 'warning' | 'error' });
+    const [openDetails, setOpenDetails] = useState(false);
 
     // Confirmation Dialog State
     const [confirmDialog, setConfirmDialog] = useState<{
@@ -473,9 +474,6 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             };
             return colors[role] || { bg: '#f5f5f5', color: '#616161', avatar: '#bdbdbd' };
         };
-
-        const [selectedUser, setSelectedUser] = useState<any>(null);
-        const [openDetails, setOpenDetails] = useState(false);
 
         return (
             <Box>
