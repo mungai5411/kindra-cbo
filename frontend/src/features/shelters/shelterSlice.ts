@@ -204,8 +204,13 @@ export const updateShelter = createAsyncThunk(
             console.error('Shelter update error details:', {
                 status: error.response?.status,
                 data: error.response?.data,
-                message: error.message
+                message: error.message,
+                fullError: error
             });
+            // Log the full error object for debugging
+            if (error.response?.data) {
+                console.error('Backend error response:', JSON.stringify(error.response.data, null, 2));
+            }
             return rejectWithValue(error.response?.data?.message || error.response?.data || 'Failed to update shelter');
         }
     }

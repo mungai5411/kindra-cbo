@@ -50,6 +50,7 @@ class ShelterHomeSerializer(serializers.ModelSerializer):
             # This is an update, make fields not required
             for field_name, field in self.fields.items():
                 if field_name not in self.Meta.read_only_fields:
+                    # Allow all fields to be optional on PATCH, except coordinates must stay not-required
                     field.required = False
     
     def validate_registration_number(self, value):
@@ -129,13 +130,13 @@ class ShelterHomeSerializer(serializers.ModelSerializer):
         result = super().to_internal_value(data)
         
         # Ensure latitude and longitude are properly formatted as Decimals
-        if 'latitude' in result:
+        if 'latitude' in result and result['latitude'] is not None:
             try:
                 result['latitude'] = float(result['latitude'])
             except (TypeError, ValueError):
                 raise serializers.ValidationError({'latitude': 'Must be a valid number'})
         
-        if 'longitude' in result:
+        if 'longitude' in result and result['longitude'] is not None:
             try:
                 result['longitude'] = float(result['longitude'])
             except (TypeError, ValueError):
@@ -203,11 +204,17 @@ class ShelterHomeSerializer(serializers.ModelSerializer):
         
         # Update only valid fields that exist on the model
         for attr, value in validated_data.items():
-            if attr in valid_fields and hasattr(instance, attr):
+            if attr in valid_fields and hasattr(instance, attr) and attr not in ['created_at', 'updated_at', 'id']:
                 setattr(instance, attr, value)
         
-        instance.save()
-        return instance
+        try:
+            instance.save()
+            return instance
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to save shelter: {str(e)}", exc_info=True)
+            raise
 
 
 class PlacementSerializer(serializers.ModelSerializer):

@@ -84,6 +84,16 @@ class ShelterHomeDetailView(generics.RetrieveUpdateDestroyAPIView):
             logger = logging.getLogger(__name__)
             logger.error(f"Shelter update error: {str(e)}", exc_info=True)
             raise
+    
+    def update(self, request, *args, **kwargs):
+        """Override update to catch serializer validation errors"""
+        try:
+            return super().update(request, *args, **kwargs)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Shelter update failed: {str(e)}", exc_info=True)
+            raise
 
     def perform_destroy(self, instance):
         name = instance.name
