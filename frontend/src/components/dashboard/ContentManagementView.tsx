@@ -300,7 +300,7 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                     variant="contained"
                     startIcon={<CloudUpload />}
                     onClick={() => setMediaDialogOpen(true)}
-                    sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
+                    sx={{ borderRadius: 1, textTransform: 'none', fontWeight: 600 }}
                 >
                     Upload Asset
                 </Button>
@@ -315,7 +315,7 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                             <Card sx={{
                                 border: '1px solid',
                                 borderColor: alpha(theme.palette.divider, 0.1),
-                                borderRadius: 3,
+                                borderRadius: 1,
                                 bgcolor: 'background.paper',
                                 height: '100%',
                                 display: 'flex',
@@ -439,7 +439,7 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                         setTeamForm({ name: '', role: '', bio: '', order: team.length, linkedin: '', twitter: '', is_active: true, image: null });
                         setTeamDialogOpen(true);
                     }}
-                    sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
+                    sx={{ borderRadius: 1, textTransform: 'none', fontWeight: 600 }}
                 >
                     Add Visionary
                 </Button>
@@ -451,7 +451,7 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                         <Paper sx={{
                             border: '1px solid',
                             borderColor: alpha(theme.palette.divider, 0.1),
-                            borderRadius: 3,
+                            borderRadius: 1,
                             bgcolor: 'background.paper',
                             p: 3,
                             textAlign: 'center',
@@ -539,7 +539,7 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                         setContentForm({ key: '', section: 'OTHER', title: '', content: '', value: '', is_active: true });
                         setContentDialogOpen(true);
                     }}
-                    sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
+                    sx={{ borderRadius: 1, textTransform: 'none', fontWeight: 600 }}
                 >
                     Create Content Block
                 </Button>
@@ -551,7 +551,7 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                         <Paper sx={{
                             border: '1px solid',
                             borderColor: alpha(theme.palette.divider, 0.1),
-                            borderRadius: 3,
+                            borderRadius: 1,
                             bgcolor: 'background.paper',
                             p: 3,
                             position: 'relative',

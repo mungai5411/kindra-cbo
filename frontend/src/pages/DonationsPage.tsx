@@ -128,7 +128,7 @@ export default function DonationsPage() {
                 {isLoading && (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', py: 8 }}>
                         {[1, 2, 3].map((n) => (
-                            <Box key={n} sx={{ width: { xs: '100%', md: 'calc(33.333% - 22px)' }, height: 400, borderRadius: 4, bgcolor: alpha(theme.palette.text.primary, 0.03), position: 'relative', overflow: 'hidden' }}>
+                            <Box key={n} sx={{ width: { xs: '100%', md: 'calc(33.333% - 22px)' }, height: 400, borderRadius: 1.5, bgcolor: alpha(theme.palette.text.primary, 0.03), position: 'relative', overflow: 'hidden' }}>
                                 <LinearProgress sx={{ position: 'absolute', bottom: 0, left: 0, right: 0 }} />
                             </Box>
                         ))}
@@ -303,7 +303,7 @@ export default function DonationsPage() {
                                                             size="large"
                                                             onClick={() => handleOpenMaterialDialog(campaign)}
                                                             sx={{
-                                                                borderRadius: 3,
+                                                                borderRadius: 1,
                                                                 fontWeight: 800,
                                                                 bgcolor: alpha(theme.palette.primary.main, 0.05),
                                                                 color: 'primary.main',
@@ -319,7 +319,7 @@ export default function DonationsPage() {
                                                             startIcon={<VolunteerActivism />}
                                                             onClick={() => handleOpenDonationDialog(campaign)}
                                                             sx={{
-                                                                borderRadius: 3,
+                                                                borderRadius: 1,
                                                                 fontWeight: 800,
                                                                 boxShadow: `0 10px 20px ${alpha(theme.palette.primary.main, 0.2)}`
                                                             }}

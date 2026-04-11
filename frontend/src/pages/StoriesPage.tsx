@@ -197,7 +197,7 @@ export default function StoriesPage() {
                                         <Search color="action" />
                                     </InputAdornment>
                                 ),
-                                sx: { borderRadius: 3, bgcolor: 'background.paper', fontWeight: 500 }
+                                sx: { borderRadius: 1, bgcolor: 'background.paper', fontWeight: 500 }
                             }}
                             sx={{ flexGrow: 1, minWidth: 280 }}
                         />
@@ -324,7 +324,7 @@ export default function StoriesPage() {
                                     ))}
                                 </Grid>
                             ) : (
-                                <Box sx={{ textAlign: 'center', py: 12, bgcolor: 'background.paper', borderRadius: 4, border: '1px dashed', borderColor: 'divider' }}>
+                                <Box sx={{ textAlign: 'center', py: 12, bgcolor: 'background.paper', borderRadius: 1.5, border: '1px dashed', borderColor: 'divider' }}>
                                     <Article sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
                                     <Typography variant="h5" fontWeight="bold" gutterBottom color="text.secondary">
                                         No stories published yet
@@ -447,7 +447,7 @@ export default function StoriesPage() {
                                                                 value={Math.min(progress, 100)}
                                                                 sx={{
                                                                     height: 8,
-                                                                    borderRadius: 4,
+                                                                    borderRadius: 1.5,
                                                                     bgcolor: alpha(theme.palette.primary.main, 0.08)
                                                                 }}
                                                             />
@@ -476,7 +476,7 @@ export default function StoriesPage() {
                                                                 sx={{
                                                                     textTransform: 'none',
                                                                     fontWeight: 'bold',
-                                                                    borderRadius: 3,
+                                                                    borderRadius: 1,
                                                                     py: 1.2,
                                                                     boxShadow: theme.shadows[2]
                                                                 }}
@@ -493,7 +493,7 @@ export default function StoriesPage() {
                                                                 sx={{
                                                                     textTransform: 'none',
                                                                     fontWeight: 'bold',
-                                                                    borderRadius: 3,
+                                                                    borderRadius: 1,
                                                                     py: 1.2,
                                                                     minWidth: 48
                                                                 }}
@@ -509,7 +509,7 @@ export default function StoriesPage() {
                                                                 sx={{
                                                                     textTransform: 'none',
                                                                     fontWeight: 'bold',
-                                                                    borderRadius: 3,
+                                                                    borderRadius: 1,
                                                                     py: 1.2,
                                                                     minWidth: 48
                                                                 }}
@@ -523,7 +523,7 @@ export default function StoriesPage() {
                                     })}
                                 </Grid>
                             ) : (
-                                <Box sx={{ textAlign: 'center', py: 12, bgcolor: 'background.paper', borderRadius: 4, border: '1px dashed', borderColor: 'divider' }}>
+                                <Box sx={{ textAlign: 'center', py: 12, bgcolor: 'background.paper', borderRadius: 1.5, border: '1px dashed', borderColor: 'divider' }}>
                                     <CampaignIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
                                     <Typography variant="h5" fontWeight="bold" gutterBottom color="text.secondary">
                                         No active campaigns

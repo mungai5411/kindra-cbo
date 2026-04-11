@@ -207,7 +207,7 @@ export default function DashboardPage() {
 
         // Shelter Partners ONLY see shelter-related content
         if (user.role === 'SHELTER_PARTNER') {
-            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'staff', 'media', 'donations', 'impact_analytics', 'content_management', 'landing_page_gallery'].includes(itemId);
+            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'staff', 'media', 'donations', 'impact_analytics'].includes(itemId);
         }
 
         // Case Workers see case management and shelter content
@@ -523,7 +523,7 @@ export default function DashboardPage() {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        borderRadius: 4,
+                        borderRadius: 1.5,
                         background: alpha(theme.palette.background.paper, 0.9),
                         backdropFilter: 'blur(20px)',
                         border: '1px solid',
@@ -579,7 +579,7 @@ export default function DashboardPage() {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        borderRadius: 4,
+                        borderRadius: 1.5,
                         background: alpha(theme.palette.background.paper, 0.9),
                         backdropFilter: 'blur(20px)',
                         border: '1px solid',

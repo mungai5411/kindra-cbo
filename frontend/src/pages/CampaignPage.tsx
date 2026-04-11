@@ -158,7 +158,7 @@ export default function CampaignPage() {
                         variant="contained" 
                         onClick={() => navigate('/donate')} 
                         startIcon={<ArrowBack />} 
-                        sx={{ px: 4, py: 1.5, borderRadius: 5, fontWeight: 800 }}
+                        sx={{ px: 4, py: 1.5, borderRadius: 1, fontWeight: 800 }}
                     >
                         Active Missions
                     </Button>
@@ -279,7 +279,7 @@ export default function CampaignPage() {
                                         fullWidth variant="contained" size="large"
                                         startIcon={<Favorite />}
                                         sx={{ 
-                                            py: 2.5, borderRadius: 5, fontWeight: 900, fontSize: '1.25rem',
+                                            py: 2.5, borderRadius: 1, fontWeight: 900, fontSize: '1.25rem',
                                             bgcolor: 'primary.main',
                                             boxShadow: `0 15px 30px ${alpha(theme.palette.primary.main, 0.3)}`,
                                             '&:hover': { bgcolor: 'primary.dark', transform: 'scale(1.02)' },
@@ -292,7 +292,7 @@ export default function CampaignPage() {
                                         fullWidth variant="outlined" size="large"
                                         startIcon={<Share />}
                                         sx={{ 
-                                            py: 2, borderRadius: 5, fontWeight: 900, 
+                                            py: 2, borderRadius: 1, fontWeight: 900, 
                                             borderWidth: 2, borderColor: alpha(theme.palette.divider, 0.1),
                                             bgcolor: alpha('#fff', 0.05),
                                             backdropFilter: 'blur(5px)',
@@ -306,7 +306,7 @@ export default function CampaignPage() {
                                 <Box sx={{ 
                                     mt: 6, p: 2.5, 
                                     bgcolor: alpha(theme.palette.primary.main, 0.04), 
-                                    borderRadius: 4, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1),
+                                    borderRadius: 1.5, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1),
                                     display: 'flex', gap: 2, alignItems: 'center' 
                                 }}>
                                     <InfoOutlined color="primary" sx={{ opacity: 0.7 }} />

@@ -309,7 +309,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     const renderBugReports = () => (
         <Box sx={{ p: 1 }}>
             <Paper elevation={0} sx={{
-                borderRadius: 4,
+                borderRadius: 1.5,
                 border: '1px solid',
                 borderColor: alpha(theme.palette.divider, 0.08),
                 overflow: 'hidden'
@@ -414,7 +414,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             elevation={0}
                             sx={{
                                 p: 3,
-                                borderRadius: 4,
+                                borderRadius: 1.5,
                                 height: '100%',
                                 position: 'relative',
                                 overflow: 'hidden',
@@ -491,7 +491,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         InputProps={{
                             startAdornment: <InputAdornment position="start"><Search fontSize="small" sx={{ color: 'text.disabled' }} /></InputAdornment>,
                             sx: {
-                                borderRadius: 3,
+                                borderRadius: 1,
                                 width: { xs: '100%', sm: 300 },
                                 bgcolor: alpha(theme.palette.background.paper, 0.8),
                                 border: '1px solid',
@@ -505,7 +505,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         startIcon={<Refresh />}
                         onClick={() => dispatch(fetchUsers())}
                         sx={{
-                            borderRadius: 3,
+                            borderRadius: 1,
                             boxShadow: 'none',
                             textTransform: 'none',
                             fontWeight: 800,
@@ -525,7 +525,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             elevation={0}
                             sx={{
                                 p: 0,
-                                borderRadius: 4,
+                                borderRadius: 1.5,
                                 border: '1px solid',
                                 borderColor: alpha(theme.palette.divider, 0.08),
                                 overflow: 'hidden',
@@ -543,7 +543,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                     sx={{
                                         width: 56,
                                         height: 56,
-                                        borderRadius: 3,
+                                        borderRadius: 1,
                                         bgcolor: alpha(theme.palette.primary.main, 0.1),
                                         color: 'primary.main',
                                         fontWeight: 900,
@@ -664,7 +664,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     variant="outlined"
                     startIcon={<Refresh />}
                     onClick={() => dispatch(fetchPendingUsers())}
-                    sx={{ borderRadius: 3, fontWeight: 800, textTransform: 'none' }}
+                    sx={{ borderRadius: 1, fontWeight: 800, textTransform: 'none' }}
                 >
                     Update Queue
                 </Button>
@@ -674,7 +674,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 <Paper sx={{
                     p: 10,
                     textAlign: 'center',
-                    borderRadius: 4,
+                    borderRadius: 1.5,
                     border: '1px dashed',
                     borderColor: alpha(theme.palette.divider, 0.1),
                     bgcolor: alpha(theme.palette.background.paper, 0.3)
@@ -691,7 +691,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                 elevation={0}
                                 sx={{
                                     p: 3,
-                                    borderRadius: 4,
+                                    borderRadius: 1.5,
                                     border: '1px solid',
                                     borderColor: alpha(theme.palette.warning.main, 0.2),
                                     bgcolor: alpha(theme.palette.background.paper, 0.8),
@@ -724,7 +724,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                     </Box>
                                 </Box>
 
-                                <Box sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
+                                <Box sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), borderRadius: 1, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
                                     <Typography variant="caption" sx={{ display: 'block', mb: 0.8, fontWeight: 700 }}>
                                         CONTACT: <Box component="span" sx={{ color: 'text.primary' }}>{u.phone_number || 'N/A'}</Box>
                                     </Typography>
@@ -763,7 +763,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
     );
 
     const renderGroups = () => (
-        <Paper elevation={0} sx={{ borderRadius: 4, overflow: 'hidden', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.08), bgcolor: alpha(theme.palette.background.paper, 0.6), backdropFilter: 'blur(20px)' }}>
+        <Paper elevation={0} sx={{ borderRadius: 1.5, overflow: 'hidden', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.08), bgcolor: alpha(theme.palette.background.paper, 0.6), backdropFilter: 'blur(20px)' }}>
             <Box sx={{ p: 4, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05), display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Groups</Typography>
@@ -773,7 +773,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     variant="contained"
                     startIcon={<GroupWork />}
                     onClick={() => setOpenGroupDialog(true)}
-                    sx={{ borderRadius: 3, fontWeight: 900, px: 3, py: 1.2, textTransform: 'none' }}
+                    sx={{ borderRadius: 1, fontWeight: 900, px: 3, py: 1.2, textTransform: 'none' }}
                 >
                     Create Group
                 </Button>
@@ -784,7 +784,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     <Grid item xs={12} md={6} lg={4} key={group.id}>
                         <Paper sx={{
                             p: 3.5,
-                            borderRadius: 4,
+                            borderRadius: 1.5,
                             border: '1px solid',
                             borderColor: alpha(theme.palette.divider, 0.08),
                             position: 'relative',
@@ -848,7 +848,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 ))}
                 {groups.length === 0 && (
                     <Grid item xs={12}>
-                        <Box sx={{ py: 6, textAlign: 'center', bgcolor: alpha(theme.palette.background.paper, 0.3), borderRadius: 4, border: '1px dashed', borderColor: alpha(theme.palette.divider, 0.1) }}>
+                        <Box sx={{ py: 6, textAlign: 'center', bgcolor: alpha(theme.palette.background.paper, 0.3), borderRadius: 1.5, border: '1px dashed', borderColor: alpha(theme.palette.divider, 0.1) }}>
                             <Typography sx={{ color: 'text.secondary', fontWeight: 600 }}>No active groups found. Create one to begin.</Typography>
                         </Box>
                     </Grid>
@@ -872,21 +872,21 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         InputProps={{
                             startAdornment: <InputAdornment position="start"><Search fontSize="small" sx={{ color: 'text.disabled' }} /></InputAdornment>,
-                            sx: { borderRadius: 3, width: 300, bgcolor: 'background.paper', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), '& fieldset': { border: 'none' } }
+                            sx: { borderRadius: 1, width: 300, bgcolor: 'background.paper', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.1), '& fieldset': { border: 'none' } }
                         }}
                     />
                     <Button
                         variant="contained"
                         startIcon={<Refresh />}
                         onClick={() => dispatch(fetchAuditLogs())}
-                        sx={{ borderRadius: 3, fontWeight: 900, textTransform: 'none', px: 3 }}
+                        sx={{ borderRadius: 1, fontWeight: 900, textTransform: 'none', px: 3 }}
                     >
                         Sync Logs
                     </Button>
                 </Box>
             </Box>
 
-            <Paper elevation={0} sx={{ borderRadius: 4, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.08), overflow: 'hidden', bgcolor: 'background.paper' }}>
+            <Paper elevation={0} sx={{ borderRadius: 1.5, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.08), overflow: 'hidden', bgcolor: 'background.paper' }}>
                 <TableContainer sx={{ maxHeight: '65vh' }}>
                     <Table stickyHeader size="small">
                         <TableHead>
@@ -965,7 +965,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             py: 12,
             textAlign: 'center',
             bgcolor: alpha(theme.palette.background.paper, 0.3),
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '2px dashed',
             borderColor: alpha(theme.palette.divider, 0.1)
         }}>
@@ -1002,7 +1002,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     startIcon={adminLoading ? <CircularProgress size={18} color="inherit" /> : <Refresh />}
                     disabled={adminLoading}
                     sx={{
-                        borderRadius: 3,
+                        borderRadius: 1,
                         fontWeight: 800,
                         px: 3,
                         py: 1.2,
@@ -1044,7 +1044,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        borderRadius: 5,
+                        borderRadius: 1,
                         p: 1.5,
                         bgcolor: alpha(theme.palette.background.paper, 0.9),
                         backdropFilter: 'blur(30px)',
@@ -1057,7 +1057,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 <DialogTitle sx={{ fontWeight: 900, fontSize: '1.75rem', letterSpacing: -1 }}>Update Account</DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, pt: 3 }}>
-                        <Box sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
+                        <Box sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: 1, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
                             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled', letterSpacing: 1, display: 'block', mb: 0.5 }}>USER</Typography>
                             <Typography variant="body1" sx={{ fontWeight: 900, color: 'primary.main' }}>{(selectedUser?.full_name || selectedUser?.email)}</Typography>
                         </Box>
@@ -1068,7 +1068,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             label="Account Role"
                             value={editRole}
                             onChange={(e) => setEditRole(e.target.value)}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, fontWeight: 700 } }}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1, fontWeight: 700 } }}
                         >
                             <MenuItem value="ADMIN">System Administrator</MenuItem>
                             <MenuItem value="MANAGEMENT">Management Team</MenuItem>
@@ -1083,7 +1083,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             label="Account Status"
                             value={editStatus}
                             onChange={(e) => setEditStatus(e.target.value)}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, fontWeight: 700 } }}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1, fontWeight: 700 } }}
                         >
                             <MenuItem value="ACTIVE">Verified Active</MenuItem>
                             <MenuItem value="SUSPENDED">Security Suspension</MenuItem>
@@ -1093,7 +1093,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             severity="info"
                             icon={<Security />}
                             sx={{
-                                borderRadius: 3,
+                                borderRadius: 1,
                                 fontWeight: 600,
                                 fontSize: '0.8rem',
                                 bgcolor: alpha(theme.palette.info.main, 0.05),
@@ -1132,7 +1132,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        borderRadius: 5,
+                        borderRadius: 1,
                         p: 1.5,
                         bgcolor: alpha(theme.palette.background.paper, 0.9),
                         backdropFilter: 'blur(30px)',
@@ -1153,7 +1153,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             value={newGroupName}
                             onChange={(e) => setNewGroupName(e.target.value)}
                             placeholder="e.g. Rapid Response Team A"
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, fontWeight: 700 } }}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1, fontWeight: 700 } }}
                         />
                         <TextField
                             fullWidth
@@ -1163,7 +1163,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             value={newGroupDesc}
                             onChange={(e) => setNewGroupDesc(e.target.value)}
                             placeholder="Describe the primary objectives of this unit..."
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, fontWeight: 700 } }}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1, fontWeight: 700 } }}
                         />
                         <Box>
                             <Typography variant="subtitle2" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1, fontWeight: 900, letterSpacing: 0.5 }}>
@@ -1174,7 +1174,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                 overflow: 'auto',
                                 border: '1px solid',
                                 borderColor: alpha(theme.palette.divider, 0.08),
-                                borderRadius: 4,
+                                borderRadius: 1.5,
                                 p: 1.5,
                                 bgcolor: alpha(theme.palette.background.default, 0.3)
                             }}>
@@ -1191,7 +1191,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                                 }}
                                                 sx={{
                                                     p: 2,
-                                                    borderRadius: 3,
+                                                    borderRadius: 1,
                                                     cursor: 'pointer',
                                                     display: 'flex',
                                                     justifyContent: 'space-between',
@@ -1250,7 +1250,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     severity={snackbar.severity}
                     variant="filled"
                     sx={{
-                        borderRadius: 3,
+                        borderRadius: 1,
                         fontWeight: 800,
                         px: 3,
                         py: 1.5,
@@ -1285,7 +1285,7 @@ const RegistryCard = ({ title, count, items, type, onDelete }: any) => {
             elevation={0}
             sx={{
                 p: 0,
-                borderRadius: 4,
+                borderRadius: 1.5,
                 overflow: 'hidden',
                 border: '1px solid',
                 borderColor: alpha(theme.palette.divider, 0.08),

@@ -366,7 +366,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                     onEdit={(id) => console.log('Edit case:', id)}
                                     onAssignVolunteer={(id) => console.log('Assign volunteer:', id)}
                                     onAllocateFunds={(id) => console.log('Allocate funds:', id)}
-                                    onMenuClick={(e, id) => setMenuAnchor({ el: e.currentTarget, caseId: id })}
+                                    onMenuClick={(e, id) => setMenuAnchor({ el: e.currentTarget as HTMLElement, caseId: id })}
                                     isOverdue={overdueCount > 0}
                                 />
                             </Grid>
@@ -376,7 +376,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                     <Paper sx={{
                         p: 6,
                         textAlign: 'center',
-                        borderRadius: 3,
+                        borderRadius: 1,
                         border: `2px dashed ${alpha(theme.palette.primary.main, 0.2)}`
                     }}>
                         <ChildCare sx={{ fontSize: 48, color: alpha(theme.palette.primary.main, 0.4), mb: 1 }} />
@@ -422,7 +422,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
     const renderChildren = () => (
         <Paper sx={{
             p: 0,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid',
             borderColor: 'divider',
             overflow: 'hidden'
@@ -432,7 +432,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                 <Button
                     variant="outlined"
                     color="primary"
-                    sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600, borderWidth: 2 }}
+                    sx={{ borderRadius: 1, textTransform: 'none', fontWeight: 600, borderWidth: 2 }}
                     onClick={() => setOpenDialog({ type: 'child', data: null })}
                 >
                     Register Child
@@ -466,7 +466,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
     const renderFamilies = () => (
         <Paper sx={{
             p: 0,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid',
             borderColor: 'divider',
             overflow: 'hidden'
@@ -476,7 +476,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                 <Button
                     variant="outlined"
                     color="primary"
-                    sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600, borderWidth: 2 }}
+                    sx={{ borderRadius: 1, textTransform: 'none', fontWeight: 600, borderWidth: 2 }}
                     onClick={() => setOpenDialog({ type: 'family', data: null })}
                 >
                     Add Family
@@ -514,7 +514,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
     const renderAssessments = () => (
         <Paper sx={{
             p: 0,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid',
             borderColor: 'divider',
             overflow: 'hidden'
@@ -525,7 +525,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                     variant="contained"
                     size="medium"
                     startIcon={<HealthAndSafety />}
-                    sx={{ borderRadius: 3, boxShadow: theme.shadows[2], textTransform: 'none', fontWeight: 600 }}
+                    sx={{ borderRadius: 1, boxShadow: theme.shadows[2], textTransform: 'none', fontWeight: 600 }}
                 >
                     New Assessment
                 </Button>
@@ -590,7 +590,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
     const renderCaseNotes = () => (
         <Paper sx={{
             p: 0,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid',
             borderColor: 'divider',
             overflow: 'hidden'

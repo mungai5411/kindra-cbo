@@ -383,7 +383,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 sx={{
                     fontWeight: 900,
                     fontSize: '0.65rem',
-                    borderRadius: 1.5,
+                    borderRadius: 1,
                     bgcolor: alpha(color, 0.08),
                     color: color,
                     border: '1px solid',
@@ -398,7 +398,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
     const renderVolunteerList = () => (
         <Paper sx={{
             p: 0,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid',
             borderColor: alpha(theme.palette.divider, 0.08),
             bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -420,7 +420,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                     startIcon={<Add />}
                     onClick={() => setOpenDialog?.(true)}
                     sx={{
-                        borderRadius: 3,
+                        borderRadius: 1,
                         textTransform: 'none',
                         fontWeight: 900,
                         px: 3,
@@ -568,7 +568,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                     {displayedTasks.map((task: any) => (
                         <Paper key={task.id} sx={{
                             p: 3,
-                            borderRadius: 4,
+                            borderRadius: 1.5,
                             border: '1px solid',
                             borderColor: alpha(theme.palette.divider, 0.08),
                             bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -612,7 +612,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         </Paper>
                     ))}
                     {displayedTasks.length === 0 && (
-                        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: 'transparent' }}>
+                        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 1.5, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: 'transparent' }}>
                             <Assignment sx={{ fontSize: 40, color: 'text.disabled', opacity: 0.2, mb: 1 }} />
                             <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>No operations identified.</Typography>
                         </Paper>
@@ -622,7 +622,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         <Box sx={{ mt: 2 }}>
                             <Typography variant="subtitle1" sx={{ fontWeight: 900, mb: 2, letterSpacing: -0.5 }}>Open Opportunities</Typography>
                             {openTasks.map((task: any) => (
-                                <Paper key={task.id} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.08), bgcolor: alpha(theme.palette.primary.main, 0.03), mb: 2 }}>
+                                <Paper key={task.id} sx={{ p: 3, borderRadius: 1.5, border: '1px solid', borderColor: alpha(theme.palette.divider, 0.08), bgcolor: alpha(theme.palette.primary.main, 0.03), mb: 2 }}>
                                     <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 0.5 }}>{task.title}</Typography>
                                     <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 2 }}>{task.location || 'LOGISTICS COORDINATION'}</Typography>
                                     <Button
@@ -655,7 +655,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
         return (
             <Paper sx={{
                 p: 0,
-                borderRadius: 4,
+                borderRadius: 1.5,
                 border: '1px solid',
                 borderColor: alpha(theme.palette.divider, 0.08),
                 bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -675,7 +675,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             startIcon={<Add />}
                             onClick={() => setTaskDialogOpen(true)}
                             sx={{
-                                borderRadius: 3,
+                                borderRadius: 1,
                                 textTransform: 'none',
                                 fontWeight: 900,
                                 px: 3,
@@ -812,7 +812,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
     const renderEvents = () => (
         <Paper sx={{
             p: 0,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid',
             borderColor: alpha(theme.palette.divider, 0.08),
             bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -830,7 +830,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         startIcon={<Add />}
                         onClick={() => setEventDialogOpen(true)}
                         sx={{
-                            borderRadius: 3,
+                            borderRadius: 1,
                             textTransform: 'none',
                             fontWeight: 900,
                             px: 3,
@@ -991,7 +991,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
         return (
             <Paper sx={{
                 p: 0,
-                borderRadius: 4,
+                borderRadius: 1.5,
                 border: '1px solid',
                 borderColor: alpha(theme.palette.divider, 0.08),
                 bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -1012,7 +1012,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 setTimeLogOpen(true);
                             }}
                             sx={{
-                                borderRadius: 3,
+                                borderRadius: 1,
                                 textTransform: 'none',
                                 fontWeight: 900,
                                 px: 3,
@@ -1105,7 +1105,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
     const renderTrainings = () => (
         <Paper sx={{
             p: 2.5,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid',
             borderColor: alpha(theme.palette.divider, 0.08),
             bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -1126,7 +1126,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             setEventDialogOpen(true);
                         }}
                         sx={{
-                            borderRadius: 3,
+                            borderRadius: 1,
                             textTransform: 'none',
                             fontWeight: 900,
                             boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
@@ -1140,7 +1140,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 {trainings && trainings.map((t: any, i: number) => (
                     <Grid item xs={12} md={4} key={i}>
                         <Card variant="outlined" sx={{
-                            borderRadius: 4,
+                            borderRadius: 1.5,
                             bgcolor: alpha(theme.palette.background.paper, 0.4),
                             border: '1px solid',
                             borderColor: alpha(theme.palette.divider, 0.08),
@@ -1347,7 +1347,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         variant="contained"
                         onClick={handleLogTime}
                         sx={{
-                            borderRadius: 3,
+                            borderRadius: 1,
                             px: 4,
                             py: 1.2,
                             fontWeight: 900,
@@ -1496,7 +1496,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         variant="contained"
                         onClick={handleAddTask}
                         sx={{
-                            borderRadius: 3,
+                            borderRadius: 1,
                             px: 4,
                             fontWeight: 900,
                             boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.2)}`
@@ -1632,7 +1632,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         variant="contained"
                         onClick={handleAddEvent}
                         sx={{
-                            borderRadius: 3,
+                            borderRadius: 1,
                             px: 4,
                             fontWeight: 900,
                             boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.2)}`
@@ -1672,7 +1672,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                     key={p.id}
                                     sx={{
                                         mb: 1,
-                                        borderRadius: 3,
+                                        borderRadius: 1,
                                         bgcolor: alpha(theme.palette.background.paper, 0.4),
                                         border: '1px solid',
                                         borderColor: alpha(theme.palette.divider, 0.05)
@@ -1827,7 +1827,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                             p: 3,
                                             flex: 1,
                                             textAlign: 'center',
-                                            borderRadius: 5,
+                                            borderRadius: 1,
                                             bgcolor: alpha(theme.palette.primary.main, 0.03),
                                             border: '1px solid',
                                             borderColor: alpha(theme.palette.primary.main, 0.1)
@@ -1839,7 +1839,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                             p: 3,
                                             flex: 1,
                                             textAlign: 'center',
-                                            borderRadius: 5,
+                                            borderRadius: 1,
                                             bgcolor: alpha(theme.palette.secondary.main, 0.03),
                                             border: '1px solid',
                                             borderColor: alpha(theme.palette.secondary.main, 0.1)
@@ -1891,7 +1891,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                     variant="contained"
                                     color="warning"
                                     sx={{
-                                        borderRadius: 3,
+                                        borderRadius: 1,
                                         fontWeight: 900,
                                         boxShadow: `0 8px 16px ${alpha(theme.palette.warning.main, 0.2)}`
                                     }}
@@ -1914,7 +1914,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                     severity={snackbar.severity}
                     variant="filled"
                     sx={{
-                        borderRadius: 4,
+                        borderRadius: 1.5,
                         fontWeight: 800,
                         fontSize: '0.85rem',
                         boxShadow: '0 8px 24px rgba(0,0,0,0.15)',

@@ -406,7 +406,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                         startIcon={<Add />}
                         onClick={() => setOpenDialog?.(true)}
                         sx={{
-                            borderRadius: 3,
+                            borderRadius: 1,
                             textTransform: 'none',
                             fontWeight: 800,
                             boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.25)}`,
@@ -430,7 +430,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                             display: 'flex',
                             flexDirection: 'column',
                             padding: 0,
-                            borderRadius: 4,
+                            borderRadius: 1.5,
                             overflow: 'hidden',
                             border: '1px solid',
                             borderColor: alpha(theme.palette.divider, 0.08),
@@ -512,7 +512,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                                     <Box sx={{ 
                                         textAlign: 'center',
                                         bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                        borderRadius: 3,
+                                        borderRadius: 1,
                                         px: 2,
                                         py: 1.5,
                                         border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`
@@ -542,10 +542,10 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                                         value={camp.target_amount > 0 ? Math.min(((camp.raised_amount || 0) / camp.target_amount) * 100, 100) : 0}
                                         sx={{
                                             height: 10,
-                                            borderRadius: 10,
+                                            borderRadius: 1.5,
                                             bgcolor: alpha(theme.palette.primary.main, 0.08),
                                             '& .MuiLinearProgress-bar': { 
-                                                borderRadius: 10,
+                                                borderRadius: 1.5,
                                                 background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`
                                             }
                                         }}
@@ -740,7 +740,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 ))}
                 {campaigns.filter((c: any) => isManagement || c.status !== 'DRAFT').length === 0 && (
                     <Grid item xs={12}>
-                        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
+                        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 1.5, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
                             <VolunteerActivism sx={{ fontSize: 60, color: 'primary.main', opacity: 0.2, mb: 2 }} />
                             <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>No Active Campaigns Found</Typography>
                             <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Start a new fundraising campaign to begin receiving contributions.</Typography>
@@ -750,7 +750,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
             </Grid>
 
             {/* Status Update Dialog */}
-            <Dialog open={openStatusDialog} onClose={() => setOpenStatusDialog(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 4, boxShadow: theme.shadows[10] } }}>
+            <Dialog open={openStatusDialog} onClose={() => setOpenStatusDialog(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 1.5, boxShadow: theme.shadows[10] } }}>
                 <DialogTitle sx={{ fontWeight: 'bold' }}>Update Campaign Progress</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -794,14 +794,14 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>
                     <Button onClick={() => setOpenStatusDialog(false)} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Dismiss</Button>
-                    <Button variant="contained" onClick={handleUpdateStatus} sx={{ borderRadius: 3, px: 4, fontWeight: 'bold' }}>
+                    <Button variant="contained" onClick={handleUpdateStatus} sx={{ borderRadius: 1, px: 4, fontWeight: 'bold' }}>
                         Save Updates
                     </Button>
                 </DialogActions>
             </Dialog>
 
             {/* Gateway Payment Dialog */}
-            <Dialog open={openDonationDialog} onClose={() => setOpenDonationDialog(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 4, boxShadow: theme.shadows[10] } }}>
+            <Dialog open={openDonationDialog} onClose={() => setOpenDonationDialog(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 1.5, boxShadow: theme.shadows[10] } }}>
                 <DialogTitle sx={{ fontWeight: 'bold' }}>Process Payment</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -863,7 +863,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>
                     <Button onClick={() => setOpenDonationDialog(false)} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Cancel</Button>
-                    <Button variant="contained" color="secondary" onClick={handleSimulateDonation} sx={{ borderRadius: 3, px: 4, fontWeight: 'bold' }}>
+                    <Button variant="contained" color="secondary" onClick={handleSimulateDonation} sx={{ borderRadius: 1, px: 4, fontWeight: 'bold' }}>
                         Confirm Payment
                     </Button>
                 </DialogActions>
@@ -888,7 +888,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
     const renderDonations = () => (
         <Paper sx={{
             p: 0,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid',
             borderColor: alpha(theme.palette.divider, 0.08),
             bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -1057,7 +1057,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
     const renderDonors = () => (
         <Paper sx={{
             p: 0,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid',
             borderColor: alpha(theme.palette.divider, 0.08),
             bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -1136,7 +1136,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
     const renderReceipts = () => (
         <Paper sx={{
             p: 0,
-            borderRadius: 4,
+            borderRadius: 1.5,
             border: '1px solid',
             borderColor: alpha(theme.palette.divider, 0.08),
             bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -1224,7 +1224,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                         startIcon={<Add />}
                         onClick={() => setOpenMaterialDialog(true)}
                         sx={{
-                            borderRadius: 3,
+                            borderRadius: 1,
                             textTransform: 'none',
                             fontWeight: 800,
                             boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.25)}`,
@@ -1244,7 +1244,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                             height: '100%',
                             display: 'flex',
                             flexDirection: 'column',
-                            borderRadius: 4,
+                            borderRadius: 1.5,
                             border: '1px solid',
                             borderColor: alpha(theme.palette.divider, 0.08),
                             bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -1273,7 +1273,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                             </Box>
                             <Typography variant="body2" sx={{ mb: 3, flexGrow: 1, color: 'text.secondary', fontWeight: 500, lineHeight: 1.6 }}>{md.description}</Typography>
 
-                            <Box sx={{ bgcolor: alpha(theme.palette.background.default, 0.3), p: 2, borderRadius: 3, mb: 3 }}>
+                            <Box sx={{ bgcolor: alpha(theme.palette.background.default, 0.3), p: 2, borderRadius: 1, mb: 3 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                     <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled' }}>QUANTITY</Typography>
                                     <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main' }}>{md.quantity || '0'}</Typography>
@@ -1360,7 +1360,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 ))}
                 {materialDonations.length === 0 && (
                     <Grid item xs={12}>
-                        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
+                        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 1.5, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
                             <Box sx={{ fontSize: 60, opacity: 0.2, mb: 2 }}>📦</Box>
                             <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>No Material Donations</Typography>
                             <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>
@@ -1396,7 +1396,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                     <Grid item xs={12} md={7}>
                         <Paper sx={{
                             p: 4,
-                            borderRadius: 4,
+                            borderRadius: 1.5,
                             border: '1px solid',
                             borderColor: alpha(theme.palette.divider, 0.08),
                             bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -1410,7 +1410,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                     <Grid item xs={12} md={5}>
                         <Paper sx={{
                             p: 4,
-                            borderRadius: 4,
+                            borderRadius: 1.5,
                             height: '100%',
                             bgcolor: alpha(theme.palette.success.main, 0.03),
                             border: '1px solid',
@@ -1432,7 +1432,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                                         alignItems: 'center',
                                         p: 2.5,
                                         bgcolor: alpha(theme.palette.background.paper, 0.8),
-                                        borderRadius: 4,
+                                        borderRadius: 1.5,
                                         border: '1px solid',
                                         borderColor: alpha(theme.palette.divider, 0.05),
                                         transition: 'transform 0.2s ease',
@@ -1468,7 +1468,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
 
         return (
             <Box component={motion.div} initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }}>
-                <Box sx={{ p: 2.5, mb: 3, borderRadius: 4, bgcolor: alpha(theme.palette.primary.main, 0.03), border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
+                <Box sx={{ p: 2.5, mb: 3, borderRadius: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.03), border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
                     <Typography variant="h6" sx={{ fontWeight: 900, mb: 1, letterSpacing: -0.5 }}>Engagement Hub</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Synchronized network of localized community events.</Typography>
                 </Box>
@@ -1477,7 +1477,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                         <Grid item xs={12} key={event.id}>
                             <Paper sx={{
                                 p: 4,
-                                borderRadius: 4,
+                                borderRadius: 1.5,
                                 border: '1px solid',
                                 borderColor: alpha(theme.palette.divider, 0.08),
                                 bgcolor: alpha(theme.palette.background.paper, 0.6),
@@ -1522,7 +1522,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                     ))}
                     {donorEvents.length === 0 && (
                         <Grid item xs={12}>
-                            <Paper sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
+                            <Paper sx={{ p: 8, textAlign: 'center', borderRadius: 1.5, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
                                 <EventIcon sx={{ fontSize: 48, opacity: 0.1, mb: 1, color: 'primary.main' }} />
                                 <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>No community events found in current cycle.</Typography>
                             </Paper>
@@ -1542,7 +1542,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
     //     { id: 'donors', label: 'Partners', component: renderDonors(), icon: <Box sx={{ fontSize: 20 }}>🤝</Box>, hidden: !isManagement },
     //     { id: 'receipts', label: 'Receipts', component: renderReceipts(), icon: <Receipt /> },
     //     { id: 'community_events', label: 'Hub', component: renderCommunityEvents(), icon: <EventIcon /> },
-    //     { id: 'social_media', label: 'Social', component: <Box sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}><Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Engagement Tracking</Typography><Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Integrated social media tracking module under development.</Typography></Box>, icon: <Box sx={{ fontSize: 20 }}>📱</Box>, hidden: !isManagement },
+    //     { id: 'social_media', label: 'Social', component: <Box sx={{ p: 8, textAlign: 'center', borderRadius: 1.5, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}><Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Engagement Tracking</Typography><Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Integrated social media tracking module under development.</Typography></Box>, icon: <Box sx={{ fontSize: 20 }}>📱</Box>, hidden: !isManagement },
     // ];
 
     // const tabs = tabsSource.filter(tab => !tab.hidden);
@@ -1594,7 +1594,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
             {activeTab === 'receipts' && renderReceipts()}
             {activeTab === 'community_events' && renderCommunityEvents()}
             {activeTab === 'social_media' && (
-                <Box sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
+                <Box sx={{ p: 8, textAlign: 'center', borderRadius: 1.5, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
                     <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Media Integration</Typography>
                     <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Integrated social media tracking module pending initialization.</Typography>
                 </Box>
@@ -1602,7 +1602,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
             {(!activeTab || activeTab === 'donations') && renderCampaigns()}
 
             {/* Donation Status Update Dialog */}
-            <Dialog open={openDonationStatusDialog} onClose={() => setOpenDonationStatusDialog(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 4, boxShadow: theme.shadows[10] } }}>
+            <Dialog open={openDonationStatusDialog} onClose={() => setOpenDonationStatusDialog(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 1.5, boxShadow: theme.shadows[10] } }}>
                 <DialogTitle sx={{ fontWeight: 'bold' }}>Update Donation Status</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -1632,7 +1632,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>
                     <Button onClick={() => setOpenDonationStatusDialog(false)} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Dismiss</Button>
-                    <Button variant="contained" onClick={handleUpdateDonationStatus} sx={{ borderRadius: 3, px: 4, fontWeight: 'bold' }}>
+                    <Button variant="contained" onClick={handleUpdateDonationStatus} sx={{ borderRadius: 1, px: 4, fontWeight: 'bold' }}>
                         Save Updates
                     </Button>
                 </DialogActions>
@@ -1719,14 +1719,14 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>
                     <Button onClick={() => setOpenMaterialDialog(false)} sx={{ fontWeight: 'bold' }}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSubmitMaterial} sx={{ px: 4, borderRadius: 3, fontWeight: 'bold' }}>
+                    <Button variant="contained" onClick={handleSubmitMaterial} sx={{ px: 4, borderRadius: 1, fontWeight: 'bold' }}>
                         Submit Request
                     </Button>
                 </DialogActions>
             </Dialog>
 
             {/* Donor Edit Dialog */}
-            <Dialog open={openDonorEditDialog} onClose={() => setOpenDonorEditDialog(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 4, boxShadow: theme.shadows[10] } }}>
+            <Dialog open={openDonorEditDialog} onClose={() => setOpenDonorEditDialog(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 1.5, boxShadow: theme.shadows[10] } }}>
                 <DialogTitle sx={{ fontWeight: 'bold', borderBottom: '1px solid', borderColor: 'divider' }}>Edit Philanthropic Partner</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
@@ -1799,7 +1799,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>
                     <Button onClick={() => setOpenDonorEditDialog(false)} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Cancel</Button>
-                    <Button variant="contained" onClick={handleUpdateDonorProfile} sx={{ borderRadius: 3, px: 4, fontWeight: 'bold' }}>
+                    <Button variant="contained" onClick={handleUpdateDonorProfile} sx={{ borderRadius: 1, px: 4, fontWeight: 'bold' }}>
                         Update Registry
                     </Button>
                 </DialogActions>

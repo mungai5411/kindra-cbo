@@ -175,13 +175,13 @@ export default function AboutPage() {
                                     bottom: -10,
                                     left: -10,
                                     background: 'rgba(69, 143, 246, 0.05)',
-                                    borderRadius: 5,
+                                    borderRadius: 1,
                                     filter: 'blur(40px)',
                                     opacity: 1,
                                     zIndex: 0
                                 }} />
                                 <Card sx={{
-                                    borderRadius: 5,
+                                    borderRadius: 1,
                                     overflow: 'hidden',
                                     boxShadow: `0 20px 40px ${alpha(theme.palette.text.primary, 0.1)}`,
                                     zIndex: 1,
@@ -200,7 +200,7 @@ export default function AboutPage() {
                                         p: 2,
                                         bgcolor: 'rgba(255, 255, 255, 0.9)',
                                         backdropFilter: 'blur(10px)',
-                                        borderRadius: 3,
+                                        borderRadius: 1,
                                         color: 'text.primary'
                                     }}>
                                         <Typography variant="subtitle2" fontWeight="900" display="flex" alignItems="center" gap={1}>
@@ -268,7 +268,7 @@ export default function AboutPage() {
                                 >
                                     <Card sx={{
                                         textAlign: 'center',
-                                        borderRadius: 5,
+                                        borderRadius: 1,
                                         p: 3,
                                         background: 'transparent',
                                         boxShadow: 'none',

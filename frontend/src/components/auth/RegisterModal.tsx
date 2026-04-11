@@ -130,7 +130,7 @@ export const RegisterModal = () => {
             fullWidth
             PaperProps={{
                 sx: {
-                    borderRadius: 5,
+                    borderRadius: 1,
                     backgroundColor: 'background.paper',
                     backgroundImage: 'none',
                     boxShadow: theme.shadows[10],

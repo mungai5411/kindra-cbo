@@ -131,7 +131,7 @@ export const Navbar = () => {
                                         sx={{
                                             fontWeight: 600,
                                             textTransform: 'none',
-                                            borderRadius: 5,
+                                            borderRadius: 1,
                                         }}
                                     >
                                         Dashboard
@@ -168,7 +168,7 @@ export const Navbar = () => {
                                         onClick={() => openRegisterModal('VOLUNTEER')}
                                         size="medium"
                                         sx={{
-                                            borderRadius: 50,
+                                            borderRadius: 1.5,
                                             px: 4,
                                             boxShadow: 'none',
                                             textTransform: 'none',

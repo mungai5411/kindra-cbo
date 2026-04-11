@@ -63,7 +63,7 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
             body1: { fontSize: '1rem', lineHeight: 1.7, color: palette.text.secondary },
             body2: { fontSize: '0.875rem', lineHeight: 1.6, color: palette.text.secondary },
         },
-        shape: { borderRadius: 24 },
+        shape: { borderRadius: 8 },
         components: {
             MuiCssBaseline: {
                 styleOverrides: {
@@ -75,7 +75,7 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
             MuiButton: {
                 styleOverrides: {
                     root: {
-                        borderRadius: 50,
+                        borderRadius: 8,
                         padding: '10px 28px',
                         transition: 'all 0.3s ease',
                         textTransform: 'none',
@@ -92,8 +92,12 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
                             boxShadow: '0 10px 20px rgba(69, 143, 246, 0.3)',
                         },
                     },
+                    containedSecondary: {
+                        borderRadius: 8
+                    },
                     outlinedPrimary: {
                         borderWidth: 2,
+                        borderRadius: 8,
                         '&:hover': {
                             borderWidth: 2,
                             background: alpha(palette.primary.main, 0.04),
@@ -104,7 +108,7 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
             MuiCard: {
                 styleOverrides: {
                     root: {
-                        borderRadius: 24,
+                        borderRadius: 12, // Standard card radius
                         border: 'none',
                         backgroundColor: mode === 'dark' ? '#1E1E1E' : '#ffffff',
                         boxShadow: mode === 'dark' ? '0 10px 30px rgba(0,0,0,0.5)' : '0 10px 40px rgba(0,0,0,0.05)',
@@ -117,7 +121,7 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
                     root: {
                         backgroundImage: 'none',
                         backgroundColor: palette.background.paper,
-                        borderRadius: 24,
+                        borderRadius: 12, // Standard paper radius
                         boxShadow: mode === 'dark' ? '0 10px 30px rgba(0,0,0,0.5)' : '0 10px 40px rgba(0,0,0,0.05)',
                     },
                 },
@@ -126,7 +130,7 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
                 styleOverrides: {
                     root: {
                         '& .MuiOutlinedInput-root': {
-                            borderRadius: 16,
+                            borderRadius: 8,
                             backgroundColor: mode === 'dark' ? alpha('#fff', 0.03) : '#fff',
                             '& fieldset': { borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' },
                             '&:hover fieldset': { borderColor: palette.primary.main },

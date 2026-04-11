@@ -215,7 +215,7 @@ export const Sidebar = ({ activeTab, setActiveTab, openSections, handleSectionTo
                                     onClick={() => hasChildren ? handleSectionToggle(item.id) : handleNavigation(item.id)}
                                     selected={activeTab === item.id}
                                     sx={{
-                                        borderRadius: 3, // Sidebar radius 12px
+                                        borderRadius: 1.5, // Sidebar radius 12px
                                         mb: 0.5,
                                         color: isActive ? theme.palette.primary.main : theme.palette.text.secondary,
                                         bgcolor: isActive ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
