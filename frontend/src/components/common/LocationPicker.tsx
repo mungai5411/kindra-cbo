@@ -117,9 +117,13 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     const displayMapCenter = mapCenter || (markerPos ? [markerPos.lat, markerPos.lng] as [number, number] : defaultCenter);
 
     const handleMapClick = (lat: number, lng: number) => {
-        setMarkerPos({ lat, lng });
-        setLatInput(lat.toFixed(6));
-        setLngInput(lng.toFixed(6));
+        // Round to 6 decimal places (max_decimal_places in Django model)
+        const roundedLat = Math.round(lat * 1000000) / 1000000;
+        const roundedLng = Math.round(lng * 1000000) / 1000000;
+        
+        setMarkerPos({ lat: roundedLat, lng: roundedLng });
+        setLatInput(roundedLat.toFixed(6));
+        setLngInput(roundedLng.toFixed(6));
     };
 
     const handleSaveLocation = () => {
@@ -137,10 +141,15 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     };
 
     const handleManualInput = () => {
-        const lat = parseFloat(latInput);
-        const lng = parseFloat(lngInput);
+        let lat = parseFloat(latInput);
+        let lng = parseFloat(lngInput);
         if (!isNaN(lat) && !isNaN(lng)) {
+            // Round to 6 decimal places (max_decimal_places in Django model)
+            lat = Math.round(lat * 1000000) / 1000000;
+            lng = Math.round(lng * 1000000) / 1000000;
             setMarkerPos({ lat, lng });
+            setLatInput(lat.toFixed(6));
+            setLngInput(lng.toFixed(6));
         }
     };
 
@@ -153,9 +162,12 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         if (countyMatches.length > 0) {
             const county = countyMatches[0];
             const [lat, lng] = getCountyCenter(county.name);
-            setMarkerPos({ lat, lng });
-            setLatInput(lat.toFixed(6));
-            setLngInput(lng.toFixed(6));
+            // Round to 6 decimal places
+            const roundedLat = Math.round(lat * 1000000) / 1000000;
+            const roundedLng = Math.round(lng * 1000000) / 1000000;
+            setMarkerPos({ lat: roundedLat, lng: roundedLng });
+            setLatInput(roundedLat.toFixed(6));
+            setLngInput(roundedLng.toFixed(6));
             setSearchSuccess(true);
             return;
         }
@@ -169,8 +181,11 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
 
             if (results.length > 0) {
                 const first = results[0];
-                const lat = parseFloat(first.lat);
-                const lng = parseFloat(first.lon);
+                let lat = parseFloat(first.lat);
+                let lng = parseFloat(first.lon);
+                // Round to 6 decimal places
+                lat = Math.round(lat * 1000000) / 1000000;
+                lng = Math.round(lng * 1000000) / 1000000;
                 setMarkerPos({ lat, lng });
                 setLatInput(lat.toFixed(6));
                 setLngInput(lng.toFixed(6));

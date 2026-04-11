@@ -173,11 +173,12 @@ export const updateShelter = createAsyncThunk(
                 payload = cleanData;
 
                 // Ensure coordinates are proper numbers for PATCH requests
+                // Round to 6 decimal places (max_decimal_places in Django model)
                 if (payload.latitude) {
-                    payload.latitude = parseFloat(payload.latitude);
+                    payload.latitude = Math.round(parseFloat(payload.latitude) * 1000000) / 1000000;
                 }
                 if (payload.longitude) {
-                    payload.longitude = parseFloat(payload.longitude);
+                    payload.longitude = Math.round(parseFloat(payload.longitude) * 1000000) / 1000000;
                 }
                 // Ensure numeric fields are parsed
                 if (payload.total_capacity) {
@@ -226,10 +227,17 @@ export const createShelter = createAsyncThunk(
             // Add all text fields
             Object.keys(shelterData).forEach(key => {
                 if (key !== 'photos' && shelterData[key] !== null && shelterData[key] !== undefined) {
-                    if (key === 'disability_types_supported' && Array.isArray(shelterData[key])) {
-                        formData.append(key, JSON.stringify(shelterData[key]));
+                    let value = shelterData[key];
+                    
+                    // Round coordinates to 6 decimal places (max_decimal_places in Django model)
+                    if (key === 'latitude' || key === 'longitude') {
+                        value = Math.round(parseFloat(value) * 1000000) / 1000000;
+                    }
+                    
+                    if (key === 'disability_types_supported' && Array.isArray(value)) {
+                        formData.append(key, JSON.stringify(value));
                     } else {
-                        formData.append(key, shelterData[key]);
+                        formData.append(key, value);
                     }
                 }
             });
