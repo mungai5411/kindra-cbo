@@ -15,6 +15,7 @@ import {
     MonetizationOn, TipsAndUpdates, AutoAwesome
 } from '@mui/icons-material';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { TrafalgarHero } from '../components/common/TrafalgarHero';
 import { AppDispatch, RootState } from '../store';
 import { fetchCampaigns } from '../features/donations/donationsSlice';
 import DonationDialog from '../components/campaigns/DonationDialog';
@@ -88,146 +89,25 @@ export default function DonationsPage() {
             overflow: 'hidden',
             position: 'relative'
         }}>
-            {/* Dynamic Mesh Gradient Background */}
-            <Box sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '100%',
-                zIndex: 0,
-                overflow: 'hidden',
-                pointerEvents: 'none'
-            }}>
-                <Box sx={{
-                    position: 'absolute',
-                    top: '-10%',
-                    right: '-5%',
-                    width: '60%',
-                    height: '60%',
-                    borderRadius: '50%',
-                    background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.08)} 0%, transparent 70%)`,
-                    filter: 'blur(60px)',
-                }} />
-                <Box sx={{
-                    position: 'absolute',
-                    bottom: '10%',
-                    left: '-10%',
-                    width: '50%',
-                    height: '50%',
-                    borderRadius: '50%',
-                    background: `radial-gradient(circle, ${alpha(theme.palette.secondary.main, 0.08)} 0%, transparent 70%)`,
-                    filter: 'blur(60px)',
-                }} />
-            </Box>
-
-            {/* Hero Section */}
-            <Box sx={{
-                pt: { xs: 12, md: 16 },
-                pb: { xs: 8, md: 12 },
-                position: 'relative',
-                zIndex: 1,
-                textAlign: 'center'
-            }}>
-                <Container maxWidth="md">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                    >
-                        <Box sx={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 1,
-                            px: 2,
-                            py: 0.5,
-                            borderRadius: 10,
-                            bgcolor: alpha(theme.palette.primary.main, 0.1),
-                            color: 'primary.main',
-                            mb: 3,
-                            border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
-                        }}>
-                            <AutoAwesome sx={{ fontSize: 16 }} />
-                            <Typography variant="caption" fontWeight="bold" letterSpacing={1} sx={{ textTransform: 'uppercase' }}>
-                                Your generosity changes lives
-                            </Typography>
-                        </Box>
-
-                        <Typography variant="h1" sx={{
-                            mb: 3,
-                            fontSize: { xs: '2.75rem', md: '4.5rem' },
-                            background: `linear-gradient(135deg, ${theme.palette.text.primary} 30%, ${theme.palette.primary.main} 100%)`,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            lineHeight: 1.15
-                        }}>
-                            Fueling Hope, <br /> One Gift at a Time
-                        </Typography>
-
-                        <Typography variant="h6" color="text.secondary" sx={{
-                            mb: 5,
-                            maxWidth: 600,
-                            mx: 'auto',
-                            lineHeight: 1.6,
-                            fontWeight: 400
-                        }}>
-                            Join us in our mission to provide sustainable support to vulnerable communities through transparent and impactful giving.
-                        </Typography>
-
-                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
-                            <Button
-                                variant="contained"
-                                size="large"
-                                startIcon={<Favorite />}
-                                onClick={() => {
-                                    if (activeCampaigns.length > 0) {
-                                        handleOpenDonationDialog(activeCampaigns[0]);
-                                    } else {
-                                        const element = document.getElementById('active-campaigns');
-                                        if (element) {
-                                            element.scrollIntoView({ behavior: 'smooth' });
-                                        }
-                                    }
-                                }}
-                                sx={{
-                                    borderRadius: 4,
-                                    px: 5,
-                                    py: 2,
-                                    fontSize: '1rem',
-                                    fontWeight: 800,
-                                    boxShadow: `0 8px 25px ${alpha(theme.palette.primary.main, 0.3)}`,
-                                    '&:hover': {
-                                        transform: 'translateY(-3px)',
-                                        boxShadow: `0 12px 30px ${alpha(theme.palette.primary.main, 0.4)}`,
-                                    }
-                                }}
-                            >
-                                Donate Now
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                size="large"
-                                startIcon={<TipsAndUpdates />}
-                                sx={{
-                                    borderRadius: 5,
-                                    px: 5,
-                                    py: 2,
-                                    fontSize: '1rem',
-                                    fontWeight: 800,
-                                    borderWidth: 2,
-                                    '&:hover': {
-                                        borderWidth: 2,
-                                        transform: 'translateY(-3px)',
-                                        bgcolor: alpha(theme.palette.primary.main, 0.05)
-                                    }
-                                }}
-                            >
-                                How it Works
-                            </Button>
-                        </Stack>
-                    </motion.div>
-                </Container>
-            </Box>
+            {/* Trafalgar Hero Section */}
+            <TrafalgarHero
+                title={<>Fueling Hope,<br/>One Gift at a Time</>}
+                description="Join us in our mission to provide sustainable support to vulnerable communities through transparent and impactful giving."
+                imageSrc="https://images.unsplash.com/photo-1593113563332-9ecb55fa1107?auto=format&fit=crop&q=80&w=2070"
+                imageAlt="Donations"
+                primaryActionText="Donate Now"
+                onPrimaryAction={() => {
+                    if (activeCampaigns.length > 0) {
+                        handleOpenDonationDialog(activeCampaigns[0]);
+                    } else {
+                        const element = document.getElementById('active-campaigns');
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                }}
+                reverse={false}
+            />
 
             {/* Main Content Area */}
             <Container maxWidth="lg" sx={{ pb: 12, position: 'relative', zIndex: 1 }}>
@@ -262,8 +142,7 @@ export default function DonationsPage() {
                             p: 8,
                             textAlign: 'center',
                             borderRadius: 6,
-                            background: alpha(theme.palette.background.paper, 0.7),
-                            backdropFilter: 'blur(20px)',
+                            background: theme.palette.background.paper,
                             border: `1px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
                             boxShadow: 'none'
                         }}>
@@ -311,10 +190,9 @@ export default function DonationsPage() {
                                                     height: '100%',
                                                     display: 'flex',
                                                     flexDirection: 'column',
-                                                    borderRadius: 5, // theme radius 16px / 20px
+                                                    borderRadius: 5,
                                                     overflow: 'hidden',
-                                                    background: alpha(theme.palette.background.paper, 0.8),
-                                                    backdropFilter: 'blur(20px)',
+                                                    background: theme.palette.background.paper,
                                                     border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                                                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                                                     '&:hover': {

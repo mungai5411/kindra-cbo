@@ -8,7 +8,6 @@ import React from 'react';
 import { Box, Container, Grid, Typography, Link as MuiLink, Stack, Divider, alpha, TextField, Button, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, LocationOn, Facebook, Twitter, Instagram, LinkedIn } from '@mui/icons-material';
-import { colorPsychology } from '../../theme/colorPsychology';
 
 interface FooterLink {
   label: string;
@@ -111,19 +110,19 @@ export const Footer: React.FC = () => {
           width: '400px',
           height: '400px',
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(colorPsychology.programs.cases.primary, 0.05)}, transparent)`,
+          background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.05)}, transparent)`,
           pointerEvents: 'none'
         }}
       />
 
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         {/* Main Footer Content */}
         <Grid container spacing={{ xs: 4, md: 5 }} sx={{ mb: 6 }}>
           {/* Brand & Description */}
           <Grid item xs={12} sm={6} md={3}>
             <Box sx={{ mb: 2 }}>
               <Typography variant="h5" sx={{ fontWeight: 900, mb: 1 }}>
-                <Box component="span" sx={{ color: colorPsychology.programs.cases.primary }}>K</Box>indra
+                <Box component="span" sx={{ color: 'primary.main' }}>K</Box>indra
               </Typography>
               <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', lineHeight: 1.6 }}>
                 Transforming lives and building futures for vulnerable children and families across Kenya.
@@ -146,7 +145,7 @@ export const Footer: React.FC = () => {
                       color: 'rgba(255, 255, 255, 0.8)',
                       transition: 'all 0.3s ease',
                       '&:hover': {
-                        color: colorPsychology.programs.cases.primary
+                        color: 'primary.main'
                       }
                     }}
                   >
@@ -200,7 +199,7 @@ export const Footer: React.FC = () => {
                       borderColor: 'rgba(255, 255, 255, 0.3)'
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: colorPsychology.programs.cases.primary
+                      borderColor: 'primary.main'
                     }
                   }
                 }}
@@ -208,11 +207,11 @@ export const Footer: React.FC = () => {
               <Button
                 variant="contained"
                 sx={{
-                  bgcolor: colorPsychology.programs.cases.primary,
+                  bgcolor: 'primary.main',
                   fontWeight: 700,
                   textTransform: 'none',
                   '&:hover': {
-                    bgcolor: alpha(colorPsychology.programs.cases.primary, 0.8)
+                    bgcolor: alpha(theme.palette.primary.main, 0.8)
                   }
                 }}
               >
@@ -248,7 +247,7 @@ export const Footer: React.FC = () => {
                     color: 'rgba(255, 255, 255, 0.7)',
                     transition: 'all 0.3s ease',
                     '&:hover': {
-                      color: colorPsychology.programs.cases.primary,
+                      color: 'primary.main',
                       transform: 'translateY(-2px)'
                     }
                   }}

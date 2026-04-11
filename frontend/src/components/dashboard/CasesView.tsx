@@ -59,7 +59,7 @@ import { CaseFilterBar } from './CaseFilterBar';
 import { KENYA_COUNTIES } from '../../utils/locationData';
 import { downloadFile } from '../../utils/downloadHelper';
 import { Select, FormControl, InputLabel } from '@mui/material';
-import { colorPsychology } from '../../theme/colorPsychology';
+// Removed colorPsychology import
 
 // Reusable Status Chip for consistency
 const StatusChip = ({ status, type = 'status' }: { status: string, type?: 'status' | 'priority' }) => {
@@ -183,7 +183,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
         dispatch(addCase(caseForm)).unwrap().then(() => {
             setOpenDialog({ type: null, data: null });
             setCaseForm({ title: '', description: '', priority: 'MEDIUM', family: '', assigned_to: '', intervention_plan: '' });
-            setSnackbar({ open: true, message: 'Case deployed successfully', severity: 'success' });
+            setSnackbar({ open: true, message: 'Case created successfully', severity: 'success' });
         }).catch((err) => {
             setSnackbar({ open: true, message: err || 'Failed to create case', severity: 'error' });
         });
@@ -219,7 +219,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
 
     const renderCases = () => {
         // Apply filters and search
-        let filteredCases = cases.filter((c: any) => {
+        const filteredCases = cases.filter((c: any) => {
             // Search query
             if (searchQuery) {
                 const q = searchQuery.toLowerCase();
@@ -252,33 +252,33 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                 {/* Summary Header with Key Metrics */}
                 <SummaryHeader
                     title="Case Management Summary"
-                    color={colorPsychology.programs.cases.primary}
+                    color={theme.palette.primary.main}
                     metrics={[
                         {
                             label: 'Total Cases',
                             value: cases.length,
                             icon: <Assignment />,
-                            color: colorPsychology.programs.cases.primary
+                            color: theme.palette.primary.main
                         },
                         {
                             label: 'Active Cases',
                             value: cases.filter((c: any) => c.status !== 'RESOLVED').length,
                             icon: <ChildCare />,
                             isGood: true,
-                            color: colorPsychology.status.success.primary
+                            color: theme.palette.success.main
                         },
                         {
                             label: 'Urgent Priority',
                             value: urgentCount,
                             isBad: urgentCount > 0,
                             icon: <WarningAmber />,
-                            color: colorPsychology.status.critical.primary
+                            color: theme.palette.error.main
                         },
                         {
                             label: 'Resolution Rate',
                             value: `${cases.length > 0 ? Math.round((cases.filter((c: any) => c.status === 'RESOLVED').length / cases.length) * 100) : 0}%`,
                             isGood: true,
-                            color: colorPsychology.status.success.primary
+                            color: theme.palette.success.main
                         }
                     ]}
                 />
@@ -301,7 +301,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                 { label: 'Resolved', value: 'RESOLVED', count: cases.filter((c: any) => c.status === 'RESOLVED').length },
                                 { label: 'Closed', value: 'CLOSED', count: cases.filter((c: any) => c.status === 'CLOSED').length }
                             ],
-                            color: colorPsychology.programs.cases.primary
+                            color: theme.palette.primary.main
                         },
                         {
                             name: 'Priority',
@@ -312,7 +312,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                 { label: 'Medium', value: 'MEDIUM', count: cases.filter((c: any) => c.priority === 'MEDIUM').length },
                                 { label: 'Low', value: 'LOW', count: cases.filter((c: any) => c.priority === 'LOW').length }
                             ],
-                            color: colorPsychology.priority.critical.primary
+                            color: theme.palette.error.main
                         }
                     ]}
                 />
@@ -324,7 +324,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                             width: 4,
                             height: 24,
                             borderRadius: 2,
-                            background: `linear-gradient(180deg, ${colorPsychology.programs.cases.primary}, ${alpha(colorPsychology.programs.cases.primary, 0.4)})`
+                            background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.4)})`
                         }} />
                         Cases
                     </Typography>
@@ -333,7 +333,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                         startIcon={<NoteAdd />}
                         onClick={() => setOpenDialog({ type: 'case', data: null })}
                         sx={{
-                            background: `linear-gradient(135deg, ${colorPsychology.programs.cases.primary}, ${colorPsychology.programs.cases.light})`,
+                            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
                             borderRadius: 2
                         }}
                     >
@@ -377,9 +377,9 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                         p: 6,
                         textAlign: 'center',
                         borderRadius: 3,
-                        border: `2px dashed ${alpha(colorPsychology.programs.cases.primary, 0.2)}`
+                        border: `2px dashed ${alpha(theme.palette.primary.main, 0.2)}`
                     }}>
-                        <ChildCare sx={{ fontSize: 48, color: alpha(colorPsychology.programs.cases.primary, 0.4), mb: 1 }} />
+                        <ChildCare sx={{ fontSize: 48, color: alpha(theme.palette.primary.main, 0.4), mb: 1 }} />
                         <Typography color="text.secondary" sx={{ mb: 2 }}>
                             {searchQuery ? 'No cases match your search' : 'No cases found. Start by adding one!'}
                         </Typography>
@@ -387,7 +387,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                             variant="contained"
                             onClick={() => setOpenDialog({ type: 'case', data: null })}
                             sx={{
-                                background: `linear-gradient(135deg, ${colorPsychology.programs.cases.primary}, ${colorPsychology.programs.cases.light})`
+                                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
                             }}
                         >
                             Create First Case
@@ -778,7 +778,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                 </DialogActions>
             </Dialog>
             <Dialog open={openDialog.type === 'case'} onClose={() => setOpenDialog({ type: null, data: null })} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
-                <DialogTitle sx={{ fontWeight: 'bold' }}>Deploy New Case</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Create New Case</DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
                         <TextField

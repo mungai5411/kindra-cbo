@@ -9,7 +9,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const PING_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
 const PING_ENDPOINT = `${API_BASE_URL}/reporting/public-stats/`; // Ping a valid lightweight endpoint (public stats) to avoid 404s
 
-let pingIntervalId: NodeJS.Timeout | null = null;
+let pingIntervalId: ReturnType<typeof setInterval> | null = null;
 
 /**
  * Sends a ping request to the server

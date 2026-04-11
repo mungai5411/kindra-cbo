@@ -13,14 +13,12 @@ import {
     Typography,
     Alert,
     CircularProgress,
-    Paper,
     Link,
     alpha,
     useTheme,
-    InputAdornment,
     Grid
 } from '@mui/material';
-import { Key, ArrowBack, Email } from '@mui/icons-material';
+import { Key, ArrowBack } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import apiClient from '../api/client';
 

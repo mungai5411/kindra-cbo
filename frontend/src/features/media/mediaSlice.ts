@@ -51,7 +51,7 @@ export const fetchMedia = createAsyncThunk(
 // Separate thunk for public media (landing page gallery) - doesn't require auth
 export const fetchPublicLandingPageMedia = createAsyncThunk(
     'media/fetchPublicLandingPageMedia',
-    async (_, { rejectWithValue }) => {
+    async () => {
         try {
             // Try to fetch media without Authorization header
             // The backend may allow public access to gallery images

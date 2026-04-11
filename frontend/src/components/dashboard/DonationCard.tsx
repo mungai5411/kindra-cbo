@@ -26,7 +26,15 @@ import {
   Download
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { colorPsychology, getColorByStatus } from '../../theme/colorPsychology';
+// Removed colorPsychology import
+const getColorByStatus = (status: string, theme: any) => {
+  switch (status?.toUpperCase()) {
+    case 'COMPLETED': return { primary: theme.palette.success.main };
+    case 'FAILED': return { primary: theme.palette.error.main };
+    case 'CANCELLED': return { primary: theme.palette.text.disabled };
+    default: return { primary: theme.palette.warning.main };
+  }
+};
 
 interface DonationCardProps {
   donation: {
@@ -64,8 +72,12 @@ export const DonationCard: React.FC<DonationCardProps> = ({
   onMenuClick
 }) => {
   const theme = useTheme();
-  const programColor = colorPsychology.programs.donations;
-  const statusColor = getColorByStatus(donation.status);
+  const programColor = {
+    primary: theme.palette.primary.main,
+    light: theme.palette.primary.light,
+    dark: theme.palette.primary.dark
+  };
+  const statusColor = getColorByStatus(donation.status, theme);
   const isCompleted = donation.status === 'COMPLETED';
 
   // Campaign progress

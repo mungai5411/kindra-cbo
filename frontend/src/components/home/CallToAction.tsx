@@ -9,7 +9,7 @@ import { Box, Container, Grid, Typography, Button, alpha, Card, CardContent } fr
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowForward, Groups, VolunteerActivism, Favorite } from '@mui/icons-material';
-import { colorPsychology } from '../../theme/colorPsychology';
+import { useTheme } from '@mui/material';
 
 interface CTACardProps {
   title: string;
@@ -106,33 +106,34 @@ const CTACard: React.FC<CTACardProps> = ({ title, description, icon, buttonText,
 );
 
 export const CallToAction: React.FC = () => {
+  const theme = useTheme();
 
   const ctaCards: CTACardProps[] = [
     {
       title: 'Make a Donation',
       description: 'Your generosity directly impacts lives. Every contribution brings hope and opportunity to vulnerable children and families.',
-      icon: <Favorite sx={{ fontSize: 'inherit', color: colorPsychology.programs.donations.primary }} />,
+      icon: <Favorite sx={{ fontSize: 'inherit', color: theme.palette.primary.main }} />,
       buttonText: 'Donate Now',
       buttonLink: '/donate',
-      color: colorPsychology.programs.donations.primary,
+      color: theme.palette.primary.main,
       delay: 0
     },
     {
       title: 'Become a Volunteer',
       description: 'Share your skills, time, and passion. Join our community of changemakers creating real impact in vulnerable communities.',
-      icon: <Groups sx={{ fontSize: 'inherit', color: colorPsychology.programs.volunteers.primary }} />,
+      icon: <Groups sx={{ fontSize: 'inherit', color: theme.palette.info.main }} />,
       buttonText: 'Volunteer',
       buttonLink: '/volunteer',
-      color: colorPsychology.programs.volunteers.primary,
+      color: theme.palette.info.main,
       delay: 0.15
     },
     {
       title: 'Partner With Us',
       description: 'Organizations and businesses can partner with us to create systemic change. Let\'s build a better future together.',
-      icon: <VolunteerActivism sx={{ fontSize: 'inherit', color: colorPsychology.programs.cases.primary }} />,
+      icon: <VolunteerActivism sx={{ fontSize: 'inherit', color: theme.palette.secondary.main }} />,
       buttonText: 'Explore Partnerships',
       buttonLink: '/contact',
-      color: colorPsychology.programs.cases.primary,
+      color: theme.palette.secondary.main,
       delay: 0.3
     }
   ];
@@ -145,14 +146,14 @@ export const CallToAction: React.FC = () => {
         overflow: 'hidden'
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         {/* Section Header */}
         <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
           <Typography
             variant="body2"
             sx={{
               fontWeight: 700,
-              color: colorPsychology.programs.cases.primary,
+              color: theme.palette.primary.main,
               textTransform: 'uppercase',
               letterSpacing: '1.5px',
               mb: 1
@@ -168,7 +169,7 @@ export const CallToAction: React.FC = () => {
               fontSize: { xs: '2rem', md: '2.8rem' }
             }}
           >
-            Multiple Ways to Make <Box component="span" sx={{ color: colorPsychology.programs.cases.primary }}>Impact</Box>
+            Multiple Ways to Make <Box component="span" sx={{ color: theme.palette.primary.main }}>Impact</Box>
           </Typography>
           <Typography
             variant="h6"
@@ -203,7 +204,7 @@ export const CallToAction: React.FC = () => {
           width: '400px',
           height: '400px',
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(colorPsychology.programs.volunteers.primary, 0.05)}, transparent)`,
+          background: `radial-gradient(circle, ${alpha(theme.palette.info.main, 0.05)}, transparent)`,
           pointerEvents: 'none',
           zIndex: 0
         }}

@@ -5,9 +5,8 @@
  */
 
 import React from 'react';
-import { Box, Container, Typography, Card, CardContent, Avatar, Grid, alpha, Rating } from '@mui/material';
+import { Box, Container, Typography, Card, CardContent, Avatar, Grid, alpha, Rating, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
-import { colorPsychology } from '../../theme/colorPsychology';
 
 const MotionCard = motion(Card);
 
@@ -26,8 +25,7 @@ const TestimonialCard: React.FC<TestimonialProps> = ({ name, role, image, testim
     whileInView={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5, delay, ease: 'easeOut' }}
     viewport={{ once: true, amount: 0.3 }}
-    elevation={0}
-    sx={{
+    sx={(theme) => ({
       background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))',
       border: '1px solid rgba(255,255,255,0.5)',
       borderRadius: 3,
@@ -37,9 +35,9 @@ const TestimonialCard: React.FC<TestimonialProps> = ({ name, role, image, testim
       transition: 'all 0.3s ease',
       '&:hover': {
         transform: 'translateY(-4px)',
-        boxShadow: `0 12px 32px ${alpha(colorPsychology.programs.cases.primary, 0.1)}`
+        boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.1)}`
       }
-    }}
+    })}
   >
     <CardContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Rating */}
@@ -54,7 +52,7 @@ const TestimonialCard: React.FC<TestimonialProps> = ({ name, role, image, testim
 
       {/* Author */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Avatar src={image} sx={{ width: 48, height: 48, bgcolor: colorPsychology.programs.cases.primary }} />
+        <Avatar src={image} sx={{ width: 48, height: 48, bgcolor: 'primary.main' }} />
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 700 }}>
             {name}
@@ -69,6 +67,7 @@ const TestimonialCard: React.FC<TestimonialProps> = ({ name, role, image, testim
 );
 
 export const TestimonialsSection: React.FC = () => {
+  const theme = useTheme();
 
   const testimonials: TestimonialProps[] = [
     {
@@ -96,14 +95,14 @@ export const TestimonialsSection: React.FC = () => {
 
   return (
     <Box sx={{ py: { xs: 6, md: 10 }, position: 'relative', overflow: 'hidden' }}>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         {/* Section Header */}
         <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
           <Typography
             variant="body2"
             sx={{
               fontWeight: 700,
-              color: colorPsychology.programs.cases.primary,
+              color: 'primary.main',
               textTransform: 'uppercase',
               letterSpacing: '1.5px',
               mb: 1
@@ -119,7 +118,7 @@ export const TestimonialsSection: React.FC = () => {
               fontSize: { xs: '2rem', md: '2.8rem' }
             }}
           >
-            Impact from the <Box component="span" sx={{ color: colorPsychology.programs.cases.primary }}>Community</Box>
+            Impact from the <Box component="span" sx={{ color: 'primary.main' }}>Community</Box>
           </Typography>
           <Typography
             variant="h6"

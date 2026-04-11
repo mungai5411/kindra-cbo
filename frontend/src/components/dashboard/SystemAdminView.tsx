@@ -194,7 +194,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             onConfirm: async () => {
                 try {
                     await dispatch(deleteUser(user.id)).unwrap();
-                    setSnackbar({ open: true, message: 'User account successfully decommissioned', severity: 'success' });
+                    setSnackbar({ open: true, message: 'User account successfully deleted', severity: 'success' });
                 } catch (error: any) {
                     setSnackbar({ open: true, message: error || 'Failed to delete user', severity: 'error' });
                 }
@@ -232,7 +232,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                 description: newGroupDesc,
                 members: selectedVolunteers
             })).unwrap();
-            setSnackbar({ open: true, message: 'New volunteer unit established', severity: 'success' });
+            setSnackbar({ open: true, message: 'Volunteer group created', severity: 'success' });
             setOpenGroupDialog(false);
             setNewGroupName('');
             setNewGroupDesc('');
@@ -261,7 +261,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     members: selectedVolunteers
                 }
             })).unwrap();
-            setSnackbar({ open: true, message: 'Volunteer unit reconfiguration successful', severity: 'success' });
+            setSnackbar({ open: true, message: 'Volunteer group updated successfully', severity: 'success' });
             setOpenGroupDialog(false);
             setEditingGroupId(null);
             setNewGroupName('');
@@ -405,9 +405,9 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             <Grid container spacing={3} sx={{ mb: 6 }}>
                 {[
                     { title: 'Registered Accounts', value: userList.length, color: theme.palette.primary.main, icon: <People /> },
-                    { title: 'System Uptime', value: '99.9%', color: '#519755', sub: 'HEALTHY', icon: <Security /> },
-                    { title: 'Inactivity Risk', value: userList.filter(u => !u.is_active).length, color: '#FF708B', icon: <ErrorOutline /> },
-                    { title: 'Volunteer Units', value: groups.length, color: '#5D5FEF', icon: <GroupWork /> }
+                    { title: 'System Status', value: 'Online', color: '#519755', sub: 'HEALTHY', icon: <Security /> },
+                    { title: 'Inactive Users', value: userList.filter(u => !u.is_active).length, color: '#FF708B', icon: <ErrorOutline /> },
+                    { title: 'Volunteer Groups', value: groups.length, color: '#5D5FEF', icon: <GroupWork /> }
                 ].map((stat, index) => (
                     <Grid item xs={12} sm={6} md={3} key={index}>
                         <Paper
@@ -462,14 +462,14 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
             </Grid>
 
             <Typography variant="h5" sx={{ mb: 4, fontWeight: 900, display: 'flex', alignItems: 'center', gap: 2, letterSpacing: -0.5 }}>
-                <FamilyRestroom sx={{ color: 'primary.main' }} /> Central Registry
+                <FamilyRestroom sx={{ color: 'primary.main' }} /> System Registry
             </Typography>
             <Grid container spacing={4}>
                 <Grid item xs={12} lg={6}>
                     <RegistryCard title="Families Managed" count={families.length} items={families.slice(0, 5)} type="family" onDelete={handleDeleteFamily} />
                 </Grid>
                 <Grid item xs={12} lg={6}>
-                    <RegistryCard title="Operations Audit" count={cases.length} items={cases.slice(0, 5)} type="case" onDelete={() => { }} />
+                    <RegistryCard title="Case Management" count={cases.length} items={cases.slice(0, 5)} type="case" onDelete={() => { }} />
                 </Grid>
             </Grid>
         </>
@@ -479,13 +479,13 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         <Box>
             <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3 }}>
                 <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Identity Management</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Administrative access and clearance control</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>User Accounts</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Administrative access and role management</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                     <TextField
                         size="small"
-                        placeholder="Search identities..."
+                        placeholder="Search users..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         InputProps={{
@@ -513,7 +513,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             '&:hover': { transform: 'translateY(-2px)' }
                         }}
                     >
-                        Directory Sync
+                        Sync Users
                     </Button>
                 </Box>
             </Box>
@@ -632,7 +632,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                     fullWidth
                                     size="small"
                                     variant="text"
-                                    onClick={() => { setSnackbar({ open: true, message: 'Checking security protocols...', severity: 'info' }) }}
+                                    onClick={() => { setSnackbar({ open: true, message: 'Opening permissions...', severity: 'info' }) }}
                                     sx={{
                                         borderRadius: 2,
                                         color: 'text.secondary',
@@ -643,7 +643,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                         '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), color: 'primary.main' }
                                     }}
                                 >
-                                    Security Vault
+                                    Permissions
                                 </Button>
                             </Box>
                         </Paper>
@@ -657,8 +657,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         <Box>
             <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Verification Queue</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Shelter Partner authorization requests</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Pending Approvals</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Shelter Partner approval requests</Typography>
                 </Box>
                 <Button
                     variant="outlined"
@@ -680,7 +680,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     bgcolor: alpha(theme.palette.background.paper, 0.3)
                 }}>
                     <VerifiedUser sx={{ fontSize: 64, color: 'success.main', mb: 2, opacity: 0.2 }} />
-                    <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Queue Clear</Typography>
+                    <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>No Pending Approvals</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', opacity: 0.6 }}>No pending account authorizations.</Typography>
                 </Paper>
             ) : (
@@ -766,8 +766,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         <Paper elevation={0} sx={{ borderRadius: 4, overflow: 'hidden', border: '1px solid', borderColor: alpha(theme.palette.divider, 0.08), bgcolor: alpha(theme.palette.background.paper, 0.6), backdropFilter: 'blur(20px)' }}>
             <Box sx={{ p: 4, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05), display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                 <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Volunteer Infrastructure</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Operational units and field groups</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Group Management</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Volunteer groups and teams</Typography>
                 </Box>
                 <Button
                     variant="contained"
@@ -775,7 +775,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                     onClick={() => setOpenGroupDialog(true)}
                     sx={{ borderRadius: 3, fontWeight: 900, px: 3, py: 1.2, textTransform: 'none' }}
                 >
-                    Deploy Unit
+                    Create Group
                 </Button>
             </Box>
 
@@ -861,8 +861,8 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
         <Box>
             <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3 }}>
                 <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>System Audit Protocol</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Immutable ledger of administrative and security events</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>System Audit Log</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mt: 0.5 }}>Comprehensive record of administrative and security events</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <TextField
@@ -892,10 +892,10 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                         <TableHead>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>TIMESTAMP</TableCell>
-                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>PROTOCOL</TableCell>
-                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>REASONING</TableCell>
-                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>AUTHORITY</TableCell>
-                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>IP ORIGIN</TableCell>
+                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>EVENT TYPE</TableCell>
+                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>DESCRIPTION</TableCell>
+                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>USER</TableCell>
+                                <TableCell sx={{ fontWeight: 900, bgcolor: 'background.paper', fontSize: '0.75rem', color: 'text.disabled', py: 2 }}>IP ADDRESS</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -1073,7 +1073,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                             <MenuItem value="ADMIN">System Administrator</MenuItem>
                             <MenuItem value="MANAGEMENT">Management Team</MenuItem>
                             <MenuItem value="CASE_WORKER">Case Worker</MenuItem>
-                            <MenuItem value="VOLUNTEER">Field Operative</MenuItem>
+                            <MenuItem value="VOLUNTEER">Field Volunteer</MenuItem>
                             <MenuItem value="DONOR">Public Donor</MenuItem>
                         </TextField>
 

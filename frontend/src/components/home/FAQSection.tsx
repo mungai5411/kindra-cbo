@@ -8,7 +8,6 @@ import React, { useState } from 'react';
 import { Box, Container, Typography, Accordion, AccordionSummary, AccordionDetails, alpha } from '@mui/material';
 import { ExpandMore, HelpOutline } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { colorPsychology } from '../../theme/colorPsychology';
 
 const MotionAccordion = motion(Accordion);
 
@@ -65,35 +64,35 @@ const FAQItemComponent: React.FC<FAQItemComponentProps> = ({ faq, index, expande
       elevation={0}
       sx={{
         background: expanded === panelId
-          ? `linear-gradient(135deg, ${alpha(colorPsychology.programs.cases.primary, 0.08)}, ${alpha(colorPsychology.programs.donations.primary, 0.05)})`
+          ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)}, ${alpha(theme.palette.secondary.main, 0.05)})`
           : 'transparent',
-        border: `1px solid ${alpha(colorPsychology.programs.cases.primary, expanded === panelId ? 0.3 : 0.15)}`,
+        border: `1px solid ${alpha(theme.palette.primary.main, expanded === panelId ? 0.3 : 0.15)}`,
         borderRadius: 2,
         transition: 'all 0.3s ease',
         '&:before': {
           display: 'none'
         },
         '&:hover': {
-          borderColor: alpha(colorPsychology.programs.cases.primary, 0.2)
+          borderColor: alpha(theme.palette.primary.main, 0.2)
         }
       }}
     >
       <AccordionSummary
-        expandIcon={<ExpandMore sx={{ color: colorPsychology.programs.cases.primary }} />}
+        expandIcon={<ExpandMore sx={{ color: 'primary.main' }} />}
         sx={{
           p: { xs: 2, md: 2.5 },
           '&:hover': {
-            bgcolor: alpha(colorPsychology.programs.cases.primary, 0.02)
+            bgcolor: alpha(theme.palette.primary.main, 0.02)
           }
         }}
       >
-        <HelpOutline sx={{ mr: 2, color: colorPsychology.programs.cases.primary, flexShrink: 0 }} />
+        <HelpOutline sx={{ mr: 2, color: 'primary.main', flexShrink: 0 }} />
         <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
           {faq.question}
         </Typography>
       </AccordionSummary>
 
-      <AccordionDetails sx={{ p: { xs: 2, md: 2.5 }, backgroundColor: alpha(colorPsychology.programs.cases.primary, 0.03) }}>
+      <AccordionDetails sx={{ p: { xs: 2, md: 2.5 }, backgroundColor: alpha(theme.palette.primary.main, 0.03) }}>
         <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.7 }}>
           {faq.answer}
         </Typography>
@@ -107,14 +106,14 @@ export const FAQSection: React.FC = () => {
 
   return (
     <Box sx={{ py: { xs: 6, md: 10 }, position: 'relative', overflow: 'hidden' }}>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         {/* Section Header */}
         <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
           <Typography
             variant="body2"
             sx={{
               fontWeight: 700,
-              color: colorPsychology.programs.cases.primary,
+              color: 'primary.main',
               textTransform: 'uppercase',
               letterSpacing: '1.5px',
               mb: 1
@@ -130,7 +129,7 @@ export const FAQSection: React.FC = () => {
               fontSize: { xs: '2rem', md: '2.8rem' }
             }}
           >
-            Frequently Asked <Box component="span" sx={{ color: colorPsychology.programs.cases.primary }}>Questions</Box>
+            Frequently Asked <Box component="span" sx={{ color: 'primary.main' }}>Questions</Box>
           </Typography>
           <Typography
             variant="h6"

@@ -27,7 +27,7 @@ import {
   Close,
   ExpandMore
 } from '@mui/icons-material';
-import { colorPsychology } from '../../theme/colorPsychology';
+// Removed colorPsychology import
 
 interface FilterOption {
   label: string;
@@ -146,7 +146,7 @@ export const CaseFilterBar: React.FC<CaseFilterBarProps> = ({
           onClick={(e) => setFilterAnchor(e.currentTarget)}
           sx={{
             background: activeFilterCount > 0 
-              ? `linear-gradient(135deg, ${colorPsychology.programs.cases.primary}, ${colorPsychology.programs.cases.light})`
+              ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
               : 'transparent'
           }}
         >
@@ -186,8 +186,8 @@ export const CaseFilterBar: React.FC<CaseFilterBarProps> = ({
             label={`${urgentCount} Urgent`}
             size="small"
             sx={{
-              backgroundColor: alpha(colorPsychology.status.critical.primary, 0.15),
-              color: colorPsychology.status.critical.primary,
+              backgroundColor: alpha(theme.palette.error.main, 0.15),
+              color: theme.palette.error.main,
               fontWeight: 700
             }}
           />
@@ -198,8 +198,8 @@ export const CaseFilterBar: React.FC<CaseFilterBarProps> = ({
             label={`${overdueCount} Overdue`}
             size="small"
             sx={{
-              backgroundColor: alpha(colorPsychology.priority.high.primary, 0.15),
-              color: colorPsychology.priority.high.primary,
+              backgroundColor: alpha(theme.palette.warning.main, 0.15),
+              color: theme.palette.warning.main,
               fontWeight: 700
             }}
           />

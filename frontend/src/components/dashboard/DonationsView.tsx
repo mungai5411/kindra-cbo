@@ -858,9 +858,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                             />
                         )}
 
-                        <Alert severity="info" sx={{ borderRadius: 2 }}>
                             For M-Pesa, this will trigger a real STK Push to the donor's phone. The donation will be marked pending until the webhook callback is received from Safaricom Daraja API.
-                        </Alert>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>
@@ -1544,7 +1542,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
     //     { id: 'donors', label: 'Partners', component: renderDonors(), icon: <Box sx={{ fontSize: 20 }}>🤝</Box>, hidden: !isManagement },
     //     { id: 'receipts', label: 'Receipts', component: renderReceipts(), icon: <Receipt /> },
     //     { id: 'community_events', label: 'Hub', component: renderCommunityEvents(), icon: <EventIcon /> },
-    //     { id: 'social_media', label: 'Social', component: <Box sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}><Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Nexus Protocol</Typography><Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Integrated social media tracking module pending initialization.</Typography></Box>, icon: <Box sx={{ fontSize: 20 }}>📱</Box>, hidden: !isManagement },
+    //     { id: 'social_media', label: 'Social', component: <Box sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}><Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Engagement Tracking</Typography><Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Integrated social media tracking module under development.</Typography></Box>, icon: <Box sx={{ fontSize: 20 }}>📱</Box>, hidden: !isManagement },
     // ];
 
     // const tabs = tabsSource.filter(tab => !tab.hidden);
@@ -1597,7 +1595,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
             {activeTab === 'community_events' && renderCommunityEvents()}
             {activeTab === 'social_media' && (
                 <Box sx={{ p: 8, textAlign: 'center', borderRadius: 4, border: '2px dashed', borderColor: alpha(theme.palette.divider, 0.1), bgcolor: alpha(theme.palette.background.paper, 0.3) }}>
-                    <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Nexus Protocol</Typography>
+                    <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 900 }}>Social Media Integration</Typography>
                     <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 600 }}>Integrated social media tracking module pending initialization.</Typography>
                 </Box>
             )}
@@ -1759,7 +1757,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                                     <MenuItem value="INDIVIDUAL">Individual</MenuItem>
                                     <MenuItem value="ORGANIZATION">Organization</MenuItem>
                                     <MenuItem value="CORPORATE">Corporate</MenuItem>
-                                    <MenuItem value="FOUNDATION">Foundation</MenuItem>
+                                    <MenuItem value="VOLUNTEER">Volunteer</MenuItem>
                                 </TextField>
                             </Grid>
                             <Grid item xs={12} sm={6}>

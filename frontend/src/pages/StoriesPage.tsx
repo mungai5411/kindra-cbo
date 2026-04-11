@@ -44,6 +44,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { TrafalgarHero } from '../components/common/TrafalgarHero';
 import DonationDialog from '../components/campaigns/DonationDialog';
 import VolunteerDialog from '../components/campaigns/VolunteerDialog';
 import MaterialDonationDialog from '../components/campaigns/MaterialDonationDialog';
@@ -120,37 +121,13 @@ export default function StoriesPage() {
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }} sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 12 }}>
             {/* Hero Section */}
-            <Box sx={{
-                py: 8,
-                mb: 4,
-                background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)}, ${alpha(theme.palette.secondary.main, 0.1)})`
-            }}>
-                <Container maxWidth="lg">
-                    <Typography
-                        component={motion.h2}
-                        initial={{ y: 15, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.1 }}
-                        variant="h3"
-                        fontWeight="800"
-                        gutterBottom
-                        color="text.primary"
-                    >
-                        Stories & Campaigns
-                    </Typography>
-                    <Typography
-                        component={motion.p}
-                        initial={{ y: 15, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        variant="body1"
-                        color="text.secondary"
-                        sx={{ maxWidth: 700 }}
-                    >
-                        Discover our impact stories and support active campaigns making a difference.
-                    </Typography>
-                </Container>
-            </Box>
+            <TrafalgarHero
+                title="Stories & Campaigns"
+                description="Discover our impact stories and support active campaigns making a difference."
+                imageSrc="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2070"
+                imageAlt="Community Stories"
+                reverse={false}
+            />
 
             <Container maxWidth="lg">
                 {/* Tabs Navigation */}
@@ -161,14 +138,15 @@ export default function StoriesPage() {
                     transition={{ delay: 0.3 }}
                     elevation={0}
                     sx={{
-                        borderRadius: 5,
-                        border: '1px solid',
-                        borderColor: alpha(theme.palette.divider, 0.1),
-                        boxShadow: theme.shadows[4],
+                        borderRadius: 6,
+                        border: 'none',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.05)',
                         mb: 4,
-                        background: alpha(theme.palette.background.paper, 0.7),
-                        backdropFilter: 'blur(10px)',
-                        overflow: 'hidden'
+                        mt: -5,
+                        bgcolor: 'background.paper',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        zIndex: 10
                     }}
                 >
                     <Tabs
@@ -272,16 +250,10 @@ export default function StoriesPage() {
                                                     height: '100%',
                                                     display: 'flex',
                                                     flexDirection: 'column',
-                                                    borderRadius: 5,
-                                                    border: '1px solid',
-                                                    borderColor: alpha(theme.palette.divider, 0.1),
-                                                    boxShadow: theme.shadows[1],
                                                     cursor: 'pointer',
-                                                    transition: 'transform 0.3s, box-shadow 0.3s',
+                                                    transition: 'transform 0.3s',
                                                     '&:hover': {
                                                         transform: 'translateY(-4px)',
-                                                        boxShadow: theme.shadows[4],
-                                                        borderColor: alpha(theme.palette.primary.main, 0.2)
                                                     }
                                                 }}
                                             >
@@ -398,15 +370,9 @@ export default function StoriesPage() {
                                                         height: '100%',
                                                         display: 'flex',
                                                         flexDirection: 'column',
-                                                        borderRadius: 5,
-                                                        border: '1px solid',
-                                                        borderColor: alpha(theme.palette.divider, 0.1),
-                                                        boxShadow: theme.shadows[1],
-                                                        transition: 'transform 0.3s, box-shadow 0.3s',
+                                                        transition: 'transform 0.3s',
                                                         '&:hover': {
-                                                            transform: 'translateY(-4px)',
-                                                            boxShadow: theme.shadows[4],
-                                                            borderColor: alpha(theme.palette.primary.main, 0.2)
+                                                            transform: 'translateY(-4px)'
                                                         }
                                                     }}
                                                 >

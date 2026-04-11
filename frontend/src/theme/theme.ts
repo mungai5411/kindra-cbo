@@ -1,38 +1,42 @@
 import { createTheme, responsiveFontSizes, Theme, alpha } from '@mui/material/styles';
 
-// Premium Color Palettes
+// Trafalgar Color Palettes
 const lightPalette = {
     mode: 'light' as const,
     primary: {
-        main: '#43A047',
-        light: '#76D275',
-        dark: '#00701A',
+        main: '#458FF6',
+        light: '#7AAFFF',
+        dark: '#2A6FD6',
         contrastText: '#ffffff',
     },
     secondary: {
-        main: '#FFB300',
-        light: '#FFE54C',
-        dark: '#C68400',
-        contrastText: '#1a2e1c',
+        main: '#1F1534',
+        light: '#3C2E5D',
+        dark: '#0D0819',
+        contrastText: '#ffffff',
     },
     background: {
-        default: '#F9FAFB',
-        paper: '#ffffff',
+        default: '#FFFFFF',
+        paper: '#FFFFFF',
     },
     text: {
-        primary: '#1A2327',
-        secondary: '#455A64',
-        disabled: '#90A4AE',
+        primary: '#000000',
+        secondary: '#7D7987',
+        disabled: '#C4C4C4',
     },
+    divider: 'rgba(0, 0, 0, 0.05)',
 };
 
 const darkPalette = {
     mode: 'dark' as const,
     primary: lightPalette.primary,
-    secondary: lightPalette.secondary,
+    secondary: {
+        main: '#FFFFFF',
+        contrastText: '#000000',
+    },
     background: {
-        default: '#050505',
-        paper: '#0A0A0A',
+        default: '#121212',
+        paper: '#1E1E1E',
     },
     text: {
         primary: '#ffffff',
@@ -48,18 +52,18 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
     const theme = createTheme({
         palette,
         typography: {
-            fontFamily: '"Outfit", "Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-            h1: { fontWeight: 800, fontSize: '2.25rem', letterSpacing: '-0.04em' },
-            h2: { fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.03em' },
-            h3: { fontWeight: 700, fontSize: '1.5rem', letterSpacing: '-0.02em' },
-            h4: { fontWeight: 700, fontSize: '1.15rem', letterSpacing: '-0.01em' },
-            h5: { fontWeight: 600, fontSize: '0.95rem' },
-            h6: { fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em' },
-            button: { fontWeight: 700, textTransform: 'none', fontSize: '0.8125rem' },
-            body1: { fontSize: '0.875rem', lineHeight: 1.6 },
-            body2: { fontSize: '0.75rem', lineHeight: 1.6 },
+            fontFamily: '"Mulish", "Inter", "Roboto", sans-serif',
+            h1: { fontWeight: 800, fontSize: '3rem', letterSpacing: '-0.02em', color: palette.text.primary },
+            h2: { fontWeight: 700, fontSize: '2.5rem', letterSpacing: '-0.01em', color: palette.text.primary },
+            h3: { fontWeight: 700, fontSize: '1.8rem', letterSpacing: '-0.01em', color: palette.text.primary },
+            h4: { fontWeight: 600, fontSize: '1.25rem', color: palette.text.primary },
+            h5: { fontWeight: 600, fontSize: '1rem', color: palette.text.primary },
+            h6: { fontWeight: 700, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' },
+            button: { fontWeight: 700, textTransform: 'none', fontSize: '0.9rem' },
+            body1: { fontSize: '1rem', lineHeight: 1.7, color: palette.text.secondary },
+            body2: { fontSize: '0.875rem', lineHeight: 1.6, color: palette.text.secondary },
         },
-        shape: { borderRadius: 12 },
+        shape: { borderRadius: 24 },
         components: {
             MuiCssBaseline: {
                 styleOverrides: {
@@ -71,27 +75,40 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
             MuiButton: {
                 styleOverrides: {
                     root: {
-                        borderRadius: 10,
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        borderRadius: 50,
+                        padding: '10px 28px',
+                        transition: 'all 0.3s ease',
                         textTransform: 'none',
-                        '&:hover': { transform: 'translateY(-1.5px)' },
-                    },
-                    containedPrimary: {
-                        background: `linear-gradient(135deg, ${palette.primary.main} 0%, ${palette.primary.dark} 100%)`,
-                        '&:hover': {
-                            background: `linear-gradient(135deg, ${palette.primary.light} 0%, ${palette.primary.main} 100%)`,
+                        boxShadow: 'none',
+                        '&:hover': { 
+                            transform: 'translateY(-2px)',
+                            boxShadow: mode === 'light' ? '0 10px 20px rgba(69, 143, 246, 0.2)' : 'none'
                         },
                     },
+                    containedPrimary: {
+                        background: palette.primary.main,
+                        '&:hover': {
+                            background: palette.primary.light,
+                            boxShadow: '0 10px 20px rgba(69, 143, 246, 0.3)',
+                        },
+                    },
+                    outlinedPrimary: {
+                        borderWidth: 2,
+                        '&:hover': {
+                            borderWidth: 2,
+                            background: alpha(palette.primary.main, 0.04),
+                        }
+                    }
                 },
             },
             MuiCard: {
                 styleOverrides: {
                     root: {
-                        borderRadius: 16,
-                        border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(0, 0, 0, 0.06)',
-                        backgroundColor: mode === 'dark' ? alpha('#111', 0.6) : '#fff',
-                        backdropFilter: mode === 'dark' ? 'blur(10px)' : 'none',
-                        backgroundImage: 'none',
+                        borderRadius: 24,
+                        border: 'none',
+                        backgroundColor: mode === 'dark' ? '#1E1E1E' : '#ffffff',
+                        boxShadow: mode === 'dark' ? '0 10px 30px rgba(0,0,0,0.5)' : '0 10px 40px rgba(0,0,0,0.05)',
+                        transition: 'box-shadow 0.3s ease, transform 0.3s ease',
                     },
                 },
             },
@@ -100,7 +117,8 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
                     root: {
                         backgroundImage: 'none',
                         backgroundColor: palette.background.paper,
-                        borderRadius: 16,
+                        borderRadius: 24,
+                        boxShadow: mode === 'dark' ? '0 10px 30px rgba(0,0,0,0.5)' : '0 10px 40px rgba(0,0,0,0.05)',
                     },
                 },
             },
@@ -108,7 +126,7 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
                 styleOverrides: {
                     root: {
                         '& .MuiOutlinedInput-root': {
-                            borderRadius: 10,
+                            borderRadius: 16,
                             backgroundColor: mode === 'dark' ? alpha('#fff', 0.03) : '#fff',
                             '& fieldset': { borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' },
                             '&:hover fieldset': { borderColor: palette.primary.main },
@@ -119,26 +137,11 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
             MuiAppBar: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: mode === 'dark' ? alpha('#050505', 0.8) : 'rgba(255, 255, 255, 0.8)',
+                        backgroundColor: mode === 'dark' ? '#000000' : 'rgba(255, 255, 255, 0.95)',
                         backdropFilter: 'blur(12px)',
                         color: palette.text.primary,
                         boxShadow: 'none',
                         borderBottom: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`,
-                    },
-                },
-            },
-            MuiDrawer: {
-                styleOverrides: {
-                    paper: {
-                        backgroundColor: palette.background.paper,
-                        borderRight: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`,
-                    },
-                },
-            },
-            MuiTableCell: {
-                styleOverrides: {
-                    head: {
-                        backgroundColor: mode === 'dark' ? alpha('#fff', 0.02) : '#f9fafb',
                     },
                 },
             },
@@ -148,5 +151,4 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
     return responsiveFontSizes(theme);
 };
 
-// Keep the static export for locations still using it, but they should transition to the context
 export const theme = getTheme('light');

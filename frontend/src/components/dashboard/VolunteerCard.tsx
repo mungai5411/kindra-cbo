@@ -31,7 +31,15 @@ import {
   Verified
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { colorPsychology, getColorByPriority } from '../../theme/colorPsychology';
+// Removed colorPsychology import
+const getColorByPriority = (priority: string, theme: any) => {
+  switch (priority?.toUpperCase()) {
+    case 'CRITICAL': return theme.palette.error.main;
+    case 'HIGH': return theme.palette.warning.main;
+    case 'MEDIUM': return theme.palette.info.main;
+    default: return theme.palette.success.main;
+  }
+};
 
 interface VolunteerCardProps {
   volunteer: {
@@ -64,7 +72,11 @@ export const VolunteerCard: React.FC<VolunteerCardProps> = ({
   onMenuClick
 }) => {
   const theme = useTheme();
-  const programColor = colorPsychology.programs.volunteers;
+  const programColor = {
+    primary: theme.palette.primary.main,
+    light: theme.palette.primary.light,
+    dark: theme.palette.primary.dark
+  };
   const isActive = volunteer.status === 'ACTIVE';
   const tasksCompletionRate = volunteer.tasks_assigned 
     ? Math.round(((volunteer.tasks_completed || 0) / volunteer.tasks_assigned) * 100)
@@ -72,10 +84,10 @@ export const VolunteerCard: React.FC<VolunteerCardProps> = ({
 
   // Determine status color
   const statusColorMap: Record<string, string> = {
-    ACTIVE: colorPsychology.status.success.primary,
-    INACTIVE: colorPsychology.neutral.medium,
-    PENDING: colorPsychology.status.pending.primary,
-    SUSPENDED: colorPsychology.status.critical.primary
+    ACTIVE: theme.palette.success.main,
+    INACTIVE: theme.palette.text.disabled,
+    PENDING: theme.palette.warning.main,
+    SUSPENDED: theme.palette.error.main
   };
 
   return (
@@ -137,7 +149,7 @@ export const VolunteerCard: React.FC<VolunteerCardProps> = ({
                   bottom: 0,
                   right: 0,
                   fontSize: '1.25rem',
-                  color: colorPsychology.status.success.primary,
+                  color: theme.palette.success.main,
                   backgroundColor: theme.palette.background.paper,
                   borderRadius: '50%'
                 }}

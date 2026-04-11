@@ -44,6 +44,96 @@ interface SettingsDrawerProps {
     user: any;
 }
 
+const BugReportSection = ({ 
+    setSaveSuccess, 
+    setActiveTab 
+}: { 
+    setSaveSuccess: (success: boolean) => void;
+    setActiveTab: (tab: number | string) => void;
+}) => {
+    const [bugType, setBugType] = useState('UI');
+    const [description, setDescription] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSubmitBug = async () => {
+        if (!description.trim()) {
+            setError('Please provide a description');
+            return;
+        }
+
+        setIsSubmitting(true);
+        setError(null);
+        try {
+            await apiClient.post(endpoints.auth.bugReports, {
+                bug_type: bugType,
+                description: description
+            });
+            setSaveSuccess(true);
+            // Optionally clear form
+            setDescription('');
+            setTimeout(() => setActiveTab(0), 1000);
+        } catch (err: any) {
+            console.error('Failed to submit bug:', err);
+            setError(err.response?.data?.message || 'Failed to submit report. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <Box>
+            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1, color: 'text.secondary' }}>
+                Describe the issue
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 3, display: 'block' }}>
+                Help us improve Kindra by reporting any bugs or glitches you find.
+            </Typography>
+
+            {error && (
+                <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>
+            )}
+
+            <Stack spacing={3}>
+                <Box>
+                    <Typography variant="caption" fontWeight="bold" sx={{ mb: 1, display: 'block' }}>ISSUE TYPE</Typography>
+                    <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                        {['UI', 'Functional', 'Security', 'Other'].map(type => (
+                            <Button
+                                key={type}
+                                size="small"
+                                variant={bugType === type ? "contained" : "outlined"}
+                                onClick={() => setBugType(type)}
+                                sx={{ borderRadius: 2, textTransform: 'none', px: 2, mb: 1 }}
+                            >
+                                {type}
+                            </Button>
+                        ))}
+                    </Stack>
+                </Box>
+                <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="What happened? Tell us the steps to reproduce..."
+                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                />
+                <Button
+                    variant="contained"
+                    fullWidth
+                    disabled={isSubmitting || !description.trim()}
+                    onClick={handleSubmitBug}
+                    sx={{ borderRadius: 3, py: 1.5, fontWeight: 'bold' }}
+                >
+                    {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Report'}
+                </Button>
+            </Stack>
+        </Box>
+    );
+};
+
 export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
@@ -483,7 +573,7 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
                 content: `By accessing Kindra's system, you agree to these operational terms:
 
                 1. Confidentiality: You must not share sensitive case details, child identities, or family locations outside the authorized Kindra context.
-                2. Volunteer Conduct: Field operatives agree to abide by the Kindra Code of Conduct, including mandatory reporting of any identified child abuse or safety incidents.
+                2. Volunteer Conduct: Field volunteers agree to abide by the Kindra Code of Conduct, including mandatory reporting of any identified child abuse or safety incidents.
                 3. Partner Integrity: Shelter partners must maintain valid fire safety certifications and government compliance to remain active in the placement system.
                 4. Misuse: Any attempt to scrape child data or misuse donor information will result in immediate termination of access and legal action.`
             },
@@ -540,89 +630,8 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
         );
     };
 
-    const renderBugReportSection = () => {
-        const [bugType, setBugType] = useState('UI');
-        const [description, setDescription] = useState('');
-        const [isSubmitting, setIsSubmitting] = useState(false);
-        const [error, setError] = useState<string | null>(null);
+    // BugReportSection extracted outside to fix react-hooks/rules-of-hooks
 
-        const handleSubmitBug = async () => {
-            if (!description.trim()) {
-                setError('Please provide a description');
-                return;
-            }
-
-            setIsSubmitting(true);
-            setError(null);
-            try {
-                await apiClient.post(endpoints.auth.bugReports, {
-                    bug_type: bugType,
-                    description: description
-                });
-                setSaveSuccess(true);
-                // Optionally clear form
-                setDescription('');
-                setTimeout(() => setActiveTab(0), 1000);
-            } catch (err: any) {
-                console.error('Failed to submit bug:', err);
-                setError(err.response?.data?.message || 'Failed to submit report. Please try again.');
-            } finally {
-                setIsSubmitting(false);
-            }
-        };
-
-        return (
-            <Box>
-                <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1, color: 'text.secondary' }}>
-                    Describe the issue
-                </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ mb: 3, display: 'block' }}>
-                    Help us improve Kindra by reporting any bugs or glitches you find.
-                </Typography>
-
-                {error && (
-                    <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>
-                )}
-
-                <Stack spacing={3}>
-                    <Box>
-                        <Typography variant="caption" fontWeight="bold" sx={{ mb: 1, display: 'block' }}>ISSUE TYPE</Typography>
-                        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-                            {['UI', 'Functional', 'Security', 'Other'].map(type => (
-                                <Button
-                                    key={type}
-                                    size="small"
-                                    variant={bugType === type ? "contained" : "outlined"}
-                                    onClick={() => setBugType(type)}
-                                    sx={{ borderRadius: 2, textTransform: 'none', px: 2, mb: 1 }}
-                                >
-                                    {type}
-                                </Button>
-                            ))}
-                        </Stack>
-                    </Box>
-                    <TextField
-                        fullWidth
-                        multiline
-                        rows={4}
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="What happened? Tell us the steps to reproduce..."
-                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
-                    />
-                    <Button
-                        variant="contained"
-                        fullWidth
-                        disabled={isSubmitting || !description.trim()}
-                        onClick={handleSubmitBug}
-                        sx={{ borderRadius: 3, py: 1.5, fontWeight: 'bold' }}
-                    >
-                        {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Report'}
-                    </Button>
-                </Stack>
-            </Box>
-        );
-    };
 
     const renderNotificationsSection = () => (
         <Box>
@@ -697,7 +706,7 @@ export const SettingsDrawer = ({ open, onClose, user }: SettingsDrawerProps) => 
                     {activeTab === 'help' && renderHelpSection()}
                     {activeTab === 'legal' && renderLegalSection()}
                     {String(activeTab).startsWith('legal-') && renderLegalSection()}
-                    {activeTab === 'bug' && renderBugReportSection()}
+                    {activeTab === 'bug' && <BugReportSection setSaveSuccess={setSaveSuccess} setActiveTab={setActiveTab} />}
                 </Box>
             </Box>
         );

@@ -8,8 +8,7 @@ import React from 'react';
 import { Box, Container, Grid, Card, CardContent, Typography, Button, alpha } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowForward } from '@mui/icons-material';
-import { colorPsychology } from '../../theme/colorPsychology';
+import { ArrowForward, VolunteerActivism, Groups, Savings, HomeWork } from '@mui/icons-material';
 
 const MotionCard = motion(Card);
 
@@ -17,7 +16,7 @@ interface ProgramProps {
   title: string;
   description: string;
   color: string;
-  icon: string;
+  icon: React.ReactNode;
   stats: string;
   cta: string;
   link: string;
@@ -77,9 +76,11 @@ const ProgramCard: React.FC<ProgramProps> = ({ title, description, color, icon, 
         {/* Icon */}
         <Box
           sx={{
-            fontSize: '3rem',
+            color,
+            fontSize: '2.5rem',
             mb: 2,
-            height: 'auto'
+            display: 'flex',
+            alignItems: 'center'
           }}
         >
           {icon}
@@ -172,8 +173,8 @@ export const ProgramsShowcase: React.FC = () => {
     {
       title: 'Case Management',
       description: 'We provide targeted support to vulnerable children and families through comprehensive case management, ensuring personalized care and sustainable solutions.',
-      color: colorPsychology.programs.cases.primary,
-      icon: '❤️',
+      color: theme.palette.primary.main,
+      icon: <VolunteerActivism fontSize="inherit" />,
       stats: '2,500+ Active Cases',
       cta: 'Explore',
       link: '/dashboard/cases',
@@ -182,8 +183,8 @@ export const ProgramsShowcase: React.FC = () => {
     {
       title: 'Volunteering',
       description: 'Join our active volunteer community dedicated to creating real change. Share your skills, time, and passion to empower vulnerable populations.',
-      color: colorPsychology.programs.volunteers.primary,
-      icon: '💪',
+      color: theme.palette.secondary.main,
+      icon: <Groups fontSize="inherit" />,
       stats: '450+ Volunteers',
       cta: 'Get Involved',
       link: '/volunteer',
@@ -192,8 +193,8 @@ export const ProgramsShowcase: React.FC = () => {
     {
       title: 'Donations',
       description: 'Your generosity directly impacts lives. Contribute financially or through material donations to support our programs and reach more families in need.',
-      color: colorPsychology.programs.donations.primary,
-      icon: '💚',
+      color: theme.palette.primary.light,
+      icon: <Savings fontSize="inherit" />,
       stats: 'KES 50M+ Raised',
       cta: 'Donate Now',
       link: '/donate',
@@ -202,8 +203,8 @@ export const ProgramsShowcase: React.FC = () => {
     {
       title: 'Shelter Support',
       description: 'We partner with care facilities to ensure every child has a safe, nurturing environment with quality care, education, and holistic development.',
-      color: colorPsychology.programs.shelter.primary,
-      icon: '🏠',
+      color: theme.palette.secondary.light,
+      icon: <HomeWork fontSize="inherit" />,
       stats: '25+ Partner Shelters',
       cta: 'Learn More',
       link: '/dashboard/shelters',
@@ -213,14 +214,14 @@ export const ProgramsShowcase: React.FC = () => {
 
   return (
     <Box sx={{ py: { xs: 6, md: 10 }, position: 'relative', overflow: 'hidden' }}>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         {/* Section Header */}
         <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
           <Typography
             variant="body2"
             sx={{
               fontWeight: 700,
-              color: colorPsychology.programs.cases.primary,
+              color: 'primary.main',
               textTransform: 'uppercase',
               letterSpacing: '1.5px',
               mb: 1
@@ -271,7 +272,7 @@ export const ProgramsShowcase: React.FC = () => {
           width: '500px',
           height: '500px',
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(colorPsychology.programs.donations.primary, 0.03)}, transparent)`,
+          background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.03)}, transparent)`,
           pointerEvents: 'none',
           zIndex: 0
         }}

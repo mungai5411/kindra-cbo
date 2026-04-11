@@ -27,7 +27,7 @@ import {
   Close,
   ExpandMore
 } from '@mui/icons-material';
-import { colorPsychology } from '../../theme/colorPsychology';
+// Removed colorPsychology import
 
 interface FilterOption {
   label: string;
@@ -121,9 +121,9 @@ export const VolunteerFilterBar: React.FC<VolunteerFilterBarProps> = ({
             width: { xs: '100%', sm: 300 },
             '& .MuiOutlinedInput-root': {
               borderRadius: 2,
-              backgroundColor: alpha(colorPsychology.programs.volunteers.primary, 0.04),
-              '& fieldset': { borderColor: alpha(colorPsychology.programs.volunteers.primary, 0.2) },
-              '&:hover fieldset': { borderColor: colorPsychology.programs.volunteers.primary }
+              backgroundColor: alpha(theme.palette.primary.main, 0.04),
+              '& fieldset': { borderColor: alpha(theme.palette.primary.main, 0.2) },
+              '&:hover fieldset': { borderColor: theme.palette.primary.main }
             }
           }}
           InputProps={{
@@ -143,7 +143,7 @@ export const VolunteerFilterBar: React.FC<VolunteerFilterBarProps> = ({
           onClick={(e) => setFilterAnchor(e.currentTarget)}
           sx={{
             background: activeFilterCount > 0 
-              ? `linear-gradient(135deg, ${colorPsychology.programs.volunteers.primary}, ${colorPsychology.programs.volunteers.light})`
+              ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
               : 'transparent'
           }}
         >
@@ -170,9 +170,9 @@ export const VolunteerFilterBar: React.FC<VolunteerFilterBarProps> = ({
         alignItems: 'center',
         flexWrap: 'wrap',
         p: 1.5,
-        backgroundColor: alpha(colorPsychology.programs.volunteers.primary, 0.04),
+        backgroundColor: alpha(theme.palette.primary.main, 0.04),
         borderRadius: 2,
-        border: `1px solid ${alpha(colorPsychology.programs.volunteers.primary, 0.1)}`
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`
       }}>
         <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
           Showing <strong>{filteredResults}</strong> of <strong>{totalResults}</strong> volunteers
@@ -183,8 +183,8 @@ export const VolunteerFilterBar: React.FC<VolunteerFilterBarProps> = ({
             label={`${activeCount} Active`}
             size="small"
             sx={{
-              backgroundColor: alpha(colorPsychology.status.success.primary, 0.15),
-              color: colorPsychology.status.success.primary,
+              backgroundColor: alpha(theme.palette.success.main, 0.15),
+              color: theme.palette.success.main,
               fontWeight: 700
             }}
           />

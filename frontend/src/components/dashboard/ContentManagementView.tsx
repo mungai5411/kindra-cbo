@@ -46,7 +46,7 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { ImageUploader } from '../common/ImageUploader';
-import { glassCard } from '../../theme/glassmorphism';
+// glassmorphism dependency removed
 
 // Status Label Mapping
 const SOURCE_LABELS: { [key: string]: string } = {
@@ -313,7 +313,10 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                     {media.map((asset) => (
                         <Grid item xs={12} sm={6} md={3} key={asset.id}>
                             <Card sx={{
-                                ...glassCard(theme),
+                                border: '1px solid',
+                                borderColor: alpha(theme.palette.divider, 0.1),
+                                borderRadius: 3,
+                                bgcolor: 'background.paper',
                                 height: '100%',
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -446,7 +449,10 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                 {team.map((member) => (
                     <Grid item xs={12} md={4} key={member.id}>
                         <Paper sx={{
-                            ...glassCard(theme),
+                            border: '1px solid',
+                            borderColor: alpha(theme.palette.divider, 0.1),
+                            borderRadius: 3,
+                            bgcolor: 'background.paper',
                             p: 3,
                             textAlign: 'center',
                             display: 'flex',
@@ -543,7 +549,10 @@ export function ContentManagementView({ initialTab = 'media' }: { initialTab?: s
                 {siteContent.map((content) => (
                     <Grid item xs={12} md={6} key={content.id}>
                         <Paper sx={{
-                            ...glassCard(theme),
+                            border: '1px solid',
+                            borderColor: alpha(theme.palette.divider, 0.1),
+                            borderRadius: 3,
+                            bgcolor: 'background.paper',
                             p: 3,
                             position: 'relative',
                             '&:hover .content-actions': { opacity: 1 }

@@ -412,8 +412,8 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
         }}>
             <Box sx={{ p: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.05) }}>
                 <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Human Capital Registry</Typography>
-                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>ACTIVE FIELD OPERATIVES</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Volunteer Directory</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>ACTIVE VOLUNTEERS</Typography>
                 </Box>
                 <Button
                     variant="contained"
@@ -428,18 +428,18 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         '&:hover': { boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.3)}` }
                     }}
                 >
-                    Provision Operative
+                    Add Volunteer
                 </Button>
             </Box>
             <TableContainer>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Operative</TableCell>
-                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Nexus Node</TableCell>
+                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Volunteer</TableCell>
+                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Location</TableCell>
                             <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Status</TableCell>
-                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Activation</TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Control</TableCell>
+                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Total Hours</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -472,7 +472,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>{v.total_hours} <Box component="span" sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>HRS</Box></TableCell>
                                 <TableCell align="right">
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                                        <Tooltip title="View System Profile">
+                                        <Tooltip title="View Profile">
                                             <IconButton
                                                 size="small"
                                                 onClick={() => handleViewProfile(v)}
@@ -498,7 +498,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                                 '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.1) }
                                             }}
                                         >
-                                            Log Delta
+                                            Log Hours
                                         </Button>
                                     </Box>
                                 </TableCell>
@@ -508,7 +508,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             <TableRow>
                                 <TableCell colSpan={5} align="center" sx={{ py: 10 }}>
                                     <People sx={{ fontSize: 48, color: 'text.disabled', mb: 2, opacity: 0.2 }} />
-                                    <Typography variant="body1" sx={{ color: 'text.disabled', fontWeight: 700 }}>No operative data synchronized.</Typography>
+                                    <Typography variant="body1" sx={{ color: 'text.disabled', fontWeight: 700 }}>No volunteer records found.</Typography>
                                 </TableCell>
                             </TableRow>
                         )}
@@ -847,7 +847,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         <TableRow>
                             <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pl: 4 }}>Engagement Protocol</TableCell>
                             <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Classification</TableCell>
-                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Nexus Point</TableCell>
+                            <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Location</TableCell>
                             <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Activation</TableCell>
                             <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Personnel</TableCell>
                             <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pr: 4 }} align="right">Control</TableCell>
@@ -1027,7 +1027,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                     <Table>
                         <TableHead>
                             <TableRow>
-                                {!isVolunteer && <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pl: 4 }}>Operative</TableCell>}
+                                {!isVolunteer && <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pl: 4 }}>Volunteer</TableCell>}
                                 <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase', pl: isVolunteer ? 4 : 2 }}>Timestamp</TableCell>
                                 <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Magnitude</TableCell>
                                 <TableCell sx={{ fontWeight: 900, fontSize: '0.75rem', color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' }}>Mission Log</TableCell>
@@ -1115,7 +1115,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
                 <Box>
                     <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>Training Academy</Typography>
-                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>OPERATIVE READINESS & CERTIFICATION</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 800, letterSpacing: 1 }}>VOLUNTEER READINESS & CERTIFICATION</Typography>
                 </Box>
                 {isManagement && (
                     <Button
@@ -1241,27 +1241,27 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
             <Grid container spacing={4} sx={{ mb: 6 }}>
                 <Grid item xs={12} md={4}>
                     <StatsCard
-                        title="Active Operatives"
+                        title="Active Volunteers"
                         value={volunteers.length}
-                        description="Synchronized Human Capital"
+                        description="Registered community members"
                         icon={<Person sx={{ fontSize: '1.8rem' }} />}
                         color={theme.palette.primary.main}
                     />
                 </Grid>
                 <Grid item xs={12} md={4}>
                     <StatsCard
-                        title="Pending Missions"
+                        title="Pending Tasks"
                         value={tasks.filter((t: any) => t.status === 'PENDING').length}
-                        description="Deployment Requests Active"
+                        description="Tasks awaiting completion"
                         icon={<Assignment sx={{ fontSize: '1.8rem' }} />}
                         color={theme.palette.secondary.main}
                     />
                 </Grid>
                 <Grid item xs={12} md={4}>
                     <StatsCard
-                        title="Strategic Events"
+                        title="Community Events"
                         value={events.length}
-                        description="Upcoming Community Ops"
+                        description="Upcoming community activities"
                         icon={<EventIcon sx={{ fontSize: '1.8rem' }} />}
                         color="#6366f1"
                     />
@@ -1297,21 +1297,21 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                     }
                 }}
             >
-                <DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: -0.5, textAlign: 'center', pt: 4 }}>Log Mission Hours</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: -0.5, textAlign: 'center', pt: 4 }}>Log Volunteer Hours</DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
                         <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 700, textAlign: 'center', letterSpacing: 0.5 }}>
                             {selectedVolunteer ? (
-                                <>SYNCING ACTIVITY FOR: <Box component="span" sx={{ color: 'primary.main' }}>{selectedVolunteer?.full_name.toUpperCase()}</Box></>
+                                <>LOGGING HOURS FOR: <Box component="span" sx={{ color: 'primary.main' }}>{selectedVolunteer?.full_name.toUpperCase()}</Box></>
                             ) : (
-                                "RECORD OPERATIVE SERVICE DATA"
+                                "RECORD VOLUNTEER SERVICE DATA"
                             )}
                         </Typography>
                         {!selectedVolunteer && (
                             <TextField
                                 fullWidth
                                 select
-                                label="Operative Identification"
+                                label="Select Volunteer"
                                 value={taskForm.assigned_to}
                                 onChange={(e) => setTaskForm({ ...taskForm, assigned_to: e.target.value })}
                                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -1324,7 +1324,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         <TextField
                             fullWidth
                             type="number"
-                            label="Service Magnitude (HRS)"
+                            label="Total Hours (HRS)"
                             value={timeHours}
                             onChange={(e) => setTimeHours(Number(e.target.value))}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -1333,8 +1333,8 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             fullWidth
                             multiline
                             rows={3}
-                            label="Mission Operational Brief"
-                            placeholder="Detail the tactical objectives achieved..."
+                            label="Description of Work"
+                            placeholder="Detail the activities performed..."
                             value={timeDesc}
                             onChange={(e) => setTimeDesc(e.target.value)}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -1342,7 +1342,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 4, pt: 0, justifyContent: 'center', gap: 2 }}>
-                    <Button onClick={() => setTimeLogOpen(false)} sx={{ fontWeight: 900, color: 'text.disabled', textTransform: 'none' }}>Abort</Button>
+                    <Button onClick={() => setTimeLogOpen(false)} sx={{ fontWeight: 900, color: 'text.disabled', textTransform: 'none' }}>Cancel</Button>
                     <Button
                         variant="contained"
                         onClick={handleLogTime}
@@ -1355,7 +1355,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.2)}`
                         }}
                     >
-                        Synchronize Log
+                        Save Hours
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -1376,12 +1376,12 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                     }
                 }}
             >
-                <DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: -0.5 }}>Task Deployment Protocol</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: -0.5 }}>Assign New Task</DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
                         <TextField
                             fullWidth
-                            label="Protocol Title"
+                            label="Task Title"
                             value={taskForm.title}
                             onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -1390,7 +1390,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             fullWidth
                             multiline
                             rows={3}
-                            label="Operational Parameters"
+                            label="Task Details"
                             value={taskForm.description}
                             onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -1410,7 +1410,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                         <MenuItem value="OTHER">Other</MenuItem>
                                         <MenuItem value="SHELTER">Shelter Support</MenuItem>
                                         <MenuItem value="COMMUNITY">Community Ops</MenuItem>
-                                        <MenuItem value="EVENT">Tactical Support</MenuItem>
+                                        <MenuItem value="EVENT">Event Support</MenuItem>
                                     </TextField>
                                 </Grid>
                             )}
@@ -1419,7 +1419,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                     <TextField
                                         fullWidth
                                         select
-                                        label="Nexus Point (Shelter)"
+                                        label="Location (Shelter)"
                                         value={taskForm.shelter}
                                         onChange={(e) => setTaskForm({ ...taskForm, shelter: e.target.value })}
                                         sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -1446,7 +1446,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 <TextField
                                     fullWidth
                                     select
-                                    label="Priority Magnitude"
+                                    label="Priority Level"
                                     value={taskForm.priority}
                                     onChange={(e) => setTaskForm({ ...taskForm, priority: e.target.value })}
                                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -1474,7 +1474,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             <TextField
                                 fullWidth
                                 select
-                                label="Operative Deployment"
+                                label="Assign Volunteers"
                                 SelectProps={{
                                     multiple: true,
                                     renderValue: (selected: any) => (selected as string[]).map(id => volunteers.find((v: any) => v.id === id)?.full_name).join(', ')
@@ -1502,7 +1502,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.2)}`
                         }}
                     >
-                        Deploy Mission
+                        Create Task
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -1523,12 +1523,12 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                     }
                 }}
             >
-                <DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: -0.5 }}>Strategic Event Hub</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: -0.5 }}>Event Management</DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
                         <TextField
                             fullWidth
-                            label="Event Designation"
+                            label="Event Name"
                             value={eventForm.title}
                             onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -1537,7 +1537,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             fullWidth
                             multiline
                             rows={3}
-                            label="Briefing Overview"
+                            label="Event Description"
                             value={eventForm.description}
                             onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -1555,14 +1555,14 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                     <MenuItem value="TRAINING">Training</MenuItem>
                                     <MenuItem value="FUNDRAISER">Fundraiser</MenuItem>
                                     <MenuItem value="COMMUNITY">Community Service</MenuItem>
-                                    <MenuItem value="MEETING">Tactical Meeting</MenuItem>
-                                    <MenuItem value="OTHER">Classified</MenuItem>
+                                    <MenuItem value="MEETING">Meeting</MenuItem>
+                                    <MenuItem value="OTHER">Other</MenuItem>
                                 </TextField>
                             </Grid>
                             <Grid item xs={6}>
                                 <TextField
                                     fullWidth
-                                    label="Nexus Point (Location)"
+                                    label="Location"
                                     value={eventForm.location}
                                     onChange={(e) => setEventForm({ ...eventForm, location: e.target.value })}
                                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -1574,7 +1574,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 <TextField
                                     fullWidth
                                     type="datetime-local"
-                                    label="Commencement"
+                                    label="Start Time"
                                     InputLabelProps={{ shrink: true }}
                                     value={eventForm.start_datetime}
                                     onChange={(e) => setEventForm({ ...eventForm, start_datetime: e.target.value })}
@@ -1585,7 +1585,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                 <TextField
                                     fullWidth
                                     type="datetime-local"
-                                    label="Conclusion"
+                                    label="End Time"
                                     InputLabelProps={{ shrink: true }}
                                     value={eventForm.end_datetime}
                                     onChange={(e) => setEventForm({ ...eventForm, end_datetime: e.target.value })}
@@ -1595,11 +1595,11 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         </Grid>
 
                         <Divider sx={{ my: 1, opacity: 0.1 }} />
-                        <Typography variant="overline" sx={{ fontWeight: 900, color: 'text.disabled', letterSpacing: 1 }}>Broadcast Range</Typography>
+                        <Typography variant="overline" sx={{ fontWeight: 900, color: 'text.disabled', letterSpacing: 1 }}>Announcements</Typography>
                         <FormGroup row sx={{ gap: 2 }}>
                             <FormControlLabel
                                 control={<Checkbox checked={eventForm.post_to_volunteers} onChange={(e) => setEventForm({ ...eventForm, post_to_volunteers: e.target.checked })} color="primary" />}
-                                label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Operatives</Typography>}
+                                label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Volunteers</Typography>}
                             />
                             <FormControlLabel
                                 control={<Checkbox checked={eventForm.post_to_donors} onChange={(e) => setEventForm({ ...eventForm, post_to_donors: e.target.checked })} color="primary" />}
@@ -1607,12 +1607,12 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             />
                             <FormControlLabel
                                 control={<Checkbox checked={eventForm.post_to_shelters} onChange={(e) => setEventForm({ ...eventForm, post_to_shelters: e.target.checked })} color="primary" />}
-                                label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Nexus Nodes</Typography>}
+                                label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Locations</Typography>}
                             />
                         </FormGroup>
 
                         <Box sx={{ mt: 1 }}>
-                            <Typography variant="overline" sx={{ fontWeight: 900, color: 'text.disabled', letterSpacing: 1, mb: 1, display: 'block' }}>Visual Intelligence (Photos)</Typography>
+                            <Typography variant="overline" sx={{ fontWeight: 900, color: 'text.disabled', letterSpacing: 1, mb: 1, display: 'block' }}>Event Gallery</Typography>
                             <ImageGallery
                                 images={eventPhotoPreviews}
                                 onAdd={handleEventGalleryAdd}
@@ -1627,7 +1627,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                         setEventDialogOpen(false);
                         setIsEditingEvent(false);
                         setEditingEventId(null);
-                    }} sx={{ fontWeight: 900, color: 'text.disabled' }}>Abort</Button>
+                    }} sx={{ fontWeight: 900, color: 'text.disabled' }}>Cancel</Button>
                     <Button
                         variant="contained"
                         onClick={handleAddEvent}
@@ -1638,7 +1638,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.2)}`
                         }}
                     >
-                        {isEditingEvent ? 'Update Engagement' : 'Launch Event'}
+                        {isEditingEvent ? 'Update Event' : 'Create Event'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -1696,7 +1696,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                             {participants.length === 0 && (
                                 <Box sx={{ py: 6, textAlign: 'center', opacity: 0.5 }}>
                                     <People sx={{ fontSize: 48, mb: 2 }} />
-                                    <Typography sx={{ fontWeight: 700 }}>No operative data synchronized.</Typography>
+                                    <Typography sx={{ fontWeight: 700 }}>No volunteer data found.</Typography>
                                 </Box>
                             )}
                         </List>
@@ -1762,7 +1762,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                                     <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>{viewingVolunteer.full_name}</Typography>
                                     <Stack direction="row" spacing={1.5} sx={{ mt: 1 }}>
                                         <Chip
-                                            label={viewingVolunteer.account_details?.role?.toUpperCase() || 'OPERATIVE'}
+                                            label={viewingVolunteer.account_details?.role?.toUpperCase() || 'VOLUNTEER'}
                                             size="small"
                                             sx={{
                                                 bgcolor: 'rgba(255,255,255,0.15)',

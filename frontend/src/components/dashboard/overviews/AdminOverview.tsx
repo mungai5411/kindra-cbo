@@ -42,8 +42,8 @@ export const AdminOverview = ({ stats, charts, activities }: AdminOverviewProps)
         >
             <Box sx={{
                 display: 'flex',
-                gap: 3,
-                mb: 6,
+                gap: 2,
+                mb: 4,
                 overflowX: { xs: 'auto', sm: 'unset' },
                 pb: { xs: 2, sm: 0 },
                 px: { xs: 0.5, sm: 0.5 },
@@ -51,7 +51,7 @@ export const AdminOverview = ({ stats, charts, activities }: AdminOverviewProps)
                 scrollbarWidth: 'none',
                 flexWrap: { xs: 'nowrap', sm: 'wrap' }
             }}>
-                <Box sx={{ minWidth: { xs: 260, sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' }, flexShrink: 0 }}>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(25% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Total Donations"
                         value={`KES ${stats.totalDonations.toLocaleString()}`}
@@ -61,7 +61,7 @@ export const AdminOverview = ({ stats, charts, activities }: AdminOverviewProps)
                         delay={0.1}
                     />
                 </Box>
-                <Box sx={{ minWidth: { xs: 260, sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' }, flexShrink: 0 }}>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(25% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Active Volunteers"
                         value={String(stats.activeVolunteers)}
@@ -71,7 +71,7 @@ export const AdminOverview = ({ stats, charts, activities }: AdminOverviewProps)
                         delay={0.2}
                     />
                 </Box>
-                <Box sx={{ minWidth: { xs: 260, sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' }, flexShrink: 0 }}>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(25% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Active Cases"
                         value={String(stats.activeCases)}
@@ -81,7 +81,7 @@ export const AdminOverview = ({ stats, charts, activities }: AdminOverviewProps)
                         delay={0.3}
                     />
                 </Box>
-                <Box sx={{ minWidth: { xs: 260, sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' }, flexShrink: 0 }}>
+                <Box sx={{ minWidth: { xs: 240, sm: 'calc(50% - 8px)', md: 'calc(25% - 12px)' }, flexShrink: 0 }}>
                     <StatsCard
                         title="Shelter Network"
                         value={String(stats.shelterCount)}
@@ -93,7 +93,7 @@ export const AdminOverview = ({ stats, charts, activities }: AdminOverviewProps)
                 </Box>
             </Box>
 
-            <Grid container spacing={4} sx={{ mb: 6 }}>
+            <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid item xs={12} lg={8}>
                     <DonationTrendsChart data={charts.donationTrends} />
                 </Grid>

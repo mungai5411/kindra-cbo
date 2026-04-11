@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Box, Container, Typography, Grid, Card, Avatar, useTheme, alpha, Stack, Paper, Divider, CircularProgress } from '@mui/material';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Navbar } from '../components/public/Navbar';
+import { TrafalgarHero } from '../components/common/TrafalgarHero';
 import { VolunteerActivism, Handshake, Lightbulb, Groups, AssignmentTurnedIn, Public, TrendingUp, Favorite } from '@mui/icons-material';
-import { glassCard, gradientText, glassColors } from '../theme/glassmorphism';
 import apiClient from '../api/client';
 
 const MotionBox = motion(Box);
@@ -70,90 +70,15 @@ export default function AboutPage() {
         <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', overflow: 'hidden' }}>
             <Navbar />
 
-            {/* Premium Hero Section - Squeezed */}
-            <Box sx={{
-                position: 'relative',
-                height: { xs: '45vh', md: '55vh' },
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                background: glassColors.primaryBgLight(alpha)
-            }}>
-                <MotionBox
-                    style={{ y: yHero, opacity: opacityHero }}
-                    sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        zIndex: 0,
-                        backgroundImage: 'url("https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop")',
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        '&::after': {
-                            content: '""',
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            background: `linear-gradient(to bottom, ${alpha(theme.palette.background.default, 0.4)}, ${theme.palette.background.default})`,
-                        }
-                    }}
-                />
+            <TrafalgarHero
+                title={getContent('about-hero-title', 'Driven by Compassion.')}
+                description={getContent('about-hero-desc', 'Kindra CBO is a grassroots movement dedicated to restoring dignity and building a sustainable future where every child in Kenya can thrive.')}
+                imageSrc="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop"
+                imageAlt="About Kindra"
+                reverse={true}
+            />
 
-                <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-                    <AnimatePresence>
-                        <MotionBox
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
-                        >
-                            <Typography
-                                variant="overline"
-                                sx={{
-                                    fontWeight: 900,
-                                    letterSpacing: 4,
-                                    color: 'primary.main',
-                                    display: 'block',
-                                    mb: 1,
-                                    textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                }}
-                            >
-                                {getContent('about-hero-overline', 'OUR JOURNEY OF HOPE')}
-                            </Typography>
-                            <MotionTypography
-                                variant="h1"
-                                sx={{
-                                    ...gradientText(glassColors.primaryGradient),
-                                    fontSize: { xs: '2.5rem', md: '4rem' },
-                                    mb: 2,
-                                    lineHeight: 1.1
-                                }}
-                            >
-                                {getContent('about-hero-title', 'Driven by Compassion.')}
-                            </MotionTypography>
-                            <Typography
-                                variant="h6"
-                                sx={{
-                                    maxWidth: 700,
-                                    mx: 'auto',
-                                    color: 'text.secondary',
-                                    fontWeight: 500,
-                                    lineHeight: 1.5,
-                                    px: 2
-                                }}
-                            >
-                                {getContent('about-hero-desc', 'Kindra CBO is a grassroots movement dedicated to restoring dignity and building a sustainable future where every child in Kenya can thrive.')}
-                            </Typography>
-                        </MotionBox>
-                    </AnimatePresence>
-                </Container>
-            </Box>
-
-            {/* Core Pillars Section - Squeezed */}
+            {/* Core Pillars Section */}
             <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 }, mt: { xs: -4, md: -6 }, position: 'relative', zIndex: 2 }}>
                 <Grid container spacing={3}>
                     {[
@@ -169,15 +94,15 @@ export default function AboutPage() {
                                 transition={{ delay: item.delay, duration: 0.5 }}
                             >
                                 <Paper sx={{
-                                    ...glassCard(theme, 'elevated'),
                                     height: '100%',
                                     p: { xs: 3, md: 4 },
-                                    borderRadius: 5,
                                     textAlign: 'center',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
-                                    borderColor: alpha(item.color, 0.2),
+                                    transition: 'transform 0.3s ease',
+                                    border: '1px solid',
+                                    borderColor: alpha(item.color, 0.1),
                                     '&:hover': {
                                         borderColor: item.color,
                                         transform: 'translateY(-8px)',
@@ -249,10 +174,10 @@ export default function AboutPage() {
                                     right: -10,
                                     bottom: -10,
                                     left: -10,
-                                    background: glassColors.secondaryGradient,
+                                    background: 'rgba(69, 143, 246, 0.05)',
                                     borderRadius: 5,
                                     filter: 'blur(40px)',
-                                    opacity: 0.1,
+                                    opacity: 1,
                                     zIndex: 0
                                 }} />
                                 <Card sx={{
@@ -273,7 +198,8 @@ export default function AboutPage() {
                                         left: 20,
                                         right: 20,
                                         p: 2,
-                                        ...glassCard(theme),
+                                        bgcolor: 'rgba(255, 255, 255, 0.9)',
+                                        backdropFilter: 'blur(10px)',
                                         borderRadius: 3,
                                         color: 'text.primary'
                                     }}>
@@ -300,7 +226,6 @@ export default function AboutPage() {
                             <Grid item xs={12} sm={6} md={3} key={i}>
                                 <Paper sx={{
                                     p: 3,
-                                    borderRadius: 5,
                                     height: '100%',
                                     bgcolor: 'background.paper',
                                     border: '1px solid',

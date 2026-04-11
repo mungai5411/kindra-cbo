@@ -219,10 +219,10 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
 
 
     return (
-        <Box sx={{ p: { xs: 2, sm: 3 } }}>
+        <Box sx={{ p: { xs: 1, sm: 1.5 } }}>
             {/* Header / Greeting Area */}
             <Box sx={(theme) => ({
-                mb: 6,
+                mb: 4,
                 display: 'flex',
                 flexDirection: 'column',
                 position: 'relative',

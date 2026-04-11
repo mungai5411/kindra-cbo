@@ -29,7 +29,24 @@ import {
   Schedule
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { colorPsychology, getColorByPriority, getColorByStatus } from '../../theme/colorPsychology';
+// Removed colorPsychology import
+const getColorByPriority = (priority: string, theme: any) => {
+  switch (priority?.toUpperCase()) {
+    case 'CRITICAL': return { primary: theme.palette.error.main };
+    case 'HIGH': return { primary: theme.palette.warning.main };
+    case 'MEDIUM': return { primary: theme.palette.info.main };
+    default: return { primary: theme.palette.success.main };
+  }
+};
+
+const getColorByStatus = (status: string, theme: any) => {
+  switch (status?.toUpperCase()) {
+    case 'RESOLVED': return { primary: theme.palette.success.main };
+    case 'CLOSED': return { primary: theme.palette.text.disabled };
+    case 'OPEN': return { primary: theme.palette.info.main };
+    default: return { primary: theme.palette.warning.main };
+  }
+};
 
 interface CaseCardProps {
   case: {
@@ -66,8 +83,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   isOverdue = false
 }) => {
   const theme = useTheme();
-  const priorityColor = getColorByPriority(caseData.priority);
-  const statusColor = getColorByStatus(caseData.status);
+  const priorityColor = getColorByPriority(caseData.priority, theme);
+  const statusColor = getColorByStatus(caseData.status, theme);
   const progressPercent = caseData.milestones_total 
     ? Math.round((caseData.milestones_completed || 0) / caseData.milestones_total * 100)
     : 0;
@@ -89,7 +106,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
         border: '1px solid',
         borderColor: alpha(priorityColor.primary, 0.2),
         background: needsAttention 
-          ? `linear-gradient(135deg, ${colorPsychology.status.critical.background} 0%, ${alpha(priorityColor.primary, 0.04)} 100%)`
+          ? `linear-gradient(135deg, ${alpha(theme.palette.error.main, 0.08)} 0%, ${alpha(priorityColor.primary, 0.04)} 100%)`
           : theme.palette.background.paper,
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         '&:hover': {
@@ -150,8 +167,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   size="small"
                   sx={{
                     height: 20,
-                    backgroundColor: alpha(colorPsychology.status.critical.primary, 0.15),
-                    color: colorPsychology.status.critical.primary,
+                    backgroundColor: alpha(theme.palette.error.main, 0.15),
+                    color: theme.palette.error.main,
                     fontWeight: 700,
                     fontSize: '0.65rem'
                   }}
@@ -397,11 +414,11 @@ export const CaseCard: React.FC<CaseCardProps> = ({
             size="small"
             onClick={() => onAllocateFunds?.(caseData.id)}
             sx={{
-              borderColor: alpha(colorPsychology.programs.donations.primary, 0.3),
-              color: colorPsychology.programs.donations.primary,
+              borderColor: alpha(theme.palette.success.main, 0.3),
+              color: theme.palette.success.main,
               '&:hover': {
-                borderColor: colorPsychology.programs.donations.primary,
-                backgroundColor: alpha(colorPsychology.programs.donations.primary, 0.05)
+                borderColor: theme.palette.success.main,
+                backgroundColor: alpha(theme.palette.success.main, 0.05)
               }
             }}
           >

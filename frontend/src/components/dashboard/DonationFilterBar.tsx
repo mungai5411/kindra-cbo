@@ -27,7 +27,7 @@ import {
   Close,
   ExpandMore
 } from '@mui/icons-material';
-import { colorPsychology } from '../../theme/colorPsychology';
+// Removed colorPsychology import
 
 interface FilterOption {
   label: string;
@@ -123,9 +123,9 @@ export const DonationFilterBar: React.FC<DonationFilterBarProps> = ({
             width: { xs: '100%', sm: 300 },
             '& .MuiOutlinedInput-root': {
               borderRadius: 2,
-              backgroundColor: alpha(colorPsychology.programs.donations.primary, 0.04),
-              '& fieldset': { borderColor: alpha(colorPsychology.programs.donations.primary, 0.2) },
-              '&:hover fieldset': { borderColor: colorPsychology.programs.donations.primary }
+              backgroundColor: alpha(theme.palette.primary.main, 0.04),
+              '& fieldset': { borderColor: alpha(theme.palette.primary.main, 0.2) },
+              '&:hover fieldset': { borderColor: theme.palette.primary.main }
             }
           }}
           InputProps={{
@@ -145,7 +145,7 @@ export const DonationFilterBar: React.FC<DonationFilterBarProps> = ({
           onClick={(e) => setFilterAnchor(e.currentTarget)}
           sx={{
             background: activeFilterCount > 0 
-              ? `linear-gradient(135deg, ${colorPsychology.programs.donations.primary}, ${colorPsychology.programs.donations.light})`
+              ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
               : 'transparent'
           }}
         >
@@ -172,9 +172,9 @@ export const DonationFilterBar: React.FC<DonationFilterBarProps> = ({
         alignItems: 'center',
         flexWrap: 'wrap',
         p: 1.5,
-        backgroundColor: alpha(colorPsychology.programs.donations.primary, 0.04),
+        backgroundColor: alpha(theme.palette.primary.main, 0.04),
         borderRadius: 2,
-        border: `1px solid ${alpha(colorPsychology.programs.donations.primary, 0.1)}`
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`
       }}>
         <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
           Showing <strong>{filteredResults}</strong> of <strong>{totalResults}</strong> donations
@@ -185,8 +185,8 @@ export const DonationFilterBar: React.FC<DonationFilterBarProps> = ({
             label={`${completedCount} Completed`}
             size="small"
             sx={{
-              backgroundColor: alpha(colorPsychology.status.success.primary, 0.15),
-              color: colorPsychology.status.success.primary,
+              backgroundColor: alpha(theme.palette.success.main, 0.15),
+              color: theme.palette.success.main,
               fontWeight: 700
             }}
           />
@@ -197,8 +197,8 @@ export const DonationFilterBar: React.FC<DonationFilterBarProps> = ({
             label={`${pendingCount} Pending`}
             size="small"
             sx={{
-              backgroundColor: alpha(colorPsychology.status.pending.primary, 0.15),
-              color: colorPsychology.status.pending.primary,
+              backgroundColor: alpha(theme.palette.warning.main, 0.15),
+              color: theme.palette.warning.main,
               fontWeight: 700
             }}
           />

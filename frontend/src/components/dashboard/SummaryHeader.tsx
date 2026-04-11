@@ -14,7 +14,7 @@ import {
   Tooltip
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { colorPsychology } from '../../theme/colorPsychology';
+import { useTheme } from '@mui/material';
 
 interface MetricProps {
   label: string;
@@ -45,9 +45,10 @@ const MetricItem: React.FC<MetricProps> = ({
   icon,
   color
 }) => {
-  const displayColor = color || colorPsychology.programs.cases.primary;
-  const bgColor = isGood ? colorPsychology.status.success.background :
-                  isBad ? colorPsychology.status.critical.background :
+  const theme = useTheme();
+  const displayColor = color || theme.palette.primary.main;
+  const bgColor = isGood ? alpha(theme.palette.success.main, 0.08) :
+                  isBad ? alpha(theme.palette.error.main, 0.08) :
                   alpha(displayColor, 0.06);
 
   const content = (
@@ -145,7 +146,8 @@ export const SummaryHeader: React.FC<SummaryHeaderProps> = ({
   metrics,
   color
 }) => {
-  const displayColor = color || colorPsychology.programs.cases.primary;
+  const theme = useTheme();
+  const displayColor = color || theme.palette.primary.main;
 
   return (
     <Box sx={{ mb: 3 }}>

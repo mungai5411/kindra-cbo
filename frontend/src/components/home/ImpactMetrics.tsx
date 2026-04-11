@@ -15,7 +15,6 @@ import {
   Groups,
   Home
 } from '@mui/icons-material';
-import { colorPsychology } from '../../theme/colorPsychology';
 
 const MotionPaper = motion(Paper);
 
@@ -106,28 +105,28 @@ export const ImpactMetrics: React.FC = () => {
       icon: <School sx={{ fontSize: 'inherit' }} />,
       value: stats.children_supported ?? 0,
       label: 'Children Supported',
-      color: colorPsychology.programs.cases.primary,
+      color: theme.palette.primary.main,
       delay: 0
     },
     {
       icon: <FamilyRestroom sx={{ fontSize: 'inherit' }} />,
       value: stats.families_helped ?? 0,
       label: 'Families Helped',
-      color: colorPsychology.programs.donations.primary,
+      color: theme.palette.secondary.main,
       delay: 0.1
     },
     {
       icon: <Groups sx={{ fontSize: 'inherit' }} />,
       value: stats.active_volunteers ?? 0,
       label: 'Active Volunteers',
-      color: colorPsychology.programs.volunteers.primary,
+      color: theme.palette.primary.light,
       delay: 0.2
     },
     {
       icon: <Home sx={{ fontSize: 'inherit' }} />,
       value: stats.partner_organizations ?? 0,
       label: 'Partner Organizations',
-      color: colorPsychology.programs.shelter.primary,
+      color: theme.palette.primary.dark,
       delay: 0.3
     }
   ];
@@ -147,19 +146,19 @@ export const ImpactMetrics: React.FC = () => {
           width: '600px',
           height: '600px',
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(colorPsychology.programs.volunteers.primary, 0.05)}, transparent)`,
+          background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.05)}, transparent)`,
           pointerEvents: 'none'
         }
       }}
     >
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         {/* Section Header */}
         <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
           <Typography
             variant="body2"
             sx={{
               fontWeight: 700,
-              color: colorPsychology.programs.cases.primary,
+              color: 'primary.main',
               textTransform: 'uppercase',
               letterSpacing: '1.5px',
               mb: 1

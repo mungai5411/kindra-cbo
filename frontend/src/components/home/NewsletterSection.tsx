@@ -8,7 +8,6 @@ import React, { useState } from 'react';
 import { Box, Container, Typography, TextField, Button, Alert, alpha, useTheme, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Send, CheckCircle } from '@mui/icons-material';
-import { colorPsychology } from '../../theme/colorPsychology';
 
 const MotionBox = motion(Box);
 
@@ -60,7 +59,7 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ background
       sx={{
         py: { xs: 6, md: 10 },
         backgroundImage: bgImage ? `url(${bgImage})` : 'none',
-        backgroundColor: colorPsychology.programs.cases.primary,
+        backgroundColor: 'primary.main',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         position: 'relative',
@@ -139,10 +138,10 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ background
                         borderColor: 'transparent'
                       },
                       '&:hover fieldset': {
-                        borderColor: alpha(colorPsychology.programs.cases.primary, 0.3)
+                        borderColor: alpha(theme.palette.primary.main, 0.3)
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: colorPsychology.programs.cases.primary
+                        borderColor: 'primary.main'
                       }
                     }
                   }}
@@ -153,7 +152,7 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ background
                   disabled={loading}
                   sx={{
                     background: 'white',
-                    color: colorPsychology.programs.cases.primary,
+                    color: 'primary.main',
                     fontWeight: 700,
                     textTransform: 'none',
                     px: { xs: 3, sm: 4 },

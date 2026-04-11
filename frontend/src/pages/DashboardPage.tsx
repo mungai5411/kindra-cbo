@@ -429,11 +429,7 @@ export default function DashboardPage() {
     const isDesktop = deviceType === 'DESKTOP';
 
     return (
-        <Box sx={{
-            display: 'flex',
-            minHeight: '100vh',
-            background: `radial-gradient(circle at 20% 30%, ${alpha(theme.palette.primary.light, 0.12)} 0%, transparent 50%), #F9FAFB`
-        }}>
+        <Box sx={{ p: { xs: 1, sm: 1.5 }, display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
             <Header
                 user={user}
                 handleDrawerToggle={handleDrawerToggle}
@@ -485,7 +481,7 @@ export default function DashboardPage() {
                         }}
                         open
                     >
-                        <Toolbar />
+                        <Toolbar sx={{ minHeight: 56 }} />
                         <Sidebar
                             activeTab={activeTab}
                             setActiveTab={handleTabChange}
@@ -501,9 +497,9 @@ export default function DashboardPage() {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    p: isMobile ? 1.5 : (isTablet ? 2 : 3),
+                    p: isMobile ? 1.5 : (isTablet ? 2 : 2.5),
                     width: isDesktop ? `calc(100% - ${DRAWER_WIDTH}px)` : '100%',
-                    pb: isMobile ? 10 : 3, // Space for bottom nav on mobile
+                    pb: isMobile ? 8 : 2, // Space for bottom nav on mobile
                 }}
             >
                 <Toolbar />
@@ -595,7 +591,7 @@ export default function DashboardPage() {
                     fontWeight: 'bold',
                     borderBottom: '1px solid',
                     borderColor: 'divider',
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)}, ${alpha(theme.palette.secondary.main, 0.05)})`
+                    bgcolor: 'background.paper'
                 }}>{selectedCampaignForEdit ? 'Edit Campaign' : 'Create New Campaign'}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>

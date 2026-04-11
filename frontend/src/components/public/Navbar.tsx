@@ -58,11 +58,13 @@ export const Navbar = () => {
         <AppBar
             position="fixed"
             sx={{
-                background: scrolled ? alpha(theme.palette.background.paper, 0.8) : 'transparent',
-                backdropFilter: scrolled ? 'blur(10px)' : 'none',
-                boxShadow: scrolled ? theme.shadows[1] : 'none',
+                background: scrolled ? alpha(theme.palette.background.paper, 0.95) : 'transparent',
+                backdropFilter: scrolled ? 'blur(12px)' : 'none',
+                boxShadow: scrolled ? '0 4px 20px rgba(0,0,0,0.05)' : 'none',
                 transition: 'all 0.3s ease-in-out',
-                color: scrolled || location.pathname !== '/' ? 'text.primary' : 'white'
+                color: 'text.primary',
+                pt: scrolled ? 0 : 2,
+                pb: scrolled ? 0 : 2
             }}
         >
             <Container maxWidth="lg">
@@ -166,16 +168,17 @@ export const Navbar = () => {
                                         onClick={() => openRegisterModal('VOLUNTEER')}
                                         size="medium"
                                         sx={{
-                                            borderRadius: 5,
-                                            px: 3,
-                                            boxShadow: theme.shadows[4],
+                                            borderRadius: 50,
+                                            px: 4,
+                                            boxShadow: 'none',
                                             textTransform: 'none',
                                             fontWeight: 700,
-                                            bgcolor: scrolled ? 'primary.main' : 'background.paper',
-                                            color: scrolled ? 'common.white' : 'primary.main',
+                                            bgcolor: 'primary.main',
+                                            color: 'common.white',
                                             '&:hover': {
-                                                bgcolor: scrolled ? 'primary.dark' : alpha(theme.palette.common.white, 0.9),
-                                                transform: 'translateY(-2px)'
+                                                bgcolor: 'primary.light',
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: '0 10px 20px rgba(69, 143, 246, 0.2)',
                                             }
                                         }}
                                     >

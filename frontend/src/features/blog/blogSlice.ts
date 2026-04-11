@@ -12,6 +12,7 @@ interface BlogPost {
     excerpt: string;
     content: string;
     featured_image: string;
+    gallery_images?: any[];
     category: any;
     category_name?: string;
     tags: any[];

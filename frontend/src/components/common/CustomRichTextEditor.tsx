@@ -130,7 +130,7 @@ export default function CustomRichTextEditor({ value, onChange, placeholder, min
         if (container.nodeType === 3) container = container.parentElement!;
         
         // Find the image in or near the selection
-        let img = container.tagName === 'IMG' ? container as HTMLImageElement : container.querySelector('img');
+        const img = container.tagName === 'IMG' ? container as HTMLImageElement : container.querySelector('img');
         
         if (img) {
             if (align === 'left') {

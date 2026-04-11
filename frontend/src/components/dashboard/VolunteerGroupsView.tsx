@@ -28,7 +28,6 @@ import {
 import { RootState, AppDispatch } from '../../store';
 import { fetchGroups, fetchGroupMessages, sendGroupMessage } from '../../features/volunteers/groupsSlice';
 import { motion, AnimatePresence } from 'framer-motion';
-import { glassChatBubble } from '../../theme/glassmorphism';
 
 export function VolunteerGroupsView() {
     const theme = useTheme();
@@ -81,10 +80,10 @@ export function VolunteerGroupsView() {
         <Box sx={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ mb: 4 }}>
                 <Typography variant="h4" fontWeight="900" sx={{ letterSpacing: '-0.02em', mb: 1 }}>
-                    Volunteer Operative Hub
+                    Volunteer Groups
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                    Secure divisional communication and unit coordination.
+                    Team communication and group coordination.
                 </Typography>
             </Box>
 
@@ -92,7 +91,7 @@ export function VolunteerGroupsView() {
                 {/* Groups List */}
                 <Grid item xs={12} md={4} lg={3} sx={{ height: '100%', overflow: 'auto' }}>
                     <Typography variant="subtitle2" fontWeight="bold" color="primary" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <GroupWork fontSize="small" /> {user?.role === 'ADMIN' || user?.role === 'MANAGEMENT' ? 'ALL OPERATIONAL UNITS' : 'YOUR ASSIGNED UNITS'}
+                        <GroupWork fontSize="small" /> {user?.role === 'ADMIN' || user?.role === 'MANAGEMENT' ? 'ALL GROUPS' : 'YOUR GROUPS'}
                     </Typography>
                     <AnimatePresence mode="popLayout">
                         {groups.map((group) => (
@@ -118,7 +117,7 @@ export function VolunteerGroupsView() {
                                     display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                                     overflow: 'hidden', lineBreak: 'anywhere'
                                 }}>
-                                    {group.description || 'Command instructions pending...'}
+                                    {group.description || 'No description provided.'}
                                 </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1.5 }}>
                                     <People sx={{ fontSize: 14, color: 'text.secondary' }} />
@@ -132,8 +131,8 @@ export function VolunteerGroupsView() {
                             <Info sx={{ fontSize: 40, opacity: 0.1, mb: 2 }} />
                             <Typography variant="body2" color="text.secondary">
                                 {user?.role === 'ADMIN' || user?.role === 'MANAGEMENT'
-                                    ? 'No operational units have been established in the system yet.'
-                                    : 'You are not currently assigned to any operational units.'}
+                                    ? 'No volunteer groups have been created yet.'
+                                    : 'You are not currently a member of any groups.'}
                             </Typography>
                         </Box>
                     )}
@@ -150,7 +149,7 @@ export function VolunteerGroupsView() {
                                         <Typography variant="h5" fontWeight="bold">{selectedGroup?.name}</Typography>
                                         <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>{selectedGroup?.description}</Typography>
                                     </Box>
-                                    <Chip label="OPERATIONAL" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: '#fff', fontWeight: 'bold', border: '1px solid rgba(255,255,255,0.3)' }} />
+                                    <Chip label="ACTIVE" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: '#fff', fontWeight: 'bold', border: '1px solid rgba(255,255,255,0.3)' }} />
                                 </Box>
                             </Paper>
 
@@ -159,7 +158,7 @@ export function VolunteerGroupsView() {
                                 <Grid item xs={12} lg={4}>
                                     <Paper sx={{ p: 3, height: '100%', borderRadius: 2, bgcolor: alpha('#fff', 0.8), backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.5)' }}>
                                         <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <People fontSize="small" /> UNIT MEMBERS
+                                            <People fontSize="small" /> GROUP MEMBERS
                                         </Typography>
                                         <List sx={{ maxHeight: '400px', overflow: 'auto' }}>
                                             {selectedGroup?.members_details?.map((member: any) => (
@@ -178,7 +177,7 @@ export function VolunteerGroupsView() {
                                         </List>
                                         <Divider sx={{ my: 2 }} />
                                         <Box>
-                                            <Typography variant="caption" fontWeight="bold" color="text.secondary" display="block" gutterBottom>UNIT CAPABILITIES</Typography>
+                                            <Typography variant="caption" fontWeight="bold" color="text.secondary" display="block" gutterBottom>GROUP FEATURES</Typography>
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                                                 <Chip label="Private Comms" size="small" color="primary" variant="outlined" />
                                                 <Chip label="File Sharing" size="small" color="primary" variant="outlined" />
@@ -195,7 +194,7 @@ export function VolunteerGroupsView() {
                                             <Box sx={{ p: 1, bgcolor: alpha(theme.palette.primary.main, 0.1), borderRadius: 1 }}>
                                                 <Forum color="primary" fontSize="small" />
                                             </Box>
-                                            <Typography variant="subtitle2" fontWeight="bold">Private Encrypted Channel</Typography>
+                                            <Typography variant="subtitle2" fontWeight="bold">Internal Chat</Typography>
                                         </Box>
 
                                         {/* Messages Area */}
@@ -212,7 +211,13 @@ export function VolunteerGroupsView() {
                                                                 {msg.sender_name}
                                                             </Typography>
                                                         )}
-                                                        <Box sx={glassChatBubble(isMine, false, false)}>
+                                                        <Box sx={{
+                                                            p: 1.5,
+                                                            borderRadius: 2,
+                                                            bgcolor: isMine ? 'primary.main' : alpha(theme.palette.divider, 0.1),
+                                                            color: isMine ? 'white' : 'text.primary',
+                                                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                                                        }}>
                                                             <Typography variant="body2">{msg.content}</Typography>
                                                         </Box>
                                                         <Typography variant="caption" sx={{
@@ -233,7 +238,7 @@ export function VolunteerGroupsView() {
                                             <TextField
                                                 fullWidth
                                                 size="small"
-                                                placeholder="Communicate with unit..."
+                                                placeholder="Message the group..."
                                                 value={messageContent}
                                                 onChange={(e) => setMessageContent(e.target.value)}
                                                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -255,8 +260,8 @@ export function VolunteerGroupsView() {
                     ) : (
                         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', p: 4, bgcolor: alpha('#fff', 0.5), borderRadius: 2, border: '1px dashed', borderColor: 'divider' }}>
                             <GroupWork sx={{ fontSize: 80, opacity: 0.1, mb: 2 }} />
-                            <Typography variant="h6" color="text.secondary">Select an operational unit to begin coordination.</Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Access secure communication and unit-specific resources.</Typography>
+                            <Typography variant="h6" color="text.secondary">Select a group to start chatting.</Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Access internal communication and group resources.</Typography>
                         </Box>
                     )}
                 </Grid>

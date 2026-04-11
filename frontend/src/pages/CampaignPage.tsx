@@ -8,6 +8,7 @@ import { ArrowBack, Favorite, Share, Campaign, InfoOutlined, AccessTimeFilled, D
 import { AppDispatch, RootState } from '../store';
 import { fetchCampaigns } from '../features/donations/donationsSlice';
 import { motion, AnimatePresence } from 'framer-motion';
+import { TrafalgarHero } from '../components/common/TrafalgarHero';
 
 // --- Styled Components / Design Tokens ---
 
@@ -18,12 +19,7 @@ const GlassPanel = ({ children, sx = {} }: any) => {
             elevation={0}
             sx={{
                 p: { xs: 3, md: 5 },
-                borderRadius: 8,
-                bgcolor: alpha(theme.palette.background.paper, 0.7),
-                backdropFilter: 'blur(20px)',
-                border: '1px solid',
-                borderColor: alpha(theme.palette.common.white, 0.2),
-                boxShadow: `0 20px 60px ${alpha(theme.palette.common.black, 0.05)}`,
+                borderRadius: 6,
                 position: 'relative',
                 overflow: 'hidden',
                 ...sx
@@ -37,7 +33,8 @@ const GlassPanel = ({ children, sx = {} }: any) => {
 const GlassMediaCard = ({ img, idx }: any) => {
     const theme = useTheme();
     return (
-        <Box
+        <Paper
+            elevation={0}
             component={motion.div}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -45,12 +42,7 @@ const GlassMediaCard = ({ img, idx }: any) => {
             transition={{ delay: idx * 0.1, duration: 0.8 }}
             sx={{
                 p: 2,
-                borderRadius: 8,
-                bgcolor: alpha(theme.palette.background.paper, 0.4),
-                backdropFilter: 'blur(10px)',
-                border: '1px solid',
-                borderColor: alpha(theme.palette.common.white, 0.15),
-                boxShadow: '0 10px 40px rgba(0,0,0,0.03)',
+                borderRadius: 6,
                 transition: 'transform 0.4s ease',
                 '&:hover': { transform: 'translateY(-8px)' }
             }}
@@ -75,7 +67,7 @@ const GlassMediaCard = ({ img, idx }: any) => {
                     {img.alt_text || 'An integral part of the mission story.'}
                 </Typography>
             </Box>
-        </Box>
+        </Paper>
     );
 };
 
@@ -188,90 +180,19 @@ export default function CampaignPage() {
     return (
         <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 15, position: 'relative', overflow: 'hidden' }}>
             
-            {/* Minimalist Background Blobs */}
-            <Box sx={{ 
-                position: 'absolute', top: '10%', right: '-5%', width: '40vw', height: '40vw', 
-                background: `radial-gradient(circle, ${alpha(theme.palette.secondary.main, 0.1)} 0%, transparent 70%)`,
-                filter: 'blur(80px)', zIndex: 0 
-            }} />
-            <Box sx={{ 
-                position: 'absolute', bottom: '15%', left: '-5%', width: '35vw', height: '35vw', 
-                background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.08)} 0%, transparent 70%)`,
-                filter: 'blur(80px)', zIndex: 0 
-            }} />
-
-            {/* Immersive Hero Section */}
-            <Box sx={{
-                position: 'relative',
-                height: { xs: '65vh', md: '85vh' },
-                width: '100%',
-                bgcolor: '#000',
-                overflow: 'hidden'
-            }}>
-                <AnimatePresence mode="wait">
-                    <Box
-                        key={heroIndex}
-                        component={motion.div}
-                        initial={{ opacity: 0, scale: 1.05 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 2, ease: "easeInOut" }}
-                        sx={{
-                            position: 'absolute',
-                            inset: 0,
-                            backgroundImage: `url(${heroMedia[heroIndex]?.url})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                        }}
-                    />
-                </AnimatePresence>
-
-                {/* Glassy Overlay Layer */}
-                <Box sx={{
-                    position: 'absolute', inset: 0,
-                    background: 'linear-gradient(to top, rgba(10,20,10,0.95) 0%, rgba(10,20,10,0.4) 40%, rgba(0,0,0,0) 100%)',
-                    display: 'flex', alignItems: 'flex-end', pb: { xs: 8, md: 15 }
-                }}>
-                    <Container maxWidth="lg">
-                        <Stack spacing={3}>
-                            <IconButton
-                                onClick={() => navigate('/donate')}
-                                sx={{
-                                    width: 48, height: 48, color: 'white',
-                                    backdropFilter: 'blur(15px)',
-                                    bgcolor: alpha('#fff', 0.1),
-                                    border: '1px solid', borderColor: alpha('#fff', 0.2),
-                                    '&:hover': { bgcolor: alpha('#fff', 0.2) }
-                                }}
-                            >
-                                <ArrowBack />
-                            </IconButton>
-                            <Box component={motion.div} initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5, type: 'spring' }}>
-                                <Chip 
-                                    label={campaign.category || 'M-Pesa Verified'} 
-                                    sx={{ 
-                                        bgcolor: alpha(theme.palette.secondary.main, 0.9), 
-                                        color: 'white', fontWeight: 900, px: 1, 
-                                        fontSize: '0.85rem', mb: 2, letterSpacing: '0.1em'
-                                    }} 
-                                />
-                                <Typography variant="h1" fontWeight="900" sx={{
-                                    fontSize: { xs: '3rem', md: '5.5rem' },
-                                    lineHeight: 0.95,
-                                    color: 'white',
-                                    mixBlendMode: 'lighten',
-                                    letterSpacing: '-0.04em'
-                                }}>
-                                    {campaign.title}
-                                </Typography>
-                            </Box>
-                        </Stack>
-                    </Container>
-                </Box>
-            </Box>
+            {/* Trafalgar Hero Section */}
+            <TrafalgarHero 
+                title={campaign.title}
+                description={campaign.description ? campaign.description.replace(/<[^>]+>/g, '').substring(0, 160) + '...' : 'Supporting our community.'}
+                primaryActionText="Donate to Mission"
+                onPrimaryAction={() => navigate('/donate')}
+                imageSrc={heroMedia[heroIndex]?.url || campaign.featured_image}
+                imageAlt={campaign.title}
+                reverse={false}
+            />
 
             {/* Main Content Layout */}
-            <Container maxWidth="lg" sx={{ mt: -6, position: 'relative', zIndex: 10 }}>
+            <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 10 }}>
                 <Grid container spacing={8}>
 
                     {/* Column 1: The Visual Story */}
