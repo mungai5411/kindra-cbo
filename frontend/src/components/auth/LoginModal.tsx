@@ -152,197 +152,179 @@ export const LoginModal = () => {
 
             {isLoginOpen && (
                 <DialogContent sx={{ p: isMobile ? 3 : 5, pt: isMobile ? 5 : 6 }}>
-                    <Box sx={{ mb: 4 }}>
-                        <Typography variant="h4" fontWeight="700" sx={{ mb: 1, letterSpacing: '-0.02em' }}>
+                    <Box sx={{ mb: 2 }}>
+                        <Typography variant="h4" fontWeight="700" sx={{ mb: 0.5, letterSpacing: '-0.02em' }}>
                             Welcome back
                         </Typography>
-                        <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 400 }}>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 400 }}>
                             Please enter your details
                         </Typography>
                     </Box>
 
-                    <GoogleSignInButton
-                        selectedRole={null}
-                        onSuccess={(data: any) => {
-                            dispatch({
-                                type: 'auth/login/fulfilled',
-                                payload: { access: data.access, refresh: data.refresh, user: data.user }
-                            });
-                            closeLoginModal();
-                            const from = (location.state as any)?.from?.pathname || '/dashboard/overview';
-                            navigate(from, { replace: true });
-                        }}
-                        onError={(msg) => {
-                            if (msg.includes('not found') || msg.includes('sign up')) {
-                                switchToRegister();
-                            } else {
-                                setLocalError(msg);
-                            }
-                        }}
-                    />
-
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
-                        <Typography variant="body2" sx={{ px: 2, color: '#999', fontWeight: 500 }}>
-                            or
-                        </Typography>
-                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#eee' }} />
-                    </Box>
-
                     {(reduxError || localError) && !rateLimitError && (
-                        <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
+                        <Alert severity="error" sx={{ mb: 2, borderRadius: '8px' }}>
                             {localError || reduxError}
                         </Alert>
                     )}
 
                     {rateLimitError && (
-                        <Alert severity="warning" sx={{ mb: 3, borderRadius: '8px' }}>
+                        <Alert severity="warning" sx={{ mb: 2, borderRadius: '8px' }}>
                             {rateLimitError}
                         </Alert>
                     )}
 
                     <Box component="form" onSubmit={handleSubmit}>
-                                <Box sx={{ mb: 3 }}>
-                                    <Typography variant="body2" fontWeight="600" sx={{ mb: 1, color: '#333' }}>
-                                        Email address
-                                    </Typography>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        placeholder="Enter your email"
-                                        value={email}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                                        disabled={localLoading || reduxLoading}
-                                        required
-                                        InputProps={{
-                                            sx: {
-                                                height: '48px',
-                                                borderRadius: 3,
-                                                '& fieldset': { borderColor: 'divider' },
-                                                '&:hover fieldset': { borderColor: alpha(theme.palette.primary.main, 0.4) },
-                                                '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main, borderWidth: '1px' },
-                                            }
-                                        }}
-                                    />
-                                </Box>
-
-                                <Box sx={{ mb: 3 }}>
-                                    <Typography variant="body2" fontWeight="600" sx={{ mb: 1, color: '#333' }}>
-                                        Password
-                                    </Typography>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        type={showPassword ? 'text' : 'password'}
-                                        autoComplete="current-password"
-                                        placeholder="••••••••"
-                                        value={password}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                                        disabled={localLoading || reduxLoading}
-                                        required
-                                        InputProps={{
-                                            sx: {
-                                                height: '48px',
-                                                borderRadius: 3,
-                                                '& fieldset': { borderColor: 'divider' },
-                                                '&:hover fieldset': { borderColor: alpha(theme.palette.primary.main, 0.4) },
-                                                '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main, borderWidth: '1px' },
-                                            },
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton
-                                                        onClick={() => setShowPassword(!showPassword)}
-                                                        edge="end"
-                                                        size="small"
-                                                    >
-                                                        {showPassword ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            )
-                                        }}
-                                    />
-                                </Box>
-
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                checked={rememberMe}
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRememberMe(e.target.checked)}
-                                                sx={{
-                                                    color: 'divider',
-                                                    '&.Mui-checked': { color: 'primary.main' }
-                                                }}
-                                            />
-                                        }
-                                        label={
-                                            <Typography variant="body2" sx={{ color: '#444', fontWeight: 500 }}>
-                                                Remember for 30 days
-                                            </Typography>
-                                        }
-                                    />
-                                    <Link
-                                        component={RouterLink}
-                                        to="/forgot-password"
-                                        onClick={closeLoginModal}
-                                        sx={{
-                                            color: '#0066ff',
-                                            textDecoration: 'none',
-                                            fontWeight: 700,
-                                            fontSize: '14px',
-                                            '&:hover': { textDecoration: 'underline' }
-                                        }}
-                                    >
-                                        Forgot password
-                                    </Link>
-                                </Box>
-
-                                <Button
-                                    fullWidth
-                                    type="submit"
-                                    variant="contained"
-                                    disabled={localLoading || reduxLoading || !!rateLimitError}
-                                    sx={{
-                                        bgcolor: 'primary.main',
-                                        color: 'primary.contrastText',
-                                        py: 1.5,
+                        <Box sx={{ mb: 2 }}>
+                            <Typography variant="body2" fontWeight="600" sx={{ mb: 0.5, color: '#333' }}>
+                                Email address
+                            </Typography>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                placeholder="Enter your email"
+                                value={email}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                                disabled={localLoading || reduxLoading}
+                                required
+                                InputProps={{
+                                    sx: {
+                                        height: '48px',
                                         borderRadius: 3,
-                                        fontWeight: '700',
-                                        textTransform: 'none',
-                                        fontSize: '16px',
-                                        boxShadow: theme.shadows[4],
-                                        '&:hover': {
-                                            bgcolor: '#222',
-                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                                        },
-                                        '&:disabled': {
-                                            bgcolor: '#eee',
-                                            color: '#aaa'
-                                        }
+                                        '& fieldset': { borderColor: 'divider' },
+                                        '&:hover fieldset': { borderColor: alpha(theme.palette.primary.main, 0.4) },
+                                        '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main, borderWidth: '1px' },
+                                    }
+                                }}
+                            />
+                        </Box>
+
+                        <Box sx={{ mb: 2 }}>
+                            <Typography variant="body2" fontWeight="600" sx={{ mb: 0.5, color: '#333' }}>
+                                Password
+                            </Typography>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                type={showPassword ? 'text' : 'password'}
+                                autoComplete="current-password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                                disabled={localLoading || reduxLoading}
+                                required
+                                InputProps={{
+                                    sx: {
+                                        height: '48px',
+                                        borderRadius: 3,
+                                        '& fieldset': { borderColor: 'divider' },
+                                        '&:hover fieldset': { borderColor: alpha(theme.palette.primary.main, 0.4) },
+                                        '&.Mui-focused fieldset': { borderColor: theme.palette.primary.main, borderWidth: '1px' },
+                                    },
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                edge="end"
+                                                size="small"
+                                            >
+                                                {showPassword ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
+                        </Box>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={rememberMe}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRememberMe(e.target.checked)}
+                                        sx={{
+                                            color: 'divider',
+                                            '&.Mui-checked': { color: 'primary.main' }
+                                        }}
+                                    />
+                                }
+                                label={
+                                    <Typography variant="body2" sx={{ color: '#444', fontWeight: 500 }}>
+                                        Remember for 30 days
+                                    </Typography>
+                                }
+                            />
+                            <Link
+                                component={RouterLink}
+                                to="/forgot-password"
+                                onClick={closeLoginModal}
+                                sx={{
+                                    color: '#0066ff',
+                                    textDecoration: 'none',
+                                    fontWeight: 700,
+                                    fontSize: '14px',
+                                    '&:hover': { textDecoration: 'underline' }
+                                }}
+                            >
+                                Forgot password
+                            </Link>
+                        </Box>
+
+                        <Button
+                            fullWidth
+                            type="submit"
+                            variant="contained"
+                            disabled={localLoading || reduxLoading || !!rateLimitError}
+                            sx={{
+                                bgcolor: 'primary.main',
+                                color: 'primary.contrastText',
+                                py: 1.5,
+                                borderRadius: 3,
+                                fontWeight: '700',
+                                textTransform: 'none',
+                                fontSize: '16px',
+                                boxShadow: theme.shadows[4],
+                                '&:hover': {
+                                    bgcolor: '#222',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                },
+                                '&:disabled': {
+                                    bgcolor: '#eee',
+                                    color: '#aaa'
+                                }
+                            }}
+                        >
+                            {(localLoading || reduxLoading) ? <CircularProgress size={24} color="inherit" /> : 'Sign in'}
+                        </Button>
+
+                        <Box sx={{ my: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
+                            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                or
+                            </Typography>
+                            <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
+                        </Box>
+
+                        <GoogleSignInButton />
+
+                        <Box sx={{ mt: 2, textAlign: 'center' }}>
+                            <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
+                                Don't have an account?{' '}
+                                <Link
+                                    component="button"
+                                    variant="body2"
+                                    onClick={switchToRegister}
+                                    sx={{
+                                        color: '#0066ff',
+                                        fontWeight: 700,
+                                        textDecoration: 'none',
+                                        '&:hover': { textDecoration: 'underline' }
                                     }}
                                 >
-                                    {(localLoading || reduxLoading) ? <CircularProgress size={24} color="inherit" /> : 'Sign in'}
-                                </Button>
-
-                                <Box sx={{ mt: 4, textAlign: 'center' }}>
-                                    <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
-                                        Don't have an account?{' '}
-                                        <Link
-                                            component="button"
-                                            variant="body2"
-                                            onClick={switchToRegister}
-                                            sx={{
-                                                color: '#0066ff',
-                                                fontWeight: 700,
-                                                textDecoration: 'none',
-                                                '&:hover': { textDecoration: 'underline' }
-                                            }}
-                                        >
-                                            Sign up
-                                        </Link>
-                                    </Typography>
-                                </Box>
-                            </Box>
+                                    Sign up
+                                </Link>
+                            </Typography>
+                        </Box>
+                    </Box>
                 </DialogContent>
             )}
         </Dialog>
