@@ -244,6 +244,43 @@ export const addCaseNote = createAsyncThunk(
     }
 );
 
+// Update Actions
+export const updateFamily = createAsyncThunk(
+    'caseManagement/updateFamily',
+    async ({ id, data }: { id: string; data: any }, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.patch(`/cases/families/${id}/`, data);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update family');
+        }
+    }
+);
+
+export const updateCase = createAsyncThunk(
+    'caseManagement/updateCase',
+    async ({ id, data }: { id: string; data: any }, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.patch(`/cases/cases/${id}/`, data);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update case');
+        }
+    }
+);
+
+export const updateChild = createAsyncThunk(
+    'caseManagement/updateChild',
+    async ({ id, data }: { id: string; data: any }, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.patch(`/cases/children/${id}/`, data);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update child');
+        }
+    }
+);
+
 // Slice
 const caseManagementSlice = createSlice({
     name: 'caseManagement',
@@ -394,6 +431,26 @@ const caseManagementSlice = createSlice({
         });
         builder.addCase(addCaseNote.fulfilled, (state, action) => {
             state.caseNotes.unshift(action.payload);
+        });
+
+        // Update Actions
+        builder.addCase(updateFamily.fulfilled, (state, action: PayloadAction<Family>) => {
+            const index = state.families.findIndex(f => f.id === action.payload.id);
+            if (index >= 0) {
+                state.families[index] = action.payload;
+            }
+        });
+        builder.addCase(updateCase.fulfilled, (state, action: PayloadAction<Case>) => {
+            const index = state.cases.findIndex(c => c.id === action.payload.id);
+            if (index >= 0) {
+                state.cases[index] = action.payload;
+            }
+        });
+        builder.addCase(updateChild.fulfilled, (state, action: PayloadAction<Child>) => {
+            const index = state.children.findIndex(c => c.id === action.payload.id);
+            if (index >= 0) {
+                state.children[index] = action.payload;
+            }
         });
     },
 });
