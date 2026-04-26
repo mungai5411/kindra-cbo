@@ -126,8 +126,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_URL=http://localhost:8000/api/v1
-      - VITE_WS_URL=ws://localhost:8000/ws
+      - VITE_API_URL=/api/v1
+      - VITE_WS_URL=/ws
     depends_on:
       - backend
     networks:

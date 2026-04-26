@@ -26,7 +26,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ images = [] }) => {
   const getImageUrl = (filePath: string) => {
     if (!filePath) return null;
     if (filePath.startsWith('http')) return filePath;
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
     return `${apiUrl}/${filePath}`.replace(/\/+/g, '/').replace(':/', '://');
   };
 

@@ -5,29 +5,21 @@
 
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
-const API_URL_FROM_ENV = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_URL_FROM_ENV = import.meta.env.VITE_API_URL || '/api/v1';
 
-// Dynamic detection for mobile/network access
-const getDynamicApiBaseUrl = () => {
-    if (typeof window === 'undefined') return API_URL_FROM_ENV;
-
-    const { hostname } = window.location;
-
-    // If we are NOT on localhost but the API is pointing to localhost, swap it
-    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-        if (API_URL_FROM_ENV.includes('localhost')) {
-            return API_URL_FROM_ENV.replace('localhost', hostname);
-        }
-        if (API_URL_FROM_ENV.includes('127.0.0.1')) {
-            return API_URL_FROM_ENV.replace('127.0.0.1', hostname);
-        }
-    }
-
-    return API_URL_FROM_ENV;
-};
-
-const rawBaseUrl = getDynamicApiBaseUrl();
+const rawBaseUrl = API_URL_FROM_ENV;
 export const API_BASE_URL = rawBaseUrl.endsWith('/') ? rawBaseUrl : `${rawBaseUrl}/`;
+
+// Fetch client IP from the internet
+let clientPublicIp: string | null = null;
+if (typeof window !== 'undefined') {
+    fetch('https://api.ipify.org?format=json')
+        .then(res => res.json())
+        .then(data => {
+            if (data.ip) clientPublicIp = data.ip;
+        })
+        .catch(err => console.warn('Failed to fetch client IP:', err));
+}
 
 // Create axios instance
 const apiClient = axios.create({
@@ -41,12 +33,25 @@ const apiClient = axios.create({
     timeout: 60000, // 60 seconds
 });
 
-// Request interceptor - add auth token
+// Request interceptor - add auth token and client context
 apiClient.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('accessToken');
-        if (token && config.headers) {
-            config.headers.Authorization = `Bearer ${token}`;
+        if (config.headers) {
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+            
+            // Appending internet IP & Browser Time/Timezone context
+            try {
+                config.headers['X-Client-Timezone'] = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                config.headers['X-Client-Time'] = new Date().toISOString();
+            } catch (e) {
+                // Ignore Intl exceptions
+            }
+            if (clientPublicIp) {
+                config.headers['X-Client-IP'] = clientPublicIp;
+            }
         }
         return config;
     },

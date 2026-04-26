@@ -28,7 +28,7 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ background
     // If already absolute URL, return as-is
     if (filePath.startsWith('http')) return filePath;
     // Otherwise, prepend API base URL
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
     return `${apiUrl}/${filePath}`.replace(/\/+/g, '/').replace(':/', '://');
   };
 
