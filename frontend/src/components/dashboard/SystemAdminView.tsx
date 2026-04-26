@@ -1001,7 +1001,7 @@ export function SystemAdminView({ activeTab }: { activeTab?: string }) {
                                             )}
                                         </TableCell>
                                         <TableCell sx={{ fontFamily: 'monospace', color: 'text.secondary', fontSize: '0.75rem', py: 2 }}>
-                                            {log.ip_address || '127.0.0.1'}
+                                            {log.ip_address || 'Unknown IP'}
                                         </TableCell>
                                     </TableRow>
                                 );

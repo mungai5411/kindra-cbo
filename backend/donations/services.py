@@ -417,7 +417,7 @@ class ReceiptService:
                 'bg_path': bg_path,
                 'font_path': font_path,
                 'target_copy': target_copy, # 'office', 'client', or 'both'
-                'server_url': settings.BACKEND_URL if hasattr(settings, 'BACKEND_URL') else 'http://localhost:8000',
+                'server_url': settings.BACKEND_URL if hasattr(settings, 'BACKEND_URL') else '',
             }
             
             # Select template based on target_copy
@@ -485,7 +485,7 @@ class MaterialAcknowledgmentService:
                 'date': timezone.now().strftime('%d %b %Y'),
                 'logo_path': logo_path,
                 'font_path': font_path,
-                'server_url': settings.BACKEND_URL if hasattr(settings, 'BACKEND_URL') else 'http://localhost:8000',
+                'server_url': settings.BACKEND_URL if hasattr(settings, 'BACKEND_URL') else '',
             }
 
             html_string = render_to_string('donations/acknowledgment.html', context)

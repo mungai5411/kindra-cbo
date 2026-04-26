@@ -14,11 +14,16 @@ def get_client_ip(request):
     Extract the real client IP address from a Django request.
     Handles reverse proxies that set X-Forwarded-For headers.
     """
+    # Prefer explicit frontend-provided IP if available
+    client_ip = request.META.get('HTTP_X_CLIENT_IP')
+    if client_ip:
+        return client_ip.split(',')[0].strip()
+
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         # Take the first (original) IP in the chain
         return x_forwarded_for.split(',')[0].strip()
-    return request.META.get('REMOTE_ADDR', '127.0.0.1')
+    return request.META.get('REMOTE_ADDR')
 
 
 # Allowed HTML tags for rich text (if needed)

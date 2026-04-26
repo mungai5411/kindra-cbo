@@ -15,18 +15,7 @@ import socket
 import dj_database_url
 import ssl
 
-def get_local_ip():
-    """Detects the local IP address of the machine."""
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8', 80))
-        ip = s.getsockname()[0]
-        s.close()
-        return ip
-    except Exception:
-        return '127.0.0.1'
 
-LOCAL_IP = get_local_ip()
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,20 +31,9 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
-if DEBUG:
-    ALLOWED_HOSTS = ['*']
-elif LOCAL_IP not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append(LOCAL_IP)
-
-# Print network access info
-if DEBUG:
-    print("\n" + "="*50)
-    print(f"NETWORK ACCESS ENABLED")
-    print(f"Local IP detected: {LOCAL_IP}")
-    print(f"Access backend at: http://{LOCAL_IP}:8000/api/v1/")
-    print(f"Access frontend at: http://{LOCAL_IP}:3000/")
-    print("="*50 + "\n")
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
+if DEBUG and '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('*')
 
 # ==================================
 # APPLICATION DEFINITION
@@ -244,7 +222,7 @@ USE_TZ = True
 # FRONTEND URL
 # ==================================
 # Used to build absolute links in emails (verification, password reset)
-FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
+FRONTEND_URL = config('FRONTEND_URL', default='')
 
 # ==================================
 # STATIC & MEDIA FILES
@@ -362,16 +340,10 @@ SIMPLE_JWT = {
 # CORS CONFIGURATION
 # ==================================
 
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:5173,https://kindra-cbo.vercel.app', cast=Csv())
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='https://kindra-cbo.vercel.app', cast=Csv())
 # Sanitize origins: remove trailing slashes if present (fixes corsheaders.E014)
 CORS_ALLOWED_ORIGINS = [origin.rstrip('/') for origin in CORS_ALLOWED_ORIGINS]
 CORS_ALLOW_ALL_ORIGINS = True if DEBUG else False
-
-# Add dynamic network origins for development
-if DEBUG and LOCAL_IP != '127.0.0.1':
-    # Allow local network access
-    CORS_ALLOWED_ORIGINS.append(f'http://{LOCAL_IP}:3000')
-    CORS_ALLOWED_ORIGINS.append(f'http://{LOCAL_IP}:5173')
 
 # Force add production frontend domain (ensures it works even if env vars override defaults)
 if 'https://kindra-cbo.vercel.app' not in CORS_ALLOWED_ORIGINS:
@@ -383,7 +355,7 @@ CORS_ALLOW_CREDENTIALS = True
 # CELERY CONFIGURATION
 # ==================================
 
-CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=config('REDIS_URL', default='redis://localhost:6379/0'))
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=config('REDIS_URL', default='redis://redis:6379/0'))
 CELERY_RESULT_BACKEND = None  # Disable result backend to avoid connection issues
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
@@ -498,7 +470,7 @@ CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'")  # Allow inline scripts for React
 CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "fonts.googleapis.com")
 CSP_IMG_SRC = ("'self'", "data:", "https:")
 CSP_FONT_SRC = ("'self'", "fonts.gstatic.com")
-CSP_CONNECT_SRC = ("'self'", config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000', cast=str))
+CSP_CONNECT_SRC = ("'self'", config('CORS_ALLOWED_ORIGINS', default='', cast=str))
 
 # Session Security
 SESSION_COOKIE_AGE = 3600  # 1 hour
@@ -510,15 +482,9 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # CSRF Protection
 CSRF_COOKIE_HTTPONLY = False  # Frontend needs to read this for API calls
 CSRF_COOKIE_SAMESITE = 'Lax'
-CSRF_TRUSTED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:5173,https://kindra-cbo.vercel.app', cast=Csv())
+CSRF_TRUSTED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='https://kindra-cbo.vercel.app', cast=Csv())
 # Sanitize trusted origins
 CSRF_TRUSTED_ORIGINS = [origin.rstrip('/') for origin in CSRF_TRUSTED_ORIGINS]
-if DEBUG:
-    # Allow local network IPs for CSRF as well in debug mode
-    CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
-    if LOCAL_IP != '127.0.0.1':
-        CSRF_TRUSTED_ORIGINS.append(f"http://{LOCAL_IP}:3000")
-        CSRF_TRUSTED_ORIGINS.append(f"http://{LOCAL_IP}:8000")
 
 # Force add production frontend domain
 if 'https://kindra-cbo.vercel.app' not in CSRF_TRUSTED_ORIGINS:
@@ -626,7 +592,7 @@ DARAJA_SHORTCODE = config('DARAJA_SHORTCODE', default=config('MPESA_SHORTCODE', 
 DARAJA_PASSKEY = config('DARAJA_PASSKEY', default=config('MPESA_PASSKEY', default=''))
 
 # Backend URL for Daraja Callback
-BACKEND_URL = config('BACKEND_URL', default='http://localhost:8000')
+BACKEND_URL = config('BACKEND_URL', default='')
 DARAJA_CALLBACK_URL = config(
     'DARAJA_CALLBACK_URL',
     default=config(

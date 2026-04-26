@@ -55,7 +55,7 @@ export const fetchPublicLandingPageMedia = createAsyncThunk(
         try {
             // Try to fetch media without Authorization header
             // The backend may allow public access to gallery images
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/blog/media/?source_type=SHELTER`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || '/api/v1'}/blog/media/?source_type=SHELTER`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'omit' // Don't send credentials for public fetch
