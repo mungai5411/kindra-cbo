@@ -304,7 +304,17 @@ export const LoginModal = () => {
                             <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
                         </Box>
 
-                        <GoogleSignInButton />
+                        <GoogleSignInButton
+                            onSuccess={(data: any) => {
+                                dispatch({
+                                    type: 'auth/login/fulfilled',
+                                    payload: { access: data.access, refresh: data.refresh, user: data.user }
+                                });
+                                closeLoginModal();
+                                const from = (location.state as any)?.from?.pathname || '/dashboard/overview';
+                                navigate(from, { replace: true });
+                            }}
+                        />
 
                         <Box sx={{ mt: 2, textAlign: 'center' }}>
                             <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
