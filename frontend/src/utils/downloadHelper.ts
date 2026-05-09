@@ -18,24 +18,17 @@ export const downloadFile = async (url: string, defaultFilename: string = 'downl
         let blob: Blob;
 
         if (isExternal) {
-            // Use native fetch for external URLs to ensure NO headers are sent
-            const response = await fetch(url, {
-                method: 'GET',
-                mode: 'cors', // Explicitly request CORS access
-            });
-
-            if (!response.ok) {
-                throw new Error(`Download failed: ${response.status} ${response.statusText}`);
-            }
-
-            blob = await response.blob();
-        } else {
-            // Use authenticated apiClient for internal URLs
-            const response = await apiClient.get(url, {
-                responseType: 'blob',
-            });
-            blob = new Blob([response.data]);
+            // For external URLs (like Cloudinary), direct download via fetch often fails with 401/CORS
+            // unless the server is specifically configured. Fallback to direct opening.
+            window.open(url, '_blank');
+            return;
         }
+
+        // Use authenticated apiClient for internal URLs
+        const response = await apiClient.get(url, {
+            responseType: 'blob',
+        });
+        blob = new Blob([response.data]);
 
         // Create blob link to download
         const blobUrl = window.URL.createObjectURL(blob);
