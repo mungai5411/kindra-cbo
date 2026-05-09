@@ -351,6 +351,14 @@ if 'https://kindra-cbo.vercel.app' not in CORS_ALLOWED_ORIGINS:
 
 CORS_ALLOW_CREDENTIALS = True
 
+# Allow custom client context headers
+from corsheaders.defaults import default_headers
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-client-timezone',
+    'x-client-time',
+    'x-client-ip',
+]
+
 # ==================================
 # CELERY CONFIGURATION
 # ==================================
@@ -457,6 +465,7 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
 SECURE_REFERRER_POLICY = 'same-origin'  # Referrer policy
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'  # Fix Google OAuth popup issue
 
 # HSTS (HTTP Strict Transport Security)
 if not DEBUG:
