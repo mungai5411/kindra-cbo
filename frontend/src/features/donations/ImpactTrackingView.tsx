@@ -51,10 +51,12 @@ import {
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { fetchImpacts, createImpact, submitImpactSummary, DonationImpact } from './impactSlice';
 import { fetchMedia } from '../media/mediaSlice';
+import { useNotification } from '../../contexts/NotificationContext';
 
 const ImpactTrackingView: React.FC = () => {
     const theme = useTheme();
     const dispatch = useAppDispatch();
+    const { confirm, notify } = useNotification();
     const { impacts, isLoading, error } = useAppSelector((state) => state.impact);
     const { assets } = useAppSelector((state) => state.media);
     const { user } = useAppSelector((state) => state.auth);
@@ -106,6 +108,7 @@ const ImpactTrackingView: React.FC = () => {
         setIsSubmitting(true);
         try {
             await dispatch(createImpact(formData)).unwrap();
+            notify({ message: 'Impact recorded successfully!', severity: 'success' });
             setCreateDialogOpen(false);
             setFormData(prev => ({
                 ...prev,
@@ -116,6 +119,7 @@ const ImpactTrackingView: React.FC = () => {
             }));
         } catch (err) {
             console.error('Failed to create impact:', err);
+            notify({ message: 'Failed to record impact. Please try again.', severity: 'error' });
         } finally {
             setIsSubmitting(false);
         }
@@ -125,14 +129,21 @@ const ImpactTrackingView: React.FC = () => {
         const pendingImpacts = impacts.filter(i => !i.is_reported).map(i => i.id);
         if (pendingImpacts.length === 0) return;
 
-        if (window.confirm(`Submit summary of ${pendingImpacts.length} impact records to admin?`)) {
-            try {
-                await dispatch(submitImpactSummary(pendingImpacts)).unwrap();
-                dispatch(fetchImpacts());
-            } catch (err) {
-                console.error('Failed to submit summary:', err);
+        confirm({
+            title: 'Submit Summary?',
+            message: `Submit summary of ${pendingImpacts.length} impact records to admin for review?`,
+            confirmText: 'Submit Now',
+            onConfirm: async () => {
+                try {
+                    await dispatch(submitImpactSummary(pendingImpacts)).unwrap();
+                    notify({ message: 'Summary submitted successfully!', severity: 'success' });
+                    dispatch(fetchImpacts());
+                } catch (err) {
+                    console.error('Failed to submit summary:', err);
+                    notify({ message: 'Failed to submit summary.', severity: 'error' });
+                }
             }
-        }
+        });
     };
 
     const getStatusChip = (isReported: boolean) => {

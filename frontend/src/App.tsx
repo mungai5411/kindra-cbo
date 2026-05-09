@@ -11,6 +11,7 @@ import { fetchProfile } from './features/auth/authSlice';
 // Contexts
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthModalProvider, useAuthModal } from './contexts/AuthModalContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import CssBaseline from '@mui/material/CssBaseline';
 import ProtectedRoute from './components/ProtectedRoute';
 // Utilities
@@ -95,51 +96,53 @@ function App() {
     return (
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
             <ThemeProvider>
-                <CssBaseline />
-                <AuthModalProvider>
-                    <Router>
-                        <RouteObserver />
-                        <Routes>
+                <NotificationProvider>
+                    <CssBaseline />
+                    <AuthModalProvider>
+                        <Router>
+                            <RouteObserver />
+                            <Routes>
 
-                            {/* Public routes */}
-                            <Route path="/" element={<HomePage />} />
-                            <Route path="/about" element={<AboutPage />} />
-                            <Route path="/login" element={<LoginRedirect />} />
-                            <Route path="/register" element={<RegisterRedirect />} />
-                            <Route path="/volunteer" element={<Navigate to="/register?role=VOLUNTEER" replace />} />
-                            <Route path="/pending-approval" element={<PendingApprovalView />} />
+                                {/* Public routes */}
+                                <Route path="/" element={<HomePage />} />
+                                <Route path="/about" element={<AboutPage />} />
+                                <Route path="/login" element={<LoginRedirect />} />
+                                <Route path="/register" element={<RegisterRedirect />} />
+                                <Route path="/volunteer" element={<Navigate to="/register?role=VOLUNTEER" replace />} />
+                                <Route path="/pending-approval" element={<PendingApprovalView />} />
 
-                            {/* Consolidated Blog & Stories */}
-                            <Route path="/blog" element={<StoriesPage />} />
-                            <Route path="/blog/:slug" element={<BlogPostPage />} />
-                            <Route path="/stories" element={<StoriesPage />} />
-                            <Route path="/stories/:slug" element={<BlogPostPage />} />
+                                {/* Consolidated Blog & Stories */}
+                                <Route path="/blog" element={<StoriesPage />} />
+                                <Route path="/blog/:slug" element={<BlogPostPage />} />
+                                <Route path="/stories" element={<StoriesPage />} />
+                                <Route path="/stories/:slug" element={<BlogPostPage />} />
 
-                            <Route path="/donate" element={<DonationsPage />} />
-                            <Route path="/campaigns" element={<DonationsPage />} />
-                            <Route path="/campaigns/:slug" element={<CampaignPage />} />
-                            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                            <Route path="/reset-password" element={<ResetPasswordPage />} />
-                            <Route path="/verify" element={<VerifyEmailPage />} />
+                                <Route path="/donate" element={<DonationsPage />} />
+                                <Route path="/campaigns" element={<DonationsPage />} />
+                                <Route path="/campaigns/:slug" element={<CampaignPage />} />
+                                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                                <Route path="/verify" element={<VerifyEmailPage />} />
 
-                            {/* Protected routes */}
-                            <Route path="/dashboard" element={<Navigate to="/dashboard/overview" replace />} />
-                            <Route
-                                path="/dashboard/:view/*"
-                                element={
-                                    <ProtectedRoute>
-                                        <DashboardPage />
-                                    </ProtectedRoute>
-                                }
-                            />
+                                {/* Protected routes */}
+                                <Route path="/dashboard" element={<Navigate to="/dashboard/overview" replace />} />
+                                <Route
+                                    path="/dashboard/:view/*"
+                                    element={
+                                        <ProtectedRoute>
+                                            <DashboardPage />
+                                        </ProtectedRoute>
+                                    }
+                                />
 
-                            {/* Redirect unknown routes to home */}
-                            <Route path="*" element={<Navigate to="/" replace />} />
-                        </Routes>
-                        <LoginModal />
-                        <RegisterModal />
-                    </Router>
-                </AuthModalProvider>
+                                {/* Redirect unknown routes to home */}
+                                <Route path="*" element={<Navigate to="/" replace />} />
+                            </Routes>
+                            <LoginModal />
+                            <RegisterModal />
+                        </Router>
+                    </AuthModalProvider>
+                </NotificationProvider>
             </ThemeProvider>
         </GoogleOAuthProvider>
     );

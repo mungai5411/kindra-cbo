@@ -36,6 +36,7 @@ import {
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { fetchMedia, uploadMedia, deleteMedia, MediaAsset } from './mediaSlice';
+import { useNotification } from '../../contexts/NotificationContext';
 
 interface MediaLibraryViewProps {
     mode?: 'general' | 'landing_page';
@@ -44,6 +45,7 @@ interface MediaLibraryViewProps {
 const MediaLibraryView: React.FC<MediaLibraryViewProps> = ({ mode = 'general' }) => {
     const theme = useTheme();
     const dispatch = useAppDispatch();
+    const { confirm, notify } = useNotification();
     const { assets, isLoading, error } = useAppSelector((state) => state.media);
     const { user } = useAppSelector((state) => state.auth);
 
@@ -99,10 +101,12 @@ const MediaLibraryView: React.FC<MediaLibraryViewProps> = ({ mode = 'general' })
 
         try {
             await dispatch(uploadMedia(formData)).unwrap();
+            notify({ message: 'Media uploaded successfully!', severity: 'success' });
             setUploadDialogOpen(false);
             resetUploadForm();
         } catch (err) {
             console.error('Upload failed:', err);
+            notify({ message: 'Failed to upload media. Please try again.', severity: 'error' });
         } finally {
             setIsUploading(false);
         }
@@ -117,13 +121,21 @@ const MediaLibraryView: React.FC<MediaLibraryViewProps> = ({ mode = 'general' })
     };
 
     const handleDelete = async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this asset?')) {
-            try {
-                await dispatch(deleteMedia(id)).unwrap();
-            } catch (err) {
-                console.error('Delete failed:', err);
+        confirm({
+            title: 'Delete Asset?',
+            message: 'Are you sure you want to delete this asset? This action cannot be undone.',
+            isDangerous: true,
+            confirmText: 'Delete',
+            onConfirm: async () => {
+                try {
+                    await dispatch(deleteMedia(id)).unwrap();
+                    notify({ message: 'Asset deleted successfully', severity: 'success' });
+                } catch (err) {
+                    console.error('Delete failed:', err);
+                    notify({ message: 'Failed to delete asset', severity: 'error' });
+                }
             }
-        }
+        });
     };
 
     const handleViewAsset = (asset: MediaAsset) => {

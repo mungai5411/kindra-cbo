@@ -6,9 +6,14 @@ interface Family {
     id: string;
     family_code: string;
     primary_contact_name: string;
+    primary_contact_phone?: string;
     vulnerability_level: string;
     county: string;
+    sub_county: string;
+    total_members: number;
     children_count: number;
+    adults_count: number;
+    monthly_income?: number;
     assigned_case_worker: string;
     is_active: boolean;
     registration_date: string;

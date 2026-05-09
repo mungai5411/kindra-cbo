@@ -44,6 +44,7 @@ import {
 import { Person, Assignment, Event as EventIcon, Schedule, School, Verified, Add, AccessTime, Email, Phone, AdminPanelSettings, OpenInNew, Delete, People, Edit, Check, Close } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
 import { fetchVolunteers, fetchTasks, fetchEvents, logTimeEntry, addTask, addEvent, updateEvent, deleteEvent, registerForEvent, unregisterFromEvent, fetchTimeLogs, fetchShelters, createTaskApplication, deleteTask, fetchEventParticipants, updateTimeLogStatus } from '../../features/volunteers/volunteersSlice';
+import { useNotification } from '../../contexts/NotificationContext';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
 import { ImageGallery, ImageItem } from '../common/ImageGallery';
@@ -57,6 +58,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const dispatch = useDispatch<AppDispatch>();
+    const { confirm, notify } = useNotification();
     const { volunteers, tasks, events, timeLogs, shelters, isLoading, error } = useSelector((state: RootState) => state.volunteers);
     const user = useSelector((state: RootState) => state.auth.user);
     const userRole = user?.role;
@@ -140,7 +142,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
         }
     };
 
-    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'info' | 'warning' | 'error' });
+    // Snackbar state removed in favor of global notify
 
     // Pagination state
     const [page, setPage] = useState(0);
@@ -195,7 +197,7 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
 
     const handleLogTime = () => {
         if (!timeDesc) {
-            setSnackbar({ open: true, message: 'Please describe the activity', severity: 'warning' });
+            notify({ message: 'Please describe the activity', severity: 'warning' });
             return;
         }
         const volunteerId = selectedVolunteer?.id || taskForm.assigned_to;
@@ -209,17 +211,17 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 setTimeLogOpen(false);
                 setTimeDesc('');
                 setTaskForm({ ...taskForm, assigned_to: '' });
-                setSnackbar({ open: true, message: 'Time log submitted successfully', severity: 'success' });
+                notify({ message: 'Time log submitted successfully', severity: 'success' });
             });
         } else {
-            setSnackbar({ open: true, message: 'Please select a volunteer', severity: 'warning' });
+            notify({ message: 'Please select a volunteer', severity: 'warning' });
         }
     };
 
     const handleAddTask = () => {
         // Validate required fields
         if (!taskForm.title || !taskForm.description) {
-            setSnackbar({ open: true, message: 'Add title and description', severity: 'warning' });
+            notify({ message: 'Add title and description', severity: 'warning' });
             return;
         }
 
@@ -251,16 +253,16 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 assignees: [],
                 due_date: new Date().toISOString().split('T')[0]
             });
-            setSnackbar({ open: true, message: 'Task assigned successfully', severity: 'success' });
+            notify({ message: 'Task assigned successfully', severity: 'success' });
         }).catch((err) => {
             console.error(err);
-            setSnackbar({ open: true, message: 'Fill all required fields', severity: 'error' });
+            notify({ message: 'Fill all required fields', severity: 'error' });
         });
     };
 
     const handleAddEvent = async () => {
         if (!eventForm.title || !eventForm.start_datetime) {
-            setSnackbar({ open: true, message: 'Missing required fields', severity: 'error' });
+            notify({ message: 'Missing required fields', severity: 'error' });
             return;
         }
 
@@ -280,18 +282,18 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 setEditingEventId(null);
                 setEventForm({ title: '', description: '', event_type: 'COMMUNITY', location: '', start_datetime: '', end_datetime: '', post_to_volunteers: true, post_to_donors: false, post_to_shelters: false, event_gallery: [] });
                 setEventPhotoPreviews([]);
-                setSnackbar({ open: true, message: 'Event updated successfully', severity: 'success' });
+                notify({ message: 'Event updated successfully', severity: 'success' });
             }).catch(() => {
-                setSnackbar({ open: true, message: 'Failed to update event.', severity: 'error' });
+                notify({ message: 'Failed to update event.', severity: 'error' });
             });
         } else {
             dispatch(addEvent(formData)).unwrap().then(() => {
                 setEventDialogOpen(false);
                 setEventForm({ title: '', description: '', event_type: 'COMMUNITY', location: '', start_datetime: '', end_datetime: '', post_to_volunteers: true, post_to_donors: false, post_to_shelters: false, event_gallery: [] });
                 setEventPhotoPreviews([]);
-                setSnackbar({ open: true, message: 'Event created and posted successfully', severity: 'success' });
+                notify({ message: 'Event created and posted successfully', severity: 'success' });
             }).catch(() => {
-                setSnackbar({ open: true, message: 'Failed to create event.', severity: 'error' });
+                notify({ message: 'Failed to create event.', severity: 'error' });
             });
         }
     };
@@ -307,20 +309,20 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
             })
             .catch(() => {
                 setParticipantsLoading(false);
-                setSnackbar({ open: true, message: 'Failed to fetch participants', severity: 'error' });
+                notify({ message: 'Failed to fetch participants', severity: 'error' });
             });
     };
 
     const handleRegister = (eventId: string) => {
         dispatch(registerForEvent(eventId)).unwrap()
-            .then(() => setSnackbar({ open: true, message: 'Successfully registered!', severity: 'success' }))
-            .catch(() => setSnackbar({ open: true, message: 'Registration failed', severity: 'error' }));
+            .then(() => notify({ message: 'Successfully registered!', severity: 'success' }))
+            .catch(() => notify({ message: 'Registration failed', severity: 'error' }));
     };
 
     const handleUnregister = (eventId: string) => {
         dispatch(unregisterFromEvent(eventId)).unwrap()
-            .then(() => setSnackbar({ open: true, message: 'Successfully unregistered', severity: 'success' }))
-            .catch(() => setSnackbar({ open: true, message: 'Failed to unregister', severity: 'error' }));
+            .then(() => notify({ message: 'Successfully unregistered', severity: 'success' }))
+            .catch(() => notify({ message: 'Failed to unregister', severity: 'error' }));
     };
 
     const handleEditEvent = (event: any) => {
@@ -342,11 +344,20 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
     };
 
     const handleDeleteEvent = (eventId: string) => {
-        if (window.confirm('Are you sure you want to delete this event?')) {
-            dispatch(deleteEvent(eventId)).unwrap()
-                .then(() => setSnackbar({ open: true, message: 'Event deleted', severity: 'success' }))
-                .catch(() => setSnackbar({ open: true, message: 'Failed to delete event', severity: 'error' }));
-        }
+        confirm({
+            title: 'Delete Event?',
+            message: 'Are you sure you want to delete this event permanently?',
+            isDangerous: true,
+            confirmText: 'Delete',
+            onConfirm: async () => {
+                try {
+                    await dispatch(deleteEvent(eventId)).unwrap();
+                    notify({ message: 'Event deleted successfully', severity: 'success' });
+                } catch (err) {
+                    notify({ message: 'Failed to delete event', severity: 'error' });
+                }
+            }
+        });
     };
 
     const handleViewProfile = (volunteer: any) => {
@@ -537,20 +548,29 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
 
         const handleApply = (id: string) => {
             if (!currentVolunteerId) {
-                setSnackbar({ open: true, message: 'Profile not linked. Please contact admin.', severity: 'error' });
+                notify({ message: 'Profile not linked. Please contact admin.', severity: 'error' });
                 return;
             }
             dispatch(createTaskApplication({ task: id, volunteer: currentVolunteerId })).unwrap()
-                .then(() => setSnackbar({ open: true, message: 'Application submitted!', severity: 'success' }))
-                .catch(() => setSnackbar({ open: true, message: 'Failed to apply.', severity: 'error' }));
+                .then(() => notify({ message: 'Application submitted!', severity: 'success' }))
+                .catch(() => notify({ message: 'Failed to apply.', severity: 'error' }));
         };
 
         const handleDeleteTask = (id: string) => {
-            if (window.confirm('Are you sure you want to delete this task?')) {
-                dispatch(deleteTask(id)).unwrap()
-                    .then(() => setSnackbar({ open: true, message: 'Task deleted successfully', severity: 'success' }))
-                    .catch(() => setSnackbar({ open: true, message: 'Failed to delete task', severity: 'error' }));
-            }
+            confirm({
+                title: 'Delete Task?',
+                message: 'Are you sure you want to delete this task?',
+                isDangerous: true,
+                confirmText: 'Delete',
+                onConfirm: async () => {
+                    try {
+                        await dispatch(deleteTask(id)).unwrap();
+                        notify({ message: 'Task deleted successfully', severity: 'success' });
+                    } catch (err) {
+                        notify({ message: 'Failed to delete task', severity: 'error' });
+                    }
+                }
+            });
         };
 
         if (isMobile) {
@@ -984,8 +1004,8 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
 
         const handleUpdateLogStatus = (id: string, status: string) => {
             dispatch(updateTimeLogStatus({ id, status })).unwrap()
-                .then(() => setSnackbar({ open: true, message: `Log ${status.toLowerCase()} successfully`, severity: 'success' }))
-                .catch(() => setSnackbar({ open: true, message: 'Failed to update status', severity: 'error' }));
+                .then(() => notify({ message: `Log ${status.toLowerCase()} successfully`, severity: 'success' }))
+                .catch(() => notify({ message: 'Failed to update status', severity: 'error' }));
         };
 
         return (
@@ -1904,32 +1924,6 @@ export function VolunteersView({ setOpenDialog, activeTab }: VolunteersViewProps
                 )}
             </Dialog>
 
-            <Snackbar
-                open={snackbar.open}
-                autoHideDuration={4000}
-                onClose={() => setSnackbar({ ...snackbar, open: false })}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            >
-                <Alert
-                    severity={snackbar.severity}
-                    variant="filled"
-                    sx={{
-                        borderRadius: 1.5,
-                        fontWeight: 800,
-                        fontSize: '0.85rem',
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                        backdropFilter: 'blur(10px)',
-                        bgcolor: alpha(
-                            snackbar.severity === 'success' ? theme.palette.success.main :
-                                snackbar.severity === 'error' ? theme.palette.error.main :
-                                    theme.palette.info.main,
-                            0.9
-                        )
-                    }}
-                >
-                    {snackbar.message.toUpperCase()}
-                </Alert>
-            </Snackbar>
         </Box>
     );
 }

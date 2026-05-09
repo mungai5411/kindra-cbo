@@ -414,6 +414,10 @@ interface Shelter {
     current_occupancy: number;
     available_beds: number;
     occupancy_percentage: number;
+    gender_policy?: string;
+    has_medical_facility?: boolean;
+    has_education_facility?: boolean;
+    has_counseling_services?: boolean;
     is_active: boolean;
     approval_status: string;
 }

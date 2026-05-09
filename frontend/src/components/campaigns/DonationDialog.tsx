@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
 import { checkMpesaStatus } from '../../features/donations/donationsSlice';
+import { useNotification } from '../../contexts/NotificationContext';
 import {
     Dialog,
     DialogTitle,
@@ -56,6 +57,7 @@ const PRESET_AMOUNTS = [500, 1000, 2500, 5000, 10000];
 export default function DonationDialog({ open, onClose, campaign }: DonationDialogProps) {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
+    const { notify } = useNotification();
     const { user } = useSelector((state: RootState) => state.auth);
     const { donations } = useSelector((state: RootState) => state.donations);
 
@@ -88,9 +90,12 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                         if (data.status === 'COMPLETED') {
                             setMpesaStatus('success');
                             setTransactionId(data.transaction_id);
+                            notify({ message: 'Donation received! Thank you for your support.', severity: 'success' });
                         } else if (data.status === 'FAILED') {
                             setMpesaStatus('failed');
-                            setError(data.message || 'Payment failed or was cancelled by user.');
+                            const failMsg = data.message || 'Payment failed or was cancelled by user.';
+                            setError(failMsg);
+                            notify({ message: failMsg, severity: 'error' });
                         }
                     }
                 } catch (err) {
@@ -110,7 +115,9 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
             }, 1000);
         } else if (timeLeft === 0 && mpesaStatus === 'pending') {
             setMpesaStatus('failed');
-            setError('Payment verification timed out. Please check your phone or try again.');
+            const timeoutMsg = 'Payment verification timed out. Please check your phone or try again.';
+            setError(timeoutMsg);
+            notify({ message: timeoutMsg, severity: 'warning' });
         }
         return () => clearInterval(timer);
     }, [success, mpesaStatus, timeLeft]);

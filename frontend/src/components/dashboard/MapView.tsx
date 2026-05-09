@@ -6,6 +6,7 @@ import {
     Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
     MenuItem, CircularProgress, Alert, Stack
 } from '@mui/material';
+import { useNotification } from '../../contexts/NotificationContext';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
 import { LocationOn, Edit, Delete, Close } from '@mui/icons-material';
@@ -49,6 +50,7 @@ const FamilyDetailsDialog: React.FC<{
     isLoading: boolean;
     counties: string[];
 }> = ({ open, family, onClose, onEdit, onDelete, isLoading, counties }) => {
+    const { confirm } = useNotification();
     const [formData, setFormData] = useState<any>({});
     const [isEditing, setIsEditing] = useState(false);
 
@@ -65,10 +67,16 @@ const FamilyDetailsDialog: React.FC<{
     };
 
     const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this family?')) {
-            await onDelete(family.id);
-            onClose();
-        }
+        confirm({
+            title: 'Delete Family?',
+            message: `Are you sure you want to delete the family "${family.family_code}" permanently? This action cannot be undone.`,
+            isDangerous: true,
+            confirmText: 'Delete',
+            onConfirm: async () => {
+                await onDelete(family.id);
+                onClose();
+            }
+        });
     };
 
     if (!family) return null;
@@ -213,6 +221,7 @@ const CaseDetailsDialog: React.FC<{
     onDelete: (id: string) => void;
     isLoading: boolean;
 }> = ({ open, case: caseData, family, onClose, onEdit, onDelete, isLoading }) => {
+    const { confirm } = useNotification();
     const [formData, setFormData] = useState<any>({});
     const [isEditing, setIsEditing] = useState(false);
 
@@ -229,10 +238,16 @@ const CaseDetailsDialog: React.FC<{
     };
 
     const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this case?')) {
-            await onDelete(caseData.id);
-            onClose();
-        }
+        confirm({
+            title: 'Delete Case?',
+            message: `Are you sure you want to delete case "${caseData.case_number}" permanently?`,
+            isDangerous: true,
+            confirmText: 'Delete',
+            onConfirm: async () => {
+                await onDelete(caseData.id);
+                onClose();
+            }
+        });
     };
 
     if (!caseData || !family) return null;
@@ -371,11 +386,11 @@ export const MapView: React.FC<{ height?: string | number, embedded?: boolean }>
     const cases = useSelector((state: RootState) => state.caseManagement.cases);
     const shelters = useSelector((state: RootState) => state.shelters.shelters);
     const isLoading = useSelector((state: RootState) => state.caseManagement.isLoading);
+    const { notify } = useNotification();
     
     // Dialog state
     const [familyDialog, setFamilyDialog] = useState<{ open: boolean; family: any }>({ open: false, family: null });
     const [caseDialog, setCaseDialog] = useState<{ open: boolean; case: any }>({ open: false, case: null });
-    const [error, setError] = useState<string>('');
 
     // Fetch data on mount
     useEffect(() => {
@@ -386,44 +401,44 @@ export const MapView: React.FC<{ height?: string | number, embedded?: boolean }>
     // Handle family edit
     const handleEditFamily = async (id: string, data: any) => {
         try {
-            setError('');
             await dispatch(updateFamily({ id, data })).unwrap();
+            notify({ message: 'Family updated successfully', severity: 'success' });
             setFamilyDialog({ open: false, family: null });
         } catch (err: any) {
-            setError(err || 'Failed to update family');
+            notify({ message: err || 'Failed to update family', severity: 'error' });
         }
     };
 
     // Handle family delete
     const handleDeleteFamily = async (id: string) => {
         try {
-            setError('');
             await dispatch(deleteFamily(id)).unwrap();
+            notify({ message: 'Family record deleted', severity: 'success' });
             setFamilyDialog({ open: false, family: null });
         } catch (err: any) {
-            setError(err || 'Failed to delete family');
+            notify({ message: err || 'Failed to delete family', severity: 'error' });
         }
     };
 
     // Handle case edit
     const handleEditCase = async (id: string, data: any) => {
         try {
-            setError('');
             await dispatch(updateCase({ id, data })).unwrap();
+            notify({ message: 'Case updated successfully', severity: 'success' });
             setCaseDialog({ open: false, case: null });
         } catch (err: any) {
-            setError(err || 'Failed to update case');
+            notify({ message: err || 'Failed to update case', severity: 'error' });
         }
     };
 
     // Handle case delete
     const handleDeleteCase = async (id: string) => {
         try {
-            setError('');
             await dispatch(deleteCase(id)).unwrap();
+            notify({ message: 'Case record deleted', severity: 'success' });
             setCaseDialog({ open: false, case: null });
         } catch (err: any) {
-            setError(err || 'Failed to delete case');
+            notify({ message: err || 'Failed to delete case', severity: 'error' });
         }
     };
 
@@ -439,7 +454,6 @@ export const MapView: React.FC<{ height?: string | number, embedded?: boolean }>
 
     return (
         <Box sx={{ height: height, width: '100%', position: 'relative' }}>
-            {error && <Alert severity="error" onClose={() => setError('')} sx={{ mb: 2 }}>{error}</Alert>}
             
             {!embedded && (
                 <Box sx={{ mb: 3 }}>

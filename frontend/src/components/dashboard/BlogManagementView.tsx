@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
 import { fetchAdminPosts, fetchCategories, createPost, updatePost, deletePost, fetchTags, createTag, updateTag, deleteTag, createCategory, updateCategory, deleteCategory, fetchAllComments, updateCommentStatus, deleteComment } from '../../features/blog/blogSlice';
 import apiClient from '../../api/client';
+import { useNotification } from '../../contexts/NotificationContext';
 import {
     Box,
     Typography,
@@ -85,6 +86,7 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const { confirm, notify } = useNotification();
     const { posts, categories, tags, comments, isLoading } = useSelector((state: RootState) => state.blog);
 
     // Dialog States
@@ -166,12 +168,15 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
         try {
             if (selectedTag) {
                 await dispatch(updateTag({ id: selectedTag.id, data: metaFormData })).unwrap();
+                notify({ message: 'Tag updated successfully', severity: 'success' });
             } else {
                 await dispatch(createTag(metaFormData)).unwrap();
+                notify({ message: 'Tag created successfully', severity: 'success' });
             }
             setTagDialogOpen(false);
         } catch (error) {
             console.error('Failed to save tag:', error);
+            notify({ message: 'Failed to save tag', severity: 'error' });
         }
     };
 
@@ -192,12 +197,15 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
         try {
             if (selectedCategory) {
                 await dispatch(updateCategory({ id: selectedCategory.id, data: metaFormData })).unwrap();
+                notify({ message: 'Category updated successfully', severity: 'success' });
             } else {
                 await dispatch(createCategory(metaFormData)).unwrap();
+                notify({ message: 'Category created successfully', severity: 'success' });
             }
             setCategoryDialogOpen(false);
         } catch (error) {
             console.error('Failed to save category:', error);
+            notify({ message: 'Failed to save category', severity: 'error' });
         }
     };
 
@@ -277,9 +285,11 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
             }
 
             setOpenDialog(false);
+            notify({ message: `Story ${selectedPost ? 'updated' : 'created'} successfully!`, severity: 'success' });
             dispatch(fetchAdminPosts()); // Refresh list
         } catch (error) {
             console.error('Failed to save story details:', error);
+            notify({ message: 'Failed to save story', severity: 'error' });
         }
     };
 
@@ -629,9 +639,20 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                                             size="small"
                                             sx={{ ml: 'auto', color: 'text.disabled', '&:hover': { color: 'error.main', bgcolor: alpha(theme.palette.error.main, 0.08) } }}
                                             onClick={() => {
-                                                if (window.confirm('Delete this comment permanently?')) {
-                                                    dispatch(deleteComment(comment.id));
-                                                }
+                                                confirm({
+                                                    title: 'Delete Comment?',
+                                                    message: 'Delete this comment permanently? This action cannot be undone.',
+                                                    isDangerous: true,
+                                                    confirmText: 'Delete',
+                                                    onConfirm: async () => {
+                                                        try {
+                                                            await dispatch(deleteComment(comment.id)).unwrap();
+                                                            notify({ message: 'Comment deleted', severity: 'success' });
+                                                        } catch (err) {
+                                                            notify({ message: 'Failed to delete comment', severity: 'error' });
+                                                        }
+                                                    }
+                                                });
                                             }}
                                         >
                                             <Delete fontSize="small" />
