@@ -47,10 +47,14 @@ import {
     HealthAndSafety,
     Edit,
     MoreVert,
-    WarningAmber
+    WarningAmber,
+    CloudUpload,
+    Description,
+    Download,
+    Delete
 } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
-import { fetchFamilies, fetchChildren, fetchCases, addFamily, addChild, addCase } from '../../features/caseManagement/caseManagementSlice';
+import { fetchFamilies, fetchChildren, fetchCases, addFamily, addChild, addCase, fetchCaseDocuments, addCaseDocument, deleteCaseDocument } from '../../features/caseManagement/caseManagementSlice';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
 import { SummaryHeader } from './SummaryHeader';
@@ -121,7 +125,7 @@ const StatusChip = ({ status, type = 'status' }: { status: string, type?: 'statu
 export function CasesView({ activeTab }: { activeTab?: string }) {
     const theme = useTheme();
     const dispatch = useDispatch<AppDispatch>();
-    const { families, children, cases, assessments, caseNotes: notes, isLoading } = useSelector((state: RootState) => state.caseManagement);
+    const { families, children, cases, assessments, caseNotes: notes, documents, isLoading } = useSelector((state: RootState) => state.caseManagement);
     const userRole = useSelector((state: RootState) => state.auth.user?.role);
     const isManagement = ['ADMIN', 'MANAGEMENT'].includes(userRole || '');
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' as 'info' | 'success' | 'error' });
@@ -160,12 +164,20 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
         legal_status: 'WITH_PARENTS',
         family: ''
     });
+    
+    const [documentForm, setDocumentForm] = useState({
+        title: '',
+        document_type: 'OTHER',
+        family: '',
+        file: null as File | null
+    });
 
     useEffect(() => {
         const fetchAll = () => {
             dispatch(fetchFamilies());
             dispatch(fetchChildren());
             dispatch(fetchCases());
+            dispatch(fetchCaseDocuments());
         };
         fetchAll();
         // Automated background sync every 60s — no manual button required
@@ -209,6 +221,33 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
             setOpenDialog({ type: null, data: null });
             setChildForm({ first_name: '', last_name: '', date_of_birth: '2015-01-01', gender: 'M', legal_status: 'WITH_PARENTS', family: '' });
             setSnackbar({ open: true, message: 'Child registered successfully', severity: 'success' });
+        });
+    };
+
+    const handleUploadDocument = () => {
+        if (!documentForm.title || !documentForm.file || !documentForm.family) {
+            setSnackbar({ open: true, message: 'Required fields missing', severity: 'error' });
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('title', documentForm.title);
+        formData.append('document_type', documentForm.document_type);
+        formData.append('family', documentForm.family);
+        formData.append('file', documentForm.file);
+        
+        dispatch(addCaseDocument(formData)).unwrap().then(() => {
+            setOpenDialog({ type: null, data: null });
+            setDocumentForm({ title: '', document_type: 'OTHER', family: '', file: null });
+            setSnackbar({ open: true, message: 'Document uploaded successfully', severity: 'success' });
+        }).catch((err) => {
+            setSnackbar({ open: true, message: err || 'Upload failed', severity: 'error' });
+        });
+    };
+
+    const handleDeleteDocument = (id: string) => {
+        dispatch(deleteCaseDocument(id)).unwrap().then(() => {
+            setSnackbar({ open: true, message: 'Document deleted', severity: 'success' });
         });
     };
 
@@ -586,6 +625,83 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
         </Paper>
     );
 
+    const renderDocuments = () => (
+        <Paper sx={{
+            p: 0,
+            borderRadius: 1.5,
+            border: '1px solid',
+            borderColor: 'divider',
+            overflow: 'hidden'
+        }}>
+            <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="h6" fontWeight="bold">Case Documents</Typography>
+                <Button
+                    variant="contained"
+                    startIcon={<CloudUpload />}
+                    onClick={() => setOpenDialog({ type: 'document', data: null })}
+                    sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 600 }}
+                >
+                    Upload Document
+                </Button>
+            </Box>
+            <TableContainer>
+                <Table size="small">
+                    <TableHead sx={{ bgcolor: alpha(theme.palette.info.main, 0.04) }}>
+                        <TableRow>
+                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Document Name</TableCell>
+                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Type</TableCell>
+                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Family Unit</TableCell>
+                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary' }}>Date Added</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 600, color: 'text.secondary' }}>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {documents.map((doc: any) => (
+                            <TableRow key={doc.id} hover>
+                                <TableCell>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                        <Description color="primary" />
+                                        <Box>
+                                            <Typography variant="body2" fontWeight="600">{doc.title}</Typography>
+                                            <Typography variant="caption" color="text.secondary">{(doc.file_size / 1024).toFixed(1)} KB • {doc.file_name}</Typography>
+                                        </Box>
+                                    </Box>
+                                </TableCell>
+                                <TableCell>
+                                    <Chip label={doc.document_type} size="small" variant="outlined" sx={{ borderRadius: 1.5, fontSize: '0.65rem', fontWeight: 700 }} />
+                                </TableCell>
+                                <TableCell>
+                                    <Typography variant="body2">{doc.family_name || 'Associated Unit'}</Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography variant="body2" color="text.secondary">{new Date(doc.uploaded_at).toLocaleDateString()}</Typography>
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                                        <IconButton size="small" onClick={() => downloadFile(doc.file, doc.file_name)}>
+                                            <Download fontSize="small" />
+                                        </IconButton>
+                                        <IconButton size="small" color="error" onClick={() => handleDeleteDocument(doc.id)}>
+                                            <Delete fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                        {documents.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
+                                    <CloudUpload sx={{ fontSize: 48, color: 'text.disabled', opacity: 0.2, mb: 1 }} />
+                                    <Typography color="text.secondary">No legal or medical documents uploaded yet.</Typography>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Paper>
+    );
+
     const renderCaseNotes = () => (
         <Paper sx={{
             p: 0,
@@ -631,6 +747,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
             {activeTab === 'families' && renderFamilies()}
             {activeTab === 'assessments' && renderAssessments()}
             {activeTab === 'case_notes' && renderCaseNotes()}
+            {activeTab === 'documents' && renderDocuments()}
             {(!activeTab || activeTab === 'case_management') && renderCases()}
 
             {/* Add Family Dialog */}
@@ -854,6 +971,72 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                 <DialogActions sx={{ p: 3, pt: 0 }}>
                     <Button onClick={() => setOpenDialog({ type: null, data: null })}>Cancel</Button>
                     <Button variant="contained" onClick={handleAddCase} sx={{ borderRadius: 2, px: 3 }}>Create Case</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Upload Document Dialog */}
+            <Dialog open={openDialog.type === 'document'} onClose={() => setOpenDialog({ type: null, data: null })} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Upload Document</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+                        <TextField
+                            fullWidth
+                            label="Document Title"
+                            required
+                            placeholder="e.g. Birth Certificate, ID Copy"
+                            value={documentForm.title}
+                            onChange={(e) => setDocumentForm({ ...documentForm, title: e.target.value })}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                        />
+                        <FormControl fullWidth required>
+                            <InputLabel>Document Type</InputLabel>
+                            <Select
+                                value={documentForm.document_type}
+                                label="Document Type"
+                                onChange={(e) => setDocumentForm({ ...documentForm, document_type: e.target.value as string })}
+                                sx={{ borderRadius: 3 }}
+                            >
+                                <MenuItem value="ID_CARD">ID Card / Passport</MenuItem>
+                                <MenuItem value="BIRTH_CERTIFICATE">Birth Certificate</MenuItem>
+                                <MenuItem value="MEDICAL_REPORT">Medical Report</MenuItem>
+                                <MenuItem value="LEGAL_DOC">Legal Document</MenuItem>
+                                <MenuItem value="SCHOOL_REPORT">School Report</MenuItem>
+                                <MenuItem value="OTHER">Other</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControl fullWidth required>
+                            <InputLabel>Associate with Family</InputLabel>
+                            <Select
+                                value={documentForm.family}
+                                label="Associate with Family"
+                                onChange={(e) => setDocumentForm({ ...documentForm, family: e.target.value as string })}
+                                sx={{ borderRadius: 3 }}
+                            >
+                                {families.map((f: any) => (
+                                    <MenuItem key={f.id} value={f.id}>{f.primary_contact_name} ({f.family_code})</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        
+                        <Button
+                            variant="outlined"
+                            component="label"
+                            fullWidth
+                            startIcon={<CloudUpload />}
+                            sx={{ borderRadius: 3, py: 1.5, borderStyle: 'dashed', borderWidth: 2 }}
+                        >
+                            {documentForm.file ? documentForm.file.name : 'Select File (PDF, Image)'}
+                            <input
+                                type="file"
+                                hidden
+                                onChange={(e) => setDocumentForm({ ...documentForm, file: e.target.files ? e.target.files[0] : null })}
+                            />
+                        </Button>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, pt: 0 }}>
+                    <Button onClick={() => setOpenDialog({ type: null, data: null })}>Cancel</Button>
+                    <Button variant="contained" onClick={handleUploadDocument} sx={{ borderRadius: 2, px: 3 }}>Start Upload</Button>
                 </DialogActions>
             </Dialog>
 

@@ -58,12 +58,25 @@ interface CaseNote {
     created_at: string;
 }
 
+interface CaseDocument {
+    id: string;
+    case: string;
+    title: string;
+    document_type: string;
+    file: string;
+    file_name: string;
+    file_size: number;
+    uploaded_by: string;
+    uploaded_at: string;
+}
+
 interface CaseManagementState {
     families: Family[];
     children: Child[];
     cases: Case[];
     assessments: Assessment[];
     caseNotes: CaseNote[];
+    documents: CaseDocument[];
     isLoading: boolean;
     error: string | null;
 }
@@ -74,6 +87,7 @@ const initialState: CaseManagementState = {
     cases: [],
     assessments: [],
     caseNotes: [],
+    documents: [],
     isLoading: false,
     error: null,
 };
@@ -127,6 +141,18 @@ export const deleteCaseNote = createAsyncThunk(
     }
 );
 
+export const deleteCaseDocument = createAsyncThunk(
+    'caseManagement/deleteCaseDocument',
+    async (documentId: string, { rejectWithValue }) => {
+        try {
+            await apiClient.delete(`/cases/documents/${documentId}/`);
+            return documentId;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete document');
+        }
+    }
+);
+
 // Fetch thunks for data loading
 export const fetchFamilies = createAsyncThunk(
     'caseManagement/fetchFamilies',
@@ -172,6 +198,18 @@ export const fetchCaseNotes = createAsyncThunk(
             return response.data.results || response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch case notes');
+        }
+    }
+);
+
+export const fetchCaseDocuments = createAsyncThunk(
+    'caseManagement/fetchCaseDocuments',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get('/cases/documents/');
+            return response.data.results || response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch documents');
         }
     }
 );
@@ -245,6 +283,20 @@ export const addCaseNote = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to add case note');
+        }
+    }
+);
+
+export const addCaseDocument = createAsyncThunk(
+    'caseManagement/addCaseDocument',
+    async (data: FormData, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post('/cases/documents/', data, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to upload document');
         }
     }
 );
@@ -361,6 +413,21 @@ const caseManagementSlice = createSlice({
                 state.error = action.payload as string;
             });
 
+        // Fetch Case Documents
+        builder
+            .addCase(fetchCaseDocuments.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(fetchCaseDocuments.fulfilled, (state, action: PayloadAction<CaseDocument[]>) => {
+                state.isLoading = false;
+                state.documents = action.payload;
+            })
+            .addCase(fetchCaseDocuments.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+            });
+
         // Delete Family
         builder
             .addCase(deleteFamily.pending, (state) => {
@@ -421,6 +488,21 @@ const caseManagementSlice = createSlice({
                 state.error = action.payload as string;
             });
 
+        // Delete Case Document
+        builder
+            .addCase(deleteCaseDocument.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(deleteCaseDocument.fulfilled, (state, action: PayloadAction<string>) => {
+                state.isLoading = false;
+                state.documents = state.documents.filter(doc => doc.id !== action.payload);
+            })
+            .addCase(deleteCaseDocument.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+            });
+
         // Add Actions
         builder.addCase(addFamily.fulfilled, (state, action) => {
             state.families.unshift(action.payload);
@@ -436,6 +518,9 @@ const caseManagementSlice = createSlice({
         });
         builder.addCase(addCaseNote.fulfilled, (state, action) => {
             state.caseNotes.unshift(action.payload);
+        });
+        builder.addCase(addCaseDocument.fulfilled, (state, action) => {
+            state.documents.unshift(action.payload);
         });
 
         // Update Actions

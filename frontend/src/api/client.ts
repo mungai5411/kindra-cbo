@@ -206,6 +206,7 @@ export const endpoints = {
         cases: '/cases/cases/',
         assessments: '/cases/assessments/',
         notes: '/cases/notes/',
+        documents: '/cases/documents/',
     },
 
     // Shelters

@@ -61,6 +61,7 @@ import { fetchVolunteers, fetchTasks, fetchEvents } from '../features/volunteers
 import { fetchCampaigns, fetchDonations } from '../features/donations/donationsSlice';
 import { fetchDashboardData } from '../features/reporting/reportingSlice';
 import { fetchPendingUsers } from '../features/admin/adminSlice';
+import { fetchCaseDocuments } from '../features/caseManagement/caseManagementSlice';
 
 const DRAWER_WIDTH = 280;
 
@@ -239,6 +240,7 @@ export default function DashboardPage() {
             dispatch(fetchFamilies());
             dispatch(fetchChildren());
             dispatch(fetchCases());
+            dispatch(fetchCaseDocuments());
             dispatch(fetchShelters());
             dispatch(fetchIncidents());
 
@@ -376,6 +378,7 @@ export default function DashboardPage() {
             'families': <CasesView activeTab={activeTab} />,
             'assessments': <CasesView activeTab={activeTab} />,
             'case_notes': <CasesView activeTab={activeTab} />,
+            'documents': <CasesView activeTab={activeTab} />,
             'shelter': <ShelterView activeTab={activeTab} />,
             'shelters': <ShelterView activeTab={activeTab} />,
             'staff': <ShelterView activeTab={activeTab} />,
