@@ -1,5 +1,5 @@
 import { List, ListItem, ListItemText, ListItemAvatar, Avatar, Typography, Paper, Box, Button, alpha, useTheme } from '@mui/material';
-import { Campaign, VolunteerActivism, FolderShared, Payments } from '@mui/icons-material';
+import { Campaign, VolunteerActivism, FolderShared, Paid } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
 interface ActivityItem {
@@ -19,7 +19,7 @@ export const ActivityFeed = ({ activities }: ActivityFeedProps) => {
 
     const getIcon = (type: string) => {
         switch (type) {
-            case 'donation': return <Payments fontSize="small" />;
+            case 'donation': return <Paid fontSize="small" />;
             case 'volunteer': return <VolunteerActivism fontSize="small" />;
             case 'case': return <FolderShared fontSize="small" />;
             case 'campaign': return <Campaign fontSize="small" />;

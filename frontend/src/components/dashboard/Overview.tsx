@@ -56,13 +56,19 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
     const shelterCapacity = getShelterCapacityData(shelters);
 
     const activities: any[] = [
-        ...donationRecords.map((d: any) => ({
-            id: `don-${d.id}`,
-            type: 'donation' as const,
-            title: 'Donation',
-            description: `KES ${(d.amount || 0).toLocaleString()} — ${d.campaign_title || 'General'}`,
-            timestamp: d.donation_date
-        })),
+        ...donationRecords.map((d: any) => {
+            const campaign = campaigns.find(c => c.id === d.campaign || c.slug === d.campaign);
+            const campaignTitle = campaign?.title || d.campaign_title || 'General Fund';
+            const donorName = d.donor_name || 'Anonymous Donor';
+            
+            return {
+                id: `don-${d.id}`,
+                type: 'donation' as const,
+                title: 'New Donation',
+                description: `${donorName} contributed KES ${(d.amount || 0).toLocaleString()} to ${campaignTitle}`,
+                timestamp: d.donation_date || d.created_at
+            };
+        }),
         ...volunteers.slice(0, 5).map((v: any) => ({
             id: `vol-${v.id}`,
             type: 'volunteer' as const,
