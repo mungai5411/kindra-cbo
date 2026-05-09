@@ -42,7 +42,7 @@ interface DonationCardProps {
     campaign_title?: string;
     donor_name?: string;
     amount: number;
-    donation_method?: 'MPESA' | 'BANK_TRANSFER' | 'CASH' | 'PAYPAL' | 'CARD';
+    donation_method?: 'MPESA';
     status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
     donation_date?: string;
     impact_description?: string;
@@ -87,11 +87,7 @@ export const DonationCard: React.FC<DonationCardProps> = ({
 
   // Donation method icons/colors
   const methodColors: Record<string, string> = {
-    'MPESA': '#4CAF50',
-    'BANK_TRANSFER': '#2196F3',
-    'CARD': '#FF9800',
-    'CASH': '#9C27B0',
-    'PAYPAL': '#003087'
+    'MPESA': '#4CAF50'
   };
 
   return (

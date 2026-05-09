@@ -51,7 +51,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
     const { user } = useSelector((state: RootState) => state.auth);
     const { donations } = useSelector((state: RootState) => state.donations);
 
-    const [paymentMethod, setPaymentMethod] = useState<'MPESA' | 'PAYPAL' | 'STRIPE'>('MPESA');
+
     const [amount, setAmount] = useState('');
     const [donorName, setDonorName] = useState(user ? `${user.first_name} ${user.last_name}` : '');
     const [donorEmail, setDonorEmail] = useState(user?.email || '');
@@ -69,7 +69,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
     // Poll for M-Pesa STK Push completion
     useEffect(() => {
         let interval: any;
-        if (success && paymentMethod === 'MPESA' && mpesaStatus === 'pending' && checkoutRequestId) {
+        if (success && mpesaStatus === 'pending' && checkoutRequestId) {
             interval = setInterval(async () => {
                 try {
                     const resultAction = await dispatch(checkMpesaStatus(checkoutRequestId));
@@ -89,7 +89,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
             }, 3000); // Poll every 3 seconds for snappy feedback
         }
         return () => clearInterval(interval);
-    }, [success, paymentMethod, mpesaStatus, checkoutRequestId, dispatch]);
+    }, [success, mpesaStatus, checkoutRequestId, dispatch]);
 
     const handleAmountSelect = (value: number) => {
         setAmount(value.toString());
@@ -106,7 +106,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
             return;
         }
 
-        if (paymentMethod === 'MPESA' && !phoneNumber) {
+        if (!phoneNumber) {
             setError('Phone number is required for M-Pesa');
             return;
         }
@@ -125,16 +125,8 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                 message: message
             };
 
-            if (paymentMethod === 'MPESA') {
-                endpoint = endpoints.donations.mpesa;
-                payload.phone_number = phoneNumber;
-            } else if (paymentMethod === 'PAYPAL') {
-                endpoint = endpoints.donations.paypal;
-                payload.order_id = `PAYPAL-${Date.now()}`; // Simulated
-            } else {
-                endpoint = endpoints.donations.stripe;
-                payload.token = `STRIPE-${Date.now()}`; // Simulated
-            }
+            endpoint = endpoints.donations.mpesa;
+            payload.phone_number = phoneNumber;
 
             const response = await apiClient.post(endpoint, payload);
 
@@ -207,7 +199,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                             exit={{ opacity: 0 }}
                         >
                             <Box sx={{ textAlign: 'center', py: 4 }}>
-                                {paymentMethod === 'MPESA' && mpesaStatus === 'pending' ? (
+                                {mpesaStatus === 'pending' ? (
                                     <>
                                         <CircularProgress size={80} sx={{ color: 'primary.main', mb: 2 }} />
                                         <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -217,7 +209,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                                             An M-Pesa prompt has been sent to your phone. Please enter your M-Pesa PIN to complete the donation of <strong>{campaign.currency} {amount}</strong>. Waiting for completion...
                                         </Typography>
                                     </>
-                                ) : paymentMethod === 'MPESA' && mpesaStatus === 'failed' ? (
+                                ) : mpesaStatus === 'failed' ? (
                                     <>
                                         <Close sx={{ fontSize: 80, color: 'error.main', mb: 2 }} />
                                         <Typography variant="h5" fontWeight="bold" color="error.main" gutterBottom>
@@ -269,29 +261,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                                     </Typography>
                                 </Box>
 
-                                {/* Payment Method Selection */}
-                                <Box>
-                                    <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                                        Payment Method
-                                    </Typography>
-                                    <ToggleButtonGroup
-                                        value={paymentMethod}
-                                        exclusive
-                                        onChange={(_, value) => value && setPaymentMethod(value)}
-                                        fullWidth
-                                        sx={{ '& .MuiToggleButton-root': { py: 1.5, borderRadius: 1.5 } }}
-                                    >
-                                        <ToggleButton value="MPESA">
-                                            <Phone sx={{ mr: 1 }} /> M-Pesa
-                                        </ToggleButton>
-                                        <ToggleButton value="PAYPAL">
-                                            <CreditCard sx={{ mr: 1 }} /> PayPal
-                                        </ToggleButton>
-                                        <ToggleButton value="STRIPE">
-                                            <AccountBalance sx={{ mr: 1 }} /> Card
-                                        </ToggleButton>
-                                    </ToggleButtonGroup>
-                                </Box>
+
 
                                 {/* Amount Selection */}
                                 <Box>
@@ -351,17 +321,15 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                                             onChange={(e) => setDonorEmail(e.target.value)}
                                             InputProps={{ sx: { borderRadius: 2 } }}
                                         />
-                                        {paymentMethod === 'MPESA' && (
-                                            <TextField
-                                                fullWidth
-                                                required
-                                                label="M-Pesa Phone Number"
-                                                placeholder="254712345678"
-                                                value={phoneNumber}
-                                                onChange={(e) => setPhoneNumber(e.target.value)}
-                                                InputProps={{ sx: { borderRadius: 2 } }}
-                                            />
-                                        )}
+                                        <TextField
+                                            fullWidth
+                                            required
+                                            label="M-Pesa Phone Number"
+                                            placeholder="254712345678"
+                                            value={phoneNumber}
+                                            onChange={(e) => setPhoneNumber(e.target.value)}
+                                            InputProps={{ sx: { borderRadius: 2 } }}
+                                        />
                                     </Box>
                                 </Box>
 

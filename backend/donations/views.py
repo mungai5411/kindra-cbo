@@ -263,50 +263,10 @@ def check_payment_status(request):
 
 
 
-@api_view(['POST'])
-@permission_classes([permissions.AllowAny])
-@throttle_classes([PaymentRateThrottle])
-def process_paypal_payment(request):
-    """Process PayPal payment (simulated)"""
-    try:
-        donation, receipt = PaymentService.process_paypal_payment(request.data)
-        return Response({
-            'status': 'success',
-            'message': 'Donation processed successfully',
-            'transaction_id': donation.transaction_id,
-            'receipt_id': receipt.id if receipt else None
-        }, status=status.HTTP_200_OK)
-    except ValueError as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        logger.error(f"Error processing PayPal payment: {str(e)}")
-        return Response(
-            {'error': 'Something went wrong. Please try again later.'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
 
 
-@api_view(['POST'])
-@permission_classes([permissions.AllowAny])
-@throttle_classes([PaymentRateThrottle])
-def process_stripe_payment(request):
-    """Process Stripe payment (simulated)"""
-    try:
-        donation, receipt = PaymentService.process_stripe_payment(request.data)
-        return Response({
-            'status': 'success',
-            'message': 'Donation processed successfully',
-            'transaction_id': donation.transaction_id,
-            'receipt_id': receipt.id if receipt else None
-        }, status=status.HTTP_200_OK)
-    except ValueError as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        logger.error(f"Error processing Stripe payment: {str(e)}")
-        return Response(
-            {'error': 'Something went wrong. Please try again later.'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+
+
 
 
 class MaterialDonationListCreateView(generics.ListCreateAPIView):

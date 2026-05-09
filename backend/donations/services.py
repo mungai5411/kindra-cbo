@@ -306,63 +306,7 @@ class PaymentService:
             logger.error(f"Error handling M-Pesa callback: {str(e)}", exc_info=True)
             return False
     
-    @staticmethod
-    def process_paypal_payment(data):
-        """
-        Process PayPal payment
-        
-        Args:
-            data: Payment data dictionary
-            
-        Returns:
-            Donation instance
-        """
-        if not data.get('amount') or not data.get('order_id'):
-            raise ValueError('Amount and order ID are required')
-        
-        donation = DonationService.create_donation({
-            'amount': data.get('amount'),
-            'payment_method': Donation.PaymentMethod.PAYPAL,
-            'transaction_id': data.get('order_id', f"PAYPAL-{uuid.uuid4().hex[:10].upper()}"),
-            'donor_name': data.get('donor_name', ''),
-            'donor_email': data.get('donor_email', ''),
-            'is_anonymous': data.get('is_anonymous', False),
-            'message': data.get('message', ''),
-            'campaign': data.get('campaign'),
-            'status': Donation.Status.COMPLETED # PayPal is usually instant
-        })
-        
-        receipt = DonationService.finalize_donation(donation)
-        return donation, receipt
-    
-    @staticmethod
-    def process_stripe_payment(data):
-        """
-        Process Stripe payment
-        
-        Args:
-            data: Payment data dictionary
-            
-        Returns:
-            Donation instance
-        """
-        if not data.get('amount'):
-            raise ValueError('Amount is required')
-        
-        donation = DonationService.create_donation({
-            'amount': data.get('amount'),
-            'payment_method': Donation.PaymentMethod.STRIPE,
-            'transaction_id': data.get('token', f"STRIPE-{uuid.uuid4().hex[:10].upper()}"),
-            'donor_name': data.get('donor_name', ''),
-            'donor_email': data.get('donor_email', ''),
-            'is_anonymous': data.get('is_anonymous', False),
-            'message': data.get('message', ''),
-            'campaign': data.get('campaign'),
-            'status': Donation.Status.COMPLETED
-        })
-        
-        receipt = DonationService.finalize_donation(donation)
-        return donation, receipt
+
 
 
 class ReceiptService:

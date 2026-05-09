@@ -176,9 +176,6 @@ class Donation(models.Model):
     
     class PaymentMethod(models.TextChoices):
         MPESA = 'MPESA', _('M-Pesa')
-        PAYPAL = 'PAYPAL', _('PayPal')
-        STRIPE = 'STRIPE', _('Stripe')
-        BANK_TRANSFER = 'BANK_TRANSFER', _('Bank Transfer')
     
     class Status(models.TextChoices):
         PENDING = 'PENDING', _('Pending')

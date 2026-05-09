@@ -93,7 +93,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
     // Donation Simulation State
     const [openDonationDialog, setOpenDonationDialog] = useState(false);
     const [donationAmount, setDonationAmount] = useState(1000);
-    const [donationMethod, setDonationMethod] = useState<'mpesa' | 'paypal' | 'stripe'>('mpesa');
+    const [donationMethod, setDonationMethod] = useState<'mpesa'>('mpesa');
     const [donorPhone, setDonorPhone] = useState('254700000000');
     const [donorName, setDonorName] = useState('Test Donor');
 
@@ -299,10 +299,6 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
 
         if (donationMethod === 'mpesa') {
             data.phone_number = donorPhone;
-        } else if (donationMethod === 'paypal') {
-            data.order_id = `PAYPAL-${Math.random().toString(36).substring(7).toUpperCase()}`;
-        } else {
-            data.token = `STRIPE-${Math.random().toString(36).substring(7).toUpperCase()}`;
         }
 
         dispatch(processPayment({ method: donationMethod, data }));
@@ -836,12 +832,7 @@ export function DonationsView({ setOpenDialog, activeTab }: DonationsViewProps) 
                             <MenuItem value="mpesa">
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><PhoneAndroid fontSize="small" /> M-Pesa (Kenya)</Box>
                             </MenuItem>
-                            <MenuItem value="paypal">
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><AccountBalanceWallet fontSize="small" /> PayPal Global</Box>
-                            </MenuItem>
-                            <MenuItem value="stripe">
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><CreditCard fontSize="small" /> Stripe Infrastructure</Box>
-                            </MenuItem>
+
                         </TextField>
 
                         <TextField

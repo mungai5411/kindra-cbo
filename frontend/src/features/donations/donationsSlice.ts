@@ -155,11 +155,9 @@ export const fetchReceipts = createAsyncThunk(
 
 export const processPayment = createAsyncThunk(
     'donations/processPayment',
-    async ({ method, data }: { method: 'mpesa' | 'paypal' | 'stripe'; data: any }, { dispatch, rejectWithValue }) => {
+    async ({ method, data }: { method: 'mpesa'; data: any }, { dispatch, rejectWithValue }) => {
         try {
-            const endpoint = method === 'mpesa' ? endpoints.donations.mpesa :
-                method === 'paypal' ? endpoints.donations.paypal :
-                    endpoints.donations.stripe;
+            const endpoint = endpoints.donations.mpesa;
             const response = await apiClient.post(endpoint, data);
 
             // Refresh data after successful payment
