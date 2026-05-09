@@ -21,6 +21,7 @@ import {
     Chip,
     Alert,
     CircularProgress,
+    LinearProgress,
     InputAdornment,
     alpha,
     useTheme,
@@ -65,6 +66,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
     const [receiptId, setReceiptId] = useState<string | null>(null);
     const [checkoutRequestId, setCheckoutRequestId] = useState('');
     const [mpesaStatus, setMpesaStatus] = useState<'pending' | 'success' | 'failed'>('pending');
+    const [timeLeft, setTimeLeft] = useState(45);
 
     // Poll for M-Pesa STK Push completion
     useEffect(() => {
@@ -90,6 +92,20 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
         }
         return () => clearInterval(interval);
     }, [success, mpesaStatus, checkoutRequestId, dispatch]);
+
+    // Countdown timer for M-Pesa verification
+    useEffect(() => {
+        let timer: any;
+        if (success && mpesaStatus === 'pending' && timeLeft > 0) {
+            timer = setInterval(() => {
+                setTimeLeft((prev) => prev - 1);
+            }, 1000);
+        } else if (timeLeft === 0 && mpesaStatus === 'pending') {
+            setMpesaStatus('failed');
+            setError('Payment verification timed out. Please check your phone or try again.');
+        }
+        return () => clearInterval(timer);
+    }, [success, mpesaStatus, timeLeft]);
 
     const handleAmountSelect = (value: number) => {
         setAmount(value.toString());
@@ -134,6 +150,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
             setReceiptId(response.data.receipt_id || null);
             setCheckoutRequestId(response.data.checkout_request_id || '');
             setMpesaStatus('pending');
+            setTimeLeft(45);
             setSuccess(true);
         } catch (err: any) {
             setError(err.response?.data?.error || 'Payment failed. Please try again.');
@@ -152,6 +169,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
             setTransactionId('');
             setCheckoutRequestId('');
             setMpesaStatus('pending');
+            setTimeLeft(45);
             setReceiptId(null);
             onClose();
         }
@@ -208,6 +226,28 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                                         <Typography variant="body1" color="text.secondary" paragraph>
                                             An M-Pesa prompt has been sent to your phone. Please enter your M-Pesa PIN to complete the donation of <strong>{campaign.currency} {amount}</strong>. Waiting for completion...
                                         </Typography>
+                                        <Box sx={{ mt: 3, mb: 2, px: 4 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                <Typography variant="body2" fontWeight="bold" color="primary">
+                                                    Verifying transaction...
+                                                </Typography>
+                                                <Typography variant="body2" fontWeight="bold" color="primary">
+                                                    {timeLeft}s
+                                                </Typography>
+                                            </Box>
+                                            <LinearProgress
+                                                variant="determinate"
+                                                value={(timeLeft / 45) * 100}
+                                                sx={{
+                                                    height: 8,
+                                                    borderRadius: 4,
+                                                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                                    '& .MuiLinearProgress-bar': {
+                                                        borderRadius: 4
+                                                    }
+                                                }}
+                                            />
+                                        </Box>
                                     </>
                                 ) : mpesaStatus === 'failed' ? (
                                     <>
