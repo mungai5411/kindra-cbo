@@ -10,6 +10,7 @@ from django.utils import timezone
 from datetime import timedelta
 import uuid
 import secrets
+import random
 
 
 class UserManager(BaseUserManager):
@@ -242,7 +243,8 @@ class VerificationToken(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='verification_tokens')
-    token = models.CharField(max_length=64, unique=True)
+    token = models.CharField(max_length=64, unique=True, blank=True, null=True)
+    numeric_code = models.CharField(max_length=6, blank=True, null=True)
     token_type = models.CharField(max_length=20, choices=TokenType.choices)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
@@ -257,8 +259,14 @@ class VerificationToken(models.Model):
     def save(self, *args, **kwargs):
         if not self.token:
             self.token = secrets.token_urlsafe(32)
+        if not self.numeric_code and self.token_type == self.TokenType.PASSWORD_RESET:
+            self.numeric_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+            
         if not self.expires_at:
             duration = self.EXPIRY_DURATIONS.get(self.token_type, timedelta(hours=1))
+            # OTPs should expire faster (e.g. 15 mins)
+            if self.token_type == self.TokenType.PASSWORD_RESET:
+                duration = timedelta(minutes=15)
             self.expires_at = timezone.now() + duration
         super().save(*args, **kwargs)
 

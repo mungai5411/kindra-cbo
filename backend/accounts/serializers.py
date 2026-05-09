@@ -259,3 +259,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
                 "new_password": "New password fields didn't match."
             })
         return attrs
+class OTPVerifySerializer(serializers.Serializer):
+    """Serializer for OTP verification"""
+    email = serializers.EmailField(required=True)
+    otp_code = serializers.CharField(required=True, min_length=6, max_length=6)

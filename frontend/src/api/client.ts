@@ -41,7 +41,7 @@ apiClient.interceptors.request.use(
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
-            
+
             // Appending internet IP & Browser Time/Timezone context
             try {
                 config.headers['X-Client-Timezone'] = Intl.DateTimeFormat().resolvedOptions().timeZone;

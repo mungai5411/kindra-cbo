@@ -254,6 +254,42 @@ export const fetchNotifications = createAsyncThunk(
     }
 );
 
+export const requestPasswordReset = createAsyncThunk(
+    'auth/requestPasswordReset',
+    async (email: string, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post(endpoints.auth.passwordReset, { email });
+            return response.data.message;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.error || error.response?.data?.message || 'Failed to request password reset');
+        }
+    }
+);
+
+export const verifyOTP = createAsyncThunk(
+    'auth/verifyOTP',
+    async (data: { email: string; otp_code: string }, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post(endpoints.auth.passwordResetVerify, data);
+            return response.data; // Contains reset_token
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.error || 'Invalid or expired OTP code');
+        }
+    }
+);
+
+export const confirmPasswordReset = createAsyncThunk(
+    'auth/confirmPasswordReset',
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post(endpoints.auth.passwordResetConfirm, data);
+            return response.data.message;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.error || 'Failed to reset password');
+        }
+    }
+);
+
 // Slice
 const authSlice = createSlice({
     name: 'auth',

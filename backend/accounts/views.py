@@ -649,26 +649,28 @@ class PasswordResetRequestView(APIView):
                 token_type=VerificationToken.TokenType.PASSWORD_RESET
             )
             
-            # Send Reset Email (Safe Async/Sync Failover)
-            reset_url = f"{settings.FRONTEND_URL}/reset-password?token={token.token}"
-            
+            # Send Reset Email (OTP)
             send_email_async_safe(
                 recipient=email,
-                subject='Reset Your Password',
-                message=f'Click below to reset your password: {reset_url}',
+                subject='Your Password Reset Code',
+                message=f'Your password reset code is: {token.numeric_code}',
                 html_message=f'''
-                <p>Hello,</p>
-                <p>You requested to reset your password. Click below to set a new one:</p>
-                <a href="{reset_url}"
-                   style="display:inline-block;padding:10px 20px;background:#28a745;color:#fff;text-decoration:none;border-radius:5px;">
-                   Reset Password
-                </a>
-                <p>If you didn’t request this, ignore this email.</p>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+                    <h2 style="color: #333; text-align: center;">Reset Your Password</h2>
+                    <p>Hello,</p>
+                    <p>You requested to reset your password. Use the 6-digit code below to proceed:</p>
+                    <div style="background: #f4f4f4; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #007BFF; border-radius: 5px; margin: 20px 0;">
+                        {token.numeric_code}
+                    </div>
+                    <p style="color: #666; font-size: 14px;">This code is valid for 15 minutes. If you didn’t request this, you can safely ignore this email.</p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                    <p style="color: #999; font-size: 12px; text-align: center;">&copy; 2026 Kindra CBO. All rights reserved.</p>
+                </div>
                 '''
             )
 
             if settings.DEBUG:
-                print(f"Password reset link for {email}: {reset_url}")
+                print(f"Password reset OTP for {email}: {token.numeric_code}")
             
             return Response({
                 'message': 'If an account exists with this email, a reset link has been sent.',

@@ -27,7 +27,6 @@ import DonationsPage from './pages/DonationsPage';
 import CampaignPage from './pages/CampaignPage';
 // RegisterPage removed
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import { PendingApprovalView } from './components/auth/PendingApprovalView';
 
@@ -121,7 +120,6 @@ function App() {
                                 <Route path="/campaigns" element={<DonationsPage />} />
                                 <Route path="/campaigns/:slug" element={<CampaignPage />} />
                                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                                <Route path="/reset-password" element={<ResetPasswordPage />} />
                                 <Route path="/verify" element={<VerifyEmailPage />} />
 
                                 {/* Protected routes */}
