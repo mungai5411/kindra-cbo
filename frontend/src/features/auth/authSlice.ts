@@ -5,6 +5,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import apiClient, { endpoints } from '../../api/client';
 
+
 interface User {
     id: string;
     email: string;
@@ -17,6 +18,7 @@ interface User {
     is_superuser: boolean;
     is_approved: boolean;
     profile_picture?: string;
+    phone_number?: string;
     donorId?: string;
 }
 

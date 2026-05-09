@@ -25,7 +25,9 @@ import {
     InputAdornment,
     alpha,
     useTheme,
-    Divider
+    Divider,
+    Collapse,
+    IconButton
 } from '@mui/material';
 import {
     AttachMoney,
@@ -33,7 +35,12 @@ import {
     CreditCard,
     AccountBalance,
     CheckCircle,
-    Close
+    Close,
+    ExpandMore,
+    ExpandLess,
+    Person,
+    Email,
+    Message as MessageIcon
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient, { endpoints } from '../../api/client';
@@ -56,8 +63,9 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
     const [amount, setAmount] = useState('');
     const [donorName, setDonorName] = useState(user ? `${user.first_name} ${user.last_name}` : '');
     const [donorEmail, setDonorEmail] = useState(user?.email || '');
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState(user?.phone_number || '');
     const [message, setMessage] = useState('');
+    const [showOptional, setShowOptional] = useState(false);
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -114,11 +122,6 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
     const handleSubmit = async () => {
         if (!amount || parseFloat(amount) < 1) {
             setError('Please enter a valid amount');
-            return;
-        }
-
-        if (!donorName || !donorEmail) {
-            setError('Name and email are required');
             return;
         }
 
@@ -219,34 +222,69 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                             <Box sx={{ textAlign: 'center', py: 4 }}>
                                 {mpesaStatus === 'pending' ? (
                                     <>
-                                        <CircularProgress size={80} sx={{ color: 'primary.main', mb: 2 }} />
-                                        <Typography variant="h5" fontWeight="bold" gutterBottom>
-                                            Check Your Phone! 📱
-                                        </Typography>
-                                        <Typography variant="body1" color="text.secondary" paragraph>
-                                            An M-Pesa prompt has been sent to your phone. Please enter your M-Pesa PIN to complete the donation of <strong>{campaign.currency} {amount}</strong>. Waiting for completion...
-                                        </Typography>
-                                        <Box sx={{ mt: 3, mb: 2, px: 4 }}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                                <Typography variant="body2" fontWeight="bold" color="primary">
-                                                    Verifying transaction...
-                                                </Typography>
-                                                <Typography variant="body2" fontWeight="bold" color="primary">
-                                                    {timeLeft}s
-                                                </Typography>
-                                            </Box>
-                                            <LinearProgress
+                                        <Box sx={{ position: 'relative', display: 'inline-flex', mb: 3 }}>
+                                            <CircularProgress
+                                                variant="determinate"
+                                                value={100}
+                                                size={140}
+                                                thickness={3}
+                                                sx={{ color: alpha(theme.palette.success.main, 0.1) }}
+                                            />
+                                            <CircularProgress
                                                 variant="determinate"
                                                 value={(timeLeft / 45) * 100}
+                                                size={140}
+                                                thickness={3}
                                                 sx={{
-                                                    height: 8,
-                                                    borderRadius: 4,
-                                                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                                    '& .MuiLinearProgress-bar': {
-                                                        borderRadius: 4
+                                                    color: 'success.main',
+                                                    position: 'absolute',
+                                                    left: 0,
+                                                    '& .MuiCircularProgress-circle': {
+                                                        strokeLinecap: 'round',
+                                                        transition: 'stroke-dashoffset 1s linear'
                                                     }
                                                 }}
                                             />
+                                            <Box
+                                                sx={{
+                                                    top: 0,
+                                                    left: 0,
+                                                    bottom: 0,
+                                                    right: 0,
+                                                    position: 'absolute',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                }}
+                                            >
+                                                <Typography variant="h3" fontWeight="900" sx={{ color: 'text.primary', lineHeight: 1 }}>
+                                                    {timeLeft}
+                                                </Typography>
+                                                <Typography variant="caption" fontWeight="bold" sx={{ color: 'text.secondary', textTransform: 'uppercase', mt: 0.5 }}>
+                                                    Sec
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+
+                                        <Typography variant="h5" fontWeight="900" gutterBottom sx={{ color: 'success.main' }}>
+                                            Check Your Phone! 📱
+                                        </Typography>
+                                        <Typography variant="body1" color="text.secondary" paragraph sx={{ maxWidth: 400, mx: 'auto' }}>
+                                            An M-Pesa prompt has been sent to <strong>{phoneNumber}</strong>. Enter your PIN to complete the donation of <strong>{campaign.currency} {amount}</strong>.
+                                        </Typography>
+
+                                        <Box sx={{
+                                            mt: 2,
+                                            p: 2,
+                                            bgcolor: alpha(theme.palette.primary.main, 0.05),
+                                            borderRadius: 2,
+                                            border: '1px dashed',
+                                            borderColor: alpha(theme.palette.primary.main, 0.3)
+                                        }}>
+                                            <Typography variant="body2" fontWeight="bold" color="primary">
+                                                Verifying your payment...
+                                            </Typography>
                                         </Box>
                                     </>
                                 ) : mpesaStatus === 'failed' ? (
@@ -337,53 +375,118 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
 
                                 {/* Donor Information */}
                                 <Box>
-                                    <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                                        Your Information
+                                    <Typography variant="subtitle2" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Phone fontSize="small" color="primary" /> M-Pesa Details
                                     </Typography>
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                        <TextField
-                                            fullWidth
-                                            required
-                                            label="Full Name"
-                                            placeholder="Enter your legal name"
-                                            value={donorName}
-                                            onChange={(e) => setDonorName(e.target.value)}
-                                            InputProps={{ sx: { borderRadius: 2 } }}
-                                        />
-                                        <TextField
-                                            fullWidth
-                                            required
-                                            label="Email Address"
-                                            type="email"
-                                            autoComplete="email"
-                                            placeholder="your@email.com"
-                                            value={donorEmail}
-                                            onChange={(e) => setDonorEmail(e.target.value)}
-                                            InputProps={{ sx: { borderRadius: 2 } }}
-                                        />
-                                        <TextField
-                                            fullWidth
-                                            required
-                                            label="M-Pesa Phone Number"
-                                            placeholder="254712345678"
-                                            value={phoneNumber}
-                                            onChange={(e) => setPhoneNumber(e.target.value)}
-                                            InputProps={{ sx: { borderRadius: 2 } }}
-                                        />
-                                    </Box>
+                                    <TextField
+                                        fullWidth
+                                        required
+                                        label="M-Pesa Number"
+                                        placeholder="2547XXXXXXXX"
+                                        value={phoneNumber}
+                                        onChange={(e) => setPhoneNumber(e.target.value)}
+                                        InputProps={{ sx: { borderRadius: 2 } }}
+                                        helperText="Enter the number that will receive the STK push"
+                                    />
                                 </Box>
 
+                                {user ? (
+                                    <Box sx={{
+                                        p: 2,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 2,
+                                        bgcolor: alpha(theme.palette.success.main, 0.05),
+                                        borderRadius: 2,
+                                        border: '1px solid',
+                                        borderColor: alpha(theme.palette.success.main, 0.2)
+                                    }}>
+                                        <Person color="success" />
+                                        <Box>
+                                            <Typography variant="body2" fontWeight="bold">
+                                                Donating as {user.first_name} {user.last_name}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {user.email}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                ) : (
+                                    <Box>
+                                        <Button
+                                            size="small"
+                                            onClick={() => setShowOptional(!showOptional)}
+                                            endIcon={showOptional ? <ExpandLess /> : <ExpandMore />}
+                                            sx={{ color: 'text.secondary', fontWeight: 'bold' }}
+                                        >
+                                            {showOptional ? 'Hide optional details' : 'Add name & email (Optional)'}
+                                        </Button>
+                                        <Collapse in={showOptional}>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+                                                <TextField
+                                                    fullWidth
+                                                    label="Full Name"
+                                                    placeholder="Enter your name"
+                                                    value={donorName}
+                                                    onChange={(e) => setDonorName(e.target.value)}
+                                                    InputProps={{ sx: { borderRadius: 2 } }}
+                                                />
+                                                <TextField
+                                                    fullWidth
+                                                    label="Email Address"
+                                                    type="email"
+                                                    placeholder="your@email.com"
+                                                    value={donorEmail}
+                                                    onChange={(e) => setDonorEmail(e.target.value)}
+                                                    InputProps={{ sx: { borderRadius: 2 } }}
+                                                />
+                                            </Box>
+                                        </Collapse>
+                                    </Box>
+                                )}
+
                                 {/* Optional Message */}
-                                <TextField
-                                    fullWidth
-                                    multiline
-                                    rows={2}
-                                    label="Message (Optional)"
-                                    placeholder="Leave words of encouragement..."
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    InputProps={{ sx: { borderRadius: 2 } }}
-                                />
+                                <Box>
+                                    {!user && !showOptional ? null : (
+                                        <TextField
+                                            fullWidth
+                                            multiline
+                                            rows={2}
+                                            label="Message (Optional)"
+                                            placeholder="Leave words of encouragement..."
+                                            value={message}
+                                            onChange={(e) => setMessage(e.target.value)}
+                                            InputProps={{
+                                                startAdornment: <InputAdornment position="start"><MessageIcon color="disabled" sx={{ alignSelf: 'flex-start', mt: 1 }} /></InputAdornment>,
+                                                sx: { borderRadius: 2 }
+                                            }}
+                                        />
+                                    )}
+                                    {user && (
+                                        <Button
+                                            size="small"
+                                            onClick={() => setShowOptional(!showOptional)}
+                                            sx={{ color: 'text.secondary', mt: 1 }}
+                                        >
+                                            {showOptional ? 'Hide message' : 'Add a message?'}
+                                        </Button>
+                                    )}
+                                    {user && (
+                                        <Collapse in={showOptional}>
+                                            <TextField
+                                                fullWidth
+                                                multiline
+                                                rows={2}
+                                                label="Message"
+                                                placeholder="Leave words of encouragement..."
+                                                value={message}
+                                                onChange={(e) => setMessage(e.target.value)}
+                                                sx={{ mt: 2 }}
+                                                InputProps={{ sx: { borderRadius: 2 } }}
+                                            />
+                                        </Collapse>
+                                    )}
+                                </Box>
 
                                 {error && (
                                     <Alert severity="error" sx={{ borderRadius: 2 }}>
