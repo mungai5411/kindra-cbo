@@ -64,8 +64,30 @@ class AssessmentSerializer(serializers.ModelSerializer):
 class DocumentSerializer(serializers.ModelSerializer):
     """Serializer for Document model"""
     uploaded_by_name = serializers.CharField(source='uploaded_by.get_full_name', read_only=True)
+    family_name = serializers.CharField(source='family.primary_contact_name', read_only=True)
+    child_name = serializers.SerializerMethodField()
+    file_name = serializers.SerializerMethodField()
+    file_size = serializers.SerializerMethodField()
     
     class Meta:
         model = Document
         fields = '__all__'
-        read_only_fields = ('id', 'uploaded_at')
+        read_only_fields = ('id', 'uploaded_at', 'uploaded_by')
+
+    def get_child_name(self, obj):
+        if obj.child:
+            return f"{obj.child.first_name} {obj.child.last_name}"
+        return None
+
+    def get_file_name(self, obj):
+        if obj.file:
+            return obj.file.name.split('/')[-1]
+        return ""
+
+    def get_file_size(self, obj):
+        if obj.file:
+            try:
+                return obj.file.size
+            except:
+                return 0
+        return 0

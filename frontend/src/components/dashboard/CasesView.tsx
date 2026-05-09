@@ -20,6 +20,7 @@ import {
     TableHead,
     TableRow,
     Chip,
+    Checkbox,
     CircularProgress,
     Button,
     InputBase,
@@ -169,7 +170,8 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
         title: '',
         document_type: 'OTHER',
         family: '',
-        file: null as File | null
+        file: null as File | null,
+        consent_obtained: true
     });
 
     useEffect(() => {
@@ -180,7 +182,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
             dispatch(fetchCaseDocuments());
         };
         fetchAll();
-        // Automated background sync every 60s — no manual button required
+        // Automated background sync every 60s â€” no manual button required
         const autoSyncInterval = setInterval(fetchAll, 60000);
         return () => clearInterval(autoSyncInterval);
     }, [dispatch]);
@@ -235,10 +237,11 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
         formData.append('document_type', documentForm.document_type);
         formData.append('family', documentForm.family);
         formData.append('file', documentForm.file);
+        formData.append('consent_obtained', String(documentForm.consent_obtained));
         
         dispatch(addCaseDocument(formData)).unwrap().then(() => {
             setOpenDialog({ type: null, data: null });
-            setDocumentForm({ title: '', document_type: 'OTHER', family: '', file: null });
+            setDocumentForm({ title: '', document_type: 'OTHER', family: '', file: null, consent_obtained: true });
             setSnackbar({ open: true, message: 'Document uploaded successfully', severity: 'success' });
         }).catch((err) => {
             setSnackbar({ open: true, message: err || 'Upload failed', severity: 'error' });
@@ -490,7 +493,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                         {children.map((child: any) => (
                             <TableRow key={child.id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                 <TableCell sx={{ fontWeight: 600 }}>{child.first_name} {child.last_name}</TableCell>
-                                <TableCell sx={{ color: 'text.secondary' }}>{child.age} yrs • {child.gender}</TableCell>
+                                <TableCell sx={{ color: 'text.secondary' }}>{child.age} yrs â€¢ {child.gender}</TableCell>
                                 <TableCell>{child.family_name || 'Guardian Registered'}</TableCell>
                                 <TableCell><Chip label={child.status || 'Verified'} size="small" variant="outlined" sx={{ borderRadius: 2 }} /></TableCell>
                             </TableRow>
@@ -663,7 +666,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                         <Description color="primary" />
                                         <Box>
                                             <Typography variant="body2" fontWeight="600">{doc.title}</Typography>
-                                            <Typography variant="caption" color="text.secondary">{(doc.file_size / 1024).toFixed(1)} KB • {doc.file_name}</Typography>
+                                            <Typography variant="caption" color="text.secondary">{(doc.file_size / 1024).toFixed(1)} KB â€¢ {doc.file_name}</Typography>
                                         </Box>
                                     </Box>
                                 </TableCell>
@@ -724,7 +727,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                         </ListItemIcon>
                         <ListItemText
                             primary={note.note}
-                            secondary={`${note.created_by_name || 'System User'} • ${new Date(note.created_at).toLocaleString()}`}
+                            secondary={`${note.created_by_name || 'System User'} â€¢ ${new Date(note.created_at).toLocaleString()}`}
                             primaryTypographyProps={{ fontWeight: 600 }}
                         />
                     </ListItem>
@@ -997,10 +1000,11 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                 sx={{ borderRadius: 3 }}
                             >
                                 <MenuItem value="ID_CARD">ID Card / Passport</MenuItem>
-                                <MenuItem value="BIRTH_CERTIFICATE">Birth Certificate</MenuItem>
-                                <MenuItem value="MEDICAL_REPORT">Medical Report</MenuItem>
-                                <MenuItem value="LEGAL_DOC">Legal Document</MenuItem>
-                                <MenuItem value="SCHOOL_REPORT">School Report</MenuItem>
+                                <MenuItem value="BIRTH_CERT">Birth Certificate</MenuItem>
+                                <MenuItem value="MEDICAL">Medical Report</MenuItem>
+                                <MenuItem value="COURT">Legal / Court Order</MenuItem>
+                                <MenuItem value="SCHOOL">School Report</MenuItem>
+                                <MenuItem value="PHOTO">Photo</MenuItem>
                                 <MenuItem value="OTHER">Other</MenuItem>
                             </Select>
                         </FormControl>
@@ -1032,6 +1036,18 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                                 onChange={(e) => setDocumentForm({ ...documentForm, file: e.target.files ? e.target.files[0] : null })}
                             />
                         </Button>
+                        
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 1 }}>
+                            <Checkbox 
+                                size="small" 
+                                checked={documentForm.consent_obtained}
+                                onChange={(e) => setDocumentForm({ ...documentForm, consent_obtained: e.target.checked })}
+                                sx={{ p: 0.5 }}
+                            />
+                            <Typography variant="caption" color="text.secondary">
+                                I confirm that consent has been obtained to store this document.
+                            </Typography>
+                        </Box>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>
