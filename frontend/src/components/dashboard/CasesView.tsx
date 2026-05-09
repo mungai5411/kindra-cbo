@@ -299,7 +299,16 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
             setSnackbar({ open: true, message: 'Family and findings are required', severity: 'error' });
             return;
         }
-        dispatch(addAssessment(assessmentForm)).unwrap().then(() => {
+
+        // Clean up data: convert empty strings to null for optional date fields
+        const cleanedData = {
+            ...assessmentForm,
+            next_assessment_date: assessmentForm.next_assessment_date || null,
+            recommendations: assessmentForm.recommendations || '',
+            urgent_needs: assessmentForm.urgent_needs || ''
+        };
+
+        dispatch(addAssessment(cleanedData)).unwrap().then(() => {
             setOpenDialog({ type: null, data: null });
             setAssessmentForm({
                 family: '',

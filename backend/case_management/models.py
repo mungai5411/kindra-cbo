@@ -273,7 +273,7 @@ class Assessment(models.Model):
     safety_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(10)])
     
     # Overall score (calculated)
-    overall_score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    overall_score = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     
     # Findings and recommendations
     findings = models.TextField()
