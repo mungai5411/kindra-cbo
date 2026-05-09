@@ -19,8 +19,22 @@ export const downloadFile = async (url: string, defaultFilename: string = 'downl
 
         if (isExternal) {
             // For external URLs (like Cloudinary), direct download via fetch often fails with 401/CORS
-            // unless the server is specifically configured. Fallback to direct opening.
-            window.open(url, '_blank');
+            // Fallback to direct opening using a link element (more reliable than window.open)
+            
+            let finalUrl = url;
+            // Optimization for Cloudinary: Add fl_attachment to force download if it's an upload URL
+            if (url.includes('cloudinary.com') && url.includes('/upload/') && !url.includes('fl_attachment')) {
+                finalUrl = url.replace('/upload/', '/upload/fl_attachment/');
+            }
+
+            const link = document.createElement('a');
+            link.href = finalUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            // link.setAttribute('download', defaultFilename); // Note: only works for same-origin or fl_attachment
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             return;
         }
 

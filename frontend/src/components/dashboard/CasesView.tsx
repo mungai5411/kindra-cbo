@@ -174,12 +174,35 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
         consent_obtained: true
     });
 
+    const [assessmentForm, setAssessmentForm] = useState({
+        family: '',
+        assessment_type: 'INITIAL',
+        assessment_date: new Date().toISOString().split('T')[0],
+        economic_score: 5,
+        housing_score: 5,
+        health_score: 5,
+        education_score: 5,
+        safety_score: 5,
+        findings: '',
+        recommendations: '',
+        urgent_needs: '',
+        next_assessment_date: ''
+    });
+
+    const [noteForm, setNoteForm] = useState({
+        case: '',
+        note: '',
+        is_milestone: false
+    });
+
     useEffect(() => {
         const fetchAll = () => {
             dispatch(fetchFamilies());
             dispatch(fetchChildren());
             dispatch(fetchCases());
             dispatch(fetchCaseDocuments());
+            dispatch(fetchAssessments());
+            dispatch(fetchCaseNotes());
         };
         fetchAll();
         // Automated background sync every 60s â€” no manual button required
@@ -251,6 +274,43 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
     const handleDeleteDocument = (id: string) => {
         dispatch(deleteCaseDocument(id)).unwrap().then(() => {
             setSnackbar({ open: true, message: 'Document deleted', severity: 'success' });
+        });
+    };
+
+    const handleAddAssessment = () => {
+        if (!assessmentForm.family || !assessmentForm.findings) {
+            setSnackbar({ open: true, message: 'Family and findings are required', severity: 'error' });
+            return;
+        }
+        dispatch(addAssessment(assessmentForm)).unwrap().then(() => {
+            setOpenDialog({ type: null, data: null });
+            setAssessmentForm({
+                family: '',
+                assessment_type: 'INITIAL',
+                assessment_date: new Date().toISOString().split('T')[0],
+                economic_score: 5,
+                housing_score: 5,
+                health_score: 5,
+                education_score: 5,
+                safety_score: 5,
+                findings: '',
+                recommendations: '',
+                urgent_needs: '',
+                next_assessment_date: ''
+            });
+            setSnackbar({ open: true, message: 'Assessment saved', severity: 'success' });
+        });
+    };
+
+    const handleAddNote = () => {
+        if (!noteForm.case || !noteForm.note) {
+            setSnackbar({ open: true, message: 'Case and note content required', severity: 'error' });
+            return;
+        }
+        dispatch(addCaseNote(noteForm)).unwrap().then(() => {
+            setOpenDialog({ type: null, data: null });
+            setNoteForm({ case: '', note: '', is_milestone: false });
+            setSnackbar({ open: true, message: 'Note added', severity: 'success' });
         });
     };
 
@@ -566,6 +626,7 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                     variant="contained"
                     size="medium"
                     startIcon={<HealthAndSafety />}
+                    onClick={() => setOpenDialog({ type: 'assessment', data: null })}
                     sx={{ borderRadius: 1, boxShadow: theme.shadows[2], textTransform: 'none', fontWeight: 600 }}
                 >
                     New Assessment
@@ -715,7 +776,18 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
         }}>
             <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
                 <Typography variant="h6" fontWeight="bold">Intervention Notes</Typography>
-                <Button variant="text" size="small" sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}>Filter Notes</Button>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button variant="text" size="small" sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}>Filter Notes</Button>
+                    <Button 
+                        variant="contained" 
+                        size="small" 
+                        startIcon={<NoteAdd />}
+                        onClick={() => setOpenDialog({ type: 'note', data: null })}
+                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
+                    >
+                        Add Note
+                    </Button>
+                </Box>
             </Box>
             <List sx={{ p: 0 }}>
                 {notes.map((note: any, i: number) => (
@@ -1053,6 +1125,154 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                 <DialogActions sx={{ p: 3, pt: 0 }}>
                     <Button onClick={() => setOpenDialog({ type: null, data: null })}>Cancel</Button>
                     <Button variant="contained" onClick={handleUploadDocument} sx={{ borderRadius: 2, px: 3 }}>Start Upload</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Add Assessment Dialog */}
+            <Dialog open={openDialog.type === 'assessment'} onClose={() => setOpenDialog({ type: null, data: null })} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>New Psychosocial Assessment</DialogTitle>
+                <DialogContent>
+                    <Grid container spacing={3} sx={{ pt: 1 }}>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                select
+                                label="Family Unit"
+                                required
+                                value={assessmentForm.family}
+                                onChange={(e) => setAssessmentForm({ ...assessmentForm, family: e.target.value })}
+                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                            >
+                                {families.map((f: any) => (
+                                    <MenuItem key={f.id} value={f.id}>{f.primary_contact_name} ({f.family_code})</MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                select
+                                label="Assessment Type"
+                                value={assessmentForm.assessment_type}
+                                onChange={(e) => setAssessmentForm({ ...assessmentForm, assessment_type: e.target.value })}
+                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                            >
+                                <MenuItem value="INITIAL">Initial Assessment</MenuItem>
+                                <MenuItem value="FOLLOW_UP">Follow-up</MenuItem>
+                                <MenuItem value="ANNUAL">Annual Review</MenuItem>
+                                <MenuItem value="EMERGENCY">Emergency</MenuItem>
+                            </TextField>
+                        </Grid>
+                        
+                        <Grid item xs={12}>
+                            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 700 }}>Vulnerability Indicators (0-10 Scale)</Typography>
+                            <Grid container spacing={2}>
+                                {[
+                                    { label: 'Economic Status', key: 'economic_score' },
+                                    { label: 'Housing / Living', key: 'housing_score' },
+                                    { label: 'Health / Nutrition', key: 'health_score' },
+                                    { label: 'Education Access', key: 'education_score' },
+                                    { label: 'Safety / Protection', key: 'safety_score' }
+                                ].map((score) => (
+                                    <Grid item xs={12} sm={4} key={score.key}>
+                                        <TextField
+                                            fullWidth
+                                            type="number"
+                                            label={score.label}
+                                            value={(assessmentForm as any)[score.key]}
+                                            onChange={(e) => setAssessmentForm({ ...assessmentForm, [score.key]: parseInt(e.target.value) })}
+                                            inputProps={{ min: 0, max: 10 }}
+                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                        />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={3}
+                                label="Key Findings"
+                                required
+                                value={assessmentForm.findings}
+                                onChange={(e) => setAssessmentForm({ ...assessmentForm, findings: e.target.value })}
+                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                label="Recommendations"
+                                value={assessmentForm.recommendations}
+                                onChange={(e) => setAssessmentForm({ ...assessmentForm, recommendations: e.target.value })}
+                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                label="Urgent Needs"
+                                value={assessmentForm.urgent_needs}
+                                onChange={(e) => setAssessmentForm({ ...assessmentForm, urgent_needs: e.target.value })}
+                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                            />
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button onClick={() => setOpenDialog({ type: null, data: null })}>Cancel</Button>
+                    <Button variant="contained" onClick={handleAddAssessment} sx={{ borderRadius: 2, px: 3 }}>Save Assessment</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Add Case Note Dialog */}
+            <Dialog open={openDialog.type === 'note'} onClose={() => setOpenDialog({ type: null, data: null })} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Add Case Progress Note</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+                        <TextField
+                            fullWidth
+                            select
+                            label="Select Case"
+                            required
+                            value={noteForm.case}
+                            onChange={(e) => setNoteForm({ ...noteForm, case: e.target.value })}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                        >
+                            {cases.map((c: any) => (
+                                <MenuItem key={c.id} value={c.id}>{c.case_number} - {c.child_name || c.family_name}</MenuItem>
+                            ))}
+                        </TextField>
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={4}
+                            label="Intervention Note"
+                            required
+                            value={noteForm.note}
+                            onChange={(e) => setNoteForm({ ...noteForm, note: e.target.value })}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox 
+                                    checked={noteForm.is_milestone} 
+                                    onChange={(e) => setNoteForm({ ...noteForm, is_milestone: e.target.checked })} 
+                                />
+                            }
+                            label="Mark as significant milestone"
+                        />
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button onClick={() => setOpenDialog({ type: null, data: null })}>Cancel</Button>
+                    <Button variant="contained" onClick={handleAddNote} sx={{ borderRadius: 2, px: 3 }}>Save Note</Button>
                 </DialogActions>
             </Dialog>
 
