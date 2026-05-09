@@ -35,7 +35,7 @@ class CaseNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = CaseNote
         fields = '__all__'
-        read_only_fields = ('id', 'created_at')
+        read_only_fields = ('id', 'created_by', 'created_at')
 
 
 class CaseSerializer(serializers.ModelSerializer):
@@ -58,7 +58,7 @@ class AssessmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assessment
         fields = '__all__'
-        read_only_fields = ('id', 'overall_score', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'overall_score', 'conducted_by', 'created_at', 'updated_at')
 
 
 class DocumentSerializer(serializers.ModelSerializer):

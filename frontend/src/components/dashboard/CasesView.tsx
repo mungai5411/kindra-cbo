@@ -316,6 +316,8 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
                 next_assessment_date: ''
             });
             setSnackbar({ open: true, message: 'Assessment saved', severity: 'success' });
+        }).catch((err) => {
+            setSnackbar({ open: true, message: typeof err === 'string' ? err : 'Validation failed. Check all fields.', severity: 'error' });
         });
     };
 
@@ -328,6 +330,8 @@ export function CasesView({ activeTab }: { activeTab?: string }) {
             setOpenDialog({ type: null, data: null });
             setNoteForm({ case: '', note: '', is_milestone: false });
             setSnackbar({ open: true, message: 'Note added', severity: 'success' });
+        }).catch((err) => {
+            setSnackbar({ open: true, message: typeof err === 'string' ? err : 'Failed to save note.', severity: 'error' });
         });
     };
 

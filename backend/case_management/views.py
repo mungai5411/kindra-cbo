@@ -219,6 +219,9 @@ class AssessmentListCreateView(generics.ListCreateAPIView):
     filterset_fields = ['family', 'assessment_type']
     ordering_fields = ['assessment_date', 'overall_score']
 
+    def perform_create(self, serializer):
+        serializer.save(conducted_by=self.request.user)
+
 
 class AssessmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete an assessment"""

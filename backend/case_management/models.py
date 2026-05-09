@@ -277,7 +277,7 @@ class Assessment(models.Model):
     
     # Findings and recommendations
     findings = models.TextField()
-    recommendations = models.TextField()
+    recommendations = models.TextField(blank=True)
     urgent_needs = models.TextField(blank=True)
     
     # Follow-up
