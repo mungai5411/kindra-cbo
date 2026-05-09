@@ -34,7 +34,11 @@ import {
     Divider,
     Snackbar,
     useTheme,
-    Menu
+    Menu,
+    FormControlLabel,
+    FormControl,
+    InputLabel,
+    Select
 } from '@mui/material';
 import {
     Search,
@@ -55,7 +59,21 @@ import {
     Delete
 } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
-import { fetchFamilies, fetchChildren, fetchCases, addFamily, addChild, addCase, fetchCaseDocuments, addCaseDocument, deleteCaseDocument } from '../../features/caseManagement/caseManagementSlice';
+import { 
+    fetchFamilies, 
+    fetchChildren, 
+    fetchCases, 
+    addFamily, 
+    addChild, 
+    addCase, 
+    fetchCaseDocuments, 
+    addCaseDocument, 
+    deleteCaseDocument,
+    fetchAssessments,
+    fetchCaseNotes,
+    addAssessment,
+    addCaseNote
+} from '../../features/caseManagement/caseManagementSlice';
 import { motion } from 'framer-motion';
 import { StatsCard } from './StatCards';
 import { SummaryHeader } from './SummaryHeader';
@@ -63,7 +81,6 @@ import { CaseCard } from './CaseCard';
 import { CaseFilterBar } from './CaseFilterBar';
 import { KENYA_COUNTIES } from '../../utils/locationData';
 import { downloadFile } from '../../utils/downloadHelper';
-import { Select, FormControl, InputLabel } from '@mui/material';
 // Removed colorPsychology import
 
 // Reusable Status Chip for consistency
