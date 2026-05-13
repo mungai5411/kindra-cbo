@@ -1,6 +1,6 @@
 /**
  * Public Blog Post Page
- * Displays a single blog post content
+ * Redesigned to match the premium editorial style and system color psychology.
  */
 
 import { useEffect, useRef } from 'react';
@@ -15,11 +15,11 @@ import {
     Button,
     Skeleton,
     Divider,
-    Paper,
+    Grid,
     useTheme,
     alpha
 } from '@mui/material';
-import { ArrowBack, AccessTime, Person, CalendarToday } from '@mui/icons-material';
+import { ArrowBack, AccessTime, Person, CalendarToday, Share } from '@mui/icons-material';
 import { AppDispatch, RootState } from '../store';
 import { fetchPostBySlug, clearCurrentPost } from '../features/blog/blogSlice';
 import { motion } from 'framer-motion';
@@ -33,7 +33,6 @@ export default function BlogPostPage() {
     const theme = useTheme();
     const commentSectionRef = useRef<HTMLDivElement>(null);
 
-    // Access Redux state
     const { currentPost, isLoading, error } = useSelector((state: RootState) => state.blog);
 
     useEffect(() => {
@@ -49,38 +48,45 @@ export default function BlogPostPage() {
         commentSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    const getAuthorName = (post: any) => {
+        const author = post.author;
+        if (author?.role === 'ADMIN' || author?.role === 'MANAGEMENT' || post.author_role === 'ADMIN' || post.author_role === 'MANAGEMENT') {
+            return 'Management';
+        }
+        return post.author_name || (author ? `${author.first_name} ${author.last_name}` : 'Kindra CBO');
+    };
+
     if (isLoading) {
         return (
-            <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-                <Skeleton variant="rectangular" height={400} animation="wave" />
-                <Container maxWidth="md" sx={{ mt: 4 }}>
-                    <Skeleton variant="text" height={60} width="80%" />
-                    <Skeleton variant="text" height={30} width="40%" sx={{ mb: 4 }} />
-                    <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
-                </Container>
-            </Box>
+            <Container maxWidth="md" sx={{ py: 12 }}>
+                <Skeleton variant="text" height={80} width="90%" sx={{ mb: 2 }} />
+                <Skeleton variant="text" height={30} width="40%" sx={{ mb: 6 }} />
+                <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 2, mb: 6 }} />
+                <Skeleton variant="text" height={30} width="100%" sx={{ mb: 1 }} />
+                <Skeleton variant="text" height={30} width="100%" sx={{ mb: 1 }} />
+                <Skeleton variant="text" height={30} width="80%" />
+            </Container>
         );
     }
 
     if (error || !currentPost) {
         return (
             <Container maxWidth="md" sx={{ py: 12, textAlign: 'center' }}>
-                <Paper sx={{ p: 4, borderRadius: 2, border: '1px dashed', borderColor: alpha(theme.palette.divider, 0.1), boxShadow: theme.shadows[1], bgcolor: 'background.paper' }}>
-                    <Typography variant="h4" fontWeight="bold" gutterBottom color="error">
-                        Story Not Found
-                    </Typography>
-                    <Typography color="text.secondary" paragraph>
-                        The story you are looking for might have been moved or deleted.
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        onClick={() => navigate('/stories')}
-                        startIcon={<ArrowBack />}
-                        sx={{ mt: 2, borderRadius: 3 }}
-                    >
-                        Back to Stories
-                    </Button>
-                </Paper>
+                <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, color: 'secondary.main' }}>
+                    Story Not Found
+                </Typography>
+                <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
+                    The story you are looking for might have been moved or deleted.
+                </Typography>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => navigate('/stories')}
+                    startIcon={<ArrowBack />}
+                    sx={{ borderRadius: 1, px: 4, py: 1.5, fontWeight: 900 }}
+                >
+                    Back to Stories
+                </Button>
             </Container>
         );
     }
@@ -92,163 +98,170 @@ export default function BlogPostPage() {
             animate={{ opacity: 1 }}
             sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 12 }}
         >
-            {/* Hero Section */}
-            <Box sx={{
-                position: 'relative',
-                height: { xs: 300, md: 500 },
-                width: '100%',
-                bgcolor: 'grey.900',
-                color: 'white',
-                overflow: 'hidden'
-            }}>
-                <Box
-                    component="img"
-                    src={currentPost.featured_image || "https://source.unsplash.com/random/1600x900?charity"}
-                    alt={currentPost.title}
-                    sx={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        opacity: 0.6
-                    }}
-                />
-                <Box sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.1) 100%)',
-                    display: 'flex',
-                    alignItems: 'flex-end'
-                }}>
-                    <Container maxWidth="md" sx={{ pb: 6 }}>
-                        <Button
-                            startIcon={<ArrowBack />}
-                            onClick={() => navigate('/stories')}
-                            sx={{ color: 'white', mb: 3, backdropFilter: 'blur(4px)', bgcolor: 'rgba(255,255,255,0.1)', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}
-                        >
-                            Back to Stories
-                        </Button>
-                        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-                            <Chip
-                                label={currentPost.category_name || 'Update'}
-                                sx={{ bgcolor: theme.palette.primary.main, color: 'white', fontWeight: 'bold', mb: 2 }}
-                            />
-                            <Typography variant="h2" fontWeight="900" sx={{
-                                fontSize: { xs: '2.5rem', md: '3.5rem' },
-                                lineHeight: 1.1,
-                                textShadow: '0 2px 10px rgba(0,0,0,0.3)',
-                                mb: 2,
-                                letterSpacing: -1
-                            }}>
-                                {currentPost.title}
-                            </Typography>
+            {/* Minimalist Editorial Header */}
+            <Box sx={{ pt: 12, pb: 8, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Container maxWidth="lg">
+                    <Button
+                        startIcon={<ArrowBack />}
+                        onClick={() => navigate('/stories')}
+                        sx={{ color: 'text.secondary', mb: 6, fontWeight: 800, '&:hover': { color: 'secondary.main', bgcolor: 'transparent' } }}
+                    >
+                        Back to Stories
+                    </Button>
 
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '1rem' }}>
-                                        {currentPost.author_name?.[0] || <Person />}
-                                    </Avatar>
-                                    <Typography variant="subtitle1" fontWeight="medium">
-                                        {currentPost.author_name || 'Anonymous'}
-                                    </Typography>
-                                </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, opacity: 0.8 }}>
-                                    <CalendarToday sx={{ fontSize: 18 }} />
-                                    <Typography variant="body2">
-                                        {new Date(currentPost.published_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-                                    </Typography>
-                                </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, opacity: 0.8 }}>
-                                    <AccessTime sx={{ fontSize: 18 }} />
-                                    <Typography variant="body2">5 min read</Typography>
-                                </Box>
+                    <Typography variant="overline" sx={{ fontWeight: 800, color: 'secondary.main', mb: 2, display: 'block', letterSpacing: '0.1em' }}>
+                        {currentPost.category_name || currentPost.category?.name || 'UPDATE'}
+                    </Typography>
+
+                    <Typography variant="h1" sx={{ 
+                        fontSize: { xs: '2.5rem', md: '4.5rem' }, 
+                        fontWeight: 900, 
+                        color: 'text.primary', 
+                        lineHeight: 1.1,
+                        mb: 4,
+                        letterSpacing: '-0.04em'
+                    }}>
+                        {currentPost.title}
+                    </Typography>
+
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 4 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Avatar sx={{ bgcolor: 'secondary.main', width: 48, height: 48 }}>
+                                <Person />
+                            </Avatar>
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 900, lineHeight: 1 }}>
+                                    {getAuthorName(currentPost)}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                    Author
+                                </Typography>
                             </Box>
-                        </motion.div>
-                    </Container>
-                </Box>
+                        </Box>
+                        
+                        <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', md: 'block' } }} />
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                            <CalendarToday sx={{ fontSize: 20 }} />
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                {new Date(currentPost.published_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </Typography>
+                        </Box>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                            <AccessTime sx={{ fontSize: 20 }} />
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                5 min read
+                            </Typography>
+                        </Box>
+
+                        <Button 
+                            startIcon={<Share />} 
+                            sx={{ ml: 'auto', fontWeight: 800, color: 'secondary.main' }}
+                            onClick={() => {
+                                navigator.clipboard.writeText(window.location.href);
+                                alert('Link copied to clipboard!');
+                            }}
+                        >
+                            Share Story
+                        </Button>
+                    </Box>
+                </Container>
             </Box>
 
-            {/* Content Section */}
-            <Container maxWidth="md" sx={{ mt: -6, position: 'relative', zIndex: 2 }}>
-                <Paper component={motion.div} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} elevation={0} sx={{
-                    p: { xs: 2.5, md: 6 },
-                    borderRadius: 4,
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.04)',
-                    border: '1px solid',
-                    borderColor: alpha(theme.palette.divider, 0.1),
-                    bgcolor: 'background.paper',
-                    mb: 4
-                }}>
+            {/* Featured Image Section */}
+            <Container maxWidth="lg" sx={{ mt: 8, mb: 10 }}>
+                <Box sx={{ overflow: 'hidden', borderRadius: 2 }}>
                     <Box
-                        sx={{
-                            fontSize: '1.2rem',
-                            lineHeight: 1.8,
-                            color: 'text.primary',
-                            fontFamily: '"Outfit", sans-serif',
-                            padding: 0,
-                            '& p': { mb: 3 },
-                            '& img': { maxWidth: '100%', borderRadius: 2, my: 4, display: 'block' },
-                            '& blockquote': { borderLeft: '4px solid', borderColor: 'primary.main', pl: 3, fontStyle: 'italic', color: 'text.secondary', bgcolor: alpha(theme.palette.primary.main, 0.05), py: 2, borderRadius: 1 }
+                        component="img"
+                        src={currentPost.featured_image || "https://source.unsplash.com/random/1600x900?charity"}
+                        alt={currentPost.title}
+                        sx={{ 
+                            width: '100%', 
+                            maxHeight: 700, 
+                            objectFit: 'cover',
+                            display: 'block'
                         }}
-                        dangerouslySetInnerHTML={{ __html: currentPost.content }}
                     />
+                </Box>
+            </Container>
 
-                    {/* Media Carousel */}
-                    {currentPost.gallery_images && currentPost.gallery_images.length > 0 && (
-                        <Box sx={{ mt: 6, mb: 4 }}>
-                            <Typography variant="h5" fontWeight="900" gutterBottom sx={{ letterSpacing: -0.5 }}>
-                                Media Gallery
-                            </Typography>
-                            <Box sx={{
-                                display: 'flex',
-                                gap: 2,
-                                overflowX: 'auto',
-                                pb: 2,
-                                pt: 1,
-                                px: 1,
-                                ml: -1,
-                                scrollSnapType: 'x mandatory',
-                                '&::-webkit-scrollbar': { height: 8 },
-                                '&::-webkit-scrollbar-thumb': { bgcolor: alpha(theme.palette.primary.main, 0.3), borderRadius: 4 },
-                                '&::-webkit-scrollbar-track': { bgcolor: alpha(theme.palette.divider, 0.1), borderRadius: 4 }
-                            }}>
-                                {currentPost.gallery_images.map((img: any) => (
+            {/* Editorial Content Section */}
+            <Container maxWidth="md">
+                <Box
+                    sx={{
+                        fontSize: '1.25rem',
+                        lineHeight: 1.8,
+                        color: 'text.primary',
+                        fontFamily: '"Outfit", sans-serif',
+                        '& p': { mb: 4 },
+                        '& h2': { fontSize: '2rem', fontWeight: 800, mt: 6, mb: 3, letterSpacing: '-0.02em' },
+                        '& h3': { fontSize: '1.5rem', fontWeight: 800, mt: 5, mb: 2, letterSpacing: '-0.01em' },
+                        '& img': { maxWidth: '100%', borderRadius: 2, my: 6, display: 'block', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' },
+                        '& blockquote': { 
+                            borderLeft: '4px solid', 
+                            borderColor: 'secondary.main', 
+                            pl: 4, 
+                            my: 6,
+                            fontStyle: 'italic', 
+                            color: 'secondary.main', 
+                            fontSize: '1.5rem',
+                            lineHeight: 1.5,
+                            fontWeight: 500,
+                            bgcolor: alpha(theme.palette.secondary.main, 0.03), 
+                            py: 4, 
+                            borderRadius: '0 8px 8px 0' 
+                        }
+                    }}
+                    dangerouslySetInnerHTML={{ __html: currentPost.content }}
+                />
+
+                {/* Media Gallery */}
+                {currentPost.gallery_images && currentPost.gallery_images.length > 0 && (
+                    <Box sx={{ mt: 10, mb: 6 }}>
+                        <Typography variant="h4" sx={{ fontWeight: 900, mb: 4, letterSpacing: '-0.02em' }}>
+                            Captured Moments
+                        </Typography>
+                        <Grid container spacing={3}>
+                            {currentPost.gallery_images.map((img: any, index: number) => (
+                                <Grid item xs={12} sm={index % 3 === 0 ? 12 : 6} key={img.id}>
                                     <Box
-                                        key={img.id}
                                         component="img"
                                         src={img.file}
                                         alt={img.alt_text || 'Gallery Media'}
                                         sx={{
-                                            height: { xs: 200, md: 300 },
-                                            minWidth: { xs: 250, md: 350 },
+                                            width: '100%',
+                                            height: index % 3 === 0 ? 500 : 350,
                                             objectFit: 'cover',
-                                            borderRadius: 3,
-                                            scrollSnapAlign: 'start',
-                                            boxShadow: theme.shadows[4],
-                                            transition: 'transform 0.3s ease',
-                                            '&:hover': { transform: 'scale(1.02)' }
+                                            borderRadius: 2,
+                                            boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+                                            transition: 'transform 0.4s ease',
+                                            '&:hover': { transform: 'scale(1.01)' }
                                         }}
                                     />
-                                ))}
-                            </Box>
-                        </Box>
-                    )}
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Box>
+                )}
 
-                    <Divider sx={{ my: 4 }} />
+                <Divider sx={{ my: 8 }} />
 
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                            {currentPost.tags?.map((tag: any) => (
-                                <Chip key={tag.id} label={tag.name} variant="outlined" size="small" sx={{ borderRadius: 1 }} />
-                            )) || (
-                                    <>
-                                        <Chip label="Community" variant="outlined" size="small" sx={{ borderRadius: 1 }} />
-                                        <Chip label="Impact" variant="outlined" size="small" sx={{ borderRadius: 1 }} />
-                                    </>
-                                )}
-                        </Box>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', mb: 6, gap: 3 }}>
+                    <Box sx={{ display: 'flex', gap: 1.5 }}>
+                        {currentPost.tags?.map((tag: any) => (
+                            <Chip 
+                                key={tag.id} 
+                                label={`#${tag.name}`} 
+                                variant="outlined" 
+                                sx={{ 
+                                    borderRadius: 1, 
+                                    fontWeight: 700,
+                                    borderColor: 'divider',
+                                    '&:hover': { bgcolor: alpha(theme.palette.secondary.main, 0.05), borderColor: 'secondary.main' }
+                                }} 
+                            />
+                        ))}
                     </Box>
 
                     {/* Likes & Share Interactions */}
@@ -259,24 +272,61 @@ export default function BlogPostPage() {
                         commentCount={currentPost.comment_count || 0}
                         onCommentClick={scrollToComments}
                     />
+                </Box>
 
-                    {/* Discussion Section */}
-                    <Box ref={commentSectionRef}>
-                        <CommentSection postSlug={currentPost.slug} postId={currentPost.id} />
-                    </Box>
-                </Paper>
-
-                {/* Navigation / Next Steps */}
-                <Box sx={{ textAlign: 'center', mt: 8 }}>
-                    <Typography variant="h6" gutterBottom color="text.secondary">
-                        Inspired by this story?
+                {/* Discussion Section */}
+                <Box ref={commentSectionRef} sx={{ mt: 8 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 900, mb: 4, letterSpacing: '-0.02em' }}>
+                        Discussion
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 2 }}>
-                        <Button variant="contained" size="large" sx={{ borderRadius: 3, px: 4, fontWeight: 'bold' }}>
+                    <CommentSection postSlug={currentPost.slug} postId={currentPost.id} />
+                </Box>
+
+                {/* Navigation / Footer CTA */}
+                <Box sx={{ 
+                    mt: 12, 
+                    p: 6, 
+                    borderRadius: 2, 
+                    bgcolor: 'secondary.main', 
+                    color: 'white',
+                    textAlign: 'center'
+                }}>
+                    <Typography variant="h4" sx={{ fontWeight: 900, mb: 2 }}>
+                        Impact happens with you.
+                    </Typography>
+                    <Typography variant="body1" sx={{ opacity: 0.9, mb: 4, maxWidth: 500, mx: 'auto' }}>
+                        Your support fuels stories like this one. Join us in making a tangible difference today.
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                        <Button 
+                            variant="contained" 
+                            size="large" 
+                            sx={{ 
+                                bgcolor: 'white', 
+                                color: 'secondary.main', 
+                                fontWeight: 900, 
+                                borderRadius: 1,
+                                px: 6,
+                                '&:hover': { bgcolor: alpha('#fff', 0.9) }
+                            }}
+                        >
                             Donate Now
                         </Button>
-                        <Button variant="outlined" size="large" onClick={() => navigate('/stories')} sx={{ borderRadius: 3, px: 4, fontWeight: 'bold' }}>
-                            Read More Stories
+                        <Button 
+                            variant="outlined" 
+                            size="large" 
+                            onClick={() => navigate('/stories')} 
+                            sx={{ 
+                                color: 'white', 
+                                borderColor: 'white', 
+                                border: '2px solid',
+                                fontWeight: 900, 
+                                borderRadius: 1,
+                                px: 4,
+                                '&:hover': { borderColor: 'white', bgcolor: alpha('#fff', 0.1) }
+                            }}
+                        >
+                            Explore More
                         </Button>
                     </Box>
                 </Box>
