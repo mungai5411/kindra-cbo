@@ -153,21 +153,21 @@ export default function StoriesPage() {
     };
 
     return (
-        <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }} sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 12 }}>
+        <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }} sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 8 }}>
             {/* Header Section */}
-            <Box sx={{ pt: 12, pb: 6, borderBottom: '1px solid', borderColor: 'divider' }}>
+            <Box sx={{ pt: 8, pb: 4, borderBottom: '1px solid', borderColor: 'divider' }}>
                 <Container maxWidth="lg">
                     <Typography variant="h1" sx={{ 
-                        fontSize: { xs: '2.5rem', md: '4rem' }, 
+                        fontSize: { xs: '2rem', md: '2.5rem' }, 
                         fontWeight: 900, 
                         color: 'secondary.main', 
-                        mb: 2,
-                        letterSpacing: '-0.04em'
+                        mb: 1,
+                        letterSpacing: '-0.03em'
                     }}>
                         Stories & Campaigns
                     </Typography>
-                    <Typography variant="h5" sx={{ color: 'text.secondary', maxWidth: 600, mb: 6, fontWeight: 400 }}>
-                        Discover our impact stories and support active campaigns making a difference in the community.
+                    <Typography variant="subtitle1" sx={{ color: 'text.secondary', maxWidth: 600, mb: 4, fontWeight: 500 }}>
+                        Impact stories and active campaigns.
                     </Typography>
 
                     {/* Filter Bar */}
@@ -179,11 +179,11 @@ export default function StoriesPage() {
                                 '& .MuiTabs-indicator': { bgcolor: 'secondary.main', height: 3 },
                                 '& .MuiTab-root': {
                                     textTransform: 'none',
-                                    fontSize: '1.1rem',
+                                    fontSize: '1rem',
                                     fontWeight: 700,
                                     color: 'text.disabled',
                                     px: 0,
-                                    mr: 4,
+                                    mr: 3,
                                     minWidth: 0,
                                     '&.Mui-selected': { color: 'secondary.main' }
                                 }
@@ -220,8 +220,9 @@ export default function StoriesPage() {
                                 sx={{ 
                                     borderRadius: 1, 
                                     fontWeight: 700, 
-                                    height: 40, 
-                                    px: 1,
+                                    height: 32, 
+                                    px: 0.5,
+                                    fontSize: '0.85rem',
                                     bgcolor: selectedCategory === category ? 'secondary.main' : 'transparent',
                                     color: selectedCategory === category ? 'white' : 'text.primary',
                                     border: '1px solid',
@@ -236,7 +237,7 @@ export default function StoriesPage() {
                 </Container>
             </Box>
 
-            <Container maxWidth="lg" sx={{ mt: 8 }}>
+            <Container maxWidth="lg" sx={{ mt: 6 }}>
                 <AnimatePresence mode="wait">
                     {items.length === 0 ? (
                         <Box key="empty" sx={{ textAlign: 'center', py: 12 }}>
@@ -280,7 +281,7 @@ export default function StoriesPage() {
                                             alt={featuredItem.title}
                                             sx={{ 
                                                 width: '100%', 
-                                                height: { xs: 300, md: 500 }, 
+                                                height: { xs: 250, md: 350 }, 
                                                 objectFit: 'cover',
                                                 transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
                                             }}
@@ -290,11 +291,11 @@ export default function StoriesPage() {
                                         <Typography variant="overline" sx={{ fontWeight: 800, color: 'secondary.main', mb: 2, letterSpacing: '0.1em' }}>
                                             {featuredItem.category_name || featuredItem.category?.name || (currentTab === 1 ? 'CAMPAIGN' : 'FEATURED')}
                                         </Typography>
-                                        <Typography variant="h2" sx={{ 
+                                        <Typography variant="h3" sx={{ 
                                             fontWeight: 800, 
-                                            lineHeight: 1.1, 
-                                            mb: 3, 
-                                            fontSize: { xs: '2rem', md: '3.5rem' },
+                                            lineHeight: 1.2, 
+                                            mb: 2, 
+                                            fontSize: { xs: '1.75rem', md: '2.5rem' },
                                             letterSpacing: '-0.02em'
                                         }}>
                                             {featuredItem.title}
@@ -356,7 +357,7 @@ export default function StoriesPage() {
                                                 <Button 
                                                     variant="contained" 
                                                     color="secondary" 
-                                                    size="large"
+                                                    size="medium"
                                                     onClick={() => { setSelectedCampaign(featuredItem); setDonationDialogOpen(true); }}
                                                     sx={{ px: 4, fontWeight: 900, borderRadius: 1 }}
                                                 >
@@ -375,7 +376,7 @@ export default function StoriesPage() {
                                             <Button 
                                                 variant="contained" 
                                                 color="secondary" 
-                                                size="large" 
+                                                size="medium" 
                                                 endIcon={<ArrowForward sx={{ transform: expandedItems.has(featuredItem.id) ? 'rotate(-90deg)' : 'none', transition: '0.3s' }} />}
                                                 onClick={() => toggleExpand(featuredItem.id)}
                                                 sx={{ alignSelf: 'flex-start', px: 4, fontWeight: 900, borderRadius: 1 }}
@@ -388,7 +389,7 @@ export default function StoriesPage() {
                             )}
 
                             {/* 3-Column Grid Section */}
-                            <Grid container spacing={6}>
+                            <Grid container spacing={4}>
                                 {remainingItems.map((item: any, index: number) => {
                                     const progress = item.progress_percentage || ((item.raised_amount / item.target_amount) * 100);
                                     
@@ -407,7 +408,7 @@ export default function StoriesPage() {
                                                 <Box sx={{ position: 'relative', overflow: 'hidden', borderRadius: 2, mb: 3 }}>
                                                     <CardMedia
                                                         component="img"
-                                                        height="240"
+                                                        height="200"
                                                         image={item.featured_image || `https://source.unsplash.com/random/800x600?charity&sig=${index}`}
                                                         alt={item.title}
                                                         sx={{ transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}
