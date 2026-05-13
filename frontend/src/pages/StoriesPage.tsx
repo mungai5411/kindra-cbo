@@ -155,8 +155,8 @@ export default function StoriesPage() {
     return (
         <Box component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }} sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 8 }}>
             {/* Header Section */}
-            <Box sx={{ pt: 8, pb: 4, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Container maxWidth="lg">
+            <Box sx={{ pt: 6, pb: 4, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 } }}>
                     <Typography variant="h1" sx={{ 
                         fontSize: { xs: '2rem', md: '2.5rem' }, 
                         fontWeight: 900, 
@@ -166,7 +166,7 @@ export default function StoriesPage() {
                     }}>
                         Stories & Campaigns
                     </Typography>
-                    <Typography variant="subtitle1" sx={{ color: 'text.secondary', maxWidth: 600, mb: 4, fontWeight: 500 }}>
+                    <Typography variant="subtitle1" sx={{ color: 'text.secondary', mb: 4, fontWeight: 500 }}>
                         Impact stories and active campaigns.
                     </Typography>
 
@@ -237,7 +237,7 @@ export default function StoriesPage() {
                 </Container>
             </Box>
 
-            <Container maxWidth="lg" sx={{ mt: 6 }}>
+            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 }, mt: 6 }}>
                 <AnimatePresence mode="wait">
                     {items.length === 0 ? (
                         <Box key="empty" sx={{ textAlign: 'center', py: 12 }}>
@@ -388,13 +388,13 @@ export default function StoriesPage() {
                                 </Box>
                             )}
 
-                            {/* 3-Column Grid Section */}
+                            {/* 4-Column Grid Section */}
                             <Grid container spacing={4}>
                                 {remainingItems.map((item: any, index: number) => {
                                     const progress = item.progress_percentage || ((item.raised_amount / item.target_amount) * 100);
                                     
                                     return (
-                                        <Grid item xs={12} sm={6} md={4} key={item.id || index}>
+                                        <Grid item xs={12} sm={6} md={4} lg={3} key={item.id || index}>
                                             <Card 
                                                 elevation={0}
                                                 sx={{ 
@@ -525,7 +525,7 @@ export default function StoriesPage() {
                     )}
                 </AnimatePresence>
 
-                <Box sx={{ mt: 12, pt: 8, borderTop: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
+                <Box sx={{ mt: 10, pt: 8, borderTop: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
                     <Typography variant="h4" sx={{ fontWeight: 800, mb: 4 }}>
                         Want to share your story or start a campaign?
                     </Typography>
