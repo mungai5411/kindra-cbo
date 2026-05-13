@@ -65,6 +65,17 @@ export default function StoriesPage() {
     const [volunteerDialogOpen, setVolunteerDialogOpen] = useState(false);
     const [materialDialogOpen, setMaterialDialogOpen] = useState(false);
     const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
+    const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+
+    const toggleExpand = (id: string) => {
+        const newExpanded = new Set(expandedItems);
+        if (newExpanded.has(id)) {
+            newExpanded.delete(id);
+        } else {
+            newExpanded.add(id);
+        }
+        setExpandedItems(newExpanded);
+    };
 
     useEffect(() => {
         dispatch(fetchPosts());
@@ -254,13 +265,11 @@ export default function StoriesPage() {
                             {/* Featured Section */}
                             {featuredItem && (
                                 <Box 
-                                    onClick={() => currentTab === 0 ? navigate(`/stories/${featuredItem.slug}`) : null}
                                     sx={{ 
                                         display: 'flex', 
                                         flexDirection: { xs: 'column', md: 'row' }, 
                                         gap: 6, 
                                         mb: 12, 
-                                        cursor: currentTab === 0 ? 'pointer' : 'default',
                                         '&:hover img': { transform: 'scale(1.02)' }
                                     }}
                                 >
@@ -290,9 +299,25 @@ export default function StoriesPage() {
                                         }}>
                                             {featuredItem.title}
                                         </Typography>
-                                        <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4, fontSize: '1.1rem', lineHeight: 1.8 }}>
-                                            {featuredItem.excerpt || (featuredItem.description ? featuredItem.description.substring(0, 180) + '...' : featuredItem.content?.substring(0, 180) + '...')}
-                                        </Typography>
+                                        <Box sx={{ mb: 4 }}>
+                                            {expandedItems.has(featuredItem.id) ? (
+                                                <Box 
+                                                    sx={{ 
+                                                        fontSize: '1.15rem', 
+                                                        lineHeight: 1.8, 
+                                                        color: 'text.primary',
+                                                        '& p': { mb: 3 },
+                                                        '& blockquote': { borderLeft: '4px solid', borderColor: 'secondary.main', pl: 3, my: 4, fontStyle: 'italic', color: 'secondary.main' },
+                                                        '& img': { maxWidth: '100%', borderRadius: 2, my: 4 }
+                                                    }}
+                                                    dangerouslySetInnerHTML={{ __html: featuredItem.content || featuredItem.description }} 
+                                                />
+                                            ) : (
+                                                <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: '1.1rem', lineHeight: 1.8 }}>
+                                                    {featuredItem.excerpt || (featuredItem.description ? featuredItem.description.substring(0, 180) + '...' : featuredItem.content?.substring(0, 180) + '...')}
+                                                </Typography>
+                                            )}
+                                        </Box>
 
                                         {currentTab === 1 && (
                                             <Box sx={{ mb: 4 }}>
@@ -351,11 +376,11 @@ export default function StoriesPage() {
                                                 variant="contained" 
                                                 color="secondary" 
                                                 size="large" 
-                                                endIcon={<ArrowForward />}
-                                                onClick={() => navigate(`/stories/${featuredItem.slug}`)}
+                                                endIcon={<ArrowForward sx={{ transform: expandedItems.has(featuredItem.id) ? 'rotate(-90deg)' : 'none', transition: '0.3s' }} />}
+                                                onClick={() => toggleExpand(featuredItem.id)}
                                                 sx={{ alignSelf: 'flex-start', px: 4, fontWeight: 900, borderRadius: 1 }}
                                             >
-                                                Read more
+                                                {expandedItems.has(featuredItem.id) ? 'Read less' : 'Read more'}
                                             </Button>
                                         )}
                                     </Box>
@@ -371,13 +396,11 @@ export default function StoriesPage() {
                                         <Grid item xs={12} sm={6} md={4} key={item.id || index}>
                                             <Card 
                                                 elevation={0}
-                                                onClick={() => currentTab === 0 ? navigate(`/stories/${item.slug}`) : null}
                                                 sx={{ 
                                                     height: '100%', 
                                                     display: 'flex', 
                                                     flexDirection: 'column', 
                                                     bgcolor: 'transparent',
-                                                    cursor: currentTab === 0 ? 'pointer' : 'default',
                                                     '&:hover img': { transform: 'scale(1.05)' }
                                                 }}
                                             >
@@ -413,9 +436,23 @@ export default function StoriesPage() {
                                                     <Typography variant="h5" sx={{ fontWeight: 800, mb: 2, lineHeight: 1.3, letterSpacing: '-0.02em' }}>
                                                         {item.title}
                                                     </Typography>
-                                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3, lineHeight: 1.6 }}>
-                                                        {item.excerpt || (item.description ? item.description.substring(0, 100) + '...' : item.content?.substring(0, 100) + '...')}
-                                                    </Typography>
+                                                    <Box sx={{ mb: 3 }}>
+                                                        {expandedItems.has(item.id) ? (
+                                                            <Box 
+                                                                sx={{ 
+                                                                    fontSize: '1rem', 
+                                                                    lineHeight: 1.7, 
+                                                                    color: 'text.primary',
+                                                                    '& p': { mb: 2 }
+                                                                }}
+                                                                dangerouslySetInnerHTML={{ __html: item.content || item.description }} 
+                                                            />
+                                                        ) : (
+                                                            <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+                                                                {item.excerpt || (item.description ? item.description.substring(0, 100) + '...' : item.content?.substring(0, 100) + '...')}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
 
                                                     {currentTab === 1 && (
                                                         <Box sx={{ mb: 3 }}>
@@ -445,27 +482,38 @@ export default function StoriesPage() {
                                                         </Typography>
                                                     </Box>
 
-                                                    {currentTab === 1 && (
-                                                        <Box sx={{ mt: 3, display: 'flex', gap: 1 }}>
-                                                            <Button 
-                                                                variant="contained" 
-                                                                color="secondary" 
-                                                                fullWidth
-                                                                onClick={() => { setSelectedCampaign(item); setDonationDialogOpen(true); }}
-                                                                sx={{ fontWeight: 800, borderRadius: 1 }}
-                                                            >
-                                                                Donate
-                                                            </Button>
-                                                            <Button 
-                                                                variant="outlined" 
-                                                                color="secondary"
-                                                                onClick={() => { setSelectedCampaign(item); setVolunteerDialogOpen(true); }}
-                                                                sx={{ minWidth: 48, borderRadius: 1 }}
-                                                            >
-                                                                <Handshake fontSize="small" />
-                                                            </Button>
-                                                        </Box>
-                                                    )}
+                                                    <Box sx={{ mt: 3, display: 'flex', gap: 1 }}>
+                                                        <Button 
+                                                            variant={expandedItems.has(item.id) ? "outlined" : "contained"}
+                                                            color="secondary" 
+                                                            fullWidth
+                                                            onClick={() => toggleExpand(item.id)}
+                                                            sx={{ fontWeight: 800, borderRadius: 1 }}
+                                                        >
+                                                            {expandedItems.has(item.id) ? 'Read less' : 'Read more'}
+                                                        </Button>
+                                                        {currentTab === 1 && (
+                                                            <>
+                                                                <Button 
+                                                                    variant="contained"
+                                                                    color="secondary"
+                                                                    fullWidth
+                                                                    onClick={() => { setSelectedCampaign(item); setDonationDialogOpen(true); }}
+                                                                    sx={{ fontWeight: 800, borderRadius: 1 }}
+                                                                >
+                                                                    Donate
+                                                                </Button>
+                                                                <Button 
+                                                                    variant="outlined" 
+                                                                    color="secondary"
+                                                                    onClick={() => { setSelectedCampaign(item); setVolunteerDialogOpen(true); }}
+                                                                    sx={{ minWidth: 48, borderRadius: 1 }}
+                                                                >
+                                                                    <Handshake fontSize="small" />
+                                                                </Button>
+                                                            </>
+                                                        )}
+                                                    </Box>
                                                 </CardContent>
                                             </Card>
                                         </Grid>
