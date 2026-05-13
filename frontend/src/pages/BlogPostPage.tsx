@@ -58,8 +58,8 @@ export default function BlogPostPage() {
 
     if (isLoading) {
         return (
-            <Container maxWidth="md" sx={{ py: 12 }}>
-                <Skeleton variant="text" height={80} width="90%" sx={{ mb: 2 }} />
+            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 }, py: 12 }}>
+                <Skeleton variant="text" height={80} width="60%" sx={{ mb: 2 }} />
                 <Skeleton variant="text" height={30} width="40%" sx={{ mb: 6 }} />
                 <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 2, mb: 6 }} />
                 <Skeleton variant="text" height={30} width="100%" sx={{ mb: 1 }} />
@@ -71,7 +71,7 @@ export default function BlogPostPage() {
 
     if (error || !currentPost) {
         return (
-            <Container maxWidth="md" sx={{ py: 12, textAlign: 'center' }}>
+            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 }, py: 12, textAlign: 'center' }}>
                 <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, color: 'secondary.main' }}>
                     Story Not Found
                 </Typography>
@@ -99,8 +99,8 @@ export default function BlogPostPage() {
             sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 12 }}
         >
             {/* Minimalist Editorial Header */}
-            <Box sx={{ pt: 12, pb: 8, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Container maxWidth="lg">
+            <Box sx={{ pt: 10, pb: 8, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 } }}>
                     <Button
                         startIcon={<ArrowBack />}
                         onClick={() => navigate('/stories')}
@@ -170,7 +170,7 @@ export default function BlogPostPage() {
             </Box>
 
             {/* Featured Image Section */}
-            <Container maxWidth="lg" sx={{ mt: 8, mb: 10 }}>
+            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 }, mt: 8, mb: 10 }}>
                 <Box sx={{ overflow: 'hidden', borderRadius: 2 }}>
                     <Box
                         component="img"
@@ -187,7 +187,7 @@ export default function BlogPostPage() {
             </Container>
 
             {/* Editorial Content Section */}
-            <Container maxWidth="md">
+            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 } }}>
                 <Box
                     sx={{
                         fontSize: '1.25rem',

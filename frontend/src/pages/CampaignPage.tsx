@@ -1,105 +1,39 @@
+/**
+ * Public Campaign Detail Page
+ * Redesigned to match the premium editorial style and system color psychology.
+ */
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    Box, Container, Typography, Chip, Button, Skeleton, Paper, useTheme, alpha, Grid, Stack, IconButton
+    Box,
+    Container,
+    Typography,
+    Chip,
+    Button,
+    Skeleton,
+    Divider,
+    Grid,
+    LinearProgress,
+    useTheme,
+    alpha,
+    Avatar,
+    Stack
 } from '@mui/material';
-import { ArrowBack, Favorite, Share, Campaign, InfoOutlined, AccessTimeFilled, Diversity3 } from '@mui/icons-material';
+import { 
+    ArrowBack, 
+    AccessTime, 
+    Favorite, 
+    Share, 
+    CalendarToday, 
+    TrendingUp,
+    Groups
+} from '@mui/icons-material';
 import { AppDispatch, RootState } from '../store';
 import { fetchCampaigns } from '../features/donations/donationsSlice';
-import { motion, AnimatePresence } from 'framer-motion';
-import { TrafalgarHero } from '../components/common/TrafalgarHero';
-
-// --- Styled Components / Design Tokens ---
-
-const GlassPanel = ({ children, sx = {} }: any) => {
-    const theme = useTheme();
-    return (
-        <Paper
-            elevation={0}
-            sx={{
-                p: { xs: 3, md: 5 },
-                borderRadius: 6,
-                position: 'relative',
-                overflow: 'hidden',
-                ...sx
-            }}
-        >
-            {children}
-        </Paper>
-    );
-};
-
-const GlassMediaCard = ({ img, idx }: any) => {
-    const theme = useTheme();
-    return (
-        <Paper
-            elevation={0}
-            component={motion.div}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: idx * 0.1, duration: 0.8 }}
-            sx={{
-                p: 2,
-                borderRadius: 6,
-                transition: 'transform 0.4s ease',
-                '&:hover': { transform: 'translateY(-8px)' }
-            }}
-        >
-            <Box
-                component="img"
-                src={img.file}
-                alt={img.alt_text}
-                sx={{
-                    width: '100%',
-                    maxHeight: 600,
-                    objectFit: 'cover',
-                    borderRadius: 6,
-                    display: 'block'
-                }}
-            />
-            <Box sx={{ mt: 3, px: 1 }}>
-                <Typography variant="h6" fontWeight="900" color="primary.dark" sx={{ mb: 0.5 }}>
-                    {img.title || `Visual Insight #${idx + 1}`}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', opacity: 0.8 }}>
-                    {img.alt_text || 'An integral part of the mission story.'}
-                </Typography>
-            </Box>
-        </Paper>
-    );
-};
-
-// --- Custom Progress Beam ---
-const ProgressBeam = ({ value }: { value: number }) => {
-    const theme = useTheme();
-    return (
-        <Box sx={{ width: '100%', mb: 4, mt: 1 }}>
-            <Box sx={{
-                height: 16,
-                width: '100%',
-                bgcolor: alpha(theme.palette.primary.main, 0.08),
-                borderRadius: 8,
-                position: 'relative',
-                overflow: 'hidden'
-            }}>
-                <Box
-                    component={motion.div}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${value}%` }}
-                    transition={{ duration: 2, ease: "easeOut" }}
-                    sx={{
-                        height: '100%',
-                        borderRadius: 8,
-                        background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                        boxShadow: `0 0 15px ${alpha(theme.palette.primary.main, 0.4)}`
-                    }}
-                />
-            </Box>
-        </Box>
-    );
-};
+import { motion } from 'framer-motion';
+import DonationDialog from '../components/campaigns/DonationDialog';
 
 export default function CampaignPage() {
     const { slug } = useParams<{ slug: string }>();
@@ -108,217 +42,242 @@ export default function CampaignPage() {
     const theme = useTheme();
 
     const { campaigns, isLoading } = useSelector((state: RootState) => state.donations);
-    const campaign = campaigns.find(c => c.slug === slug || c.id === slug);
+    const campaign = campaigns.find(c => c.slug === slug || c.id?.toString() === slug);
 
-    const [heroIndex, setHeroIndex] = useState(0);
+    const [donationDialogOpen, setDonationDialogOpen] = useState(false);
 
     useEffect(() => {
-        if (!campaign && slug) {
+        if (!campaign) {
             dispatch(fetchCampaigns());
         }
     }, [dispatch, campaign, slug]);
 
-    useEffect(() => {
-        if (campaign && campaign.gallery_images?.length > 0) {
-            const timer = setInterval(() => {
-                setHeroIndex(prev => (prev + 1) % (campaign.gallery_images.length + 1));
-            }, 7000); // 7s for calmer feel
-            return () => clearInterval(timer);
-        }
-    }, [campaign]);
-
     if (isLoading && !campaign) {
         return (
-            <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-                <Skeleton variant="rectangular" height="60vh" animation="wave" />
-                <Container sx={{ mt: 4 }}>
+            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 }, py: 12 }}>
+                <Skeleton variant="text" height={80} width="60%" sx={{ mb: 2 }} />
+                <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 2, mb: 6 }} />
+                <Grid container spacing={6}>
+                    <Grid item xs={12} md={8}>
+                        <Skeleton variant="text" height={30} width="100%" sx={{ mb: 1 }} />
+                        <Skeleton variant="text" height={30} width="100%" sx={{ mb: 1 }} />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+                    </Grid>
+                </Grid>
+            </Container>
+        );
+    }
+
+    if (!campaign) {
+        return (
+            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 }, py: 12, textAlign: 'center' }}>
+                <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, color: 'secondary.main' }}>
+                    Campaign Not Found
+                </Typography>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => navigate('/stories')}
+                    startIcon={<ArrowBack />}
+                    sx={{ borderRadius: 1, px: 4, py: 1.5, fontWeight: 900 }}
+                >
+                    Back to Stories
+                </Button>
+            </Container>
+        );
+    }
+
+    const progress = Math.min((campaign.raised_amount / campaign.target_amount) * 100, 100);
+    const daysLeft = Math.max(0, Math.ceil((new Date(campaign.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+
+    return (
+        <Box
+            component={motion.div}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 12 }}
+        >
+            {/* Full-Width Header */}
+            <Box sx={{ pt: 10, pb: 6, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 } }}>
+                    <Button
+                        startIcon={<ArrowBack />}
+                        onClick={() => navigate('/stories')}
+                        sx={{ color: 'text.secondary', mb: 4, fontWeight: 800, '&:hover': { color: 'secondary.main', bgcolor: 'transparent' } }}
+                    >
+                        Back to Stories
+                    </Button>
+
                     <Grid container spacing={6}>
-                        <Grid item xs={12} md={7}>
-                            <Skeleton variant="text" height={80} width="60%" />
-                            <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 8, mt: 4 }} />
+                        <Grid item xs={12} md={8}>
+                            <Typography variant="overline" sx={{ fontWeight: 800, color: 'secondary.main', mb: 2, display: 'block', letterSpacing: '0.1em' }}>
+                                ACTIVE CAMPAIGN
+                            </Typography>
+                            <Typography variant="h1" sx={{ 
+                                fontSize: { xs: '2.5rem', md: '4rem' }, 
+                                fontWeight: 900, 
+                                color: 'text.primary', 
+                                lineHeight: 1.1,
+                                mb: 4,
+                                letterSpacing: '-0.04em'
+                            }}>
+                                {campaign.title}
+                            </Typography>
+
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 4 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: 'text.secondary' }}>
+                                    <CalendarToday sx={{ fontSize: 20 }} />
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                        Ends in {daysLeft} days
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: 'text.secondary' }}>
+                                    <Groups sx={{ fontSize: 24 }} />
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                        2,410 Supporters
+                                    </Typography>
+                                </Box>
+                                <Button 
+                                    startIcon={<Share />} 
+                                    sx={{ ml: 'auto', fontWeight: 800, color: 'secondary.main' }}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(window.location.href);
+                                        alert('Link copied to clipboard!');
+                                    }}
+                                >
+                                    Share Campaign
+                                </Button>
+                            </Box>
                         </Grid>
-                        <Grid item xs={12} md={5}>
-                            <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 8 }} />
+                        
+                        <Grid item xs={12} md={4}>
+                            <Box sx={{ p: 4, borderRadius: 2, border: '1px solid', borderColor: 'divider', bgcolor: alpha(theme.palette.secondary.main, 0.02) }}>
+                                <Box sx={{ mb: 3 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                        <Typography variant="h4" sx={{ fontWeight: 900, color: 'secondary.main' }}>
+                                            KES {Number(campaign.raised_amount).toLocaleString()}
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                                            {Math.round(progress)}%
+                                        </Typography>
+                                    </Box>
+                                    <LinearProgress 
+                                        variant="determinate" 
+                                        value={progress} 
+                                        sx={{ height: 10, borderRadius: 5, bgcolor: alpha(theme.palette.secondary.main, 0.1), '& .MuiLinearProgress-bar': { bgcolor: 'secondary.main' } }}
+                                    />
+                                </Box>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontWeight: 500 }}>
+                                    Target: KES {Number(campaign.target_amount).toLocaleString()}
+                                </Typography>
+                                <Button 
+                                    fullWidth 
+                                    variant="contained" 
+                                    color="secondary" 
+                                    size="large"
+                                    startIcon={<Favorite />}
+                                    onClick={() => setDonationDialogOpen(true)}
+                                    sx={{ py: 2, fontWeight: 900, borderRadius: 1 }}
+                                >
+                                    Donate to Mission
+                                </Button>
+                            </Box>
                         </Grid>
                     </Grid>
                 </Container>
             </Box>
-        );
-    }
 
-    if (!campaign && !isLoading) {
-        return (
-             <Container maxWidth="md" sx={{ py: 15, textAlign: 'center' }}>
-                <GlassPanel sx={{ p: 8, textAlign: 'center' }}>
-                    <Typography variant="h3" fontWeight="900" gutterBottom color="primary.main">Quiet Mission</Typography>
-                    <Typography variant="h6" color="text.secondary" paragraph sx={{ mb: 4 }}>
-                        This story hasn't finished loading or has found its completion.
-                    </Typography>
-                    <Button 
-                        variant="contained" 
-                        onClick={() => navigate('/donate')} 
-                        startIcon={<ArrowBack />} 
-                        sx={{ px: 4, py: 1.5, borderRadius: 1, fontWeight: 800 }}
-                    >
-                        Active Missions
-                    </Button>
-                </GlassPanel>
-            </Container>
-        );
-    }
-
-    if (!campaign) return null;
-
-    const progress = campaign.target_amount > 0 ? Math.min((campaign.raised_amount / campaign.target_amount) * 100, 100) : 0;
-    const heroMedia = [
-        { url: campaign.featured_image, title: 'Featured' },
-        ...(campaign.gallery_images || []).map((img: any) => ({ url: img.file, title: img.title }))
-    ];
-
-    const daysLeft = Math.max(0, Math.ceil((new Date(campaign.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
-
-    return (
-        <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 15, position: 'relative', overflow: 'hidden' }}>
-            
-            {/* Trafalgar Hero Section */}
-            <TrafalgarHero 
-                title={campaign.title}
-                description={campaign.description ? campaign.description.replace(/<[^>]+>/g, '').substring(0, 160) + '...' : 'Supporting our community.'}
-                primaryActionText="Donate to Mission"
-                onPrimaryAction={() => navigate('/donate')}
-                imageSrc={heroMedia[heroIndex]?.url || campaign.featured_image}
-                imageAlt={campaign.title}
-                reverse={false}
-            />
-
-            {/* Main Content Layout */}
-            <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 10 }}>
+            {/* Expansive Imagery & Content */}
+            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 }, mt: 8 }}>
                 <Grid container spacing={8}>
-
-                    {/* Column 1: The Visual Story */}
                     <Grid item xs={12} md={7}>
-                        <Stack spacing={6}>
-                            {campaign.gallery_images?.length > 0 ? (
-                                campaign.gallery_images.map((img: any, idx: number) => (
-                                    <GlassMediaCard key={img.id} img={img} idx={idx} />
-                                ))
-                            ) : (
-                                <Box sx={{ p: 2, borderRadius: 8, bgcolor: 'background.paper', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
-                                    <Box component="img" src={campaign.featured_image} sx={{ width: '100%', borderRadius: 6 }} />
-                                </Box>
-                            )}
-                        </Stack>
+                        <Box sx={{ overflow: 'hidden', borderRadius: 2, mb: 6 }}>
+                            <Box
+                                component="img"
+                                src={campaign.featured_image || "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2070"}
+                                alt={campaign.title}
+                                sx={{ width: '100%', maxHeight: 600, objectFit: 'cover' }}
+                            />
+                        </Box>
+
+                        <Box
+                            sx={{
+                                fontSize: '1.25rem',
+                                lineHeight: 1.8,
+                                color: 'text.primary',
+                                fontFamily: '"Outfit", sans-serif',
+                                '& p': { mb: 4 },
+                                '& h2': { fontSize: '2rem', fontWeight: 800, mt: 6, mb: 3, letterSpacing: '-0.02em' },
+                                '& blockquote': { 
+                                    borderLeft: '4px solid', 
+                                    borderColor: 'secondary.main', 
+                                    pl: 4, my: 6, fontStyle: 'italic', color: 'secondary.main', fontSize: '1.5rem', bgcolor: alpha(theme.palette.secondary.main, 0.03), py: 4, borderRadius: '0 8px 8px 0' 
+                                }
+                            }}
+                            dangerouslySetInnerHTML={{ __html: campaign.description || '' }}
+                        />
+
+                        {/* Gallery Section */}
+                        {campaign.gallery_images && campaign.gallery_images.length > 0 && (
+                            <Box sx={{ mt: 8 }}>
+                                <Typography variant="h4" sx={{ fontWeight: 900, mb: 4 }}>Visual Progress</Typography>
+                                <Grid container spacing={3}>
+                                    {campaign.gallery_images.map((img: any) => (
+                                        <Grid item xs={12} sm={6} key={img.id}>
+                                            <Box
+                                                component="img"
+                                                src={img.file}
+                                                alt={img.alt_text}
+                                                sx={{ width: '100%', height: 350, objectFit: 'cover', borderRadius: 2 }}
+                                            />
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            </Box>
+                        )}
                     </Grid>
 
-                    {/* Column 2: The Heart of the Mission (Glass Sidebar) */}
                     <Grid item xs={12} md={5}>
                         <Box sx={{ position: { md: 'sticky' }, top: 100 }}>
-                            <GlassPanel>
-                                <Typography variant="h5" fontWeight="900" sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2, opacity: 0.9 }}>
-                                    <Campaign sx={{ fontSize: 32, color: 'primary.main', opacity: 0.6 }} />
-                                    The Narrative
+                            <Box sx={{ p: 4, borderRadius: 2, bgcolor: alpha(theme.palette.secondary.main, 0.02), border: '1px solid', borderColor: 'divider' }}>
+                                <Typography variant="h5" sx={{ fontWeight: 900, mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <TrendingUp color="secondary" />
+                                    Impact Metrics
                                 </Typography>
-
-                                <Box
-                                    sx={{
-                                        fontSize: '1.25rem',
-                                        lineHeight: 1.85,
-                                        color: 'text.primary',
-                                        mb: 6,
-                                        '& p': { mb: 3 },
-                                        '& blockquote': {
-                                            borderLeft: '4px solid', borderColor: 'secondary.main',
-                                            pl: 4, my: 5, fontStyle: 'italic', fontWeight: 500,
-                                            color: 'text.secondary', opacity: 0.9
-                                        }
-                                    }}
-                                    dangerouslySetInnerHTML={{ __html: campaign.description || '' }}
-                                />
-
-                                <Box sx={{ mb: 6 }}>
-                                    <Stack direction="row" justifyContent="space-between" alignItems="flex-end" sx={{ mb: 1 }}>
-                                        <Typography variant="subtitle1" fontWeight="900" color="text.secondary">FUNDRAISED</Typography>
-                                        <Typography variant="h6" fontWeight="900" color="primary.main">
-                                            {Math.round(progress)}%
+                                
+                                <Stack spacing={4}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', mb: 1 }}>SUPPORTERS</Typography>
+                                        <Typography variant="h4" sx={{ fontWeight: 900 }}>2,410</Typography>
+                                        <Typography variant="body2" color="text.secondary">Passionate individuals contributing.</Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', mb: 1 }}>TIME REMAINING</Typography>
+                                        <Typography variant="h4" sx={{ fontWeight: 900 }}>{daysLeft} Days</Typography>
+                                        <Typography variant="body2" color="text.secondary">Until the mission target is reviewed.</Typography>
+                                    </Box>
+                                    <Divider />
+                                    <Box sx={{ pt: 2 }}>
+                                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                            "Every shilling contributed directly supports the beneficiaries listed in this campaign. We maintain end-to-end transparency."
                                         </Typography>
-                                    </Stack>
-                                    
-                                    <Typography variant="h2" fontWeight="900" color="text.primary" sx={{ mb: 1 }}>
-                                        KES {Number(campaign.raised_amount).toLocaleString()}
-                                    </Typography>
-                                    <Typography variant="h6" color="text.secondary" fontWeight={500} sx={{ mb: 3, opacity: 0.7 }}>
-                                        Target: KES {Number(campaign.target_amount).toLocaleString()}
-                                    </Typography>
-
-                                    <ProgressBeam value={progress} />
-
-                                    <Grid container spacing={3} sx={{ mt: 2 }}>
-                                        <Grid item xs={6}>
-                                            <Stack direction="row" spacing={1.5} alignItems="center">
-                                                <Diversity3 color="primary" sx={{ opacity: 0.6 }} />
-                                                <Box>
-                                                    <Typography variant="h5" fontWeight="900">2,410</Typography>
-                                                    <Typography variant="caption" color="text.secondary" fontWeight={700}>SUPPORTERS</Typography>
-                                                </Box>
-                                            </Stack>
-                                        </Grid>
-                                        <Grid item xs={6}>
-                                            <Stack direction="row" spacing={1.5} alignItems="center">
-                                                <AccessTimeFilled color="secondary" sx={{ opacity: 0.6 }} />
-                                                <Box>
-                                                    <Typography variant="h5" fontWeight="900">{daysLeft}</Typography>
-                                                    <Typography variant="caption" color="text.secondary" fontWeight={700}>DAYS TO GO</Typography>
-                                                </Box>
-                                            </Stack>
-                                        </Grid>
-                                    </Grid>
-                                </Box>
-
-                                <Stack spacing={2.5}>
-                                    <Button
-                                        fullWidth variant="contained" size="large"
-                                        startIcon={<Favorite />}
-                                        sx={{ 
-                                            py: 2.5, borderRadius: 1, fontWeight: 900, fontSize: '1.25rem',
-                                            bgcolor: 'primary.main',
-                                            boxShadow: `0 15px 30px ${alpha(theme.palette.primary.main, 0.3)}`,
-                                            '&:hover': { bgcolor: 'primary.dark', transform: 'scale(1.02)' },
-                                            transition: 'all 0.3s ease'
-                                        }}
-                                    >
-                                        Donate to Mission
-                                    </Button>
-                                    <Button
-                                        fullWidth variant="outlined" size="large"
-                                        startIcon={<Share />}
-                                        sx={{ 
-                                            py: 2, borderRadius: 1, fontWeight: 900, 
-                                            borderWidth: 2, borderColor: alpha(theme.palette.divider, 0.1),
-                                            bgcolor: alpha('#fff', 0.05),
-                                            backdropFilter: 'blur(5px)',
-                                            '&:hover': { borderWidth: 2, bgcolor: alpha('#fff', 0.1) }
-                                        }}
-                                    >
-                                        Signal Others
-                                    </Button>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 900, mt: 2 }}>— Kindra Management</Typography>
+                                    </Box>
                                 </Stack>
-
-                                <Box sx={{ 
-                                    mt: 6, p: 2.5, 
-                                    bgcolor: alpha(theme.palette.primary.main, 0.04), 
-                                    borderRadius: 1.5, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1),
-                                    display: 'flex', gap: 2, alignItems: 'center' 
-                                }}>
-                                    <InfoOutlined color="primary" sx={{ opacity: 0.7 }} />
-                                    <Typography variant="caption" color="text.secondary" fontWeight={500} sx={{ fontStyle: 'italic' }}>
-                                        End-to-end transparency: Your life-changing contribution is verified & audited.
-                                    </Typography>
-                                </Box>
-                            </GlassPanel>
+                            </Box>
                         </Box>
                     </Grid>
                 </Grid>
             </Container>
+
+            {/* Donation Dialog */}
+            <DonationDialog
+                open={donationDialogOpen}
+                onClose={() => setDonationDialogOpen(false)}
+                campaign={campaign}
+            />
         </Box>
     );
 }
