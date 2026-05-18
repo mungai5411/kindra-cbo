@@ -82,6 +82,14 @@ class ShelterHome(models.Model):
     last_inspection_date = models.DateField(null=True, blank=True)
     compliance_status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
     
+    # Financial Details
+    bank_name = models.CharField(max_length=100, blank=True)
+    bank_account_number = models.CharField(max_length=100, blank=True)
+    bank_branch = models.CharField(max_length=100, blank=True)
+    mpesa_paybill_number = models.CharField(max_length=50, blank=True)
+    mpesa_account_number = models.CharField(max_length=50, blank=True)
+    mpesa_phone_number = models.CharField(max_length=20, blank=True)
+    
     # Partner user account
     partner_user = models.ForeignKey(
         User,

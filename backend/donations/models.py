@@ -420,6 +420,12 @@ class Disbursement(models.Model):
         VERIFIED = 'VERIFIED', _('Verified')
         FAILED = 'FAILED', _('Failed')
 
+    class PaymentMethod(models.TextChoices):
+        BANK_TRANSFER = 'BANK_TRANSFER', _('Bank Transfer')
+        MPESA = 'MPESA', _('M-Pesa')
+        CASH = 'CASH', _('Cash')
+        OTHER = 'OTHER', _('Other')
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     shelter_home = models.ForeignKey('shelter_homes.ShelterHome', on_delete=models.CASCADE, related_name='disbursements')
     amount = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(1)])
@@ -427,6 +433,9 @@ class Disbursement(models.Model):
     
     purpose_description = models.TextField(help_text=_('What these funds are intended for'))
     transaction_reference = models.CharField(max_length=200, blank=True, help_text=_('Bank or M-Pesa transaction ref'))
+    
+    payment_method = models.CharField(max_length=20, choices=PaymentMethod.choices, default=PaymentMethod.OTHER)
+    payment_details = models.JSONField(default=dict, blank=True, help_text=_('Specific account/number funds were sent to'))
     
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     
