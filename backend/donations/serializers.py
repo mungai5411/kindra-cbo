@@ -4,7 +4,11 @@ Donation Serializers
 
 from rest_framework import serializers
 from django.utils.html import strip_tags
-from .models import Donor, Campaign, Donation, Receipt, SocialMediaPost, MaterialDonation, DonationImpact
+from .models import (
+    Donor, Campaign, Donation, Receipt, SocialMediaPost, 
+    MaterialDonation, DonationImpact, Wallet, Disbursement, 
+    DisbursementReceipt, DisbursementPhoto
+)
 from blog.models import MediaAsset
 from blog.serializers import MediaAssetSerializer
 
@@ -123,3 +127,35 @@ class DonationImpactSerializer(serializers.ModelSerializer):
         if not value:
             raise serializers.ValidationError('Description is required.')
         return value
+
+class WalletSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wallet
+        fields = '__all__'
+        read_only_fields = ('id', 'last_updated', 'current_balance')
+
+
+class DisbursementPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DisbursementPhoto
+        fields = '__all__'
+        read_only_fields = ('id', 'uploaded_at', 'receipt')
+
+
+class DisbursementReceiptSerializer(serializers.ModelSerializer):
+    photos = DisbursementPhotoSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = DisbursementReceipt
+        fields = '__all__'
+        read_only_fields = ('id', 'uploaded_at', 'uploaded_by', 'is_verified', 'verified_by', 'verified_at', 'admin_notes')
+
+
+class DisbursementSerializer(serializers.ModelSerializer):
+    receipt = DisbursementReceiptSerializer(read_only=True)
+    shelter_home_name = serializers.CharField(source='shelter_home.name', read_only=True)
+    
+    class Meta:
+        model = Disbursement
+        fields = '__all__'
+        read_only_fields = ('id', 'created_at', 'updated_at', 'created_by')

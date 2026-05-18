@@ -13,11 +13,16 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.utils import timezone
-from .models import Donor, Campaign, Donation, Receipt, SocialMediaPost, MaterialDonation, DonationImpact
 from .serializers import (
     DonorSerializer, CampaignSerializer, DonationSerializer, 
     ReceiptSerializer, SocialMediaPostSerializer, MaterialDonationSerializer,
-    DonationImpactSerializer
+    DonationImpactSerializer, WalletSerializer, DisbursementSerializer,
+    DisbursementReceiptSerializer, DisbursementPhotoSerializer
+)
+from .models import (
+    Donor, Campaign, Donation, Receipt, SocialMediaPost, 
+    MaterialDonation, DonationImpact, Wallet, Disbursement,
+    DisbursementReceipt, DisbursementPhoto
 )
 from .services import DonationService, PaymentService, NotificationService, MaterialAcknowledgmentService, ReceiptService
 from accounts.models import User, Notification, AuditLog
@@ -620,3 +625,112 @@ def submit_impact_summary(request):
     NotificationService.notify_impact_summary(shelter, impact_count)
     
     return Response({'message': f'Summary of {impact_count} impact records submitted to admin.'}, status=status.HTTP_200_OK)
+
+class WalletViewSet(generics.RetrieveAPIView):
+    serializer_class = WalletSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
+    
+    def get_object(self):
+        return Wallet.get_instance()
+
+class DisbursementListCreateView(generics.ListCreateAPIView):
+    serializer_class = DisbursementSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['status', 'shelter_home']
+    ordering = ['-date_sent']
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ['ADMIN', 'MANAGEMENT']:
+            return Disbursement.objects.all()
+        # Partners see their own shelter's disbursements
+        return Disbursement.objects.filter(shelter_home__partner_user=user)
+
+    def perform_create(self, serializer):
+        if self.request.user.role not in ['ADMIN', 'MANAGEMENT']:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only admins can create disbursements.")
+        
+        serializer.save(
+            created_by=self.request.user,
+            date_sent=timezone.now() if serializer.validated_data.get('status') == Disbursement.Status.SENT else None
+        )
+        
+        # Update wallet total disbursed
+        wallet = Wallet.get_instance()
+        wallet.total_disbursed += serializer.validated_data.get('amount')
+        wallet.save()
+
+class DisbursementDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = DisbursementSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ['ADMIN', 'MANAGEMENT']:
+            return Disbursement.objects.all()
+        return Disbursement.objects.filter(shelter_home__partner_user=user)
+        
+    def perform_update(self, serializer):
+        if self.request.user.role not in ['ADMIN', 'MANAGEMENT']:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only admins can update disbursements.")
+        serializer.save()
+
+class DisbursementReceiptListCreateView(generics.ListCreateAPIView):
+    serializer_class = DisbursementReceiptSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ['ADMIN', 'MANAGEMENT']:
+            return DisbursementReceipt.objects.all()
+        return DisbursementReceipt.objects.filter(disbursement__shelter_home__partner_user=user)
+        
+    def perform_create(self, serializer):
+        disbursement = serializer.validated_data.get('disbursement')
+        if self.request.user.role not in ['ADMIN', 'MANAGEMENT'] and disbursement.shelter_home.partner_user != self.request.user:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You can only upload receipts for your own shelter's disbursements.")
+            
+        receipt = serializer.save(uploaded_by=self.request.user)
+        
+        # Update disbursement status
+        if disbursement.status in [Disbursement.Status.SENT, Disbursement.Status.AWAITING_RECEIPT]:
+            disbursement.status = Disbursement.Status.RECEIPT_UPLOADED
+            disbursement.save()
+
+class DisbursementReceiptDetailView(generics.RetrieveUpdateAPIView):
+    serializer_class = DisbursementReceiptSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ['ADMIN', 'MANAGEMENT']:
+            return DisbursementReceipt.objects.all()
+        return DisbursementReceipt.objects.filter(disbursement__shelter_home__partner_user=user)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated, IsAdminOrManagement])
+def verify_receipt(request, pk):
+    try:
+        receipt = DisbursementReceipt.objects.get(pk=pk)
+        receipt.is_verified = True
+        receipt.verified_by = request.user
+        receipt.verified_at = timezone.now()
+        
+        admin_notes = request.data.get('admin_notes')
+        if admin_notes:
+            receipt.admin_notes = admin_notes
+            
+        receipt.save()
+        
+        # Update disbursement
+        disbursement = receipt.disbursement
+        disbursement.status = Disbursement.Status.VERIFIED
+        disbursement.save()
+        
+        return Response({'message': 'Receipt verified successfully'}, status=status.HTTP_200_OK)
+    except DisbursementReceipt.DoesNotExist:
+        return Response({'error': 'Receipt not found'}, status=status.HTTP_404_NOT_FOUND)

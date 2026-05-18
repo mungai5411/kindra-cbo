@@ -14,6 +14,9 @@ from .views import (
     approve_material_donation, reject_material_donation,
     download_material_acknowledgment, download_receipt,
     delete_campaign_image,
+    WalletViewSet, DisbursementListCreateView, DisbursementDetailView,
+    DisbursementReceiptListCreateView, DisbursementReceiptDetailView,
+    verify_receipt
 )
 
 app_name = 'donations'
@@ -52,4 +55,12 @@ urlpatterns = [
     
     # Image Management
     path('campaigns/<uuid:pk>/image/', delete_campaign_image, name='delete-campaign-image'),
+    
+    # Wallet & Disbursements
+    path('wallet/', WalletViewSet.as_view(), name='wallet-detail'),
+    path('disbursements/', DisbursementListCreateView.as_view(), name='disbursement-list'),
+    path('disbursements/<uuid:pk>/', DisbursementDetailView.as_view(), name='disbursement-detail'),
+    path('disbursements/receipts/', DisbursementReceiptListCreateView.as_view(), name='disbursement-receipt-list'),
+    path('disbursements/receipts/<uuid:pk>/', DisbursementReceiptDetailView.as_view(), name='disbursement-receipt-detail'),
+    path('disbursements/receipts/<uuid:pk>/verify/', verify_receipt, name='disbursement-receipt-verify'),
 ]

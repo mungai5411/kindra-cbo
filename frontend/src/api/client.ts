@@ -185,6 +185,10 @@ export const endpoints = {
         materialDonations: '/donations/material-donations/',
         impact: '/donations/impact/',
         impactSummary: '/donations/impact/submit-summary/',
+        
+        wallet: '/donations/wallet/',
+        disbursements: '/donations/disbursements/',
+        disbursementReceipts: '/donations/disbursements/receipts/',
     },
 
     // Volunteers

@@ -378,3 +378,112 @@ class DonationImpact(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.shelter_home.name}"
+
+
+class Wallet(models.Model):
+    """
+    Central wallet tracking total funds for the organization
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    total_received = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    total_disbursed = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    
+    last_updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = _('wallet')
+        verbose_name_plural = _('wallets')
+        
+    def __str__(self):
+        return "Kindra CBO Central Wallet"
+        
+    @property
+    def current_balance(self):
+        return self.total_received - self.total_disbursed
+        
+    @classmethod
+    def get_instance(cls):
+        """Get or create the singleton wallet instance"""
+        wallet, created = cls.objects.get_or_create(id=uuid.UUID('00000000-0000-0000-0000-000000000001'))
+        return wallet
+
+
+class Disbursement(models.Model):
+    """
+    Funds sent to a shelter home
+    """
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', _('Pending')
+        SENT = 'SENT', _('Sent')
+        AWAITING_RECEIPT = 'AWAITING_RECEIPT', _('Awaiting Receipt')
+        RECEIPT_UPLOADED = 'RECEIPT_UPLOADED', _('Receipt Uploaded')
+        VERIFIED = 'VERIFIED', _('Verified')
+        FAILED = 'FAILED', _('Failed')
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    shelter_home = models.ForeignKey('shelter_homes.ShelterHome', on_delete=models.CASCADE, related_name='disbursements')
+    amount = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(1)])
+    currency = models.CharField(max_length=3, default='KES')
+    
+    purpose_description = models.TextField(help_text=_('What these funds are intended for'))
+    transaction_reference = models.CharField(max_length=200, blank=True, help_text=_('Bank or M-Pesa transaction ref'))
+    
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    
+    date_sent = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='disbursements_created')
+
+    class Meta:
+        verbose_name = _('disbursement')
+        verbose_name_plural = _('disbursements')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.amount} {self.currency} to {self.shelter_home.name}"
+
+
+class DisbursementReceipt(models.Model):
+    """
+    Proof of fund usage uploaded by shelter partners
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    disbursement = models.OneToOneField(Disbursement, on_delete=models.CASCADE, related_name='receipt')
+    
+    receipt_file = models.FileField(upload_to='disbursement_receipts/%Y/%m/', blank=True, null=True)
+    description = models.TextField(help_text=_('Details of how the funds were used'))
+    
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='uploaded_receipts')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    is_verified = models.BooleanField(default=False)
+    verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='verified_receipts')
+    verified_at = models.DateTimeField(null=True, blank=True)
+    admin_notes = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = _('disbursement receipt')
+        verbose_name_plural = _('disbursement receipts')
+
+    def __str__(self):
+        return f"Receipt for {self.disbursement}"
+
+
+class DisbursementPhoto(models.Model):
+    """
+    Impact photos linked to a disbursement receipt
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    receipt = models.ForeignKey(DisbursementReceipt, on_delete=models.CASCADE, related_name='photos')
+    image = models.ImageField(upload_to='disbursement_impact/%Y/%m/')
+    caption = models.CharField(max_length=200, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('disbursement photo')
+        verbose_name_plural = _('disbursement photos')
+
+    def __str__(self):
+        return f"Impact photo for {self.receipt.disbursement}"

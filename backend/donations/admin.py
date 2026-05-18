@@ -3,7 +3,10 @@ Donation Admin Configuration
 """
 
 from django.contrib import admin
-from .models import Donor, Campaign, Donation, Receipt, SocialMediaPost
+from .models import (
+    Donor, Campaign, Donation, Receipt, SocialMediaPost,
+    Wallet, Disbursement, DisbursementReceipt, DisbursementPhoto
+)
 
 
 @admin.register(Donor)
@@ -62,3 +65,41 @@ class SocialMediaPostAdmin(admin.ModelAdmin):
     list_display = ('campaign', 'platform', 'likes_count', 'shares_count', 'reach', 'posted_at')
     list_filter = ('platform', 'posted_at')
     search_fields = ('campaign__title', 'post_id')
+
+
+@admin.register(Wallet)
+class WalletAdmin(admin.ModelAdmin):
+    list_display = ('id', 'total_received', 'total_disbursed', 'current_balance', 'last_updated')
+    readonly_fields = ('total_received', 'total_disbursed')
+
+
+class DisbursementReceiptInline(admin.StackedInline):
+    model = DisbursementReceipt
+    extra = 0
+
+
+@admin.register(Disbursement)
+class DisbursementAdmin(admin.ModelAdmin):
+    list_display = ('amount', 'currency', 'shelter_home', 'status', 'date_sent', 'transaction_reference')
+    list_filter = ('status', 'date_sent')
+    search_fields = ('shelter_home__name', 'purpose_description', 'transaction_reference')
+    inlines = [DisbursementReceiptInline]
+
+
+class DisbursementPhotoInline(admin.TabularInline):
+    model = DisbursementPhoto
+    extra = 0
+
+
+@admin.register(DisbursementReceipt)
+class DisbursementReceiptAdmin(admin.ModelAdmin):
+    list_display = ('disbursement', 'is_verified', 'uploaded_at', 'verified_at')
+    list_filter = ('is_verified', 'uploaded_at')
+    search_fields = ('description', 'admin_notes')
+    inlines = [DisbursementPhotoInline]
+
+
+@admin.register(DisbursementPhoto)
+class DisbursementPhotoAdmin(admin.ModelAdmin):
+    list_display = ('receipt', 'uploaded_at')
+    list_filter = ('uploaded_at',)

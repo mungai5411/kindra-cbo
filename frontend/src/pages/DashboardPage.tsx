@@ -48,6 +48,8 @@ import { BlogManagementView } from '../components/dashboard/BlogManagementView';
 import { ContentManagementView } from '../components/dashboard/ContentManagementView';
 import MediaLibraryView from '../features/media/MediaLibraryView';
 import ImpactTrackingView from '../features/donations/ImpactTrackingView';
+import WalletDashboard from '../features/donations/WalletDashboard';
+import FundsReceived from '../features/shelters/FundsReceived';
 import { LogoutDialog } from '../components/common/LogoutDialog';
 import { MobileBottomNav } from '../components/dashboard/MobileBottomNav';
 import { VolunteerGroupsView } from '../components/dashboard/VolunteerGroupsView';
@@ -208,7 +210,7 @@ export default function DashboardPage() {
 
         // Shelter Partners ONLY see shelter-related content
         if (user.role === 'SHELTER_PARTNER') {
-            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'staff', 'media', 'donations', 'impact_analytics'].includes(itemId);
+            return ['overview', 'shelter', 'shelters', 'placements', 'resources', 'staff', 'media', 'donations', 'impact_analytics', 'funds_received'].includes(itemId);
         }
 
         // Case Workers see case management and shelter content
@@ -371,6 +373,8 @@ export default function DashboardPage() {
             'material_donations': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
             'impact_analytics': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
             'community_events': <DonationsView setOpenDialog={handleOpenCampaignDialog} activeTab={activeTab} onTabChange={handleTabChange} />,
+            'wallet_impact': <WalletDashboard />,
+            'funds_received': <FundsReceived />,
 
             'case_management': <CasesView activeTab={activeTab} />,
             'cases': <CasesView activeTab={activeTab} />,

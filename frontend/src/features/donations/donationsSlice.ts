@@ -261,12 +261,90 @@ export const rejectMaterialDonation = createAsyncThunk(
     }
 );
 
+export const fetchWallet = createAsyncThunk(
+    'donations/fetchWallet',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get(endpoints.donations.wallet);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch wallet');
+        }
+    }
+);
+
+export const fetchDisbursements = createAsyncThunk(
+    'donations/fetchDisbursements',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get(endpoints.donations.disbursements);
+            return response.data.results || response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch disbursements');
+        }
+    }
+);
+
+export const createDisbursement = createAsyncThunk(
+    'donations/createDisbursement',
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post(endpoints.donations.disbursements, data);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to create disbursement');
+        }
+    }
+);
+
+export const fetchDisbursementReceipts = createAsyncThunk(
+    'donations/fetchDisbursementReceipts',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.get(endpoints.donations.disbursementReceipts);
+            return response.data.results || response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch disbursement receipts');
+        }
+    }
+);
+
+export const uploadDisbursementReceipt = createAsyncThunk(
+    'donations/uploadDisbursementReceipt',
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const isFormData = data instanceof FormData;
+            const response = await apiClient.post(endpoints.donations.disbursementReceipts, data, {
+                headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {}
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to upload receipt');
+        }
+    }
+);
+
+export const verifyDisbursementReceipt = createAsyncThunk(
+    'donations/verifyDisbursementReceipt',
+    async ({ id, admin_notes }: { id: string; admin_notes?: string }, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.post(`${endpoints.donations.disbursementReceipts}${id}/verify/`, { admin_notes });
+            return { id, message: response.data.message };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to verify receipt');
+        }
+    }
+);
+
 interface DonationsState {
     campaigns: any[];
     donations: any[];
     donors: any[];
     receipts: any[];
     materialDonations: any[];
+    wallet: any | null;
+    disbursements: any[];
+    disbursementReceipts: any[];
     isLoading: boolean;
     error: string | null;
 }
@@ -277,6 +355,9 @@ const initialState: DonationsState = {
     donors: [],
     receipts: [],
     materialDonations: [],
+    wallet: null,
+    disbursements: [],
+    disbursementReceipts: [],
     isLoading: false,
     error: null,
 };
@@ -394,6 +475,29 @@ const donationsSlice = createSlice({
             const index = state.materialDonations.findIndex(m => m.id === action.payload.id);
             if (index !== -1) {
                 state.materialDonations[index].status = 'REJECTED';
+            }
+        });
+        
+        // Wallet & Disbursements
+        builder.addCase(fetchWallet.fulfilled, (state, action) => {
+            state.wallet = action.payload;
+        });
+        builder.addCase(fetchDisbursements.fulfilled, (state, action) => {
+            state.disbursements = Array.isArray(action.payload) ? action.payload : [];
+        });
+        builder.addCase(createDisbursement.fulfilled, (state, action) => {
+            state.disbursements.unshift(action.payload);
+        });
+        builder.addCase(fetchDisbursementReceipts.fulfilled, (state, action) => {
+            state.disbursementReceipts = Array.isArray(action.payload) ? action.payload : [];
+        });
+        builder.addCase(uploadDisbursementReceipt.fulfilled, (state, action) => {
+            state.disbursementReceipts.unshift(action.payload);
+        });
+        builder.addCase(verifyDisbursementReceipt.fulfilled, (state, action) => {
+            const index = state.disbursementReceipts.findIndex(r => r.id === action.payload.id);
+            if (index !== -1) {
+                state.disbursementReceipts[index].is_verified = true;
             }
         });
     },

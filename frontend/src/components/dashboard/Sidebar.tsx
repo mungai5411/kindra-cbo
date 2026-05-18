@@ -81,6 +81,7 @@ const NAVIGATION = [
             { id: 'material_donations', label: 'Material Giving' },
             { id: 'donors', label: 'Donors' },
             { id: 'receipts', label: 'Receipts' },
+            { id: 'wallet_impact', label: 'Wallet Disburse', adminOnly: true },
             { id: 'impact_analytics', label: 'Impact Tracker' },
             { id: 'community_events', label: 'Community Hub' },
             { id: 'social_media', label: 'Social Media' },
@@ -92,6 +93,7 @@ const NAVIGATION = [
         icon: <Home />,
         children: [
             { id: 'shelters', label: 'Shelter Homes' },
+            { id: 'funds_received', label: 'Funds Received' },
             { id: 'placements', label: 'Placements' },
             { id: 'resources', label: 'Resources' },
             { id: 'staff', label: 'Staff registry' },
