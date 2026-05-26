@@ -47,7 +47,6 @@ import {
     Event as EventIcon,
     LocationOn,
     Schedule,
-    AssignmentInd,
     PersonAdd,
     NoAccounts,
     VerifiedUser,

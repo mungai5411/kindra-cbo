@@ -107,8 +107,8 @@ export const FAQSection: React.FC = () => {
   const [expanded, setExpanded] = useState<string | false>('panel-0');
 
   return (
-    <Box sx={{ py: { xs: 6, md: 10 }, position: 'relative', overflow: 'hidden' }}>
-      <Container maxWidth="xl">
+    <Box sx={{ py: { xs: 4, md: 6 }, position: 'relative', overflow: 'hidden' }}>
+      <Container maxWidth="lg">
         {/* Section Header */}
         <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
           <Typography

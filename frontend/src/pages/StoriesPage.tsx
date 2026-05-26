@@ -31,15 +31,8 @@ import {
 import {
     Search,
     ArrowForward,
-    AccessTime,
     Article,
-    Campaign as CampaignIcon,
-    CalendarMonth,
-    Favorite,
-    AttachMoney,
     Handshake,
-    Inventory,
-    Forum,
     Person
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -260,7 +253,7 @@ export default function StoriesPage() {
                                         display: 'flex', 
                                         flexDirection: { xs: 'column', md: 'row' }, 
                                         gap: 6, 
-                                        mb: 12, 
+                                        mb: 8, 
                                         cursor: 'pointer',
                                         '&:hover img': { transform: 'scale(1.02)' }
                                     }}
@@ -357,7 +350,11 @@ export default function StoriesPage() {
                                                 endIcon={<ArrowForward />}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    currentTab === 0 ? navigate(`/stories/${featuredItem.slug}`) : navigate(`/campaigns/${featuredItem.slug || featuredItem.id}`);
+                                                    if (currentTab === 0) {
+                                                        navigate(`/stories/${featuredItem.slug}`);
+                                                    } else {
+                                                        navigate(`/campaigns/${featuredItem.slug || featuredItem.id}`);
+                                                    }
                                                 }}
                                                 sx={{ alignSelf: 'flex-start', px: 4, fontWeight: 900, borderRadius: 1 }}
                                             >
@@ -460,7 +457,11 @@ export default function StoriesPage() {
                                                             fullWidth
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                currentTab === 0 ? navigate(`/stories/${item.slug}`) : navigate(`/campaigns/${item.slug || item.id}`);
+                                                                if (currentTab === 0) {
+                                                                    navigate(`/stories/${item.slug}`);
+                                                                } else {
+                                                                    navigate(`/campaigns/${item.slug || item.id}`);
+                                                                }
                                                             }}
                                                             sx={{ fontWeight: 800, borderRadius: 1 }}
                                                         >
@@ -494,7 +495,7 @@ export default function StoriesPage() {
                     )}
                 </AnimatePresence>
 
-                <Box sx={{ mt: 10, pt: 8, borderTop: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
+                <Box sx={{ mt: 8, pt: 6, borderTop: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
                     <Typography variant="h4" sx={{ fontWeight: 800, mb: 4 }}>
                         Want to share your story or start a campaign?
                     </Typography>

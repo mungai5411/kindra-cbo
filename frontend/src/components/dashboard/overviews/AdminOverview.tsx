@@ -9,7 +9,6 @@ import {
     DonationMethodsChart,
     ShelterCapacityChart
 } from '../../charts/DashboardCharts';
-import { useDeviceType } from '../../../hooks/useDeviceType';
 
 interface AdminOverviewProps {
     stats: {

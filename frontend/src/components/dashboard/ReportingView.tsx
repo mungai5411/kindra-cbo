@@ -22,12 +22,6 @@ import {
     IconButton,
     TableContainer,
     Chip,
-    Table,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    Divider,
     Alert,
     Snackbar,
     alpha,
@@ -46,13 +40,10 @@ import {
     BarChart,
     Insights,
     AutoGraph,
-    Security,
     Psychology,
     TableView,
     FilterList,
     Download,
-    Warning,
-    Folder,
     LocationOn
 } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';

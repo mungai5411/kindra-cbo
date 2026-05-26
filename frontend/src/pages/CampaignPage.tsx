@@ -10,7 +10,6 @@ import {
     Box,
     Container,
     Typography,
-    Chip,
     Button,
     Skeleton,
     Divider,
@@ -18,12 +17,10 @@ import {
     LinearProgress,
     useTheme,
     alpha,
-    Avatar,
     Stack
 } from '@mui/material';
 import { 
     ArrowBack, 
-    AccessTime, 
     Favorite, 
     Share, 
     CalendarToday, 
@@ -54,10 +51,10 @@ export default function CampaignPage() {
 
     if (isLoading && !campaign) {
         return (
-            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 }, py: 12 }}>
+            <Container maxWidth="lg" sx={{ py: 8 }}>
                 <Skeleton variant="text" height={80} width="60%" sx={{ mb: 2 }} />
                 <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 2, mb: 6 }} />
-                <Grid container spacing={6}>
+                <Grid container spacing={4}>
                     <Grid item xs={12} md={8}>
                         <Skeleton variant="text" height={30} width="100%" sx={{ mb: 1 }} />
                         <Skeleton variant="text" height={30} width="100%" sx={{ mb: 1 }} />
@@ -72,7 +69,7 @@ export default function CampaignPage() {
 
     if (!campaign) {
         return (
-            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 }, py: 12, textAlign: 'center' }}>
+            <Container maxWidth="lg" sx={{ py: 8, textAlign: 'center' }}>
                 <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, color: 'secondary.main' }}>
                     Campaign Not Found
                 </Typography>
@@ -97,11 +94,11 @@ export default function CampaignPage() {
             component={motion.div}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 12 }}
+            sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 8 }}
         >
             {/* Full-Width Header */}
-            <Box sx={{ pt: 10, pb: 6, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 } }}>
+            <Box sx={{ pt: 6, pb: 4, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Container maxWidth="lg">
                     <Button
                         startIcon={<ArrowBack />}
                         onClick={() => navigate('/stories')}
@@ -110,7 +107,7 @@ export default function CampaignPage() {
                         Back to Stories
                     </Button>
 
-                    <Grid container spacing={6}>
+                    <Grid container spacing={4}>
                         <Grid item xs={12} md={8}>
                             <Typography variant="overline" sx={{ fontWeight: 800, color: 'secondary.main', mb: 2, display: 'block', letterSpacing: '0.1em' }}>
                                 ACTIVE CAMPAIGN
@@ -153,7 +150,7 @@ export default function CampaignPage() {
                         </Grid>
                         
                         <Grid item xs={12} md={4}>
-                            <Box sx={{ p: 4, borderRadius: 2, border: '1px solid', borderColor: 'divider', bgcolor: alpha(theme.palette.secondary.main, 0.02) }}>
+                            <Box sx={{ p: 3, borderRadius: 2, border: '1px solid', borderColor: 'divider', bgcolor: alpha(theme.palette.secondary.main, 0.02) }}>
                                 <Box sx={{ mb: 3 }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                         <Typography variant="h4" sx={{ fontWeight: 900, color: 'secondary.main' }}>
@@ -190,8 +187,8 @@ export default function CampaignPage() {
             </Box>
 
             {/* Expansive Imagery & Content */}
-            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 }, mt: 8 }}>
-                <Grid container spacing={8}>
+            <Container maxWidth="lg" sx={{ mt: 4 }}>
+                <Grid container spacing={4}>
                     <Grid item xs={12} md={7}>
                         <Box sx={{ overflow: 'hidden', borderRadius: 2, mb: 6 }}>
                             <Box
@@ -241,7 +238,7 @@ export default function CampaignPage() {
 
                     <Grid item xs={12} md={5}>
                         <Box sx={{ position: { md: 'sticky' }, top: 100 }}>
-                            <Box sx={{ p: 4, borderRadius: 2, bgcolor: alpha(theme.palette.secondary.main, 0.02), border: '1px solid', borderColor: 'divider' }}>
+                            <Box sx={{ p: 3, borderRadius: 2, bgcolor: alpha(theme.palette.secondary.main, 0.02), border: '1px solid', borderColor: 'divider' }}>
                                 <Typography variant="h5" sx={{ fontWeight: 900, mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
                                     <TrendingUp color="secondary" />
                                     Impact Metrics

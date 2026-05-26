@@ -26,7 +26,6 @@ import {
     Snackbar,
     alpha,
     useTheme,
-    LinearProgress,
     Avatar,
     Stack,
     Divider
@@ -35,12 +34,8 @@ import {
     AdminPanelSettings,
     Search,
     Edit,
-    Refresh,
     Delete,
     FamilyRestroom,
-    Schedule,
-    AccessTime,
-    Autorenew,
     ErrorOutline,
     People,
     Security,
@@ -55,7 +50,7 @@ import {
     fetchCases,
     deleteFamily
 } from '../../features/caseManagement/caseManagementSlice';
-import { fetchUsers, deleteUser, triggerInactivityCleanup, fetchAuditLogs, fetchPendingUsers, approveUser, fetchPeriodicTasks, fetchTaskResults, fetchBugReports, updateBugReport } from '../../features/admin/adminSlice';
+import { fetchUsers, deleteUser, fetchAuditLogs, fetchPendingUsers, approveUser, fetchPeriodicTasks, fetchTaskResults, fetchBugReports, updateBugReport } from '../../features/admin/adminSlice';
 import { fetchGroups, createGroup, deleteGroup, updateGroup } from '../../features/volunteers/groupsSlice';
 import { GroupWork, Forum, VerifiedUser, HourglassTop } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';

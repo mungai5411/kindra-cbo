@@ -134,7 +134,7 @@ export const ImpactMetrics: React.FC = () => {
   return (
     <Box
       sx={{
-        py: { xs: 6, md: 10 },
+        py: { xs: 4, md: 6 },
         background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.03)} 0%, transparent 100%)`,
         position: 'relative',
         overflow: 'hidden',
@@ -151,7 +151,7 @@ export const ImpactMetrics: React.FC = () => {
         }
       }}
     >
-      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         {/* Section Header */}
         <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
           <Typography

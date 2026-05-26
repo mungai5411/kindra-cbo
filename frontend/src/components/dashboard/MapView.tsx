@@ -4,7 +4,7 @@ import L from 'leaflet';
 import { 
     Box, Paper, Typography, useTheme, alpha, Chip, Divider, Grid,
     Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
-    MenuItem, CircularProgress, Alert, Stack
+    MenuItem, CircularProgress, Stack
 } from '@mui/material';
 import { useNotification } from '../../contexts/NotificationContext';
 import { useSelector, useDispatch } from 'react-redux';

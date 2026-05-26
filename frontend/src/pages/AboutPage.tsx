@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Container, Typography, Grid, Card, Avatar, useTheme, alpha, Stack, Paper, Divider, CircularProgress } from '@mui/material';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Navbar } from '../components/public/Navbar';
 import { TrafalgarHero } from '../components/common/TrafalgarHero';
 import { VolunteerActivism, Handshake, Lightbulb, Groups, AssignmentTurnedIn, Public, TrendingUp, Favorite } from '@mui/icons-material';
@@ -132,7 +132,7 @@ export default function AboutPage() {
             </Container>
 
             {/* Split Story Section - Squeezed */}
-            <Box sx={{ py: { xs: 4, md: 8 }, position: 'relative', overflow: 'hidden' }}>
+            <Box sx={{ py: { xs: 4, md: 6 }, position: 'relative', overflow: 'hidden' }}>
                 <Container maxWidth="lg">
                     <Grid container spacing={6} alignItems="center">
                         <Grid item xs={12} md={6}>
@@ -215,7 +215,7 @@ export default function AboutPage() {
             </Box>
 
             {/* Minimal Values Grid - Squeezed */}
-            <Box sx={{ py: 6, bgcolor: alpha(theme.palette.divider, 0.02) }}>
+            <Box sx={{ py: { xs: 4, md: 6 }, bgcolor: alpha(theme.palette.divider, 0.02) }}>
                 <Container maxWidth="lg">
                     <Box sx={{ textAlign: 'center', mb: 6 }}>
                         <Typography variant="overline" color="primary" sx={{ fontWeight: 900, letterSpacing: 2 }}>CORE VALUES</Typography>
@@ -248,7 +248,7 @@ export default function AboutPage() {
             </Box>
 
             {/* Leadership Section - Squeezed */}
-            <Container maxWidth="lg" id="team" sx={{ py: 8 }}>
+            <Container maxWidth="lg" id="team" sx={{ py: { xs: 4, md: 6 } }}>
                 <Box sx={{ textAlign: 'center', mb: 6 }}>
                     <Typography variant="overline" color="secondary" sx={{ fontWeight: 900, letterSpacing: 2 }}>LEADERSHIP</Typography>
                     <Typography variant="h3" fontWeight="900" sx={{ letterSpacing: -1 }}>Meet Our Visionaries</Typography>

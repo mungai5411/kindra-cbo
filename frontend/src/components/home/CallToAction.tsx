@@ -141,12 +141,12 @@ export const CallToAction: React.FC = () => {
   return (
     <Box
       sx={{
-        py: { xs: 6, md: 10 },
+        py: { xs: 4, md: 6 },
         position: 'relative',
         overflow: 'hidden'
       }}
     >
-      <Container maxWidth="xl">
+      <Container maxWidth="lg">
         {/* Section Header */}
         <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
           <Typography

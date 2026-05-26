@@ -3,10 +3,7 @@ import {
     Box,
     Typography,
     Grid,
-    Card,
-    CardContent,
     Button,
-    IconButton,
     Dialog,
     DialogTitle,
     DialogContent,
@@ -16,7 +13,6 @@ import {
     Alert,
     alpha,
     useTheme,
-    Divider,
     Paper,
     Breadcrumbs,
     Link as MuiLink,
@@ -43,13 +39,10 @@ import {
     NavigateNext as NextIcon,
     CheckCircle as CheckCircleIcon,
     Pending as PendingIcon,
-    AttachMoney as MoneyIcon,
-    Category as CategoryIcon,
-    Collections as MediaIcon,
     Send as SendIcon
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { fetchImpacts, createImpact, submitImpactSummary, DonationImpact } from './impactSlice';
+import { fetchImpacts, createImpact, submitImpactSummary } from './impactSlice';
 import { fetchMedia } from '../media/mediaSlice';
 import { useNotification } from '../../contexts/NotificationContext';
 

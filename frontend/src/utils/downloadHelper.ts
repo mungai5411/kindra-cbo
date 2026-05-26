@@ -15,7 +15,7 @@ export const downloadFile = async (url: string, defaultFilename: string = 'downl
     try {
         const isExternal = url.startsWith('http') || url.startsWith('//');
 
-        let blob: Blob;
+
 
         if (isExternal) {
             // For external URLs (like Cloudinary), direct download via fetch often fails with 401/CORS
@@ -42,7 +42,7 @@ export const downloadFile = async (url: string, defaultFilename: string = 'downl
         const response = await apiClient.get(url, {
             responseType: 'blob',
         });
-        blob = new Blob([response.data]);
+        const blob = new Blob([response.data]);
 
         // Create blob link to download
         const blobUrl = window.URL.createObjectURL(blob);

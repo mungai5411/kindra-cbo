@@ -23,15 +23,12 @@ import {
     Checkbox,
     CircularProgress,
     Button,
-    InputBase,
     IconButton,
     List,
     ListItem,
     ListItemIcon,
     ListItemText,
     Avatar,
-    Tooltip,
-    Divider,
     Snackbar,
     useTheme,
     Menu,
@@ -41,17 +38,12 @@ import {
     Select
 } from '@mui/material';
 import {
-    Search,
-    FilterList,
     ChildCare,
-    FamilyRestroom,
     Assignment,
     NoteAdd,
     HistoryEdu,
-    Refresh,
     HealthAndSafety,
     Edit,
-    MoreVert,
     WarningAmber,
     CloudUpload,
     Description,
@@ -75,7 +67,6 @@ import {
     addCaseNote
 } from '../../features/caseManagement/caseManagementSlice';
 import { motion } from 'framer-motion';
-import { StatsCard } from './StatCards';
 import { SummaryHeader } from './SummaryHeader';
 import { CaseCard } from './CaseCard';
 import { CaseFilterBar } from './CaseFilterBar';

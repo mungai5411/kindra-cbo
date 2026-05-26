@@ -57,7 +57,7 @@ export const NewsletterSection: React.FC<NewsletterSectionProps> = ({ background
   return (
     <Box
       sx={{
-        py: { xs: 6, md: 10 },
+        py: { xs: 4, md: 6 },
         backgroundImage: bgImage ? `url(${bgImage})` : 'none',
         backgroundColor: 'primary.main',
         backgroundSize: 'cover',

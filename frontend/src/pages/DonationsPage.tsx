@@ -8,11 +8,11 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Container, Grid, Card, CardContent, Typography, Box, Button,
-    LinearProgress, useTheme, alpha, Stack
+    LinearProgress, useTheme, alpha
 } from '@mui/material';
 import {
     Favorite, Security, Public, VolunteerActivism,
-    MonetizationOn, TipsAndUpdates, AutoAwesome
+    MonetizationOn
 } from '@mui/icons-material';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { TrafalgarHero } from '../components/common/TrafalgarHero';
@@ -110,7 +110,7 @@ export default function DonationsPage() {
             />
 
             {/* Main Content Area */}
-            <Container maxWidth="lg" sx={{ pb: 12, position: 'relative', zIndex: 1 }}>
+            <Container maxWidth="lg" sx={{ pb: 8, position: 'relative', zIndex: 1 }}>
                 {/* Section Header */}
                 <Box id="active-campaigns" sx={{ mb: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box>
@@ -126,7 +126,7 @@ export default function DonationsPage() {
 
                 {/* Loading State */}
                 {isLoading && (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', py: 8 }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', py: 6 }}>
                         {[1, 2, 3].map((n) => (
                             <Box key={n} sx={{ width: { xs: '100%', md: 'calc(33.333% - 22px)' }, height: 400, borderRadius: 1.5, bgcolor: alpha(theme.palette.text.primary, 0.03), position: 'relative', overflow: 'hidden' }}>
                                 <LinearProgress sx={{ position: 'absolute', bottom: 0, left: 0, right: 0 }} />
@@ -139,7 +139,7 @@ export default function DonationsPage() {
                 {!isLoading && activeCampaigns.length === 0 && (
                     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
                         <Card sx={{
-                            p: 8,
+                            p: 6,
                             textAlign: 'center',
                             borderRadius: 6,
                             background: theme.palette.background.paper,
@@ -179,7 +179,7 @@ export default function DonationsPage() {
                 {/* Campaigns Grid */}
                 {!isLoading && activeCampaigns.length > 0 && (
                     <motion.div variants={containerVariants} initial="hidden" animate="show">
-                        <Grid container spacing={4}>
+                        <Grid container spacing={3}>
                             <AnimatePresence>
                                 {activeCampaigns.map((campaign: any) => {
                                     const progress = (campaign.raised_amount / campaign.target_amount) * 100;
@@ -239,7 +239,7 @@ export default function DonationsPage() {
                                                         </Box>
                                                     </Box>
 
-                                                    <CardContent sx={{ flexGrow: 1, p: 4 }}>
+                                                    <CardContent sx={{ flexGrow: 1, p: 3 }}>
                                                         <Typography 
                                                             variant="h4" 
                                                             onClick={() => navigate(`/campaigns/${campaign.slug || campaign.id}`)}
@@ -296,7 +296,7 @@ export default function DonationsPage() {
                                                         </Box>
                                                     </CardContent>
 
-                                                    <Box sx={{ p: 4, pt: 0, display: 'flex', gap: 2 }}>
+                                                    <Box sx={{ p: 3, pt: 0, display: 'flex', gap: 2 }}>
                                                         <Button
                                                             variant="text"
                                                             fullWidth
@@ -342,10 +342,10 @@ export default function DonationsPage() {
             <Box sx={{
                 bgcolor: theme.palette.mode === 'dark' ? alpha(theme.palette.background.paper, 0.3) : '#ffffff',
                 borderTop: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
-                py: { xs: 8, md: 15 }
+                py: { xs: 5, md: 8 }
             }}>
                 <Container maxWidth="lg">
-                    <Grid container spacing={8} justifyContent="center" alignItems="center">
+                    <Grid container spacing={4} justifyContent="center" alignItems="center">
                         {[
                             { icon: <Security sx={{ fontSize: 50 }} />, title: 'Fully Secure', desc: 'Industry-standard encryption for all financial transactions.' },
                             { icon: <Public sx={{ fontSize: 50 }} />, title: 'Direct Impact', desc: '100% of your gift reaches the intended communities directly.' },

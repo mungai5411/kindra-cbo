@@ -13,11 +13,9 @@ import {
   Button,
   Stack,
   LinearProgress,
-  Tooltip,
   IconButton,
   alpha,
-  useTheme,
-  AvatarGroup
+  useTheme
 } from '@mui/material';
 import {
   Edit,
@@ -25,9 +23,7 @@ import {
   AccessTime,
   TaskAlt,
   TrendingUp,
-  Phone,
   Email,
-  LocationOn,
   Verified
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';

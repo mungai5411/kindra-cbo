@@ -14,15 +14,9 @@ import {
     Grid,
     Divider,
     IconButton,
-    Menu,
-    MenuItem,
-    SimpleDialog,
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions,
-    FormControlLabel,
-    Checkbox,
     useTheme,
     alpha,
     Tooltip,
@@ -34,14 +28,10 @@ import {
 import {
     Send,
     Delete,
-    Flag,
-    MoreVert,
     Group,
     PersonAdd,
     Message as MessageIcon,
     Close,
-    EmojiEmotions,
-    AttachFile,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { RootState, AppDispatch } from '../../store';
@@ -50,7 +40,6 @@ import {
     fetchAvailableUsers,
     sendMessage,
     deleteMessage,
-    setSelectedConversation,
 } from '../../features/socialChat/socialChatSlice';
 import { StatsCard } from './StatCards';
 

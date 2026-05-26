@@ -21,7 +21,7 @@ export const TrafalgarHero = ({
     reverse = false,
 }: TrafalgarHeroProps) => {
     return (
-        <Box sx={{ position: 'relative', pt: { xs: 15, md: 24 }, pb: { xs: 10, md: 15 }, overflow: 'hidden', bgcolor: 'background.default' }}>
+        <Box sx={{ position: 'relative', pt: { xs: 12, md: 16 }, pb: { xs: 8, md: 10 }, overflow: 'hidden', bgcolor: 'background.default' }}>
             {/* Dot Pattern Graphic Background (Left Top) */}
             <Box sx={{
                 position: 'absolute',
@@ -73,7 +73,7 @@ export const TrafalgarHero = ({
                                     height: 'auto', 
                                     display: 'block', 
                                     margin: '0 auto',
-                                    borderRadius: 6,
+                                    borderRadius: 3,
                                 }} 
                             />
                         </motion.div>

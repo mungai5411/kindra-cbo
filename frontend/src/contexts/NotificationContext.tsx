@@ -13,15 +13,13 @@ import {
     DialogContentText, 
     DialogActions, 
     Button, 
-    Box, 
-    Typography,
+    Box,
     alpha,
     useTheme,
     Zoom,
     CircularProgress
 } from '@mui/material';
 import { 
-    Info, 
     CheckCircle, 
     Warning, 
     Error as ErrorIcon,

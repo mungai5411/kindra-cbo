@@ -83,13 +83,13 @@ export const MissionAndValues: React.FC = () => {
   return (
     <Box
       sx={{
-        py: { xs: 6, md: 10 },
+        py: { xs: 4, md: 6 },
         background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.02)} 0%, ${alpha(theme.palette.secondary.main, 0.02)} 100%)`,
         position: 'relative',
         overflow: 'hidden'
       }}
     >
-      <Container maxWidth="xl">
+      <Container maxWidth="lg">
         <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
           {/* Left: Mission Statement */}
           <Grid item xs={12} md={6}>

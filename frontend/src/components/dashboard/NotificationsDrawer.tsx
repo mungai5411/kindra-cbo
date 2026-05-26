@@ -12,10 +12,8 @@ import {
     Stack,
     Paper,
     Tooltip,
-    Badge,
     Autocomplete,
-    Chip,
-    Divider
+    Chip
 } from '@mui/material';
 import {
     Close,
@@ -30,10 +28,8 @@ import {
     Warning,
     CheckCircle,
     Info,
-    Tune,
-    ArrowBack
+    Tune
 } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
 

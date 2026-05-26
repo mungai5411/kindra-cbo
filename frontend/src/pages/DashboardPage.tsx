@@ -205,7 +205,7 @@ export default function DashboardPage() {
 
         // Donors ONLY see donation-related content
         if (user.role === 'DONOR') {
-            return ['overview', 'donations', 'campaigns', 'donation_records', 'receipts', 'material_donations', 'impact_analytics', 'community_events'].includes(itemId);
+            return ['overview', 'donations', 'campaigns', 'donation_records', 'receipts', 'material_donations', 'impact_analytics', 'community_events', 'wallet_impact'].includes(itemId);
         }
 
         // Shelter Partners ONLY see shelter-related content

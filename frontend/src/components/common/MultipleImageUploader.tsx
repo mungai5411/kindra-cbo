@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Box, Button, Typography, IconButton, alpha, useTheme, Grid, Alert } from '@mui/material';
-import { CloudUpload, Delete, Close } from '@mui/icons-material';
+import { Box, Typography, IconButton, alpha, useTheme, Grid, Alert } from '@mui/material';
+import { CloudUpload, Close } from '@mui/icons-material';
 
 export interface MediaItem {
     id?: string;

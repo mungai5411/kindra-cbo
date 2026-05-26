@@ -15,32 +15,25 @@ import {
     DialogActions,
     Button,
     TextField,
-    ToggleButtonGroup,
-    ToggleButton,
     Box,
     Typography,
     Chip,
     Alert,
     CircularProgress,
-    LinearProgress,
     InputAdornment,
     alpha,
     useTheme,
     Divider,
-    Collapse,
-    IconButton
+    Collapse
 } from '@mui/material';
 import {
     AttachMoney,
     Phone,
-    CreditCard,
-    AccountBalance,
     CheckCircle,
     Close,
     ExpandMore,
     ExpandLess,
     Person,
-    Email,
     Message as MessageIcon
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -104,7 +97,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
             }, 3000); // Poll every 3 seconds for snappy feedback
         }
         return () => clearInterval(interval);
-    }, [success, mpesaStatus, checkoutRequestId, dispatch]);
+    }, [success, mpesaStatus, checkoutRequestId, dispatch, notify]);
 
     // Countdown timer for M-Pesa verification
     useEffect(() => {
@@ -120,7 +113,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
             notify({ message: timeoutMsg, severity: 'warning' });
         }
         return () => clearInterval(timer);
-    }, [success, mpesaStatus, timeLeft]);
+    }, [success, mpesaStatus, timeLeft, notify]);
 
     const handleAmountSelect = (value: number) => {
         setAmount(value.toString());
