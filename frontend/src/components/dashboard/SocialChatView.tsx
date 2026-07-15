@@ -125,23 +125,20 @@ export function SocialChatView() {
         {
             title: 'Total Messages',
             value: messages.length,
-            icon: MessageIcon,
-            color: 'primary.main',
-            backColor: alpha(theme.palette.primary.main, 0.1)
+            icon: <MessageIcon />,
+            color: theme.palette.primary.main,
         },
         {
             title: 'Active Members',
             value: uniqueAuthors.length,
-            icon: Group,
-            color: 'success.main',
-            backColor: alpha(theme.palette.success.main, 0.1)
+            icon: <Group />,
+            color: theme.palette.success.main,
         },
         {
             title: 'Public Messages',
             value: publicMessages.length,
-            icon: MessageIcon,
-            color: 'info.main',
-            backColor: alpha(theme.palette.info.main, 0.1)
+            icon: <MessageIcon />,
+            color: theme.palette.info.main,
         },
     ];
 
