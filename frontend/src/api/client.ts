@@ -233,7 +233,7 @@ export const endpoints = {
 
     // Social Chat
     socialChat: {
-        messages: '/social-chat/messages/',
-        users: '/social-chat/messages/users/',
+        messages: '/chat/messages/',
+        users: '/chat/messages/users/',
     },
 };
