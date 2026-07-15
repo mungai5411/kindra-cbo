@@ -504,8 +504,8 @@ export default function DashboardPage() {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    p: { xs: 1, sm: 2, md: 2.5 },
-                    pt: { xs: 0.5, sm: 1 },
+                    p: { xs: 2, sm: 3, md: 4 },
+                    pt: { xs: 2, sm: 3 },
                     width: isDesktop ? `calc(100% - ${DRAWER_WIDTH}px)` : '100%',
                     pb: { xs: 10, md: 3 }, // Space for bottom nav on mobile
                     overflowX: 'hidden',

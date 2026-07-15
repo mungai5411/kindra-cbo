@@ -12,6 +12,7 @@ from .serializers import (
     AssessmentSerializer, DocumentSerializer, CaseNoteSerializer
 )
 from accounts.models import AuditLog, User, Notification
+from accounts.permissions import IsCaseWorkerOrAdmin
 from reporting.utils import log_analytics_event
 from reporting.models import AnalyticsEvent
 from .services import CaseExportService
@@ -24,7 +25,7 @@ class FamilyListCreateView(generics.ListCreateAPIView):
     """List all families or create a new family"""
     queryset = Family.objects.all()
     serializer_class = FamilySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsCaseWorkerOrAdmin]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['vulnerability_level', 'county', 'assigned_case_worker', 'is_active']
     search_fields = ['family_code', 'primary_contact_name', 'primary_contact_phone']
@@ -71,7 +72,7 @@ class FamilyDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete a family"""
     queryset = Family.objects.all()
     serializer_class = FamilySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsCaseWorkerOrAdmin]
 
     def perform_destroy(self, instance):
         code = instance.family_code
@@ -90,7 +91,7 @@ class ChildListCreateView(generics.ListCreateAPIView):
     """List all children or create a new child"""
     queryset = Child.objects.all()
     serializer_class = ChildSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsCaseWorkerOrAdmin]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['family', 'gender', 'legal_status', 'in_school', 'is_active']
     search_fields = ['first_name', 'last_name']
@@ -101,14 +102,14 @@ class ChildDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete a child"""
     queryset = Child.objects.all()
     serializer_class = ChildSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsCaseWorkerOrAdmin]
 
 
 class CaseListCreateView(generics.ListCreateAPIView):
     """List all cases or create a new case"""
     queryset = Case.objects.all()
     serializer_class = CaseSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsCaseWorkerOrAdmin]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'priority', 'assigned_to', 'family']
     search_fields = ['case_number', 'title']
@@ -167,7 +168,7 @@ class CaseDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete a case"""
     queryset = Case.objects.all()
     serializer_class = CaseSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsCaseWorkerOrAdmin]
 
     def perform_destroy(self, instance):
         case_num = instance.case_number
@@ -214,7 +215,7 @@ class AssessmentListCreateView(generics.ListCreateAPIView):
     """List all assessments or create a new assessment"""
     queryset = Assessment.objects.all()
     serializer_class = AssessmentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsCaseWorkerOrAdmin]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['family', 'assessment_type']
     ordering_fields = ['assessment_date', 'overall_score']
@@ -227,14 +228,14 @@ class AssessmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete an assessment"""
     queryset = Assessment.objects.all()
     serializer_class = AssessmentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsCaseWorkerOrAdmin]
 
 
 class DocumentListCreateView(generics.ListCreateAPIView):
     """List all documents or upload a new document"""
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsCaseWorkerOrAdmin]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['family', 'child', 'document_type']
     
@@ -246,14 +247,14 @@ class DocumentDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete a document"""
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsCaseWorkerOrAdmin]
 
 
 class CaseNoteListCreateView(generics.ListCreateAPIView):
     """List all case notes or create a new note"""
     queryset = CaseNote.objects.all()
     serializer_class = CaseNoteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsCaseWorkerOrAdmin]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['case', 'is_milestone']
     
@@ -262,7 +263,7 @@ class CaseNoteListCreateView(generics.ListCreateAPIView):
 
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated, IsCaseWorkerOrAdmin])
 def case_statistics(request):
     """Get case management statistics"""
     stats = {
@@ -277,7 +278,7 @@ def case_statistics(request):
 
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated, IsCaseWorkerOrAdmin])
 def export_assessment_pdf(request, pk):
     """Export assessment to PDF"""
     try:
@@ -292,7 +293,7 @@ def export_assessment_pdf(request, pk):
 
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated, IsCaseWorkerOrAdmin])
 def export_case_summary_pdf(request, pk):
     """Export case summary to PDF"""
     try:

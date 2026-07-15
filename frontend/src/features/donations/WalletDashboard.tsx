@@ -90,61 +90,61 @@ const WalletDashboard: React.FC = () => {
         >
             <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
                 <div>
-                    <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600 dark:from-primary-light dark:to-purple-400">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
                         Organization Wallet
                     </h2>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1">Manage funds and track disbursements seamlessly.</p>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">Manage funds and track disbursements seamlessly.</p>
                 </div>
                 <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 bg-gradient-to-r from-primary to-purple-600 hover:from-primary-dark hover:to-purple-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg transition-all"
+                    className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition-all text-sm"
                 >
                     <CallMadeIcon fontSize="small" /> Send Funds
                 </motion.button>
             </div>
 
             {/* Wallet Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <motion.div variants={itemVariants} className="relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 group hover:shadow-md transition-shadow">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <AccountBalanceWalletIcon sx={{ fontSize: 80 }} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <motion.div variants={itemVariants} className="relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 group transition-shadow">
+                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-primary">
+                        <AccountBalanceWalletIcon sx={{ fontSize: 60 }} />
                     </div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Received</h3>
-                    <p className="text-4xl font-black text-gray-900 dark:text-white mt-4 tracking-tight">
-                        <span className="text-xl font-medium text-gray-400 mr-1">KES</span>
+                    <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Total Received</h3>
+                    <p className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                        <span className="text-lg font-medium text-gray-400 mr-1">KES</span>
                         {Number(wallet?.total_received || 0).toLocaleString()}
                     </p>
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 group hover:shadow-md transition-shadow">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <CallMadeIcon sx={{ fontSize: 80 }} />
+                <motion.div variants={itemVariants} className="relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 group transition-shadow">
+                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-primary">
+                        <CallMadeIcon sx={{ fontSize: 60 }} />
                     </div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Disbursed</h3>
-                    <p className="text-4xl font-black text-gray-900 dark:text-white mt-4 tracking-tight">
-                        <span className="text-xl font-medium text-gray-400 mr-1">KES</span>
+                    <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Total Disbursed</h3>
+                    <p className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                        <span className="text-lg font-medium text-gray-400 mr-1">KES</span>
                         {Number(wallet?.total_disbursed || 0).toLocaleString()}
                     </p>
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-green-500 to-emerald-700 p-6 rounded-3xl shadow-lg text-white group hover:shadow-xl transition-shadow transform hover:-translate-y-1">
-                    <div className="absolute top-0 right-0 p-4 opacity-20">
-                        <AccountBalanceWalletIcon sx={{ fontSize: 80 }} />
+                <motion.div variants={itemVariants} className="relative overflow-hidden bg-primary/10 dark:bg-primary/20 p-6 rounded-2xl border border-primary/20 dark:border-primary/30 group transition-shadow">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-primary">
+                        <AccountBalanceWalletIcon sx={{ fontSize: 60 }} />
                     </div>
-                    <h3 className="text-sm font-medium text-green-100 uppercase tracking-wider">Current Balance</h3>
-                    <p className="text-4xl font-black text-white mt-4 tracking-tight">
-                        <span className="text-xl font-medium text-green-200 mr-1">KES</span>
+                    <h3 className="text-xs font-semibold text-primary dark:text-primary-light uppercase tracking-wider mb-2">Current Balance</h3>
+                    <p className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                        <span className="text-lg font-medium text-gray-500 dark:text-gray-400 mr-1">KES</span>
                         {Number(wallet?.current_balance || 0).toLocaleString()}
                     </p>
                 </motion.div>
             </div>
 
             {/* Disbursements Table */}
-            <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
-                    <h3 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         Recent Disbursements
                     </h3>
                 </div>
@@ -219,14 +219,14 @@ const WalletDashboard: React.FC = () => {
                             className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
                         />
                         <motion.div 
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            initial={{ opacity: 0, scale: 0.98, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden relative z-10 flex flex-col max-h-[90vh]"
+                            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 w-full max-w-2xl overflow-hidden relative z-10 flex flex-col max-h-[90vh]"
                         >
-                            <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
+                            <div className="px-8 py-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Send Funds to Shelter</h3>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Send Funds to Shelter</h3>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Disburse resources directly to partner shelters.</p>
                                 </div>
                                 <button onClick={() => setIsModalOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
@@ -244,7 +244,7 @@ const WalletDashboard: React.FC = () => {
                                             required 
                                             value={shelterId} 
                                             onChange={(e) => setShelterId(e.target.value)}
-                                            className="w-full rounded-xl border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow py-3"
+                                            className="w-full rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow py-3"
                                         >
                                             <option value="">-- Choose a partner --</option>
                                             {shelters.map((shelter: any) => (
@@ -265,7 +265,7 @@ const WalletDashboard: React.FC = () => {
                                                     min="1"
                                                     value={amount} 
                                                     onChange={(e) => setAmount(e.target.value)}
-                                                    className="w-full pl-14 pr-4 py-3 rounded-xl border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow font-bold text-lg"
+                                                    className="w-full pl-14 pr-4 py-3 rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow font-bold text-lg"
                                                     placeholder="0.00"
                                                 />
                                             </div>
@@ -277,7 +277,7 @@ const WalletDashboard: React.FC = () => {
                                                 required 
                                                 value={purpose} 
                                                 onChange={(e) => setPurpose(e.target.value)}
-                                                className="w-full px-4 py-3 rounded-xl border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+                                                className="w-full px-4 py-3 rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
                                                 placeholder="e.g. Monthly Food Supply"
                                             />
                                         </div>
@@ -287,7 +287,7 @@ const WalletDashboard: React.FC = () => {
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Payment Method</label>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <label className={`relative flex cursor-pointer rounded-xl border p-4 shadow-sm focus:outline-none transition-all ${paymentMethod === 'BANK_TRANSFER' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}>
+                                            <label className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none transition-all ${paymentMethod === 'BANK_TRANSFER' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}>
                                                 <input type="radio" name="payment_method" value="BANK_TRANSFER" className="sr-only" checked={paymentMethod === 'BANK_TRANSFER'} onChange={(e) => setPaymentMethod(e.target.value)} />
                                                 <span className="flex flex-1">
                                                     <span className="flex flex-col">
@@ -299,7 +299,7 @@ const WalletDashboard: React.FC = () => {
                                                 </span>
                                             </label>
 
-                                            <label className={`relative flex cursor-pointer rounded-xl border p-4 shadow-sm focus:outline-none transition-all ${paymentMethod === 'MPESA' ? 'border-green-500 bg-green-50 dark:bg-green-900/10 ring-1 ring-green-500' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}>
+                                            <label className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none transition-all ${paymentMethod === 'MPESA' ? 'border-green-500 bg-green-50 dark:bg-green-900/10 ring-1 ring-green-500' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}>
                                                 <input type="radio" name="payment_method" value="MPESA" className="sr-only" checked={paymentMethod === 'MPESA'} onChange={(e) => setPaymentMethod(e.target.value)} />
                                                 <span className="flex flex-1">
                                                     <span className="flex flex-col">
@@ -322,7 +322,7 @@ const WalletDashboard: React.FC = () => {
                                                 exit={{ opacity: 0, height: 0 }}
                                                 className="overflow-hidden"
                                             >
-                                                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-5 mt-4">
+                                                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg p-5 mt-4">
                                                     <h4 className="text-sm font-bold text-blue-900 dark:text-blue-300 mb-3 uppercase tracking-wider">Registered {paymentMethod === 'MPESA' ? 'M-Pesa' : 'Bank'} Details</h4>
                                                     
                                                     {paymentMethod === 'BANK_TRANSFER' ? (
@@ -378,18 +378,18 @@ const WalletDashboard: React.FC = () => {
                                             type="text" 
                                             value={reference} 
                                             onChange={(e) => setReference(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+                                            className="w-full px-4 py-3 rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
                                             placeholder="Bank Receipt No. or M-Pesa Code"
                                         />
                                     </div>
                                 </form>
                             </div>
 
-                            <div className="px-8 py-5 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 flex justify-end gap-3">
+                            <div className="px-8 py-5 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 flex justify-end gap-3">
                                 <button 
                                     type="button" 
                                     onClick={() => setIsModalOpen(false)}
-                                    className="px-6 py-2.5 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors"
+                                    className="px-6 py-2 text-sm text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors border border-transparent hover:border-gray-300 dark:hover:border-gray-600"
                                 >
                                     Cancel
                                 </button>
@@ -397,7 +397,7 @@ const WalletDashboard: React.FC = () => {
                                     form="send-funds-form"
                                     type="submit" 
                                     disabled={isLoading || !shelterId}
-                                    className="px-8 py-2.5 bg-gradient-to-r from-primary to-purple-600 hover:from-primary-dark hover:to-purple-700 text-white rounded-xl font-bold shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    className="px-6 py-2 text-sm bg-primary hover:bg-primary-dark text-white rounded-lg font-medium shadow-sm hover:shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 >
                                     {isLoading ? 'Processing...' : 'Confirm Transfer'}
                                 </button>

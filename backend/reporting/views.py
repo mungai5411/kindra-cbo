@@ -172,7 +172,7 @@ class DashboardDataView(APIView):
 class ReportListCreateView(generics.ListCreateAPIView):
     queryset = Report.objects.all().select_related('generated_by')
     serializer_class = ReportSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['report_type', 'format', 'is_scheduled']
     ordering_fields = ['generated_at', 'start_date', 'end_date']
@@ -246,7 +246,7 @@ class ReportListCreateView(generics.ListCreateAPIView):
 class ReportDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Report.objects.all()
     serializer_class = ReportSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
 
 
 import logging
@@ -312,7 +312,7 @@ def download_report(request, pk):
 
 class DashboardListCreateView(generics.ListCreateAPIView):
     serializer_class = DashboardSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['dashboard_type', 'is_active', 'is_default']
     
@@ -329,7 +329,7 @@ class DashboardListCreateView(generics.ListCreateAPIView):
 
 class DashboardDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DashboardSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
     
     def get_queryset(self):
         user = self.request.user
@@ -341,7 +341,7 @@ class DashboardDetailView(generics.RetrieveUpdateDestroyAPIView):
 class KPIListCreateView(generics.ListCreateAPIView):
     queryset = KPI.objects.filter(is_active=True)
     serializer_class = KPISerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['category', 'is_active']
     ordering_fields = ['category', 'name', 'last_updated']
@@ -351,7 +351,7 @@ class KPIListCreateView(generics.ListCreateAPIView):
 class KPIDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = KPI.objects.all()
     serializer_class = KPISerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
 
 
 class AnalyticsEventListView(generics.ListAPIView):
@@ -368,7 +368,7 @@ class AnalyticsAggregationView(APIView):
     """
     Aggregated analytics data
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
     
     def get(self, request):
         # Get date range from query params
@@ -402,7 +402,7 @@ class ComplianceReportListCreateView(generics.ListCreateAPIView):
         'prepared_by', 'submitted_by', 'approved_by'
     )
     serializer_class = ComplianceReportSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['status', 'reporting_period']
     ordering_fields = ['period_start', 'created_at']
@@ -415,14 +415,14 @@ class ComplianceReportListCreateView(generics.ListCreateAPIView):
 class ComplianceReportDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ComplianceReport.objects.all()
     serializer_class = ComplianceReportSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
 
 
 class ComplianceReportSubmitView(APIView):
     """
     Submit a compliance report
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrManagement]
     
     def post(self, request, pk):
         try:

@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Box } from '@mui/material';
 import { AppDispatch, RootState } from '../store';
 import { fetchPublicStats } from '../features/reporting/reportingSlice';
-import { fetchPublicLandingPageMedia } from '../features/media/mediaSlice';
+
 import { Navbar } from '../components/public/Navbar';
 import { HeroSection } from '../components/home/HeroSection';
 import { ImpactMetrics } from '../components/home/ImpactMetrics';
@@ -22,7 +22,7 @@ import { NewsletterSection } from '../components/home/NewsletterSection';
 
 export default function HomePage() {
   const dispatch = useDispatch<AppDispatch>();
-  const { assets: landingPageImages, authChecked } = useSelector((state: RootState) => state.media);
+  const { assets: landingPageImages } = useSelector((state: RootState) => state.media);
   
   // Memoize filtered images to prevent infinite re-renders
   const heroImages = useMemo(
@@ -30,14 +30,10 @@ export default function HomePage() {
     [landingPageImages]
   );
 
-  // Fetch public statistics and landing page media on component mount
+  // Fetch public statistics on component mount
   useEffect(() => {
     dispatch(fetchPublicStats());
-    // Fetch landing page gallery images (public access, no auth required)
-    if (!authChecked) {
-      dispatch(fetchPublicLandingPageMedia());
-    }
-  }, [dispatch, authChecked]);
+  }, [dispatch]);
 
   return (
     <Box sx={{ bgcolor: 'background.default', overflow: 'hidden' }}>

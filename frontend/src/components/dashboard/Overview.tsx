@@ -224,7 +224,7 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
 
 
     return (
-        <Box sx={{ p: { xs: 1, sm: 1.5 } }}>
+        <Box sx={{ width: '100%' }}>
             {/* Header / Greeting Area */}
             <Box sx={(theme) => ({
                 mb: 4,
