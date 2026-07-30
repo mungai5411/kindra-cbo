@@ -217,22 +217,26 @@ export default function DonationsPage() {
                                                                 '&:hover': { transform: 'scale(1.05)' }
                                                             }}
                                                         />
-                                                        {/* Badge Overlay */}
+                                                        {/* Category Overlay Tag at Bottom Left of Image */}
                                                         <Box sx={{
                                                             position: 'absolute',
-                                                            top: 20,
-                                                            left: 20,
-                                                            bgcolor: alpha(theme.palette.background.paper, 0.9),
-                                                            backdropFilter: 'blur(10px)',
-                                                            px: 1.5,
-                                                            py: 0.5,
+                                                            bottom: 16,
+                                                            left: 16,
+                                                            bgcolor: 'white',
+                                                            color: 'text.primary',
+                                                            fontWeight: 800,
+                                                            fontSize: '0.75rem',
+                                                            px: 2,
+                                                            py: 0.75,
                                                             borderRadius: 2,
                                                             display: 'flex',
                                                             alignItems: 'center',
-                                                            gap: 1,
-                                                            boxShadow: theme.shadows[1]
+                                                            gap: 0.75,
+                                                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: '0.05em'
                                                         }}>
-                                                            <Favorite sx={{ fontSize: 14, color: 'error.main' }} />
+                                                            <Favorite sx={{ fontSize: 13, color: 'error.main' }} />
                                                             <Typography variant="caption" fontWeight="800" textTransform="uppercase">
                                                                 {campaign.category}
                                                             </Typography>

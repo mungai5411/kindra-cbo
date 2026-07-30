@@ -245,125 +245,229 @@ export default function StoriesPage() {
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ duration: 0.4 }}
                         >
-                            {/* Featured Section */}
-                            {featuredItem && (
-                                <Box 
-                                    onClick={() => currentTab === 0 ? navigate(`/stories/${featuredItem.slug}`) : navigate(`/campaigns/${featuredItem.slug || featuredItem.id}`)}
-                                    sx={{ 
-                                        display: 'flex', 
-                                        flexDirection: { xs: 'column', md: 'row' }, 
-                                        gap: 6, 
-                                        mb: 8, 
-                                        cursor: 'pointer',
-                                        '&:hover img': { transform: 'scale(1.02)' }
-                                    }}
-                                >
-                                    <Box sx={{ flex: 1.5, overflow: 'hidden', borderRadius: 2 }}>
-                                        <Box
-                                            component="img"
-                                            src={featuredItem.featured_image || `https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2070`}
-                                            alt={featuredItem.title}
-                                            sx={{ 
-                                                width: '100%', 
-                                                height: { xs: 250, md: 350 }, 
-                                                objectFit: 'cover',
-                                                transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+                            {/* Sheng: Magazine layout - Featured card chapu chapu kwa left + Stacked horizontal cards kwa right */}
+                            <Grid container spacing={3} sx={{ mb: 6 }}>
+                                {/* Left Column - Large Featured Magazine Card */}
+                                {featuredItem && (
+                                    <Grid item xs={12} lg={7}>
+                                        <Card
+                                            elevation={0}
+                                            onClick={() => currentTab === 0 ? navigate(`/stories/${featuredItem.slug}`) : navigate(`/campaigns/${featuredItem.slug || featuredItem.id}`)}
+                                            sx={{
+                                                p: 2.5,
+                                                borderRadius: 5,
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                height: '100%',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                bgcolor: 'background.paper',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease',
+                                                '&:hover': {
+                                                    borderColor: 'primary.main',
+                                                    transform: 'translateY(-3px)',
+                                                    boxShadow: '0 12px 28px rgba(0,0,0,0.06)'
+                                                }
                                             }}
-                                        />
-                                    </Box>
-                                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                        <Typography variant="overline" sx={{ fontWeight: 800, color: 'secondary.main', mb: 2, letterSpacing: '0.1em' }}>
-                                            {featuredItem.category_name || featuredItem.category?.name || (currentTab === 1 ? 'CAMPAIGN' : 'FEATURED')}
-                                        </Typography>
-                                        <Typography variant="h3" sx={{ 
-                                            fontWeight: 800, 
-                                            lineHeight: 1.2, 
-                                            mb: 2, 
-                                            fontSize: { xs: '1.75rem', md: '2.5rem' },
-                                            letterSpacing: '-0.02em'
-                                        }}>
-                                            {featuredItem.title}
-                                        </Typography>
-                                        <Box sx={{ mb: 4 }}>
-                                            <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: '1.1rem', lineHeight: 1.8 }}>
-                                                {featuredItem.excerpt || (featuredItem.description ? featuredItem.description.substring(0, 180) + '...' : featuredItem.content?.substring(0, 180) + '...')}
-                                            </Typography>
-                                        </Box>
-
-                                        {currentTab === 1 && (
-                                            <Box sx={{ mb: 4 }}>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
-                                                    <Typography variant="h6" color="secondary.main" fontWeight="900">
-                                                        {formatCurrency(featuredItem.raised_amount, featuredItem.currency)}
-                                                    </Typography>
-                                                    <Typography variant="subtitle2" color="text.secondary">
-                                                        {Math.round(featuredItem.progress_percentage || (featuredItem.raised_amount / featuredItem.target_amount * 100))}% Goal
-                                                    </Typography>
-                                                </Box>
-                                                <LinearProgress 
-                                                    variant="determinate" 
-                                                    value={Math.min(featuredItem.progress_percentage || (featuredItem.raised_amount / featuredItem.target_amount * 100), 100)}
-                                                    sx={{ height: 10, borderRadius: 5, bgcolor: alpha(theme.palette.secondary.main, 0.1), '& .MuiLinearProgress-bar': { bgcolor: 'secondary.main' } }}
+                                        >
+                                            <Box sx={{ position: 'relative', mb: 2, borderRadius: 4, overflow: 'hidden' }}>
+                                                <Box
+                                                    component="img"
+                                                    src={featuredItem.featured_image || `https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2070`}
+                                                    alt={featuredItem.title}
+                                                    sx={{
+                                                        width: '100%',
+                                                        height: { xs: 260, md: 340 },
+                                                        objectFit: 'cover',
+                                                        borderRadius: 4
+                                                    }}
                                                 />
+                                                {/* Category Overlay Tag at Bottom Left of Image */}
+                                                <Box
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        bottom: 16,
+                                                        left: 16,
+                                                        bgcolor: 'white',
+                                                        color: 'text.primary',
+                                                        fontWeight: 800,
+                                                        fontSize: '0.8rem',
+                                                        px: 2,
+                                                        py: 0.75,
+                                                        borderRadius: 2,
+                                                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.05em'
+                                                    }}
+                                                >
+                                                    {featuredItem.category_name || featuredItem.category?.name || (currentTab === 1 ? 'CAMPAIGN' : 'FEATURED')}
+                                                </Box>
                                             </Box>
-                                        )}
 
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-                                            <Avatar sx={{ bgcolor: 'secondary.main', width: 32, height: 32 }}>
-                                                <Person fontSize="small" />
-                                            </Avatar>
-                                            <Box>
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                                                    {new Date(featuredItem.published_at || featuredItem.created_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                    {' • '}
                                                     {getAuthorName(featuredItem)}
                                                 </Typography>
-                                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                                    {new Date(featuredItem.published_at || featuredItem.created_at || Date.now()).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
-                                                </Typography>
                                             </Box>
-                                        </Box>
 
-                                        {currentTab === 1 ? (
-                                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                                <Button 
-                                                    variant="contained" 
-                                                    color="secondary" 
-                                                    size="medium"
-                                                    onClick={() => { setSelectedCampaign(featuredItem); setDonationDialogOpen(true); }}
-                                                    sx={{ px: 4, fontWeight: 900, borderRadius: 1 }}
+                                            <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 1.5, lineHeight: 1.25, fontSize: { xs: '1.4rem', md: '1.8rem' } }}>
+                                                {featuredItem.title}
+                                            </Typography>
+
+                                            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3, flexGrow: 1, lineHeight: 1.6 }}>
+                                                {featuredItem.excerpt || (featuredItem.description ? featuredItem.description.substring(0, 160) + '...' : featuredItem.content?.substring(0, 160) + '...')}
+                                            </Typography>
+
+                                            {currentTab === 1 && (
+                                                <Box sx={{ mb: 3 }}>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                        <Typography variant="subtitle2" color="primary.main" fontWeight="900">
+                                                            {formatCurrency(featuredItem.raised_amount, featuredItem.currency)}
+                                                        </Typography>
+                                                        <Typography variant="caption" color="text.secondary" fontWeight="700">
+                                                            {Math.round(featuredItem.progress_percentage || (featuredItem.raised_amount / featuredItem.target_amount * 100))}% Goal
+                                                        </Typography>
+                                                    </Box>
+                                                    <LinearProgress
+                                                        variant="determinate"
+                                                        value={Math.min(featuredItem.progress_percentage || (featuredItem.raised_amount / featuredItem.target_amount * 100), 100)}
+                                                        sx={{ height: 8, borderRadius: 4, bgcolor: alpha(theme.palette.primary.main, 0.1), '& .MuiLinearProgress-bar': { bgcolor: 'primary.main', borderRadius: 4 } }}
+                                                    />
+                                                </Box>
+                                            )}
+
+                                            <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    disableElevation
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (currentTab === 1) {
+                                                            setSelectedCampaign(featuredItem);
+                                                            setDonationDialogOpen(true);
+                                                        } else {
+                                                            navigate(`/stories/${featuredItem.slug}`);
+                                                        }
+                                                    }}
+                                                    sx={{
+                                                        borderRadius: 50,
+                                                        px: 4,
+                                                        py: 1,
+                                                        fontWeight: 800,
+                                                        textTransform: 'none',
+                                                        background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)'
+                                                    }}
                                                 >
-                                                    Donate Now
-                                                </Button>
-                                                <Button 
-                                                    variant="outlined" 
-                                                    color="secondary"
-                                                    onClick={() => { setSelectedCampaign(featuredItem); setVolunteerDialogOpen(true); }}
-                                                    sx={{ borderRadius: 1, border: '2px solid' }}
-                                                >
-                                                    <Handshake />
+                                                    {currentTab === 1 ? 'Donate Now' : 'Read Story'}
                                                 </Button>
                                             </Box>
-                                        ) : (
-                                            <Button 
-                                                variant="contained" 
-                                                color="secondary" 
-                                                size="medium" 
-                                                endIcon={<ArrowForward />}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    if (currentTab === 0) {
-                                                        navigate(`/stories/${featuredItem.slug}`);
-                                                    } else {
-                                                        navigate(`/campaigns/${featuredItem.slug || featuredItem.id}`);
+                                        </Card>
+                                    </Grid>
+                                )}
+
+                                {/* Right Column - Stacked Secondary Cards */}
+                                <Grid item xs={12} lg={5}>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: '100%' }}>
+                                        {remainingItems.slice(0, 2).map((item: any, idx: number) => (
+                                            <Card
+                                                key={item.id || idx}
+                                                elevation={0}
+                                                onClick={() => currentTab === 0 ? navigate(`/stories/${item.slug}`) : navigate(`/campaigns/${item.slug || item.id}`)}
+                                                sx={{
+                                                    p: 2,
+                                                    borderRadius: 5,
+                                                    border: '1px solid',
+                                                    borderColor: 'divider',
+                                                    bgcolor: 'background.paper',
+                                                    display: 'flex',
+                                                    flexDirection: { xs: 'column', sm: 'row' },
+                                                    gap: 2,
+                                                    flex: 1,
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.3s ease',
+                                                    '&:hover': {
+                                                        borderColor: 'primary.main',
+                                                        transform: 'translateY(-2px)'
                                                     }
                                                 }}
-                                                sx={{ alignSelf: 'flex-start', px: 4, fontWeight: 900, borderRadius: 1 }}
                                             >
-                                                Read more
-                                            </Button>
-                                        )}
+                                                <Box sx={{ position: 'relative', width: { xs: '100%', sm: 200 }, minWidth: { sm: 180 }, height: { xs: 180, sm: '100%' }, minHeight: 160, borderRadius: 4, overflow: 'hidden' }}>
+                                                    <Box
+                                                        component="img"
+                                                        src={item.featured_image || `https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=600`}
+                                                        alt={item.title}
+                                                        sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }}
+                                                    />
+                                                    <Box
+                                                        sx={{
+                                                            position: 'absolute',
+                                                            bottom: 12,
+                                                            left: 12,
+                                                            bgcolor: 'white',
+                                                            color: 'text.primary',
+                                                            fontWeight: 800,
+                                                            fontSize: '0.75rem',
+                                                            px: 1.5,
+                                                            py: 0.5,
+                                                            borderRadius: 1.5,
+                                                            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                                                            textTransform: 'uppercase'
+                                                        }}
+                                                    >
+                                                        {item.category_name || item.category?.name || (currentTab === 1 ? 'CAMPAIGN' : 'STORY')}
+                                                    </Box>
+                                                </Box>
+
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flex: 1, py: 0.5 }}>
+                                                    <Box>
+                                                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.5 }}>
+                                                            {new Date(item.published_at || item.created_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                        </Typography>
+                                                        <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', mb: 1, lineHeight: 1.3, fontSize: '1.05rem' }}>
+                                                            {item.title}
+                                                        </Typography>
+                                                        <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.85rem', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                            {item.excerpt || item.description || item.content}
+                                                        </Typography>
+                                                    </Box>
+
+                                                    <Box sx={{ mt: 2 }}>
+                                                        <Button
+                                                            variant="outlined"
+                                                            color="primary"
+                                                            size="small"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (currentTab === 1) {
+                                                                    setSelectedCampaign(item);
+                                                                    setDonationDialogOpen(true);
+                                                                } else {
+                                                                    navigate(`/stories/${item.slug}`);
+                                                                }
+                                                            }}
+                                                            sx={{
+                                                                borderRadius: 50,
+                                                                px: 2.5,
+                                                                fontWeight: 700,
+                                                                textTransform: 'none',
+                                                                borderColor: 'divider',
+                                                                color: 'text.primary',
+                                                                '&:hover': { borderColor: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.05) }
+                                                            }}
+                                                        >
+                                                            {currentTab === 1 ? 'Donate' : 'Explore'}
+                                                        </Button>
+                                                    </Box>
+                                                </Box>
+                                            </Card>
+                                        ))}
                                     </Box>
-                                </Box>
-                            )}
+                                </Grid>
+                            </Grid>
 
                             {/* 4-Column Grid Section */}
                             <Grid container spacing={4}>

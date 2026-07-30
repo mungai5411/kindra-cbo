@@ -15,6 +15,7 @@ class DarajaService:
     def get_access_token(cls):
         """
         Authenticate with Daraja API and get the OAuth Access Token
+        // Sheng: Chukua OAuth token ya Daraja ndio tustart Push ya M-Pesa
         """
         if settings.DARAJA_ENVIRONMENT == 'production':
             auth_url = 'https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
@@ -38,6 +39,7 @@ class DarajaService:
         response = requests.get(auth_url, headers=headers)
 
         if response.status_code == 200:
+            # Sheng: Access token imeingia safi!
             return response.json().get('access_token')
         else:
             logger.error(f"Failed to get Daraja access token. Status: {response.status_code} | Body: {response.text} | Consumer Key used: {consumer_key[:6]}...{consumer_key[-4:]}")

@@ -253,11 +253,24 @@ class PaymentService:
                 logger.info(f"Donation {donation.id} already processed. Current status: {donation.status}")
                 return True
 
+            # Sheng check: Form ni gani kwa M-Pesa result code?
+            # Standard Safaricom Daraja error code map
+            MPESA_ERROR_MAPPING = {
+                1: 'Transaction failed or was rejected.',
+                1032: 'Transaction cancelled by user (Ulikana PIN prompt).',
+                1037: 'Timeout: User took too long to enter PIN (Time iliisha).',
+                1001: 'Another transaction is in progress.',
+                2001: 'Invalid M-Pesa PIN entered (PIN ilikuwa wrong).',
+                1019: 'Transaction expired.',
+                1025: 'System error occurred during payment.',
+                9999: 'Insufficient M-Pesa balance (Mfuko hauna za kutosha).'
+            }
+
             # Save the raw result code for auditing
             donation.last_mpesa_result_code = str(result_code)
 
             if result_code == 0:
-                # Payment Successful
+                # Sheng: Payment imefaulu safi kabisa! Finalize hapa 
                 callback_metadata = stk_callback.get('CallbackMetadata', {}).get('Item', [])
                 
                 # Extract details from metadata
@@ -288,7 +301,8 @@ class PaymentService:
                 # Finalize (updates campaign, donor, and generates receipt)
                 DonationService.finalize_donation(donation)
             else:
-                friendly_message = error_mapping.get(result_code, result_desc)
+                # Sheng: Transaction imekataa bro! Map the error code formatted
+                friendly_message = MPESA_ERROR_MAPPING.get(result_code, result_desc or 'M-Pesa payment failed')
                 
                 logger.warning(f"STK Push failed for {donation.id}. Code: {result_code}, Desc: {result_desc}")
                 

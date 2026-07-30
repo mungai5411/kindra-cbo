@@ -71,6 +71,7 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
     const [mpesaStatus, setMpesaStatus] = useState<'pending' | 'success' | 'failed'>('pending');
     const [timeLeft, setTimeLeft] = useState(45);
 
+    // Sheng check: Tunapoll Daraja callback hapa real-time kabla count-down iishe
     // Poll for M-Pesa STK Push completion
     useEffect(() => {
         let interval: any;
@@ -81,12 +82,14 @@ export default function DonationDialog({ open, onClose, campaign }: DonationDial
                     if (checkMpesaStatus.fulfilled.match(resultAction)) {
                         const data = resultAction.payload;
                         if (data.status === 'COMPLETED') {
+                            // Sheng: Cash imeingia safi! Confirm transaction
                             setMpesaStatus('success');
                             setTransactionId(data.transaction_id);
-                            notify({ message: 'Donation received! Thank you for your support.', severity: 'success' });
+                            notify({ message: 'Donation received! Thank you for your support (Asante sana!).', severity: 'success' });
                         } else if (data.status === 'FAILED') {
+                            // Sheng: Form ni bad, user alicancel ama hakuwa na dough
                             setMpesaStatus('failed');
-                            const failMsg = data.message || 'Payment failed or was cancelled by user.';
+                            const failMsg = data.message || 'Payment failed or was cancelled by user (Transaction imekataa).';
                             setError(failMsg);
                             notify({ message: failMsg, severity: 'error' });
                         }
