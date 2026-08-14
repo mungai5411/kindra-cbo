@@ -355,11 +355,15 @@ export default function StoriesPage() {
                                                     }}
                                                     sx={{
                                                         borderRadius: 50,
-                                                        px: 4,
+                                                        px: 3.5,
                                                         py: 1,
-                                                        fontWeight: 800,
+                                                        fontWeight: 700,
                                                         textTransform: 'none',
-                                                        background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)'
+                                                        bgcolor: '#0f172a',
+                                                        color: '#ffffff',
+                                                        '&:hover': {
+                                                            bgcolor: '#1e293b'
+                                                        }
                                                     }}
                                                 >
                                                     {currentTab === 1 ? 'Donate Now' : 'Read Story'}
