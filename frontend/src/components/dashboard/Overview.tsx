@@ -158,7 +158,7 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
                                 }
                                 return sum;
                             }, 0),
-                            impactRank: 'Silver Partner', // Will be dynamic inside DonorOverview
+                            impactRank: '', // Computed dynamically inside DonorOverview from myTotalDonations
                             supportedCampaigns: new Set(myDonations.map(d => d.campaign)).size
                         }}
                         charts={{
@@ -187,14 +187,15 @@ export const Overview = ({ setActiveTab, setOpenDonationDialog }: OverviewProps)
                     <CaseWorkerOverview
                         stats={{
                             assignedChildren: children.length,
-                            pendingAssessments: 3,
+                            pendingAssessments: dashboardData?.overview?.pending_assessments || 0,
                             totalCases: cases.length
                         }}
                         recentCases={cases.slice(0, 5)}
-                        pendingTasks={[
-                            { title: 'Follow-up Assessment', target: 'John Doe' },
-                            { title: 'Home Visit Update', target: 'Smith Family' }
-                        ]}
+                        pendingTasks={cases
+                            .filter((c: any) => c.status === 'PENDING' || c.status === 'OPEN')
+                            .slice(0, 3)
+                            .map((c: any) => ({ title: c.case_number || `Case ${c.id}`, target: c.child_name || 'Assigned Child' }))
+                        }
                         onNavigate={() => setActiveTab('cases')}
                     />
                 );

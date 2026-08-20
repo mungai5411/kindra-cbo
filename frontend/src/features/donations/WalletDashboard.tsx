@@ -3,19 +3,21 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchWallet, fetchDisbursements, createDisbursement } from './donationsSlice';
 import { AppDispatch, RootState } from '../../store';
 import { fetchShelters } from '../shelters/shelterSlice';
-import { 
-    Box, Typography, Button, Grid, Card, CardContent, 
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
+import {
+    Box, Typography, Button, Grid, Card, CardContent,
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Dialog, DialogTitle, DialogContent, DialogActions,
     TextField, MenuItem, Select, FormControl, InputLabel, Chip, IconButton,
-    RadioGroup, FormControlLabel, Radio, alpha, useTheme 
+    RadioGroup, FormControlLabel, Radio, alpha, useTheme, Paper, Skeleton, Divider
 } from '@mui/material';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import CloseIcon from '@mui/icons-material/Close';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { format } from 'date-fns';
+import { motion } from 'framer-motion';
 
 const WalletDashboard: React.FC = () => {
     const theme = useTheme();
@@ -23,7 +25,7 @@ const WalletDashboard: React.FC = () => {
     const { wallet, disbursements, isLoading } = useSelector((state: RootState) => state.donations);
     const { shelters } = useSelector((state: RootState) => state.shelters);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    
+
     // Form state
     const [amount, setAmount] = useState('');
     const [shelterId, setShelterId] = useState('');
@@ -41,7 +43,7 @@ const WalletDashboard: React.FC = () => {
 
     const handleSendFunds = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         let paymentDetails = {};
         if (selectedShelter) {
             if (paymentMethod === 'BANK_TRANSFER') {
@@ -68,53 +70,69 @@ const WalletDashboard: React.FC = () => {
             payment_details: paymentDetails,
             status: 'SENT'
         }));
-        
+
         setIsModalOpen(false);
         setAmount('');
         setShelterId('');
         setPurpose('');
         setReference('');
         setPaymentMethod('BANK_TRANSFER');
-        dispatch(fetchWallet()); 
-        dispatch(fetchDisbursements()); 
+        dispatch(fetchWallet());
+        dispatch(fetchDisbursements());
     };
 
-    const formatCurrency = (amount: number | string) => {
-        return new Intl.NumberFormat('en-KE', {
+    const formatCurrency = (amount: number | string) =>
+        new Intl.NumberFormat('en-KE', {
             style: 'currency',
             currency: 'KES',
             minimumFractionDigits: 0,
         }).format(Number(amount || 0));
-    };
 
-    const getStatusChipColor = (status: string) => {
+    const getStatusColor = (status: string) => {
         switch (status) {
-            case 'VERIFIED': return 'success';
-            case 'RECEIPT_UPLOADED': return 'info';
-            case 'SENT': return 'warning';
-            default: return 'default';
+            case 'VERIFIED': return { color: theme.palette.success.main, bg: alpha(theme.palette.success.main, 0.1) };
+            case 'RECEIPT_UPLOADED': return { color: theme.palette.info.main, bg: alpha(theme.palette.info.main, 0.1) };
+            case 'SENT': return { color: theme.palette.warning.main, bg: alpha(theme.palette.warning.main, 0.1) };
+            default: return { color: theme.palette.text.secondary, bg: alpha(theme.palette.divider, 0.1) };
         }
     };
 
+    const balanceUtilization = wallet?.total_received
+        ? Math.round(((wallet.total_disbursed || 0) / wallet.total_received) * 100)
+        : 0;
+
     return (
-        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <Box
+            component={motion.div}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}
+        >
             {/* Header */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
                 <Box>
-                    <Typography variant="h4" fontWeight="800" gutterBottom>
+                    <Typography variant="overline" sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: 2, opacity: 0.8 }}>
+                        Financial Dashboard
+                    </Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: '-0.03em', mt: 0.5 }}>
                         Organization Wallet
                     </Typography>
-                    <Typography variant="body1" color="text.secondary">
-                        Manage funds and track disbursements seamlessly.
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontWeight: 500 }}>
+                        All figures are real-time from your verified donation records.
                     </Typography>
                 </Box>
                 <Button
                     variant="contained"
                     size="large"
-                    color="primary"
                     startIcon={<CallMadeIcon />}
                     onClick={() => setIsModalOpen(true)}
-                    sx={{ borderRadius: 2, px: 4, py: 1.5, fontWeight: 'bold' }}
+                    sx={{
+                        borderRadius: 2, px: 4, py: 1.5, fontWeight: 800,
+                        textTransform: 'none', boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.25)}`,
+                        '&:hover': { boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.35)}`, transform: 'translateY(-1px)' },
+                        transition: 'all 0.25s'
+                    }}
                 >
                     Send Funds
                 </Button>
@@ -122,137 +140,269 @@ const WalletDashboard: React.FC = () => {
 
             {/* Stats Cards */}
             <Grid container spacing={3}>
-                <Grid item xs={12} md={4}>
-                    <Card sx={{ borderRadius: 3, boxShadow: theme.shadows[1], border: `1px solid ${theme.palette.divider}`, position: 'relative', overflow: 'hidden' }}>
-                        <Box sx={{ position: 'absolute', top: -10, right: -10, opacity: 0.05, color: theme.palette.primary.main }}>
-                            <AccountBalanceWalletIcon sx={{ fontSize: 120 }} />
-                        </Box>
-                        <CardContent sx={{ p: 4 }}>
-                            <Typography variant="overline" color="text.secondary" fontWeight="bold">Total Received</Typography>
-                            <Typography variant="h3" fontWeight="900" sx={{ mt: 1 }}>
-                                {formatCurrency(wallet?.total_received || 0)}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <Card sx={{ borderRadius: 3, boxShadow: theme.shadows[1], border: `1px solid ${theme.palette.divider}`, position: 'relative', overflow: 'hidden' }}>
-                        <Box sx={{ position: 'absolute', top: -10, right: -10, opacity: 0.05, color: theme.palette.primary.main }}>
-                            <CallMadeIcon sx={{ fontSize: 120 }} />
-                        </Box>
-                        <CardContent sx={{ p: 4 }}>
-                            <Typography variant="overline" color="text.secondary" fontWeight="bold">Total Disbursed</Typography>
-                            <Typography variant="h3" fontWeight="900" sx={{ mt: 1 }}>
-                                {formatCurrency(wallet?.total_disbursed || 0)}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <Card sx={{ 
-                        borderRadius: 3, 
-                        boxShadow: 'none',
-                        bgcolor: alpha(theme.palette.primary.main, 0.08),
-                        border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                        position: 'relative', 
-                        overflow: 'hidden' 
-                    }}>
-                        <Box sx={{ position: 'absolute', top: -10, right: -10, opacity: 0.1, color: theme.palette.primary.main }}>
-                            <AccountBalanceWalletIcon sx={{ fontSize: 120 }} />
-                        </Box>
-                        <CardContent sx={{ p: 4 }}>
-                            <Typography variant="overline" color="primary" fontWeight="bold">Current Balance</Typography>
-                            <Typography variant="h3" fontWeight="900" sx={{ mt: 1, color: theme.palette.mode === 'dark' ? 'white' : theme.palette.primary.dark }}>
+                {/* Balance Card — Hero */}
+                <Grid item xs={12} md={5}>
+                    {isLoading ? (
+                        <Skeleton variant="rectangular" height={180} sx={{ borderRadius: 3 }} />
+                    ) : (
+                        <Box
+                            component={motion.div}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            sx={{
+                                borderRadius: 3,
+                                p: 4,
+                                height: '100%',
+                                background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 60%, ${theme.palette.secondary.main} 100%)`,
+                                color: '#fff',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                boxShadow: `0 16px 48px ${alpha(theme.palette.primary.main, 0.35)}`
+                            }}
+                        >
+                            {/* Decorative blob */}
+                            <Box sx={{
+                                position: 'absolute', right: -30, top: -30,
+                                width: 180, height: 180, borderRadius: '50%',
+                                bgcolor: 'rgba(255,255,255,0.06)'
+                            }} />
+                            <Box sx={{
+                                position: 'absolute', right: 40, bottom: -60,
+                                width: 220, height: 220, borderRadius: '50%',
+                                bgcolor: 'rgba(255,255,255,0.04)'
+                            }} />
+
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, position: 'relative' }}>
+                                <AccountBalanceWalletIcon sx={{ opacity: 0.7, fontSize: 20 }} />
+                                <Typography sx={{ fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.8 }}>
+                                    Current Balance
+                                </Typography>
+                            </Box>
+                            <Typography sx={{ fontWeight: 900, fontSize: '2.4rem', letterSpacing: '-0.04em', position: 'relative', lineHeight: 1.1 }}>
                                 {formatCurrency(wallet?.current_balance || 0)}
                             </Typography>
-                        </CardContent>
-                    </Card>
+                            <Typography sx={{ mt: 1, opacity: 0.75, fontWeight: 500, fontSize: '0.9rem', position: 'relative' }}>
+                                Available for disbursement
+                            </Typography>
+
+                            {/* Utilization bar */}
+                            <Box sx={{ mt: 3, position: 'relative' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.75 }}>
+                                    <Typography sx={{ fontSize: '0.75rem', opacity: 0.75, fontWeight: 600 }}>Utilization rate</Typography>
+                                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 800 }}>{balanceUtilization}%</Typography>
+                                </Box>
+                                <Box sx={{ height: 4, bgcolor: 'rgba(255,255,255,0.2)', borderRadius: 100, overflow: 'hidden' }}>
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${balanceUtilization}%` }}
+                                        transition={{ duration: 1, delay: 0.4, ease: 'easeOut' }}
+                                        style={{ height: '100%', background: 'rgba(255,255,255,0.85)', borderRadius: 100 }}
+                                    />
+                                </Box>
+                            </Box>
+                        </Box>
+                    )}
+                </Grid>
+
+                {/* Received + Disbursed */}
+                <Grid item xs={12} md={7}>
+                    <Grid container spacing={3} sx={{ height: '100%' }}>
+                        {[
+                            {
+                                label: 'Total Received',
+                                value: formatCurrency(wallet?.total_received || 0),
+                                icon: <TrendingUpIcon />,
+                                color: theme.palette.success.main,
+                                sub: 'From all verified donations'
+                            },
+                            {
+                                label: 'Total Disbursed',
+                                value: formatCurrency(wallet?.total_disbursed || 0),
+                                icon: <CallMadeIcon />,
+                                color: theme.palette.warning.main,
+                                sub: `${disbursements.length} disbursement${disbursements.length !== 1 ? 's' : ''} made`
+                            }
+                        ].map((stat, i) => (
+                            <Grid item xs={12} sm={6} key={i} sx={{ display: 'flex' }}>
+                                {isLoading ? (
+                                    <Skeleton variant="rectangular" height={140} sx={{ borderRadius: 3, width: '100%' }} />
+                                ) : (
+                                    <Box
+                                        component={motion.div}
+                                        initial={{ opacity: 0, y: 12 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.15 + i * 0.1 }}
+                                        sx={{
+                                            flex: 1,
+                                            p: 3.5,
+                                            borderRadius: 3,
+                                            border: '1px solid',
+                                            borderColor: alpha(theme.palette.divider, 0.6),
+                                            bgcolor: 'background.paper',
+                                            position: 'relative',
+                                            overflow: 'hidden'
+                                        }}
+                                    >
+                                        <Box sx={{
+                                            position: 'absolute', right: -12, bottom: -12,
+                                            color: stat.color, opacity: 0.06, fontSize: 100
+                                        }}>
+                                            {stat.icon}
+                                        </Box>
+                                        <Box sx={{
+                                            width: 40, height: 40, borderRadius: 2,
+                                            bgcolor: alpha(stat.color, 0.1), color: stat.color,
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2
+                                        }}>
+                                            {stat.icon}
+                                        </Box>
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', letterSpacing: '0.08em', textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
+                                            {stat.label}
+                                        </Typography>
+                                        <Typography sx={{ fontWeight: 900, fontSize: '1.4rem', letterSpacing: '-0.03em', color: stat.color }}>
+                                            {stat.value}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 500 }}>
+                                            {stat.sub}
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </Grid>
+                        ))}
+                    </Grid>
                 </Grid>
             </Grid>
 
             {/* Disbursements Table */}
-            <Card sx={{ borderRadius: 3, boxShadow: theme.shadows[1], border: `1px solid ${theme.palette.divider}` }}>
-                <Box sx={{ px: 3, py: 2.5, borderBottom: `1px solid ${theme.palette.divider}`, bgcolor: alpha(theme.palette.background.default, 0.5) }}>
-                    <Typography variant="h6" fontWeight="bold">Recent Disbursements</Typography>
+            <Paper
+                elevation={0}
+                sx={{
+                    borderRadius: 3,
+                    border: '1px solid', borderColor: alpha(theme.palette.divider, 0.6),
+                    overflow: 'hidden'
+                }}
+            >
+                <Box sx={{
+                    px: 4, py: 3,
+                    borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.5),
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                }}>
+                    <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: '-0.02em' }}>Disbursement History</Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                            Complete record of funds sent to partner shelter homes
+                        </Typography>
+                    </Box>
+                    <Chip
+                        label={`${disbursements.length} record${disbursements.length !== 1 ? 's' : ''}`}
+                        size="small"
+                        sx={{ fontWeight: 700, bgcolor: alpha(theme.palette.primary.main, 0.08), color: 'primary.main' }}
+                    />
                 </Box>
                 <TableContainer>
                     <Table>
                         <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Date Sent</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Shelter Home</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Amount</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Method</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Status</TableCell>
+                            <TableRow sx={{ bgcolor: alpha(theme.palette.background.default, 0.6) }}>
+                                {['Date Sent', 'Shelter Home', 'Amount', 'Method', 'Status'].map((h) => (
+                                    <TableCell key={h} sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', py: 2 }}>
+                                        {h}
+                                    </TableCell>
+                                ))}
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {disbursements.length === 0 ? (
+                            {isLoading ? (
+                                Array.from({ length: 4 }).map((_, i) => (
+                                    <TableRow key={i}>
+                                        {Array.from({ length: 5 }).map((_, j) => (
+                                            <TableCell key={j}><Skeleton variant="text" height={20} /></TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : disbursements.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
-                                        <AccountBalanceWalletIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
-                                        <Typography variant="h6" color="text.secondary">No disbursements yet</Typography>
-                                        <Typography variant="body2" color="text.secondary">When you send funds, they will appear here.</Typography>
+                                    <TableCell colSpan={5} align="center" sx={{ py: 10 }}>
+                                        <AccountBalanceWalletIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2, display: 'block', mx: 'auto' }} />
+                                        <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 800, mb: 0.5 }}>
+                                            No disbursements yet
+                                        </Typography>
+                                        <Typography variant="body2" color="text.disabled">
+                                            Send funds to a shelter home to see records here.
+                                        </Typography>
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                disbursements.map((disbursement: any) => (
-                                    <TableRow key={disbursement.id} hover>
-                                        <TableCell>{disbursement.date_sent ? format(new Date(disbursement.date_sent), 'MMM dd, yyyy') : 'N/A'}</TableCell>
-                                        <TableCell>
-                                            <Typography variant="body2" fontWeight="bold">{disbursement.shelter_home_name || 'Unknown'}</Typography>
-                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                {disbursement.purpose_description}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography variant="body2" fontWeight="bold">{formatCurrency(disbursement.amount)}</Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                {disbursement.payment_method === 'MPESA' ? <PhoneAndroidIcon fontSize="small" color="success" /> : <AccountBalanceIcon fontSize="small" color="info" />}
-                                                <Typography variant="body2">{disbursement.payment_method?.replace('_', ' ')}</Typography>
-                                            </Box>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Chip 
-                                                label={disbursement.status.replace('_', ' ')} 
-                                                size="small" 
-                                                color={getStatusChipColor(disbursement.status) as any}
-                                                sx={{ fontWeight: 'bold', borderRadius: 1 }}
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                ))
+                                disbursements.map((d: any) => {
+                                    const statusStyle = getStatusColor(d.status);
+                                    return (
+                                        <TableRow key={d.id} hover sx={{ '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.02) } }}>
+                                            <TableCell sx={{ py: 2.5 }}>
+                                                <Typography variant="body2" fontWeight={600}>
+                                                    {d.date_sent ? format(new Date(d.date_sent), 'MMM dd, yyyy') : 'N/A'}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2" fontWeight={800}>{d.shelter_home_name || 'Unknown'}</Typography>
+                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    {d.purpose_description}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2" fontWeight={900} color="primary.main">
+                                                    {formatCurrency(d.amount)}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    {d.payment_method === 'MPESA'
+                                                        ? <PhoneAndroidIcon fontSize="small" sx={{ color: 'success.main' }} />
+                                                        : <AccountBalanceIcon fontSize="small" sx={{ color: 'info.main' }} />
+                                                    }
+                                                    <Typography variant="body2" fontWeight={600}>
+                                                        {d.payment_method?.replace(/_/g, ' ')}
+                                                    </Typography>
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Chip
+                                                    label={d.status.replace(/_/g, ' ')}
+                                                    size="small"
+                                                    sx={{
+                                                        fontWeight: 800, fontSize: '0.65rem', borderRadius: 1.5,
+                                                        bgcolor: statusStyle.bg, color: statusStyle.color, border: 'none'
+                                                    }}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })
                             )}
                         </TableBody>
                     </Table>
                 </TableContainer>
-            </Card>
+            </Paper>
 
             {/* Send Funds Modal */}
-            <Dialog 
-                open={isModalOpen} 
+            <Dialog
+                open={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 maxWidth="md"
                 fullWidth
-                PaperProps={{
-                    sx: { borderRadius: 3 }
-                }}
+                PaperProps={{ sx: { borderRadius: 3 } }}
             >
-                <DialogTitle sx={{ m: 0, p: 3, pb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${theme.palette.divider}` }}>
+                <DialogTitle sx={{ m: 0, p: 3, pb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
                     <Box>
-                        <Typography variant="h5" fontWeight="bold">Send Funds to Shelter</Typography>
-                        <Typography variant="body2" color="text.secondary">Disburse resources directly to partner shelters.</Typography>
+                        <Typography variant="h5" fontWeight={900} sx={{ letterSpacing: '-0.02em' }}>Send Funds to Shelter</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>Disburse resources directly to partner shelter homes.</Typography>
                     </Box>
-                    <IconButton onClick={() => setIsModalOpen(false)}>
+                    <IconButton onClick={() => setIsModalOpen(false)} size="small">
                         <CloseIcon />
                     </IconButton>
                 </DialogTitle>
                 <DialogContent dividers sx={{ p: 4 }}>
                     <form id="send-funds-form" onSubmit={handleSendFunds}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                            {/* Shelter Selection */}
                             <FormControl fullWidth required>
                                 <InputLabel>Select Shelter Home</InputLabel>
                                 <Select
@@ -270,8 +420,7 @@ const WalletDashboard: React.FC = () => {
                             <Grid container spacing={3}>
                                 <Grid item xs={12} md={6}>
                                     <TextField
-                                        fullWidth
-                                        required
+                                        fullWidth required
                                         label="Amount (KES)"
                                         type="number"
                                         InputProps={{ inputProps: { min: 1 } }}
@@ -282,8 +431,7 @@ const WalletDashboard: React.FC = () => {
                                 </Grid>
                                 <Grid item xs={12} md={6}>
                                     <TextField
-                                        fullWidth
-                                        required
+                                        fullWidth required
                                         label="Purpose"
                                         placeholder="e.g. Monthly Food Supply"
                                         value={purpose}
@@ -293,123 +441,79 @@ const WalletDashboard: React.FC = () => {
                                 </Grid>
                             </Grid>
 
-                            {/* Payment Method */}
                             <Box>
-                                <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Payment Method</Typography>
-                                <RadioGroup 
-                                    row 
-                                    value={paymentMethod} 
-                                    onChange={(e) => setPaymentMethod(e.target.value)}
-                                >
+                                <Typography variant="subtitle2" fontWeight={800} gutterBottom>Payment Method</Typography>
+                                <RadioGroup row value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
                                     <Grid container spacing={2}>
-                                        <Grid item xs={12} sm={6}>
-                                            <Paper 
-                                                variant="outlined" 
-                                                sx={{ 
-                                                    p: 2, 
-                                                    borderRadius: 2, 
-                                                    cursor: 'pointer',
-                                                    border: paymentMethod === 'BANK_TRANSFER' ? `2px solid ${theme.palette.primary.main}` : `1px solid ${theme.palette.divider}`,
-                                                    bgcolor: paymentMethod === 'BANK_TRANSFER' ? alpha(theme.palette.primary.main, 0.05) : 'transparent'
-                                                }}
-                                                onClick={() => setPaymentMethod('BANK_TRANSFER')}
-                                            >
-                                                <FormControlLabel 
-                                                    value="BANK_TRANSFER" 
-                                                    control={<Radio color="primary" sx={{ display: 'none' }} />} 
-                                                    label={
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                            <AccountBalanceIcon color={paymentMethod === 'BANK_TRANSFER' ? 'primary' : 'action'} />
-                                                            <Box>
-                                                                <Typography variant="body1" fontWeight="bold">Bank Transfer</Typography>
-                                                                <Typography variant="caption" color="text.secondary">Direct deposit to shelter's bank</Typography>
+                                        {[
+                                            { value: 'BANK_TRANSFER', icon: <AccountBalanceIcon />, label: 'Bank Transfer', sub: 'Direct deposit to shelter bank', color: theme.palette.primary.main },
+                                            { value: 'MPESA', icon: <PhoneAndroidIcon />, label: 'M-Pesa', sub: "Send to shelter's Paybill/Till", color: theme.palette.success.main }
+                                        ].map((method) => (
+                                            <Grid item xs={12} sm={6} key={method.value}>
+                                                <Paper
+                                                    variant="outlined"
+                                                    onClick={() => setPaymentMethod(method.value)}
+                                                    sx={{
+                                                        p: 2.5, borderRadius: 2, cursor: 'pointer',
+                                                        border: `2px solid ${paymentMethod === method.value ? method.color : alpha(theme.palette.divider, 0.5)}`,
+                                                        bgcolor: paymentMethod === method.value ? alpha(method.color, 0.04) : 'transparent',
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                >
+                                                    <FormControlLabel
+                                                        value={method.value}
+                                                        control={<Radio sx={{ display: 'none' }} />}
+                                                        label={
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                <Box sx={{ color: paymentMethod === method.value ? method.color : 'text.secondary' }}>
+                                                                    {method.icon}
+                                                                </Box>
+                                                                <Box>
+                                                                    <Typography variant="body2" fontWeight={800}>{method.label}</Typography>
+                                                                    <Typography variant="caption" color="text.secondary">{method.sub}</Typography>
+                                                                </Box>
                                                             </Box>
-                                                        </Box>
-                                                    } 
-                                                    sx={{ m: 0, width: '100%' }}
-                                                />
-                                            </Paper>
-                                        </Grid>
-                                        <Grid item xs={12} sm={6}>
-                                            <Paper 
-                                                variant="outlined" 
-                                                sx={{ 
-                                                    p: 2, 
-                                                    borderRadius: 2, 
-                                                    cursor: 'pointer',
-                                                    border: paymentMethod === 'MPESA' ? `2px solid ${theme.palette.success.main}` : `1px solid ${theme.palette.divider}`,
-                                                    bgcolor: paymentMethod === 'MPESA' ? alpha(theme.palette.success.main, 0.05) : 'transparent'
-                                                }}
-                                                onClick={() => setPaymentMethod('MPESA')}
-                                            >
-                                                <FormControlLabel 
-                                                    value="MPESA" 
-                                                    control={<Radio color="success" sx={{ display: 'none' }} />} 
-                                                    label={
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                            <PhoneAndroidIcon color={paymentMethod === 'MPESA' ? 'success' : 'action'} />
-                                                            <Box>
-                                                                <Typography variant="body1" fontWeight="bold">M-Pesa</Typography>
-                                                                <Typography variant="caption" color="text.secondary">Send to shelter's Paybill/Till</Typography>
-                                                            </Box>
-                                                        </Box>
-                                                    } 
-                                                    sx={{ m: 0, width: '100%' }}
-                                                />
-                                            </Paper>
-                                        </Grid>
+                                                        }
+                                                        sx={{ m: 0, width: '100%' }}
+                                                    />
+                                                </Paper>
+                                            </Grid>
+                                        ))}
                                     </Grid>
                                 </RadioGroup>
                             </Box>
 
-                            {/* Dynamic Details */}
                             {selectedShelter && (
-                                <Box sx={{ p: 3, bgcolor: alpha(theme.palette.info.main, 0.1), borderRadius: 2, border: `1px solid ${alpha(theme.palette.info.main, 0.2)}` }}>
-                                    <Typography variant="subtitle2" color="info.dark" fontWeight="bold" gutterBottom sx={{ textTransform: 'uppercase' }}>
-                                        Registered {paymentMethod === 'MPESA' ? 'M-Pesa' : 'Bank'} Details
+                                <Box sx={{ p: 3, bgcolor: alpha(theme.palette.info.main, 0.06), borderRadius: 2, border: `1px solid ${alpha(theme.palette.info.main, 0.2)}` }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: 'info.dark', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 2 }}>
+                                        Registered {paymentMethod === 'MPESA' ? 'M-Pesa' : 'Bank'} Details for {selectedShelter.name}
                                     </Typography>
-                                    
                                     {paymentMethod === 'BANK_TRANSFER' ? (
                                         <Grid container spacing={2}>
                                             <Grid item xs={6}>
                                                 <Typography variant="caption" color="text.secondary">Bank Name</Typography>
-                                                <Typography variant="body2" fontWeight="bold">{selectedShelter.bank_name || 'Not provided'}</Typography>
+                                                <Typography variant="body2" fontWeight={800}>{selectedShelter.bank_name || 'Not provided'}</Typography>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 <Typography variant="caption" color="text.secondary">Branch</Typography>
-                                                <Typography variant="body2" fontWeight="bold">{selectedShelter.bank_branch || 'Not provided'}</Typography>
+                                                <Typography variant="body2" fontWeight={800}>{selectedShelter.bank_branch || 'Not provided'}</Typography>
                                             </Grid>
                                             <Grid item xs={12}>
                                                 <Typography variant="caption" color="text.secondary">Account Number</Typography>
-                                                <Box sx={{ mt: 0.5 }}>
-                                                    <Chip label={selectedShelter.bank_account_number || 'Not provided'} size="small" sx={{ fontFamily: 'monospace', fontWeight: 'bold' }} />
-                                                </Box>
+                                                <Chip label={selectedShelter.bank_account_number || 'Not provided'} size="small" sx={{ display: 'flex', fontFamily: 'monospace', fontWeight: 800, mt: 0.5 }} />
                                             </Grid>
                                         </Grid>
                                     ) : (
                                         <Grid container spacing={2}>
                                             <Grid item xs={6}>
                                                 <Typography variant="caption" color="text.secondary">Paybill / Till Number</Typography>
-                                                <Box sx={{ mt: 0.5 }}>
-                                                    <Chip label={selectedShelter.mpesa_paybill_number || 'Not provided'} size="small" sx={{ fontFamily: 'monospace', fontWeight: 'bold' }} />
-                                                </Box>
+                                                <Chip label={selectedShelter.mpesa_paybill_number || 'Not provided'} size="small" sx={{ display: 'flex', fontFamily: 'monospace', fontWeight: 800, mt: 0.5 }} />
                                             </Grid>
                                             <Grid item xs={6}>
-                                                <Typography variant="caption" color="text.secondary">Account No</Typography>
-                                                <Typography variant="body2" fontWeight="bold">{selectedShelter.mpesa_account_number || 'N/A'}</Typography>
-                                            </Grid>
-                                            <Grid item xs={12}>
                                                 <Typography variant="caption" color="text.secondary">Registered Phone</Typography>
-                                                <Typography variant="body2" fontWeight="bold">{selectedShelter.mpesa_phone_number || 'Not provided'}</Typography>
+                                                <Typography variant="body2" fontWeight={800}>{selectedShelter.mpesa_phone_number || 'Not provided'}</Typography>
                                             </Grid>
                                         </Grid>
-                                    )}
-
-                                    {((!selectedShelter.bank_account_number && paymentMethod === 'BANK_TRANSFER') || 
-                                      (!selectedShelter.mpesa_paybill_number && !selectedShelter.mpesa_phone_number && paymentMethod === 'MPESA')) && (
-                                        <Typography variant="caption" color="error" sx={{ display: 'block', mt: 2, fontWeight: 'bold' }}>
-                                            Warning: This shelter has not provided {paymentMethod === 'MPESA' ? 'M-Pesa' : 'Bank'} details. You may need to contact them first.
-                                        </Typography>
                                     )}
                                 </Box>
                             )}
@@ -425,21 +529,19 @@ const WalletDashboard: React.FC = () => {
                         </Box>
                     </form>
                 </DialogContent>
-                <DialogActions sx={{ p: 3, pt: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
-                    <Button 
-                        onClick={() => setIsModalOpen(false)} 
-                        color="inherit" 
-                        sx={{ borderRadius: 2, px: 3 }}
-                    >
+                <DialogActions sx={{ p: 3, borderTop: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
+                    <Button onClick={() => setIsModalOpen(false)} color="inherit" sx={{ borderRadius: 2, px: 3, fontWeight: 700, textTransform: 'none' }}>
                         Cancel
                     </Button>
-                    <Button 
-                        form="send-funds-form" 
-                        type="submit" 
-                        variant="contained" 
-                        color="primary" 
+                    <Button
+                        form="send-funds-form"
+                        type="submit"
+                        variant="contained"
                         disabled={isLoading || !shelterId}
-                        sx={{ borderRadius: 2, px: 4 }}
+                        sx={{
+                            borderRadius: 2, px: 4, fontWeight: 800, textTransform: 'none',
+                            boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.25)}`
+                        }}
                     >
                         {isLoading ? 'Processing...' : 'Confirm Transfer'}
                     </Button>
