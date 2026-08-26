@@ -136,15 +136,11 @@ export default function StoriesPage() {
             animate={{ opacity: 1 }}
             sx={{ bgcolor: 'background.default', minHeight: '100vh' }}
         >
-            {/* ─── TOP NAV BAR ─── */}
+            {/* ─── CONTENT NAVIGATION ─── */}
             <Box sx={{
                 borderBottom: '1px solid',
                 borderColor: alpha(theme.palette.divider, 0.6),
-                bgcolor: alpha(theme.palette.background.paper, 0.85),
-                backdropFilter: 'blur(20px)',
-                position: 'sticky',
-                top: 0,
-                zIndex: 100
+                bgcolor: 'background.paper'
             }}>
                 <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 10 } }}>
                     <Box sx={{
@@ -158,8 +154,8 @@ export default function StoriesPage() {
                         {/* Tab Switcher — Pill Style */}
                         <Box sx={{
                             display: 'inline-flex',
-                            bgcolor: alpha(theme.palette.divider, 0.08),
-                            borderRadius: 100,
+                            bgcolor: alpha(theme.palette.divider, 0.06),
+                            borderRadius: 1,
                             p: 0.5,
                             gap: 0.5
                         }}>
@@ -175,7 +171,7 @@ export default function StoriesPage() {
                                         outline: 'none',
                                         px: 3,
                                         py: 1,
-                                        borderRadius: 100,
+                                        borderRadius: 0.75,
                                         fontWeight: 700,
                                         fontSize: '0.9rem',
                                         fontFamily: 'inherit',
@@ -254,19 +250,25 @@ export default function StoriesPage() {
                 </Container>
             </Box>
 
-            {/* ─── HERO HEADLINE ─── */}
-            <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 10 }, pt: 8, pb: 6 }}>
-                <Box sx={{ maxWidth: 700 }}>
+            {/* ─── EDITORIAL INTRO ─── */}
+            <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 10 }, pt: { xs: 6, md: 10 }, pb: { xs: 5, md: 8 } }}>
+                <Box sx={{ maxWidth: 820 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5 }}>
+                        <Box sx={{ width: 36, height: 2, bgcolor: 'secondary.main' }} />
+                        <Typography variant="overline" sx={{ color: 'secondary.main', fontWeight: 800, letterSpacing: '0.16em' }}>
+                            Kindra Journal
+                        </Typography>
+                    </Box>
                     <Typography
                         component={motion.h1}
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                         sx={{
-                            fontSize: { xs: '2.4rem', md: '3.5rem', lg: '4rem' },
+                            fontSize: { xs: '2.5rem', md: '4rem', lg: '5rem' },
                             fontWeight: 900,
-                            letterSpacing: '-0.04em',
-                            lineHeight: 1.08,
+                            letterSpacing: '-0.045em',
+                            lineHeight: 1.02,
                             color: 'text.primary',
                             mb: 2
                         }}
@@ -279,11 +281,11 @@ export default function StoriesPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.1 }}
                         sx={{
-                            fontSize: '1.1rem',
+                            fontSize: { xs: '1rem', md: '1.15rem' },
                             color: 'text.secondary',
                             fontWeight: 500,
                             lineHeight: 1.6,
-                            maxWidth: 520
+                            maxWidth: 600
                         }}
                     >
                         {currentTab === 'stories'
@@ -369,12 +371,13 @@ export default function StoriesPage() {
                                         }
                                         sx={{
                                             position: 'relative',
-                                            borderRadius: 4,
+                                            borderRadius: 1.5,
                                             overflow: 'hidden',
                                             cursor: 'pointer',
                                             aspectRatio: '16/10',
                                             '&:hover img': { transform: 'scale(1.04)' },
-                                            '&:hover .featured-overlay': { opacity: 1 }
+                                            '&:hover .featured-overlay': { opacity: 1 },
+                                            boxShadow: `0 24px 60px ${alpha(theme.palette.text.primary, 0.14)}`
                                         }}
                                     >
                                         <Box
@@ -600,7 +603,7 @@ export default function StoriesPage() {
                                                 {/* Image */}
                                                 <Box sx={{
                                                     position: 'relative',
-                                                    borderRadius: 3,
+                                                    borderRadius: 1.5,
                                                     overflow: 'hidden',
                                                     mb: 3,
                                                     aspectRatio: '16/10'
@@ -717,7 +720,7 @@ export default function StoriesPage() {
                                                             }
                                                         }}
                                                         sx={{
-                                                            borderRadius: 100, px: 2,
+                                                            borderRadius: 1, px: 1.5,
                                                             fontWeight: 700, textTransform: 'none',
                                                             fontSize: '0.78rem',
                                                             color: 'text.primary',
