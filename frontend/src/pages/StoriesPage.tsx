@@ -104,6 +104,14 @@ export default function StoriesPage() {
         return item.author_name || (author ? `${author.first_name} ${author.last_name}` : 'Kindra CBO');
     };
 
+    const getExcerpt = (item: any, length = 180) => {
+        const excerpt = item.excerpt || (item.description || item.content || '').replace(/<[^>]+>/g, '');
+        return excerpt.length > length ? `${excerpt.substring(0, length).trim()}...` : excerpt;
+    };
+
+    const formatDate = (item: any, options: Intl.DateTimeFormatOptions) =>
+        new Date(item.published_at || item.created_at || Date.now()).toLocaleDateString('en-GB', options);
+
     const formatCurrency = (amount: number, currency: string) =>
         new Intl.NumberFormat('en-KE', { style: 'currency', currency: currency || 'KES', minimumFractionDigits: 0 }).format(amount);
 
@@ -135,14 +143,14 @@ export default function StoriesPage() {
             component={motion.div}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            sx={{ bgcolor: 'background.default', minHeight: '100vh' }}
+            sx={{ bgcolor: '#f7f8fa', minHeight: '100vh' }}
         >
             <Navbar />
             {/* ─── CONTENT NAVIGATION ─── */}
             <Box sx={{
                 borderBottom: '1px solid',
                 borderColor: alpha(theme.palette.divider, 0.6),
-                bgcolor: 'background.paper',
+                bgcolor: '#ffffff',
                 pt: { xs: 9, md: 10 }
             }}>
                 <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 10 } }}>
@@ -157,10 +165,9 @@ export default function StoriesPage() {
                         {/* Tab Switcher — Pill Style */}
                         <Box sx={{
                             display: 'inline-flex',
-                            bgcolor: alpha(theme.palette.divider, 0.06),
-                            borderRadius: 1,
-                            p: 0.5,
-                            gap: 0.5
+                            borderBottom: '1px solid',
+                            borderColor: theme.palette.divider,
+                            gap: 3
                         }}>
                             {(['stories', 'campaigns'] as const).map((tab) => (
                                 <Box
@@ -172,17 +179,18 @@ export default function StoriesPage() {
                                         cursor: 'pointer',
                                         border: 'none',
                                         outline: 'none',
-                                        px: 3,
-                                        py: 1,
-                                        borderRadius: 0.75,
+                                        px: 0,
+                                        py: 1.5,
+                                        borderRadius: 0,
                                         fontWeight: 700,
                                         fontSize: '0.9rem',
                                         fontFamily: 'inherit',
                                         transition: 'all 0.25s ease',
-                                        bgcolor: currentTab === tab ? 'text.primary' : 'transparent',
-                                        color: currentTab === tab ? 'background.paper' : 'text.secondary',
+                                        borderBottom: currentTab === tab ? `3px solid ${theme.palette.secondary.main}` : '3px solid transparent',
+                                        bgcolor: 'transparent',
+                                        color: currentTab === tab ? 'text.primary' : 'text.secondary',
                                         '&:hover': {
-                                            color: currentTab === tab ? 'background.paper' : 'text.primary'
+                                            color: 'text.primary'
                                         }
                                     }}
                                 >
@@ -205,9 +213,9 @@ export default function StoriesPage() {
                                     </InputAdornment>
                                 ),
                                 sx: {
-                                    borderRadius: 100,
+                                    borderRadius: 1,
                                     fontSize: '0.875rem',
-                                    bgcolor: alpha(theme.palette.divider, 0.05),
+                                    bgcolor: '#f7f8fa',
                                     width: { xs: '100%', sm: 260 }
                                 }
                             }}
@@ -254,8 +262,8 @@ export default function StoriesPage() {
             </Box>
 
             {/* ─── EDITORIAL INTRO ─── */}
-            <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 10 }, pt: { xs: 6, md: 10 }, pb: { xs: 5, md: 8 } }}>
-                <Box sx={{ maxWidth: 820 }}>
+            <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 10 }, pt: { xs: 6, md: 8 }, pb: { xs: 4, md: 6 } }}>
+                <Box sx={{ maxWidth: 760 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5 }}>
                         <Box sx={{ width: 36, height: 2, bgcolor: 'secondary.main' }} />
                         <Typography variant="overline" sx={{ color: 'secondary.main', fontWeight: 800, letterSpacing: '0.16em' }}>
@@ -268,9 +276,9 @@ export default function StoriesPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                         sx={{
-                            fontSize: { xs: '2.5rem', md: '4rem', lg: '5rem' },
+                            fontSize: { xs: '2.25rem', md: '3.5rem', lg: '4.25rem' },
                             fontWeight: 900,
-                            letterSpacing: '-0.045em',
+                            letterSpacing: '-0.035em',
                             lineHeight: 1.02,
                             color: 'text.primary',
                             mb: 2
@@ -361,9 +369,14 @@ export default function StoriesPage() {
                                     sx={{
                                         mb: 10,
                                         display: 'grid',
-                                        gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
-                                        gap: 6,
-                                        alignItems: 'center'
+                                        gridTemplateColumns: { xs: '1fr', lg: '1.08fr 0.92fr' },
+                                        gap: { xs: 3, lg: 5 },
+                                        alignItems: 'center',
+                                        bgcolor: 'background.paper',
+                                        border: '1px solid',
+                                        borderColor: alpha(theme.palette.divider, 0.8),
+                                        borderRadius: 1.5,
+                                        p: { xs: 1.5, md: 2.5, lg: 3 }
                                     }}
                                 >
                                     {/* Featured Image */}
@@ -374,7 +387,7 @@ export default function StoriesPage() {
                                         }
                                         sx={{
                                             position: 'relative',
-                                            borderRadius: 1.5,
+                                            borderRadius: 1,
                                             overflow: 'hidden',
                                             cursor: 'pointer',
                                             aspectRatio: '16/10',
@@ -601,15 +614,31 @@ export default function StoriesPage() {
                                                     ? navigate(`/stories/${item.slug}`)
                                                     : navigate(`/campaigns/${item.slug || item.id}`)
                                                 }
-                                                sx={{ cursor: 'pointer', '&:hover .story-img': { transform: 'scale(1.05)' } }}
+                                                sx={{
+                                                    cursor: 'pointer',
+                                                    bgcolor: 'background.paper',
+                                                    border: '1px solid',
+                                                    borderColor: alpha(theme.palette.divider, 0.8),
+                                                    borderRadius: 1.5,
+                                                    overflow: 'hidden',
+                                                    transition: 'border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease',
+                                                    '&:hover': {
+                                                        borderColor: alpha(theme.palette.secondary.main, 0.55),
+                                                        boxShadow: `0 14px 32px ${alpha(theme.palette.text.primary, 0.08)}`,
+                                                        transform: 'translateY(-4px)'
+                                                    },
+                                                    '&:hover .story-img': { transform: 'scale(1.04)' }
+                                                }}
                                             >
                                                 {/* Image */}
                                                 <Box sx={{
                                                     position: 'relative',
-                                                    borderRadius: 1.5,
+                                                    borderRadius: 0,
                                                     overflow: 'hidden',
                                                     mb: 3,
-                                                    aspectRatio: '16/10'
+                                                    aspectRatio: '16/10',
+                                                    border: '1px solid',
+                                                    borderColor: alpha(theme.palette.divider, 0.7)
                                                 }}>
                                                     <Box
                                                         className="story-img"
@@ -638,7 +667,7 @@ export default function StoriesPage() {
                                                 </Box>
 
                                                 {/* Meta */}
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, px: { xs: 2, sm: 2.5 } }}>
                                                     <Typography variant="caption" sx={{
                                                         fontWeight: 800, color: 'primary.main',
                                                         textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.7rem'
@@ -653,6 +682,7 @@ export default function StoriesPage() {
                                                 </Box>
 
                                                 <Typography sx={{
+                                                    px: { xs: 2, sm: 2.5 },
                                                     fontWeight: 800, fontSize: '1.05rem',
                                                     letterSpacing: '-0.02em', lineHeight: 1.3,
                                                     mb: 1.5, color: 'text.primary',
@@ -663,6 +693,7 @@ export default function StoriesPage() {
                                                 </Typography>
 
                                                 <Typography sx={{
+                                                    px: { xs: 2, sm: 2.5 },
                                                     color: 'text.secondary', fontSize: '0.875rem',
                                                     lineHeight: 1.6, mb: 2.5,
                                                     display: '-webkit-box', WebkitLineClamp: 3,
@@ -673,7 +704,7 @@ export default function StoriesPage() {
 
                                                 {/* Campaign Progress Bar */}
                                                 {currentTab === 'campaigns' && (
-                                                    <Box sx={{ mb: 3 }}>
+                                                    <Box sx={{ mb: 3, px: { xs: 2, sm: 2.5 } }}>
                                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.75 }}>
                                                             <Typography variant="caption" sx={{ fontWeight: 800, color: 'primary.main' }}>
                                                                 {formatCurrency(item.raised_amount || 0, item.currency)}
@@ -700,6 +731,7 @@ export default function StoriesPage() {
                                                     alignItems: 'center',
                                                     justifyContent: 'space-between',
                                                     pt: 2.5,
+                                                    px: { xs: 2, sm: 2.5 },
                                                     borderTop: '1px solid',
                                                     borderColor: alpha(theme.palette.divider, 0.4)
                                                 }}>
