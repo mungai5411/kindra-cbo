@@ -56,7 +56,7 @@ export default function CampaignPage() {
 
     if (isLoading && !campaign) {
         return (
-            <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+            <Box sx={{ bgcolor: '#f7f8fa', minHeight: '100vh' }}>
                 {/* Skeleton Hero */}
                 <Skeleton variant="rectangular" height={520} sx={{ width: '100%' }} />
                 <Container maxWidth="lg" sx={{ py: 8 }}>
@@ -112,11 +112,11 @@ export default function CampaignPage() {
             component={motion.div}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 16 }}
+            sx={{ bgcolor: '#f7f8fa', minHeight: '100vh', pb: 16 }}
         >
             <Navbar />
             {/* ─── FULL-BLEED HERO ─── */}
-            <Box sx={{ position: 'relative', height: { xs: 340, md: 520, lg: 620 }, overflow: 'hidden' }}>
+            <Box sx={{ position: 'relative', height: { xs: 380, md: 540, lg: 620 }, overflow: 'hidden' }}>
                 <Box
                     component="img"
                     src={campaign.featured_image || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2070'}
@@ -149,7 +149,7 @@ export default function CampaignPage() {
 
                 {/* Hero Text */}
                 <Container maxWidth="lg" sx={{
-                    position: 'absolute', bottom: 0, left: 0, right: 0, pb: { xs: 5, md: 7 }
+                    position: 'absolute', bottom: 0, left: 0, right: 0, pb: { xs: 5, md: 7 }, px: { xs: 2, md: 0 }
                 }}>
                     <Box>
                         <Chip
@@ -170,7 +170,7 @@ export default function CampaignPage() {
                             transition={{ duration: 0.6 }}
                             sx={{
                                 color: '#fff',
-                                fontSize: { xs: '2rem', md: '3.2rem', lg: '4rem' },
+                                fontSize: { xs: '2rem', md: '3.4rem', lg: '4.5rem' },
                                 fontWeight: 900,
                                 letterSpacing: '-0.04em',
                                 lineHeight: 1.1,
@@ -212,7 +212,7 @@ export default function CampaignPage() {
             </Box>
 
             {/* ─── CONTENT ─── */}
-            <Container maxWidth="lg" sx={{ mt: { xs: -4, md: -6 }, position: 'relative', zIndex: 1 }}>
+            <Container maxWidth="lg" sx={{ mt: { xs: -3, md: -5 }, position: 'relative', zIndex: 1 }}>
                 <Grid container spacing={4}>
                     {/* Main Content */}
                     <Grid item xs={12} md={7} lg={8}>
@@ -220,7 +220,7 @@ export default function CampaignPage() {
                         <Box
                             sx={{
                                 bgcolor: 'background.paper',
-                                borderRadius: 3,
+                                borderRadius: 1.5,
                                 p: { xs: 3, md: 5 },
                                 mb: 4,
                                 border: '1px solid',
@@ -254,7 +254,7 @@ export default function CampaignPage() {
                         {campaign.gallery_images && campaign.gallery_images.length > 0 && (
                             <Box sx={{
                                 bgcolor: 'background.paper',
-                                borderRadius: 3,
+                                borderRadius: 1.5,
                                 p: { xs: 3, md: 5 },
                                 border: '1px solid', borderColor: alpha(theme.palette.divider, 0.6)
                             }}>
@@ -296,12 +296,12 @@ export default function CampaignPage() {
                                 transition={{ duration: 0.5, delay: 0.2 }}
                                 sx={{
                                     bgcolor: 'background.paper',
-                                    borderRadius: 3,
+                                    borderRadius: 1.5,
                                     p: 4,
                                     mb: 3,
                                     border: '1px solid',
                                     borderColor: alpha(theme.palette.divider, 0.6),
-                                    boxShadow: '0 8px 40px rgba(0,0,0,0.08)'
+                                    boxShadow: '0 18px 50px rgba(9, 9, 11, 0.1)'
                                 }}
                             >
                                 {/* Raised Amount */}
@@ -384,7 +384,7 @@ export default function CampaignPage() {
                             {/* Impact Metrics Card */}
                             <Box sx={{
                                 bgcolor: alpha(theme.palette.primary.main, 0.04),
-                                borderRadius: 3, p: 4,
+                                borderRadius: 1.5, p: 4,
                                 border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.12)
                             }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
