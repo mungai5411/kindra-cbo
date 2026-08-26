@@ -336,68 +336,85 @@ export function BlogManagementView({ initialTab = 'blog_posts' }: { initialTab?:
                     New Story
                 </Button>
             </Box>
-            <TableContainer>
-                <Table>
-                    <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
-                        <TableRow>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary', borderBottom: 'none' }}>Title</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary', borderBottom: 'none' }}>Author</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary', borderBottom: 'none' }}>Category</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary', borderBottom: 'none' }}>Status</TableCell>
-                            <TableCell sx={{ fontWeight: 600, color: 'text.secondary', borderBottom: 'none' }}>Date</TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 600, color: 'text.secondary', borderBottom: 'none' }}>Controls</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {posts.map((post: any) => (
-                            <TableRow key={post.id} hover sx={{ '& td': { borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` } }}>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'text.primary' }}>{post.title}</TableCell>
-                                <TableCell>{post.author?.full_name || 'System Admin'}</TableCell>
-                                <TableCell><Chip label={post.category?.name || 'General'} size="small" variant="outlined" sx={{ borderRadius: 2 }} /></TableCell>
-                                <TableCell>
-                                    <StatusChip status={post.status} />
-                                </TableCell>
-                                <TableCell sx={{ color: 'text.secondary' }}>
-                                    {(() => {
-                                        const dateVal = post.published_at || post.created_at;
-                                        if (!dateVal) return 'Draft';
-                                        const date = new Date(dateVal);
-                                        return isNaN(date.getTime()) ? 'Draft' : date.toLocaleDateString();
-                                    })()}
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Tooltip title="View Public Page">
-                                        <IconButton
-                                            size="small"
-                                            sx={{ color: 'info.main' }}
-                                            onClick={() => navigate(`/stories/${post.slug}`)}
-                                        >
-                                            <Visibility fontSize="small" />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Edit Story">
-                                        <IconButton size="small" sx={{ color: 'primary.main' }} onClick={() => handleOpenEdit(post)}>
-                                            <Edit fontSize="small" />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Delete Story">
-                                        <IconButton size="small" sx={{ color: 'error.main' }} onClick={() => handleDeleteClick(post)}>
-                                            <Delete fontSize="small" />
-                                        </IconButton>
-                                    </Tooltip>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                        {posts.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
-                                    <Typography color="text.secondary">No stories found. Create one to get started.</Typography>
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <Grid container spacing={2.5} sx={{ p: { xs: 2, md: 3 } }}>
+                {posts.map((post: any) => {
+                    const dateVal = post.published_at || post.created_at;
+                    const postDate = dateVal && !isNaN(new Date(dateVal).getTime())
+                        ? new Date(dateVal).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                        : 'Draft';
+                    const excerpt = (post.excerpt || post.content || '').replace(/<[^>]+>/g, '').trim();
+
+                    return (
+                        <Grid item xs={12} sm={6} lg={4} key={post.id}>
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    height: '100%',
+                                    overflow: 'hidden',
+                                    borderRadius: 1.5,
+                                    border: '1px solid',
+                                    borderColor: alpha(theme.palette.divider, 0.8),
+                                    transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+                                    '&:hover': {
+                                        transform: 'translateY(-3px)',
+                                        borderColor: alpha(theme.palette.secondary.main, 0.5),
+                                        boxShadow: '0 12px 28px rgba(9, 9, 11, 0.08)'
+                                    }
+                                }}
+                            >
+                                <Box
+                                    component="img"
+                                    src={post.featured_image || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=900'}
+                                    alt={post.title}
+                                    sx={{ width: '100%', height: 170, objectFit: 'cover', display: 'block' }}
+                                />
+                                <Box sx={{ p: 2.5, display: 'flex', flexDirection: 'column', height: 'calc(100% - 170px)' }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                                        <Chip label={post.category?.name || 'General'} size="small" sx={{ borderRadius: 0.75, fontWeight: 700, bgcolor: alpha(theme.palette.secondary.main, 0.08), color: 'secondary.dark' }} />
+                                        <StatusChip status={post.status} />
+                                    </Box>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.25, mb: 1, textTransform: 'none', letterSpacing: '-0.01em' }}>
+                                        {post.title}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.55, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 2 }}>
+                                        {excerpt || 'No excerpt available for this story.'}
+                                    </Typography>
+                                    <Box sx={{ mt: 'auto', pt: 1.5, borderTop: '1px solid', borderColor: alpha(theme.palette.divider, 0.7), display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                                        <Box>
+                                            <Typography variant="caption" sx={{ display: 'block', color: 'text.disabled', fontWeight: 700 }}>{postDate}</Typography>
+                                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>{post.author?.full_name || 'System Admin'}</Typography>
+                                        </Box>
+                                        <Box sx={{ display: 'flex', gap: 0.25 }}>
+                                            <Tooltip title="View Public Page">
+                                                <IconButton size="small" sx={{ color: 'info.main' }} onClick={() => navigate(`/stories/${post.slug}`)}>
+                                                    <Visibility fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Edit Story">
+                                                <IconButton size="small" sx={{ color: 'primary.main' }} onClick={() => handleOpenEdit(post)}>
+                                                    <Edit fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Delete Story">
+                                                <IconButton size="small" sx={{ color: 'error.main' }} onClick={() => handleDeleteClick(post)}>
+                                                    <Delete fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </Paper>
+                        </Grid>
+                    );
+                })}
+                {posts.length === 0 && (
+                    <Grid item xs={12}>
+                        <Box sx={{ py: 8, textAlign: 'center' }}>
+                            <Typography color="text.secondary">No stories found. Create one to get started.</Typography>
+                        </Box>
+                    </Grid>
+                )}
+            </Grid>
         </Paper>
     );
 
