@@ -59,7 +59,7 @@ export const getTheme = (mode: 'light' | 'dark'): Theme => {
     const theme = createTheme({
         palette,
         typography: {
-            fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontFamily: '"Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
             h1: { fontWeight: 800, fontSize: '2.75rem', letterSpacing: '-0.03em', color: palette.text.primary },
             h2: { fontWeight: 700, fontSize: '2.25rem', letterSpacing: '-0.02em', color: palette.text.primary },
             h3: { fontWeight: 700, fontSize: '1.65rem', letterSpacing: '-0.02em', color: palette.text.primary },

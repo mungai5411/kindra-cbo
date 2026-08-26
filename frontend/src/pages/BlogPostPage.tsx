@@ -25,6 +25,7 @@ import { fetchPostBySlug, clearCurrentPost } from '../features/blog/blogSlice';
 import { motion } from 'framer-motion';
 import { PostInteractions } from '../components/blog/PostInteractions';
 import { CommentSection } from '../components/blog/CommentSection';
+import { Navbar } from '../components/public/Navbar';
 
 export default function BlogPostPage() {
     const { slug } = useParams<{ slug: string }>();
@@ -98,6 +99,7 @@ export default function BlogPostPage() {
             animate={{ opacity: 1 }}
             sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 12 }}
         >
+            <Navbar />
             {/* Minimalist Editorial Header */}
             <Box sx={{ pt: 10, pb: 8, borderBottom: '1px solid', borderColor: 'divider' }}>
                 <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 } }}>

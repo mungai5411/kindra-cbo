@@ -38,6 +38,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import DonationDialog from '../components/campaigns/DonationDialog';
 import VolunteerDialog from '../components/campaigns/VolunteerDialog';
 import MaterialDonationDialog from '../components/campaigns/MaterialDonationDialog';
+import { Navbar } from '../components/public/Navbar';
 
 export default function StoriesPage() {
     const theme = useTheme();
@@ -136,11 +137,13 @@ export default function StoriesPage() {
             animate={{ opacity: 1 }}
             sx={{ bgcolor: 'background.default', minHeight: '100vh' }}
         >
+            <Navbar />
             {/* ─── CONTENT NAVIGATION ─── */}
             <Box sx={{
                 borderBottom: '1px solid',
                 borderColor: alpha(theme.palette.divider, 0.6),
-                bgcolor: 'background.paper'
+                bgcolor: 'background.paper',
+                pt: { xs: 9, md: 10 }
             }}>
                 <Container maxWidth={false} sx={{ px: { xs: 2, md: 6, lg: 10 } }}>
                     <Box sx={{

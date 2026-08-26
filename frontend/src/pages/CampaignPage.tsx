@@ -34,6 +34,7 @@ import { AppDispatch, RootState } from '../store';
 import { fetchCampaigns } from '../features/donations/donationsSlice';
 import { motion } from 'framer-motion';
 import DonationDialog from '../components/campaigns/DonationDialog';
+import { Navbar } from '../components/public/Navbar';
 
 export default function CampaignPage() {
     const { slug } = useParams<{ slug: string }>();
@@ -113,6 +114,7 @@ export default function CampaignPage() {
             animate={{ opacity: 1 }}
             sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 16 }}
         >
+            <Navbar />
             {/* ─── FULL-BLEED HERO ─── */}
             <Box sx={{ position: 'relative', height: { xs: 340, md: 520, lg: 620 }, overflow: 'hidden' }}>
                 <Box
