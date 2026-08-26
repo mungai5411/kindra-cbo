@@ -97,12 +97,12 @@ export default function BlogPostPage() {
             component={motion.div}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 12 }}
+            sx={{ bgcolor: '#f7f8fa', minHeight: '100vh', pb: 12 }}
         >
             <Navbar />
             {/* Minimalist Editorial Header */}
-            <Box sx={{ pt: 10, pb: 8, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 } }}>
+            <Box sx={{ pt: { xs: 12, md: 15 }, pb: { xs: 6, md: 9 }, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+                <Container maxWidth="md" sx={{ px: { xs: 2, md: 4 } }}>
                     <Button
                         startIcon={<ArrowBack />}
                         onClick={() => navigate('/stories')}
@@ -115,12 +115,13 @@ export default function BlogPostPage() {
                         {currentPost.category_name || currentPost.category?.name || 'UPDATE'}
                     </Typography>
 
-                    <Typography variant="h1" sx={{ 
+                    <Typography variant="h1" sx={{
                         fontSize: { xs: '2.5rem', md: '4.5rem' }, 
                         fontWeight: 900, 
                         color: 'text.primary', 
                         lineHeight: 1.1,
                         mb: 4,
+                        maxWidth: 820,
                         letterSpacing: '-0.04em'
                     }}>
                         {currentPost.title}
@@ -172,15 +173,16 @@ export default function BlogPostPage() {
             </Box>
 
             {/* Featured Image Section */}
-            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 }, mt: 8, mb: 10 }}>
-                <Box sx={{ overflow: 'hidden', borderRadius: 2 }}>
+            <Container maxWidth="lg" sx={{ px: { xs: 2, md: 4 }, mt: { xs: 5, md: 8 }, mb: { xs: 7, md: 10 } }}>
+                <Box sx={{ overflow: 'hidden', borderRadius: 1.5, boxShadow: '0 24px 70px rgba(9, 9, 11, 0.12)' }}>
                     <Box
                         component="img"
                         src={currentPost.featured_image || "https://source.unsplash.com/random/1600x900?charity"}
                         alt={currentPost.title}
                         sx={{ 
                             width: '100%', 
-                            maxHeight: 700, 
+                            maxHeight: 680,
+                            aspectRatio: '16 / 8.5',
                             objectFit: 'cover',
                             display: 'block'
                         }}
@@ -189,14 +191,16 @@ export default function BlogPostPage() {
             </Container>
 
             {/* Editorial Content Section */}
-            <Container maxWidth={false} sx={{ px: { xs: 2, md: 8, lg: 10 } }}>
+            <Container maxWidth="md" sx={{ px: { xs: 2, md: 4 } }}>
                 <Box
                     sx={{
-                        fontSize: '1.25rem',
+                        fontSize: { xs: '1.05rem', md: '1.18rem' },
+                        maxWidth: 760,
+                        mx: 'auto',
                         lineHeight: 1.8,
                         color: 'text.primary',
                         fontFamily: '"Outfit", sans-serif',
-                        '& p': { mb: 4 },
+                        '& p': { mb: 3.5 },
                         '& h2': { fontSize: '2rem', fontWeight: 800, mt: 6, mb: 3, letterSpacing: '-0.02em' },
                         '& h3': { fontSize: '1.5rem', fontWeight: 800, mt: 5, mb: 2, letterSpacing: '-0.01em' },
                         '& img': { maxWidth: '100%', borderRadius: 2, my: 6, display: 'block', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' },
@@ -207,7 +211,7 @@ export default function BlogPostPage() {
                             my: 6,
                             fontStyle: 'italic', 
                             color: 'secondary.main', 
-                            fontSize: '1.5rem',
+                            fontSize: { xs: '1.2rem', md: '1.45rem' },
                             lineHeight: 1.5,
                             fontWeight: 500,
                             bgcolor: alpha(theme.palette.secondary.main, 0.03), 
@@ -285,13 +289,15 @@ export default function BlogPostPage() {
                 </Box>
 
                 {/* Navigation / Footer CTA */}
-                <Box sx={{ 
+                <Box sx={{
                     mt: 12, 
                     p: 6, 
                     borderRadius: 2, 
                     bgcolor: 'secondary.main', 
                     color: 'white',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    maxWidth: 760,
+                    mx: 'auto'
                 }}>
                     <Typography variant="h4" sx={{ fontWeight: 900, mb: 2 }}>
                         Impact happens with you.
